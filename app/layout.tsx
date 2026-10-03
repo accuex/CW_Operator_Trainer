@@ -3,11 +3,19 @@ import { GoogleAnalytics } from '@/app/components/GoogleAnalytics';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL ?? 'https://cw-operator-trainer.sacred-charm-9370.chatgpt.site'),
+  metadataBase: new URL(process.env.SITE_URL ?? 'https://cw.conagi.jp'),
   title: 'CW Operator Trainer — 聞こえる、溜められる、書ける。',
   description: '欧文・和文モールスを、音感法・遅れ受信・試験形式まで訓練できるブラウザアプリ。',
   applicationName: 'CW Operator Trainer',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/icons/icon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
   openGraph: {
     title: 'CW Operator Trainer',
     description: 'HEAR · HOLD · COPY — CW受信を実戦のオペレータースキルへ。',
