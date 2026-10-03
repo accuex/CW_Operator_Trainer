@@ -1,24 +1,6 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, M_PLUS_Rounded_1c } from 'next/font/google';
+import { GoogleAnalytics } from '@/app/components/GoogleAnalytics';
 import './globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
-const rounded = M_PLUS_Rounded_1c({
-  variable: '--font-rounded',
-  weight: ['500', '700', '800', '900'],
-  subsets: ['latin'],
-  display: 'swap',
-  preload: false,
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL ?? 'https://cw-operator-trainer.sacred-charm-9370.chatgpt.site'),
@@ -46,10 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${rounded.variable} antialiased`}
-      >
+      <body className="antialiased">
         {children}
+        <GoogleAnalytics />
       </body>
     </html>
   );

@@ -9,7 +9,9 @@
 !.yarn/versions
 .history/
 .openai/
-
+.vscode/
+/bin
+/tmp
 # testing
 /coverage
 
@@ -30,6 +32,7 @@ yarn-error.log*
 
 # local environment
 .env*
+!.env.example
 
 # deployment and generated files
 .vercel
@@ -39,5 +42,5 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
-
+/ecosystem.config.cjs
 /docs/

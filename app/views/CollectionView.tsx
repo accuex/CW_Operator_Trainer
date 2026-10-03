@@ -19,16 +19,14 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
   const courseCards = cardsForCourse(CARDS, course, unlockedKinds);
   const [kindFilter, setKindFilter] = useState<CharacterKind | 'all'>('all');
   const [selected, setSelected] = useState<MorseCard | null>(null);
-  const [debugRevealAll, setDebugRevealAll] = useState(false);
-  const sourceCards = debugRevealAll ? CARDS : courseCards;
-  const kinds = [...new Set(sourceCards.map((card) => card.kind))];
-  const cards = kindFilter === 'all' ? sourceCards : sourceCards.filter((card) => card.kind === kindFilter);
+  const kinds = [...new Set(courseCards.map((card) => card.kind))];
+  const cards = kindFilter === 'all' ? courseCards : courseCards.filter((card) => card.kind === kindFilter);
   const masteredCount = cards.filter((card) => profile.cards[cardKey(card)]?.mastered).length;
   const learningCount = cards.filter((card) => {
     const progress = profile.cards[cardKey(card)];
     return !progress?.mastered && readProgressMeter(progress) > 0;
   }).length;
-  const revealCard = (progress?: CardProgress) => debugRevealAll || Boolean(progress?.mastered);
+  const revealCard = (progress?: CardProgress) => Boolean(progress?.mastered);
   const play = async (card: MorseCard) => {
     setAudioStatus('PLAYING');
     const handle = await audioEngine.playSymbol(card.symbol, card.code, settings, 1);
@@ -39,7 +37,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
     setProfile((old) => ({ ...old, cards: { ...old.cards, [cardKey(card)]: { ...progress, selectedMnemonic: value, customMnemonic: value === progress.customMnemonic ? progress.customMnemonic : undefined } } }));
   };
   const selectedProgress = selected ? profile.cards[cardKey(selected)] ?? emptyProgress() : undefined;
-  const showMnemonics = profile.goal === 'fun' || debugRevealAll;
+  const showMnemonics = profile.goal === 'fun';
   const selectedRevealed = selected ? revealCard(selectedProgress) : false;
   const selectedIndex = selected ? cards.indexOf(selected) : -1;
 
@@ -55,23 +53,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
     return () => window.removeEventListener('keydown', onKey);
   }, [selected, selectedIndex, cards]);
 
-  const debugToggle = (
-    <button
-      type="button"
-      className={`scope-toggle collection-debug-toggle ${debugRevealAll ? 'on' : ''}`}
-      aria-pressed={debugRevealAll}
-      onClick={() => {
-        setDebugRevealAll((value) => !value);
-        setSelected(null);
-        setKindFilter('all');
-      }}
-    >
-      <i>{debugRevealAll ? <Icon name="check" size={12} /> : null}</i>
-      DEBUG 全表示
-    </button>
-  );
-
-  if (!course && !debugRevealAll) {
+  if (!course) {
     return <section className="page-pad collection-page">
       <div className="page-title">
         <div>
@@ -79,7 +61,6 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
           <h1>カード図鑑</h1>
           <p>「おぼえる」でコースを選ぶと、その範囲のカードがここに並びます。学習記録は消えません。</p>
         </div>
-        {debugToggle}
       </div>
     </section>;
   }
@@ -87,11 +68,9 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
   return <section className="page-pad collection-page">
     <div className="collection-hero panel">
       <div className="collection-hero-copy">
-        <p className="section-kicker"><Icon name="collection" size={14} />CARD ARCHIVE · {debugRevealAll ? 'DEBUG ALL' : courseMeta(course)?.short}</p>
+        <p className="section-kicker"><Icon name="collection" size={14} />CARD ARCHIVE · {courseMeta(course)?.short}</p>
         <h1>カード図鑑</h1>
-        <p>{debugRevealAll
-          ? 'DEBUG：全カードをコース・習得状況に関係なく表示しています。進捗は書き換えません。'
-          : '「当てる」で連続正解した文字がカードになります。全部そろえてコンプリートを目指そう。'}</p>
+        <p>「当てる」で連続正解した文字がカードになります。全部そろえてコンプリートを目指そう。</p>
         <div className="collection-tally">
           <span className="tally gold"><b>{masteredCount}</b>GET</span>
           <span className="tally sky"><b>{learningCount}</b>練習中</span>
@@ -103,7 +82,6 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
           <b>{cards.length ? Math.round((masteredCount / cards.length) * 100) : 0}<small>%</small></b>
           <span>COMPLETE</span>
         </Ring>
-        {debugToggle}
       </div>
     </div>
 
@@ -125,7 +103,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
         <button
           key={cardKey(card)}
           type="button"
-          className={`collection-item status-${status.toLowerCase()} ${acquired ? 'acquired' : 'locked'}${debugRevealAll && !progress?.mastered ? ' debug-revealed' : ''}`}
+          className={`collection-item status-${status.toLowerCase()} ${acquired ? 'acquired' : 'locked'}`}
           style={{ '--delay': `${Math.min(cardIndex, 30) * 18}ms` } as React.CSSProperties}
           onClick={() => setSelected(card)}
           aria-label={`${acquired ? card.symbol : '未取得'}のカード詳細`}
@@ -156,7 +134,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
             <span className="chip">{cardNumber(selected)}</span>
             <span className="chip">{KIND_LABEL[selected.kind]}</span>
             {selectedRevealed && <span className={`rarity-badge ${selected.rarity.toLowerCase()}`}>{selected.rarity}</span>}
-            <span className={`chip ${selectedProgress.mastered ? 'gold' : ''}`}>{debugRevealAll && !selectedProgress.mastered ? 'DEBUG表示' : CARD_STATUS_LABEL[cardStatus(selectedProgress)]}</span>
+            <span className={`chip ${selectedProgress.mastered ? 'gold' : ''}`}>{CARD_STATUS_LABEL[cardStatus(selectedProgress)]}</span>
           </div>
           <div className="detail-heading">
             <h2>{selectedRevealed ? selected.symbol : '???'}</h2>

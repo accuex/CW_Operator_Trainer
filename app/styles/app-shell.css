@@ -79,8 +79,12 @@
   background: var(--gold);
 }
 
-.sidebar-goal {
+.sidebar-foot {
   margin-top: auto;
+  display: grid;
+  gap: 10px;
+}
+.sidebar-goal {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -94,6 +98,14 @@
 .sidebar-goal-text span { color: var(--muted); font: 700 11px var(--font-display); }
 .sidebar-goal-text b { font: 800 15px var(--font-display); }
 .sidebar-goal-text small { display: inline-flex; align-items: center; gap: 4px; color: #ff9b5c; font: 700 12px var(--font-display); }
+.app-credit {
+  margin: 0;
+  padding: 0 4px 2px;
+  color: var(--faint);
+  font: 700 10px/1.3 var(--font-mono);
+  letter-spacing: .04em;
+  text-align: center;
+}
 
 /* ───────── Main + header ───────── */
 .app-main { min-height: 100vh; margin-left: var(--sidebar); }
@@ -295,7 +307,7 @@
     background: color-mix(in srgb, #0b0f28 92%, transparent);
     backdrop-filter: blur(16px);
   }
-  .brand, .sidebar-goal { display: none; }
+  .brand, .sidebar-foot { display: none; }
   .nav { flex-direction: row; justify-content: space-around; gap: 0; }
   .nav-item.secondary { display: none; }
   .nav-item {

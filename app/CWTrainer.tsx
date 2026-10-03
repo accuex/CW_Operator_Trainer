@@ -19,6 +19,7 @@ import { ExamView } from '@/app/views/ExamView';
 import { CollectionView } from '@/app/views/CollectionView';
 import { SettingsView } from '@/app/views/SettingsView';
 import { Onboarding } from '@/app/views/Onboarding';
+import { trackPageView } from '@/app/components/GoogleAnalytics';
 
 const AUDIO_STATUS_LABEL: Record<string, string> = {
   READY: '待機中',
@@ -88,7 +89,9 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
     setStopEpoch((value) => value + 1);
     setAudioStatus('READY'); setView(next); setSpeedOpen(false);
-    history.pushState(null, '', next === 'home' ? '/' : `/${next}`);
+    const path = next === 'home' ? '/' : `/${next}`;
+    history.pushState(null, '', path);
+    trackPageView(path);
     setProfile((old) => ({ ...old, lastMode: next }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -149,15 +152,18 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             </button>
           ))}
         </nav>
-        <div className="sidebar-goal">
-          <Ring value={stats.dailyProgress} size={58} stroke={6} tone={stats.dailyProgress >= 1 ? 'var(--mint)' : 'var(--gold)'}>
-            <b>{Math.min(stats.todayAnswers, DAILY_GOAL)}</b>
-          </Ring>
-          <div className="sidebar-goal-text">
-            <span>今日の目標</span>
-            <b>{stats.todayAnswers} / {DAILY_GOAL} 問</b>
-            <small><Icon name="flame" size={13} /> {stats.streakDays}日連続</small>
+        <div className="sidebar-foot">
+          <div className="sidebar-goal">
+            <Ring value={stats.dailyProgress} size={58} stroke={6} tone={stats.dailyProgress >= 1 ? 'var(--mint)' : 'var(--gold)'}>
+              <b>{Math.min(stats.todayAnswers, DAILY_GOAL)}</b>
+            </Ring>
+            <div className="sidebar-goal-text">
+              <span>今日の目標</span>
+              <b>{stats.todayAnswers} / {DAILY_GOAL} 問</b>
+              <small><Icon name="flame" size={13} /> {stats.streakDays}日連続</small>
+            </div>
           </div>
+          <p className="app-credit">(C) 2026 Int Design LLC.</p>
         </div>
       </aside>
 

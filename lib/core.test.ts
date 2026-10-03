@@ -258,6 +258,19 @@ describe('FIFO queue scoring', () => {
     expect(queue.metrics().burstOutputs).toBe(1);
     expect(queue.metrics().stableDepth).toBeLessThan(2);
   });
+  it('keeps the same FIFO slot after a miss so the correct symbol can still score', () => {
+    const queue = new QueueEvaluator(['A', 'B', 'C', 'D'], 2);
+    const miss = queue.input('X', 3, 1, [0, 1, 2, 3]);
+    expect(miss?.isCorrect).toBe(false);
+    expect(miss?.expected).toBe('A');
+    expect(queue.answered).toBe(0);
+    const hit = queue.input('A', 3, 2, [0, 1, 2, 3]);
+    expect(hit?.isCorrect).toBe(true);
+    expect(hit?.expected).toBe('A');
+    expect(queue.answered).toBe(1);
+    expect(queue.metrics().correct).toBe(1);
+    expect(queue.metrics().answered).toBe(2);
+  });
 });
 
 describe('random group sequencing', () => {

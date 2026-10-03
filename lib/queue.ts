@@ -21,7 +21,8 @@ export class QueueEvaluator {
     const isEarly = actualDepth < this.target;
     const isCorrect = symbol.toUpperCase() === expected.toUpperCase();
     const responseLatency = Math.max(0, inputTime - (stimulusTimes[this.outputIndex] ?? inputTime));
-    const stable = !isEarly && actualDepth === this.target;
+    // Misses must not consume the FIFO slot — otherwise the correct retry never matches.
+    const stable = isCorrect && !isEarly && actualDepth === this.target;
     this.stableRun = stable ? this.stableRun + 1 : 0;
     this.longestStableRun = Math.max(this.longestStableRun, this.stableRun);
 
@@ -33,7 +34,7 @@ export class QueueEvaluator {
 
     const result = { expected, input: symbol.toUpperCase(), isCorrect, isEarly, actualDepth, responseLatency, stableRun: this.stableRun };
     this.results.push(result);
-    this.outputIndex += 1;
+    if (isCorrect) this.outputIndex += 1;
     return result;
   }
 

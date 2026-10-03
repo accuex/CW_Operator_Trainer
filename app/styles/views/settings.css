@@ -216,6 +216,14 @@
   transform: translateX(22px);
 }
 
+.settings-credit {
+  margin: 28px 0 0;
+  color: var(--faint);
+  font: 700 11px/1.4 var(--font-mono);
+  letter-spacing: .04em;
+  text-align: center;
+}
+
 @media (max-width: 980px) {
   .settings-grid {
     grid-template-columns: 1fr;

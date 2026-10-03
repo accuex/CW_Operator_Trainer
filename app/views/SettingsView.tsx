@@ -142,11 +142,12 @@ export function SettingsView({ settings, setSettings, profile, setProfile, onImp
           <input ref={fileRef} hidden type="file" accept="application/json" onChange={(event) => importFile(event.target.files?.[0])} />
           <div className="storage-note">
             <b>この端末に保存</b>
-            <span>サーバーにも API キーにも送りません</span>
-            <small>この端末に保存されています</small>
+            <span>サーバーには保存されません。</span>
+            <small>あなたの端末（ブラウザ）に保存されています</small>
           </div>
         </div>
       </div>
+      <p className="settings-credit">(C) 2026 Int Design LLC.</p>
     </section>
   );
 }

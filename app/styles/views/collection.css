@@ -33,7 +33,6 @@
 .collection-hero-ring .progress-ring-label b small { font-size: 16px; }
 .collection-hero-ring .progress-ring-label span { color: var(--muted); font: 800 10px var(--font-mono); letter-spacing: .2em; }
 
-.collection-debug-toggle { border-style: dashed; font-size: 11px; }
 .collection-toolbar { margin-bottom: 18px; }
 
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 14px; }
@@ -59,7 +58,6 @@
 .collection-item-meter { position: relative; height: 5px; margin: -2px 4px 0; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
 .collection-item-meter i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: linear-gradient(90deg, var(--gold-2), var(--gold)); }
 .collection-item.status-unfound .signal-card { opacity: .7; }
-.collection-item.debug-revealed .signal-card { outline: 1px dashed rgb(246 196 83 / 50%); outline-offset: 3px; border-radius: var(--r-sm); }
 
 /* Detail drawer */
 .card-drawer-backdrop {

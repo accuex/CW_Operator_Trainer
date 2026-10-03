@@ -99,6 +99,18 @@ npm run dev
 
 表示されたURLをブラウザで開いてください。ブラウザの自動再生制限により、CW音声は最初の `PLAY` または `START` 操作後に再生されます。
 
+### Google Analytics（任意）
+
+本番ビルドで GA4 を使う場合のみ、Measurement ID を設定してください。未設定なら GA は読み込まれません。
+
+```bash
+cp .env.example .env.local
+# .env.local に NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX を記入
+npm run build
+```
+
+`NEXT_PUBLIC_*` はビルド時に埋め込まれるため、ID を変えたあとは再ビルドが必要です。
+
 ## コマンド
 
 ```bash
@@ -112,11 +124,12 @@ npm run generate:exam-sets  # 試験問題セットを再生成
 
 ## データとプライバシー
 
-学習データは外部サーバーへ送信されません。
+学習データ（回答履歴・進捗・設定）は外部サーバーへ送信されません。
 
 - 音響設定と基本設定: `localStorage`
 - 回答履歴、セッション、カード進捗、遅れ受信統計: `IndexedDB`
 - バックアップ: 設定画面からJSONを書き出し・読み込み
+- Google Analytics: `NEXT_PUBLIC_GA_MEASUREMENT_ID` を設定した本番ビルドのみ。学習内容は送りません
 
 ブラウザのサイトデータを削除すると学習履歴も失われるため、必要に応じてJSONバックアップを保存してください。
 
@@ -141,6 +154,7 @@ lib/                 モールス定義、音響、採点、分析、保存処�
 data/exam/           生成済み試験問題と辞書
 scripts/             試験問題セット生成スクリプト
 public/cards/        カードイラスト
+public/fonts/        自前ホストの Web フォント（Geist / Geist Mono / M PLUS Rounded）
 docs/                設計資料、試験形式の調査メモ
 ```
 
@@ -171,3 +185,5 @@ npm run build
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).
+
+(C) 2026 Int Design LLC.

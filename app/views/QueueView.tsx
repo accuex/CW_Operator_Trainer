@@ -230,7 +230,8 @@ export function QueueView({ settings, setSettings, record, setAudioStatus, stopE
     return () => window.removeEventListener('keydown', onKey);
   }, [active, acceptInput]);
 
-  const heldStart = Math.max(0, results.length);
+  // Held queue advances only on correct answers (misses stay on the same FIFO slot).
+  const heldStart = results.reduce((count, result) => count + (result.isCorrect ? 1 : 0), 0);
   const held = Array.from(sequence).slice(heldStart, received);
   const incoming = sequence[received] ?? '—';
   const canDigest = held.length > 0;
