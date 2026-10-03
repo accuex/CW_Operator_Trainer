@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/components.css';
+@import './styles/app-shell.css';
+@import './styles/card.css';
+@import './styles/fx.css';
+@import './styles/views/home.css';
+@import './styles/views/learn.css';
+@import './styles/views/train.css';
+@import './styles/views/koch.css';
+@import './styles/views/queue.css';
+@import './styles/views/analysis.css';
+@import './styles/views/exam.css';
+@import './styles/views/collection.css';
+@import './styles/views/settings.css';
+@import './styles/views/onboarding.css';

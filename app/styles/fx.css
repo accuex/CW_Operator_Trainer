@@ -1,0 +1,311 @@
+/* ───────── Answer feedback burst ───────── */
+.fx-burst {
+  --fx: var(--mint);
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  overflow: visible;
+}
+.fx-burst.miss { --fx: var(--coral); }
+.fx-ring {
+  position: absolute;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid var(--fx);
+  box-shadow: 0 0 30px var(--fx), inset 0 0 20px color-mix(in srgb, var(--fx) 40%, transparent);
+  animation: fx-ring .7s var(--ease-out) both;
+}
+.fx-ring.delay { animation-delay: .12s; border-width: 2px; opacity: .6; }
+.fx-burst.miss .fx-ring { width: 46%; animation-duration: .5s; }
+.fx-spark {
+  --angle: calc(var(--i) * 36deg);
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--fx);
+  box-shadow: 0 0 10px var(--fx);
+  animation: fx-spark .75s var(--ease-out) both;
+}
+.fx-spark:nth-child(odd) { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+.fx-float {
+  position: absolute;
+  top: 18%;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--fx) 20%, var(--bg));
+  border: 1.5px solid var(--fx);
+  color: var(--fx);
+  font: 900 18px/1 var(--font-display);
+  letter-spacing: .04em;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--fx) 60%, transparent);
+  animation: fx-float .9s var(--ease-out) both;
+}
+
+@keyframes fx-ring { 0% { transform: scale(.4); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes fx-spark {
+  0% { transform: rotate(var(--angle)) translateX(10px) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--angle)) translateX(120px) scale(.2) rotate(180deg); opacity: 0; }
+}
+@keyframes fx-float {
+  0% { transform: translateY(16px) scale(.6); opacity: 0; }
+  25% { transform: translateY(0) scale(1.1); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(-34px) scale(1); opacity: 0; }
+}
+
+/* Reusable reaction classes */
+.fx-shake { animation: fx-shake .42s cubic-bezier(.36, .07, .19, .97) both; }
+.fx-pop { animation: fx-pop .45s var(--ease-spring) both; }
+.fx-glow-hit { animation: fx-glow-hit .7s ease-out both; }
+.fx-glow-miss { animation: fx-glow-miss .7s ease-out both; }
+@keyframes fx-shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-7px); } 40%, 60% { transform: translateX(7px); } }
+@keyframes fx-pop { 0% { transform: scale(.85); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes fx-glow-hit { 0% { box-shadow: 0 0 0 0 rgb(67 224 166 / 70%); } 100% { box-shadow: 0 0 0 22px rgb(67 224 166 / 0%); } }
+@keyframes fx-glow-miss { 0% { box-shadow: 0 0 0 0 rgb(255 111 127 / 70%); } 100% { box-shadow: 0 0 0 22px rgb(255 111 127 / 0%); } }
+
+/* ───────── Combo ───────── */
+.combo-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--gold-soft), transparent);
+  border: 1.5px solid rgb(246 196 83 / 45%);
+  color: var(--gold);
+  animation: fx-pop .4s var(--ease-spring) both;
+}
+.combo-badge b { font: 900 24px/1 var(--font-mono); }
+.combo-badge small { font: 800 11px var(--font-mono); letter-spacing: .14em; }
+.combo-badge.warm { color: #ffb347; border-color: #ffb34788; }
+.combo-badge.hot { color: #ff7b54; border-color: #ff7b5499; box-shadow: 0 0 24px #ff7b5444; }
+.combo-badge.legend { color: #ff8bd6; border-color: #ff8bd699; box-shadow: 0 0 30px #ff8bd655; }
+
+/* ───────── Signal pulse / bars ───────── */
+.signal-pulse { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.signal-pulse i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--sky);
+  opacity: 0;
+}
+.signal-pulse.on i { animation: signal-pulse 1.8s var(--ease-out) infinite; }
+.signal-pulse.on i:nth-child(2) { animation-delay: .6s; }
+.signal-pulse.on i:nth-child(3) { animation-delay: 1.2s; }
+@keyframes signal-pulse { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.75); opacity: 0; } }
+
+.signal-bars { display: inline-flex; align-items: center; gap: 4px; height: 28px; }
+.signal-bars i {
+  width: 4px;
+  height: 25%;
+  border-radius: 4px;
+  background: var(--faint);
+  transition: background var(--t-med);
+}
+.signal-bars.on i { background: var(--sky); animation: signal-bar .9s ease-in-out infinite; animation-delay: calc(var(--i) * -0.11s); }
+@keyframes signal-bar { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+
+/* ───────── Card GET reveal ───────── */
+.get-reveal {
+  --rarity: var(--rarity-r);
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  align-content: safe center;
+  overflow: hidden auto;
+  background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--rarity) 22%, #0b0e24) 0%, #05061a 62%);
+  perspective: 1600px;
+  cursor: pointer;
+  animation: fade-in .35s ease both;
+}
+.get-reveal.rarity-sr { --rarity: var(--rarity-sr); }
+.get-reveal.rarity-ssr { --rarity: var(--rarity-ssr); }
+.get-reveal.rarity-n { --rarity: var(--rarity-n); }
+
+.get-rays {
+  position: absolute;
+  width: 220vmax;
+  aspect-ratio: 1;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--rarity) 30%, transparent) 0deg 6deg, transparent 6deg 18deg);
+  mask: radial-gradient(circle, #000 0%, transparent 46%);
+  opacity: 0;
+  animation: get-rays-in .8s 1.05s ease-out forwards, get-rays-spin 24s linear infinite;
+}
+.get-reveal.rarity-ssr .get-rays {
+  background: repeating-conic-gradient(from 0deg, #ff8bd655 0deg 5deg, transparent 5deg 12deg, #ffd36e55 12deg 17deg, transparent 17deg 24deg, #7dffcf55 24deg 29deg, transparent 29deg 36deg);
+}
+.get-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #fff 0%, color-mix(in srgb, var(--rarity) 80%, #fff) 20%, transparent 60%);
+  opacity: 0;
+  animation: get-flash .9s 1s ease-out both;
+  pointer-events: none;
+}
+.get-shock {
+  position: absolute;
+  width: 260px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 4px solid var(--rarity);
+  box-shadow: 0 0 40px var(--rarity), inset 0 0 40px var(--rarity);
+  opacity: 0;
+  animation: get-shock 1.1s 1.05s var(--ease-out) both;
+}
+.get-shock.second { animation-delay: 1.25s; border-width: 2px; }
+
+.get-confetti { position: absolute; inset: 0; pointer-events: none; }
+.get-confetti i {
+  --x: calc((var(--i) - 14) * 3.4vw);
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--c, var(--gold));
+  opacity: 0;
+  animation: get-confetti 2.6s calc(1.05s + var(--d, 0s)) cubic-bezier(.2, .7, .3, 1) both;
+}
+
+.get-stage {
+  position: relative;
+  z-index: 2;
+  /* Card height (1.5 × width) plus the copy block must fit the viewport height. */
+  width: clamp(150px, calc((100dvh - 320px) / 1.5), min(320px, 64vw));
+  transform-style: preserve-3d;
+  animation: get-drop 1.05s var(--ease-out) both;
+}
+.get-flip {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: get-charge .55s .45s ease-in-out both, get-flip 1s 1s var(--ease-spring) both;
+}
+.get-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.get-face.back { position: absolute; inset: 0; transform: rotateY(180deg); }
+.get-face.front { position: relative; }
+.get-face.front .signal-card { box-shadow: 0 0 0 2px color-mix(in srgb, var(--rarity) 70%, transparent), 0 0 70px color-mix(in srgb, var(--rarity) 55%, transparent), 0 40px 90px #000a; }
+.get-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: var(--r-lg);
+  background: linear-gradient(115deg, transparent 40%, rgb(255 255 255 / 55%) 50%, transparent 60%) no-repeat;
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  mix-blend-mode: overlay;
+  animation: get-sheen 1.1s 2s ease-in-out both;
+  pointer-events: none;
+}
+.get-float { animation: get-float 4s 2.2s ease-in-out infinite; }
+
+.get-copy {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  text-align: center;
+  opacity: 0;
+  animation: get-copy .6s 1.75s var(--ease-spring) forwards;
+}
+.get-layout { display: grid; justify-items: center; }
+.get-title {
+  margin: 0;
+  font: 900 clamp(40px, 7vw, 72px)/1 var(--font-display);
+  letter-spacing: .04em;
+  color: #fff;
+  text-shadow: 0 0 24px var(--rarity), 0 4px 0 color-mix(in srgb, var(--rarity) 50%, #000);
+}
+.get-reveal.rarity-ssr .get-title {
+  background: linear-gradient(90deg, #ff9ad5, #ffd36e, #7dffcf, #8ab8ff, #d49bff, #ff9ad5);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 18px #ff8bd688);
+  animation: rainbow-shift 2.4s linear infinite;
+}
+.get-kicker { margin: 0; color: var(--rarity); font: 900 13px var(--font-mono); letter-spacing: .32em; text-shadow: 0 0 14px var(--rarity); }
+.get-reveal.skipped :is(.get-stage, .get-flip, .get-copy, .get-flash, .get-shock, .get-confetti i, .get-sheen) {
+  animation-delay: 0s !important;
+  animation-duration: .25s !important;
+}
+.get-reveal.skipped .get-flip { animation: get-flip .25s ease-out both !important; }
+.get-reveal.skipped .get-rays { opacity: 1; animation: get-rays-spin 24s linear infinite; }
+.get-reveal.skipped .get-float { animation-delay: .3s; }
+.get-reveal.skipped .get-flash, .get-reveal.skipped .get-shock, .get-reveal.skipped .get-confetti { display: none; }
+.get-sub { margin: 0; color: var(--text-2); font: 700 15px var(--font-display); }
+.get-sub b { color: var(--text); font-size: 18px; }
+.get-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
+.get-skip { position: fixed; z-index: 4; right: 20px; bottom: 18px; color: var(--muted); font: 700 12px var(--font-display); animation: get-skip-out .4s 2.4s ease forwards; }
+@keyframes get-skip-out { to { opacity: 0; visibility: hidden; } }
+
+/* Card back */
+.card-back {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 3px solid #d7a443;
+  background:
+    radial-gradient(circle at 50% 50%, rgb(246 196 83 / 28%) 0 18%, transparent 19%),
+    repeating-linear-gradient(45deg, rgb(246 196 83 / 9%) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(-45deg, rgb(246 196 83 / 9%) 0 2px, transparent 2px 14px),
+    linear-gradient(160deg, #242c6b, #121640 60%, #0b0e2c);
+  box-shadow: inset 0 0 0 6px #121640, inset 0 0 0 8px rgb(246 196 83 / 55%), 0 30px 80px #000a;
+}
+.card-back::before {
+  content: '';
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  border: 2px solid rgb(246 196 83 / 60%);
+  box-shadow: 0 0 0 10px rgb(246 196 83 / 10%), 0 0 40px rgb(246 196 83 / 30%);
+}
+.card-back-emblem {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  color: var(--gold);
+  text-align: center;
+}
+.card-back-emblem b { font: 900 clamp(26px, 5vw, 44px)/1 var(--font-mono); letter-spacing: .12em; text-shadow: 0 0 18px rgb(246 196 83 / 60%); }
+.card-back-emblem small { font: 800 clamp(8px, 1vw, 11px) var(--font-mono); letter-spacing: .3em; opacity: .85; }
+.card-back.compact { border-width: 2px; border-radius: var(--r-sm); box-shadow: inset 0 0 0 4px #121640, inset 0 0 0 5px rgb(246 196 83 / 45%); }
+.card-back.compact::before { inset: 26%; box-shadow: none; }
+.card-back.compact .card-back-emblem b { font-size: 18px; }
+
+@keyframes get-drop { 0% { opacity: 0; transform: translateY(-70vh) rotateZ(-8deg) scale(.7); } 70% { opacity: 1; transform: translateY(12px) rotateZ(1deg) scale(1.02); } 100% { transform: none; } }
+@keyframes get-charge { 0%, 100% { transform: rotateY(180deg) scale(1); } 20% { transform: rotateY(180deg) translateX(-4px) scale(1.01); } 40% { transform: rotateY(180deg) translateX(5px) scale(1.02); } 60% { transform: rotateY(180deg) translateX(-6px) scale(1.03); } 80% { transform: rotateY(180deg) translateX(6px) scale(1.04); } }
+@keyframes get-flip { 0% { transform: rotateY(180deg) scale(1.04); } 100% { transform: rotateY(360deg) scale(1); } }
+@keyframes get-flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes get-shock { 0% { opacity: 1; transform: scale(.3); } 100% { opacity: 0; transform: scale(3.4); } }
+@keyframes get-rays-in { to { opacity: 1; } }
+@keyframes get-rays-spin { to { rotate: 360deg; } }
+@keyframes get-sheen { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@keyframes get-float { 0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); } 50% { transform: translateY(-10px) rotateX(4deg) rotateY(-6deg); } }
+@keyframes get-copy { from { opacity: 0; transform: translateY(24px) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes get-confetti {
+  0% { opacity: 1; transform: translate(0, 0) scale(.4) rotate(0); }
+  28% { opacity: 1; transform: translate(calc(var(--x) * .75), calc(-18vh - var(--i) * .5vh)) scale(1) rotate(calc(var(--i) * 40deg)); }
+  100% { opacity: 0; transform: translate(var(--x), 52vh) scale(.9) rotate(calc(var(--i) * 97deg)); }
+}
+
+@media (max-width: 760px) {
+  .get-stage { width: clamp(150px, calc((100dvh - 320px) / 1.5), min(250px, 66vw)); }
+  .get-copy { margin-top: 18px; }
+}

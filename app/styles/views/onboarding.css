@@ -1,0 +1,147 @@
+/* 初回モーダル — welcome + goal cards */
+
+.onboarding {
+  width: min(760px, 100%);
+  max-height: min(92vh, 880px);
+  overflow: auto;
+  padding: clamp(22px, 4vw, 40px);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-xl);
+  background:
+    radial-gradient(120% 70% at 0% 0%, rgb(246 196 83 / 14%), transparent 48%),
+    linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 72%, var(--bg)));
+  box-shadow: var(--shadow-2);
+  animation: onboard-in 0.5s var(--ease-spring) both;
+}
+
+.onboarding h1 {
+  margin: 8px 0 8px;
+  font-size: clamp(26px, 4vw, 36px);
+}
+
+.onboarding-lead {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--text-2);
+}
+
+.morse-motif {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 18px;
+  margin-bottom: 10px;
+}
+
+.morse-motif i {
+  display: block;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--gold);
+  box-shadow: 0 0 12px rgb(246 196 83 / 45%);
+  animation: morse-blink 1.8s var(--ease-out) infinite;
+}
+
+.morse-motif .dot { width: 8px; }
+.morse-motif .dash { width: 26px; }
+.morse-motif i:nth-child(2) { animation-delay: 0.15s; }
+.morse-motif i:nth-child(3) { animation-delay: 0.3s; }
+.morse-motif i:nth-child(4) { animation-delay: 0.45s; }
+.morse-motif i:nth-child(5) { animation-delay: 0.6s; }
+
+.onboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.onboard-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 96px;
+  padding: 16px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+  color: var(--text);
+  text-align: left;
+  box-shadow: var(--shadow-1);
+  animation: onboard-card-in 0.45s var(--ease-out) both;
+  transition: transform var(--t-med) var(--ease-out), border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.onboard-card:nth-child(1) { animation-delay: 0.05s; }
+.onboard-card:nth-child(2) { animation-delay: 0.1s; }
+.onboard-card:nth-child(3) { animation-delay: 0.15s; }
+.onboard-card:nth-child(4) { animation-delay: 0.2s; }
+
+.onboard-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--line));
+  box-shadow: var(--shadow-gold);
+}
+
+.onboard-card:active {
+  transform: translateY(-1px);
+}
+
+.onboard-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.onboard-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.onboard-copy strong {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.onboard-copy small {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.onboard-card > svg {
+  color: var(--muted);
+}
+
+@keyframes onboard-in {
+  from { opacity: 0; transform: scale(0.94) translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes onboard-card-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes morse-blink {
+  0%, 100% { opacity: 0.28; transform: scaleY(0.72); }
+  40% { opacity: 1; transform: scaleY(1); }
+}
+
+@media (max-width: 760px) {
+  .onboarding {
+    padding: 20px 16px 24px;
+  }
+
+  .onboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "_comment": "書き方ルールは scripts/generateExamSets.mjs 先頭コメントを必ず読む。欧文=大文字ASCII、和文=カタカナのみ。キー追加時は生成スクリプトの参照も更新。",
+  "originsLand": [
+    "KAGOSHIMA", "YOKOHAMA", "KOBE", "OSAKA", "NAGOYA", "HAKODATE", "AOMORI",
+    "MAEBASHI", "NAGANO", "SHIMONOSEKI", "PARIS", "ROMA", "NAGASAKI", "MOJI",
+    "NIIGATA", "KUSHIRO", "SHIMIZU", "TOKYO", "YOKOSUKA", "SAPPORO",
+    "CHIBA", "SENDAI", "HIROSHIMA", "FUKUOKA", "SASEBO", "SINGAPORE",
+    "MANILA", "HONGKONG", "LONDON", "SEATTLE", "VANCOUVER", "HONOLULU"
+  ],
+  "shipsEn": [
+    { "name": "ATSUTAMARU", "call": "JEKU" },
+    { "name": "ARIAKEMARU", "call": "JCNO" },
+    { "name": "ENOSHIMAMARU", "call": "JLLW" },
+    { "name": "TOKYOMARU", "call": "JFPN" },
+    { "name": "KORYUMARU", "call": "JFKI" },
+    { "name": "ZUIYOMARU", "call": "JDRA" },
+    { "name": "KISHIEMARU", "call": "JKEE" },
+    { "name": "KANDAMARU", "call": "JKAN" },
+    { "name": "KOHEIMARU", "call": "JBAN" },
+    { "name": "TAISEIMARU", "call": "JRCD" },
+    { "name": "HOKUTOMARU", "call": "JLKX" },
+    { "name": "HEIYOMARU", "call": "JACU" },
+    { "name": "NARITAMARU", "call": "JLFL" },
+    { "name": "TAKUYOMARU", "call": "JDRP" },
+    { "name": "KAIOMARU", "call": "JEPC" },
+    { "name": "TOKOMARU", "call": "JKOD" },
+    { "name": "ASAMARU", "call": "JFSW" },
+    { "name": "YASUKUNIMARU", "call": "JNDK" },
+    { "name": "HAKUBASANMARU", "call": "JHBM" },
+    { "name": "SAKURAMARU", "call": "JSKR" },
+    { "name": "AKATSUKIMARU", "call": "JQAT" },
+    { "name": "SEIYOMARU", "call": "JQSY" },
+    { "name": "HINODEMARU", "call": "JHND" },
+    { "name": "WAKASHIOMARU", "call": "JQWK" },
+    { "name": "MATSUSHIMAMARU", "call": "JMTM" },
+    { "name": "SHIRAYUKIMARU", "call": "JQSR" },
+    { "name": "KONANMARU", "call": "JKNN" },
+    { "name": "ASAHIMARU", "call": "JASH" },
+    { "name": "HAYATOMARU", "call": "JHYT" },
+    { "name": "MISAKIMARU", "call": "JMSK" }
+  ],
+  "coastVia": [
+    "CHOSHIMUSEN", "NAGASAKIMUSEN", "HAKODATEMUSEN", "NAPOLIRADIO",
+    "SYDNEYRADIO", "DARWINRADIO", "HAVANARADIO", "ANDERADIO", "TOKYO",
+    "YOKOHAMARADIO", "KOBERADIO", "OSAKARADIO", "MANILARADIO",
+    "SINGAPORERADIO", "HONOLULURADIO", "LONDONRADIO", "SEATTLERADIO"
+  ],
+  "coastJa": [
+    "ヨコハマムセン", "ナガサキムセン", "コウベムセン", "トウキヨウムセン", "オオサカムセン",
+    "シミズムセン", "モジムセン", "ニイガタムセン", "クシロムセン", "ナハムセン",
+    "ハコダテムセン", "アオモリムセン", "チヨウシムセン", "カゴシマムセン",
+    "フクオカムセン", "サセボムセン", "ヨツカイチムセン", "オナハマムセン"
+  ],
+  "shipsJa": [
+    "ハクバサンマル", "コウヘイマル", "トウキヨウマル", "ニホンマル", "サクラマル",
+    "アサヒマル", "タイセイマル", "カイオウマル", "ホクトウマル", "アリアケマル",
+    "アカツキマル", "ヒノデマル", "ワカシオマル", "マツシママル", "ミサキマル",
+    "シラユキマル", "コウナンマル", "ハヤトマル"
+  ],
+  "personsJa": [
+    "コタニハルエ", "ヤマダタロウ", "サトウハナコ", "センチョウ", "ヒサエ", "タナカ",
+    "スズキ", "タカハシ", "イトウ", "ワタナベ", "カトウ", "ヨシダ",
+    "ナカムラ", "コバヤシ", "ヤマグチ", "マツモト", "イノウエ", "キムラ",
+    "ハヤシ", "シミズ", "ヤマザキ", "モリタ"
+  ],
+  "placesJa": [
+    "トウキヨウ", "オオサカ", "コウベ", "ナガサキ", "ヨコハマ", "アオモリ", "ナハ", "ハコダテ",
+    "フクオカ", "ヒロシマ", "センダイ", "カゴシマ", "サツポロ", "ニイガタ", "シミズ", "サセボ"
+  ],
+  "personsEn": [
+    "JAMES", "SMITH", "YAMAMOTO", "YOSHIKAWA", "MONIN", "AUGUST CARLOUS",
+    "JOHN MUCCIO", "KK HONDA", "CAPT OKADA", "SHIRO HAYASHI", "KOJIMA",
+    "SUGIMOTO", "SUMOTO", "HASE", "TOHMEN", "CAPTAIN", "TAYLOR", "FRANKLIN",
+    "NAKAMURA", "KOBAYASHI", "YAMAGUCHI", "MATSUMOTO", "WILLIAMS", "BROWN",
+    "ANDERSON", "PARKER", "MORGAN", "HARRIS"
+  ],
+  "placesEn": [
+    "IMPERIAL HOTEL TOKYO", "KANAYA HOTEL NIKKO", "UNZEN HOTEL UNZEN",
+    "KUMAMOTO", "SHANGHAI", "YUSEN TOKYO", "MARSEILLE", "TOKYO", "KOBE", "OSAKA",
+    "SINGAPORE", "MANILA", "HONGKONG", "LONDON", "SEATTLE", "VANCOUVER",
+    "GRAND HOTEL YOKOHAMA", "CENTRAL HOTEL KOBE"
+  ],
+  "firmsEn": [
+    "YUSEN", "MONIN", "TOHMEN", "KK HONDA", "NIPPON YUSEN", "ORIENT SHIPPING",
+    "PACIFIC TRADING", "KOBE MARINE", "EASTERN AGENCY", "CENTRAL EXPORT"
+  ],
+  "signatures": [
+    "HONTEN", "TAYLOR", "MAYOR", "KANBE", "MIYAMOTO", "HEIWA",
+    "CAPTAIN", "FRANKLIN", "HARUKO MIYAKE", "MASTER", "AGENT", "NAKAMURA",
+    "KOBAYASHI", "WILLIAMS", "BROWN", "PORT CAPTAIN", "CHIEF ENGINEER"
+  ]
+}
