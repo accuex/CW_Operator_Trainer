@@ -975,6 +975,12 @@
 .exam-listen-panel.is-review .gaku-sheet.wabun .wg-mark.listen-now {
   color: #1d1d1d;
 }
+/* 和文マス: background:none だとグリッドの赤地が全面に透けるので用紙色を戻す */
+.exam-listen-panel.is-review .gaku-sheet.wabun .gaku-cell.listen-heard,
+.exam-listen-panel.is-review .gaku-sheet.wabun .gaku-cell.listen-now {
+  background: var(--wg-paper, #fffefb);
+  color: #1d1d1d;
+}
 .exam-listen-panel.is-review .gaku-sheet.wabun .wg-mark,
 .exam-listen-panel.is-review .gaku-sheet.wabun .wg-note {
   color: var(--wg-green, #17994a);

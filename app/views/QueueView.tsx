@@ -13,6 +13,9 @@ import { ComboBadge, FxBurst, SignalPulse, useFx } from '@/app/components/fx';
 import { Icon } from '@/app/components/icons';
 
 export const QUEUE_CAP = 8;
+/** 欧文暗語1行相当: 5字 × 8群 = 40字（空白は送信タイミングのみ） */
+export const QUEUE_BODY_CHARS = 40;
+export const QUEUE_GROUP_SIZE = 5;
 export type QueuePad = { left: string; up: string; right: string; down: string };
 export const queuePadList = (pad: QueuePad) => [pad.left, pad.up, pad.right, pad.down];
 export const queueUniverse = (source: QueueSource) => {
@@ -28,6 +31,15 @@ export const pickRandomQueuePad = (source: QueueSource): QueuePad => {
   }
   const [left, up, right, down] = universe.slice(0, 4);
   return { left, up, right, down };
+};
+/** Answer letters only → playback text with 5-char word gaps. */
+export const formatQueuePlayText = (letters: string, groupSize = QUEUE_GROUP_SIZE) => {
+  if (!letters) return '';
+  const groups: string[] = [];
+  for (let index = 0; index < letters.length; index += groupSize) {
+    groups.push(letters.slice(index, index + groupSize));
+  }
+  return groups.join(' ');
 };
 
 export function QueueView({ settings, setSettings, record, setAudioStatus, stopEpoch, onSession }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; record: (answer: AnswerLog) => void; setAudioStatus: (status: string) => void; stopEpoch: number; onSession: (session: SessionRecord) => void }) {
@@ -126,28 +138,30 @@ export function QueueView({ settings, setSettings, record, setAudioStatus, stopE
       setPad(nextPad);
       padRef.current = nextPad;
       const pool = queuePadList(nextPad);
-      const next = randomGroup(alphabet, 18, pool, { avoidImmediateRepeat: true });
+      const letters = randomGroup(alphabet, QUEUE_BODY_CHARS, pool, { avoidImmediateRepeat: true });
+      const playText = formatQueuePlayText(letters);
+      const letterCount = letters.length;
       receivedRef.current = 0;
-      setSequence(next); sequenceRef.current = next; setReceived(0); setResults([]); setMetrics(null); setLastResult(null); setExitFx(null); setPadFlash(null); setPadNote(null);
-      sessionIdRef.current = nowId(); evaluatorRef.current = new QueueEvaluator(Array.from(next), depthRef.current);
+      setSequence(letters); sequenceRef.current = letters; setReceived(0); setResults([]); setMetrics(null); setLastResult(null); setExitFx(null); setPadFlash(null); setPadNote(null);
+      sessionIdRef.current = nowId(); evaluatorRef.current = new QueueEvaluator(Array.from(letters), depthRef.current);
       const isCw = source === 'international' || source === 'wabun';
       if (isCw) {
         setAudioStatus('PLAYING');
-        const handle = await audioEngine.play(next, alphabet, { ...settings, effectiveSpeed: Math.min(settings.effectiveSpeed, 14) });
+        const handle = await audioEngine.play(playText, alphabet, { ...settings, effectiveSpeed: Math.min(settings.effectiveSpeed, 14) });
         if (!activeRef.current) { handle.stop(); return; }
         playbackRef.current = handle; stimulusTimesRef.current = handle.timeline.characters.map((character) => character.end);
         timerRef.current = window.setInterval(() => {
           syncReceived(handle.receivedCount());
-          if (handle.receivedCount() >= next.length && handle.currentTime() > handle.timeline.duration + 1.2) finishRef.current();
+          if (handle.receivedCount() >= letterCount && handle.currentTime() > handle.timeline.duration + 1.2) finishRef.current();
         }, 50);
         handle.finished.then(() => { if (activeRef.current) setAudioStatus('BUFFER DRAIN'); });
       } else {
-        const step = 0.85; stimulusTimesRef.current = Array.from({ length: next.length }, (_, index) => (index + 1) * step);
+        const step = 0.85; stimulusTimesRef.current = Array.from({ length: letterCount }, (_, index) => (index + 1) * step);
         let count = 0;
         timerRef.current = window.setInterval(() => {
           if (!activeRef.current) return;
-          if (count >= next.length) { finishRef.current(); return; }
-          const symbol = next[count]; count += 1; syncReceived(count);
+          if (count >= letterCount) { finishRef.current(); return; }
+          const symbol = letters[count]; count += 1; syncReceived(count);
           if (source !== 'visual' && 'speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(source === 'phonetic' ? phonetic(symbol) : symbol); utterance.rate = 1.2; utterance.lang = source === 'kana' ? 'ja-JP' : 'en-US'; speechSynthesis.speak(utterance);
           }
@@ -271,7 +285,7 @@ export function QueueView({ settings, setSettings, record, setAudioStatus, stopE
       <div>
         <p className="section-kicker">Delayed Copy</p>
         <h1>遅れ受信トレーニング</h1>
-        <p>文字が次々届きます。頭の中に置いて、いちばん古いものから答えてください。{QUEUE_CAP}文字を超えると失敗です。</p>
+        <p>欧文暗語1行（5字×8群＝{QUEUE_BODY_CHARS}字）を送ります。頭の中に置いて、いちばん古いものから答えてください。{QUEUE_CAP}文字を超えると失敗です。</p>
         <ol className="queue-steps">
           <li><span className="queue-step"><Icon name="ear" size={16} />聴く</span></li>
           <li><span className="queue-step"><Icon name="queue" size={16} />覚えておく</span></li>
@@ -359,7 +373,7 @@ export function QueueView({ settings, setSettings, record, setAudioStatus, stopE
           <SignalPulse active={active} />
           <em className={source === 'visual' && active ? 'is-char' : ''}>{source === 'visual' ? incoming : active ? '♪' : '—'}</em>
         </strong>
-        <small>{received} / {sequence.length || 18}</small>
+        <small>{received} / {sequence.length || QUEUE_BODY_CHARS}</small>
       </div>
       <div className="fifo-arrow" aria-hidden="true">→</div>
       <div className="fifo-memory">
