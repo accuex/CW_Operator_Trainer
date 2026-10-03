@@ -10,8 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://cw-operator-trainer.sacred-charm-9370.chatgpt.site">Web Demo</a>
-  ·
+  <a href="https://cw.conagi.jp/"><strong>https://cw.conagi.jp/</strong></a> — アカウント不要ですぐ練習できます<br>
   <a href="#ローカルで起動">Getting Started</a>
   ·
   <a href="#license">MIT License</a>
@@ -23,6 +22,14 @@
   <img alt="Tests" src="https://img.shields.io/badge/tests-69%20passing-52f5a5">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-f2b84b">
 </p>
+
+## 公開サイト
+
+本番環境は次のURLで利用できます。インストールやサインアップは不要で、ブラウザからそのまま練習を始められます。
+
+**[https://cw.conagi.jp/](https://cw.conagi.jp/)**
+
+学習データはこの端末のブラウザ内に保存されます。別端末や別ブラウザへ移す場合は、設定画面からJSONバックアップを使ってください。
 
 ## Overview
 
