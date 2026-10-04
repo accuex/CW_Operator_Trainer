@@ -7,15 +7,90 @@ export type SfxName = 'hit' | 'miss' | 'combo' | 'reveal' | 'rare' | 'tap';
 
 let context: AudioContext | null = null;
 let enabled = true;
+let needsHardUnlock = false;
 
 export const setSfxEnabled = (value: boolean) => { enabled = value; };
 
-const ctx = () => {
+type ContextState = AudioContextState | 'interrupted';
+
+const stateOf = (audio: AudioContext) => audio.state as ContextState;
+
+async function closeSfx() {
+  const current = context;
+  context = null;
+  if (!current) return;
+  try {
+    if (stateOf(current) !== 'closed') await current.close();
+  } catch { /* ignore */ }
+}
+
+async function prime(audio: AudioContext) {
+  try {
+    if (stateOf(audio) !== 'running') await audio.resume();
+    const buffer = audio.createBuffer(1, 1, audio.sampleRate);
+    const source = audio.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audio.destination);
+    source.start(0);
+  } catch { /* ignore */ }
+}
+
+async function ensureSfxContext(create: boolean, hard = false) {
   if (typeof window === 'undefined' || typeof AudioContext === 'undefined') return null;
-  if (!context) context = new AudioContext({ latencyHint: 'interactive' });
-  if (context.state === 'suspended') void context.resume();
+
+  if (hard || needsHardUnlock) {
+    if (!create && !hard) return null;
+    await closeSfx();
+    if (!create && !hard) return null;
+    context = new AudioContext({ latencyHint: 'interactive' });
+    try {
+      await context.resume();
+      await prime(context);
+    } catch { /* gesture */ }
+    if (stateOf(context) === 'running') needsHardUnlock = false;
+    return context;
+  }
+
+  if (context && stateOf(context) === 'closed') context = null;
+  if (!context) {
+    if (!create) return null;
+    context = new AudioContext({ latencyHint: 'interactive' });
+  }
+  let state = stateOf(context);
+  if (state === 'suspended' || state === 'interrupted') {
+    try {
+      await context.resume();
+      await prime(context);
+    } catch { /* gesture race */ }
+    state = stateOf(context);
+  }
+  if (state !== 'running') {
+    await closeSfx();
+    context = new AudioContext({ latencyHint: 'interactive' });
+    try {
+      await context.resume();
+      await prime(context);
+    } catch { /* ignore */ }
+    if (stateOf(context) === 'running') needsHardUnlock = false;
+  }
   return context;
-};
+}
+
+/** Drop SFX session when the app backgrounds (YouTube etc.). */
+export function markSfxBackground() {
+  needsHardUnlock = true;
+  void closeSfx();
+}
+
+/** Soft wake — hard unlock happens on next play / gesture. */
+export async function wakeSfx() {
+  if (needsHardUnlock || !context) return;
+  await ensureSfxContext(false);
+}
+
+export async function unlockSfx() {
+  await ensureSfxContext(true, needsHardUnlock || !context);
+}
 
 function tone(audio: AudioContext, frequency: number, start: number, duration: number, volume: number, type: OscillatorType = 'sine', glideTo?: number) {
   const osc = audio.createOscillator();
@@ -31,10 +106,7 @@ function tone(audio: AudioContext, frequency: number, start: number, duration: n
   osc.stop(start + duration + 0.02);
 }
 
-export function playSfx(name: SfxName, masterVolume = 0.25) {
-  if (!enabled) return;
-  const audio = ctx();
-  if (!audio) return;
+function fire(audio: AudioContext, name: SfxName, masterVolume: number) {
   const v = Math.max(0, Math.min(0.6, masterVolume)) * 0.55;
   if (v <= 0) return;
   const t = audio.currentTime + 0.01;
@@ -61,4 +133,12 @@ export function playSfx(name: SfxName, masterVolume = 0.25) {
       [2093, 2637].forEach((f, i) => tone(audio, f, t + 0.55 + i * 0.12, 1, v * 0.3, 'sine'));
       break;
   }
+}
+
+export function playSfx(name: SfxName, masterVolume = 0.25) {
+  if (!enabled) return;
+  void ensureSfxContext(true, needsHardUnlock || !context).then((audio) => {
+    if (!audio || stateOf(audio) !== 'running') return;
+    fire(audio, name, masterVolume);
+  });
 }

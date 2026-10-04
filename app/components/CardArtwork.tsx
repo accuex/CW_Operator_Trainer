@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { MorseCard } from '@/lib/morse';
 
 interface CardArtworkProps {
-  card: MorseCard;
+  /** Artwork URL. When missing or failing to load, fallback stays visible. */
+  src?: string;
+  /**
+   * Optional second URL tried when `src` fails (e.g. SR missing → R).
+   * Still falls through to the CSS face if both fail.
+   */
+  fallbackSrc?: string;
   /** Rendered underneath the image; visible while loading and when the asset is missing. */
   fallback: React.ReactNode;
   onAvailability?: (hasArtwork: boolean) => void;
@@ -15,23 +20,35 @@ interface CardArtworkProps {
  * Preloads artwork before inserting an img into the DOM. A missing path never
  * produces a broken-image glyph; the designed fallback face remains underneath.
  */
-export function CardArtwork({ card, fallback, onAvailability, className = '' }: CardArtworkProps) {
+export function CardArtwork({ src, fallbackSrc, fallback, onAvailability, className = '' }: CardArtworkProps) {
   const [loadedSource, setLoadedSource] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    if (!card.artwork) {
+    if (!src) {
+      setLoadedSource(null);
       onAvailability?.(false);
       return () => { active = false; };
     }
-    const preload = new Image();
-    preload.onload = () => { if (!active) return; setLoadedSource(card.artwork ?? null); onAvailability?.(true); };
-    preload.onerror = () => { if (!active) return; setLoadedSource(null); onAvailability?.(false); };
-    preload.src = card.artwork;
+    const tryLoad = (url: string, next?: string) => {
+      const preload = new Image();
+      preload.onload = () => { if (!active) return; setLoadedSource(url); onAvailability?.(true); };
+      preload.onerror = () => {
+        if (!active) return;
+        if (next && next !== url) tryLoad(next);
+        else {
+          setLoadedSource(null);
+          onAvailability?.(false);
+        }
+      };
+      preload.src = url;
+    };
+    const secondary = fallbackSrc && fallbackSrc !== src ? fallbackSrc : undefined;
+    tryLoad(src, secondary);
     return () => { active = false; };
-  }, [card.artwork, onAvailability]);
+  }, [src, fallbackSrc, onAvailability]);
 
-  const visibleSource = loadedSource === card.artwork ? loadedSource : null;
+  const visibleSource = loadedSource && (loadedSource === src || loadedSource === fallbackSrc) ? loadedSource : null;
 
   return (
     <div className={`artwork-frame ${visibleSource ? 'has-artwork' : 'fallback-artwork'} ${className}`}>

@@ -169,11 +169,12 @@ docs/                設計資料、試験形式の調査メモ
 
 カード画像は文字・符号・学習進捗と分離されています。画像内には文字情報を描き込まず、イラストのみを用意してください。
 
-- 推奨サイズ: `1200 × 1800 px`（2:3、WebP推奨）
-- 欧文: `public/cards/international/`
-- 和文: `public/cards/wabun/`
-- 数字・記号・手続符号: `public/cards/kigo/`
-- 対応表: [`lib/cardArtwork.ts`](./lib/cardArtwork.ts)
+- 推奨サイズ: `1024 × 1536 px`（2:3、WebP推奨）
+- レア別フォルダ: `public/cards/{international|wabun|kigo}/{r|sr|ssr}/`
+- 欧文例: `public/cards/international/r/A.webp`（SR/SSR は同名を `sr/` `ssr/` へ）
+- 和文例: `public/cards/wabun/r/a.webp`
+- 数字・記号・手続符号: `public/cards/kigo/r/`
+- 対応表: [`lib/cardArtwork.ts`](./lib/cardArtwork.ts)（マニフェストは R パス。表示時に所持レアで差し替え）
 
 manifestに画像がない場合や読み込みに失敗した場合は、CSSによるフォールバックカードを表示します。
 

@@ -98,6 +98,9 @@ export interface QueueMetrics {
   scoreMultiplier: number;
 }
 
+/** Owned rarity on a character card. Absent + mastered ⇒ treat as R. */
+export type CardRarityOwned = 'R' | 'SR' | 'SSR';
+
 export interface CardProgress {
   /** Recall Check attempts (identification), not Discover listens. */
   attempts: number;
@@ -119,6 +122,15 @@ export interface CardProgress {
   selectedMnemonic?: string;
   customMnemonic?: string;
   masteredAt?: number;
+  /**
+   * Highest rarity owned for this character card (R→SR→SSR upgrade model).
+   * When omitted, mastered cards are treated as R.
+   */
+  rarityOwned?: CardRarityOwned;
+}
+
+export interface AchievementProgress {
+  unlockedAt: number;
 }
 
 /** Koch 法レベル試験の進捗。レッスン番号はキーを文字列化して保存。 */
@@ -139,7 +151,14 @@ export interface TrainerProfile {
   /** Unlocked character kinds within the selected course catalog. */
   unlockedKinds?: CharacterKind[];
   cards: Record<string, CardProgress>;
+  /** Achievement archive unlocks keyed by AchievementId. */
+  achievements?: Record<string, AchievementProgress>;
   koch?: KochProgress;
+  /**
+   * Collection preview: ignore unlock state and show all cards/achievements
+   * (SSR art). Does not mutate mastered / rarityOwned / unlockedAt.
+   */
+  revealAll?: boolean;
   totalTrainingMs: number;
   lastMode: string;
 }

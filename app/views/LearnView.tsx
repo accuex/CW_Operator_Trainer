@@ -144,6 +144,7 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
     const targetKey = cardKey(card);
     setListenStep(0);
     setActiveElement(-1);
+    await audioEngine.unlock();
     const handle = await audioEngine.playSymbol(card.symbol, card.code, settings, LEARN_REPEATS);
     monitorPlayback(handle, LEARN_REPEATS, () => {
       setListenStep(LEARN_REPEATS);

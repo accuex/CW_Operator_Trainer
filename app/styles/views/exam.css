@@ -19,7 +19,7 @@
   margin-inline: auto;
 }
 .exam-terminal.listen-mode,
-.exam-result.has-gaku { max-width: 1100px; }
+.exam-result.has-gaku { max-width: 1100px; width: 100%; }
 
 .exam-setup { display: grid; gap: 20px; }
 .exam-brief-chips {
@@ -337,7 +337,7 @@
 }
 .exam-listen-progress {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 10px 12px;
   align-items: center;
 }
@@ -345,6 +345,28 @@
   color: var(--sky);
   font: 700 12px/1 var(--font-mono);
   white-space: nowrap;
+}
+.exam-listen-loop-hint {
+  grid-column: 1 / span 2;
+}
+.exam-loop-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--muted);
+  font: 700 12px/1 var(--font-display);
+  white-space: nowrap;
+}
+.exam-loop-toggle input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--sky);
+  cursor: pointer;
+}
+.exam-loop-toggle.on {
+  color: var(--sky);
 }
 
 /* ── Receiving copy ── */
@@ -625,7 +647,8 @@
   align-items: flex-start;
   gap: 4px;
 }
-.gaku-sheet.wabun .wg-margin > .wg-mark:first-child { margin-top: 196px; }
+/* DOM 先頭は HRHR。帳票では「、」を下段へ（再生順の上下） */
+.gaku-sheet.wabun .wg-margin > .wg-mark:last-child { margin-top: 196px; }
 
 /* 上段: 採点欄 + 前文欄 */
 .gaku-sheet.wabun .wg-top {
@@ -651,6 +674,12 @@
   border: 1.5px solid var(--wg-red);
   border-bottom: 0;
 }
+/* DOM は再生順。PC 帳票は左から 受付→番号→発信局→字数→種類 */
+.gaku-sheet.wabun .wg-field-time { grid-column: 1; }
+.gaku-sheet.wabun .wg-field-number { grid-column: 2; }
+.gaku-sheet.wabun .wg-field-office { grid-column: 3; }
+.gaku-sheet.wabun .wg-field-count { grid-column: 4; }
+.gaku-sheet.wabun .wg-field-kind { grid-column: 5; }
 .gaku-sheet.wabun .wg-field {
   display: flex;
   flex-direction: column;
@@ -660,7 +689,7 @@
   padding-top: 6px;
   border-left: 1.5px solid var(--wg-red);
 }
-.gaku-sheet.wabun .wg-field:first-child { border-left: 0; }
+.gaku-sheet.wabun .wg-field-time { border-left: 0; }
 .gaku-sheet.wabun .wg-vals { display: flex; align-items: flex-start; gap: 4px; }
 .gaku-sheet.wabun .wg-time { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .gaku-sheet.wabun .wg-unit {
@@ -686,6 +715,12 @@
   grid-template-columns: var(--wg-info) var(--wg-notes) var(--wg-grid) calc(4 * var(--wg-addr)) var(--wg-side);
   align-items: stretch;
 }
+/* DOM 順と見た目の列を分離（モバイルは source order のまま縦積み） */
+.gaku-sheet.wabun .wg-info { grid-column: 1; grid-row: 1; }
+.gaku-sheet.wabun .wg-notes { grid-column: 2; grid-row: 1; }
+.gaku-sheet.wabun .gaku-wabun-grid { grid-column: 3; grid-row: 1; }
+.gaku-sheet.wabun .wg-address { grid-column: 4; grid-row: 1; }
+.gaku-sheet.wabun .wg-side { grid-column: 5; grid-row: 1; }
 .gaku-sheet.wabun .wg-info {
   display: grid;
   grid-template-rows: 82px 110px 165px 1fr;
@@ -959,6 +994,14 @@
   color: var(--text);
   font: 700 13px/1.4 var(--font-display);
 }
+.exam-audio-interrupt-bar {
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  color: var(--text);
+  font: 700 13px/1.4 var(--font-display);
+}
 .exam-listen-panel.is-review .listen-heard,
 .exam-listen-panel.is-review .listen-now,
 .exam-listen-panel.is-review .wg-mark.listen-heard,
@@ -986,18 +1029,340 @@
   color: var(--wg-green, #17994a);
 }
 
-@media (max-width: 760px) {
+/* screen 限定: 印刷は実物様式のまま */
+@media screen and (max-width: 760px) {
   .exam-brief-chips { justify-content: flex-start; align-self: auto; }
   .preset-grid { grid-template-columns: 1fr; }
   .preset-card { min-height: 0; }
   .exam-status-row { grid-template-columns: minmax(0, 1fr) auto; }
-  .exam-transport { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .exam-transport .btn { padding-inline: 8px; font-size: 12px; }
-  .exam-listen-progress { grid-template-columns: 1fr; }
+  .exam-status-meta { gap: 6px; }
+  .exam-status-detail {
+    flex: 1 1 100%;
+    white-space: normal;
+    line-height: 1.35;
+    font-size: 11px;
+  }
+  .exam-transport {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+  .exam-transport .btn { padding-inline: 8px; font-size: 12px; min-height: 40px; }
+  .exam-listen-progress { grid-template-columns: minmax(0, 1fr) auto; }
+  .exam-listen-loop-hint { grid-column: 1 / -1; }
+  .exam-listen-progress .progress-bar { grid-column: 1 / -1; }
   .exam-result-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
   .exam-ledger th { width: 28%; white-space: normal; }
-  .gaku-sheet { padding: 16px 14px 20px; }
-  .gaku-sheet.oubun { padding: 30px 22px 24px; }
+
+  /* 視聴パネル: 横スクロール禁止 */
+  .exam-page,
+  .exam-terminal.listen-mode,
+  .exam-result.has-gaku {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+  .exam-listen-panel,
+  .exam-result-gaku .exam-listen-panel {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: 0;
+  }
+  .gaku-stack { gap: 18px; width: 100%; }
+  .gaku-sheet {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 16px 14px 20px;
+  }
+
+  /* ── 欧文 TELEGRAM（縦積み視聴用） ── */
+  .gaku-sheet.oubun {
+    min-width: 0;
+    width: 100%;
+    padding: 22px 14px 18px;
+  }
+  .gaku-sheet.oubun .gaku-title {
+    margin: 8px 0 4px;
+    font-size: 22px;
+    letter-spacing: .18em;
+    text-indent: .18em;
+  }
+  .gaku-sheet.oubun .gaku-page-no {
+    top: 8px;
+    right: 12px;
+    font-size: 16px;
+  }
+  .gaku-sheet.oubun .gaku-punch { display: none; }
+  .gaku-sheet.oubun .gaku-row {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+    align-items: stretch;
+  }
+  .gaku-sheet.oubun .gaku-row + .gaku-row { margin-top: 12px; }
+  .gaku-sheet.oubun .gaku-label {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    font-size: 13px;
+  }
+  .gaku-sheet.oubun .gaku-line {
+    min-height: 36px;
+    padding: 8px 2px 4px;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .gaku-sheet.oubun .gaku-line.flow {
+    padding-top: 6px;
+    line-height: 36px;
+    background: repeating-linear-gradient(transparent 0 35px, var(--form-rule) 35px 36px);
+  }
+  .gaku-sheet.oubun .gaku-line.groups {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 4px;
+    row-gap: 6px;
+    font-size: 14px;
+  }
+  .gaku-sheet.oubun .gaku-line.groups .gaku-mark { font-size: 13px; }
+  .gaku-mark { font-size: 13px; white-space: normal; }
+
+  /* ── 和文受信用紙（コンパクト視聴用） ── */
+  .gaku-sheet.wabun {
+    width: 100%;
+    max-width: 100%;
+    justify-self: stretch;
+    margin-inline: 0;
+    padding: 10px 10px 12px;
+    overflow: hidden;
+  }
+  /* 視聴では帳票タイトルは邪魔。枚番号だけで足りる */
+  .gaku-sheet.wabun .wg-title { display: none; }
+  .gaku-sheet.wabun .wg-sheet-no {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0 8px;
+    padding: 5px 10px;
+    border: 1.5px solid var(--wg-red);
+    border-radius: 999px;
+    color: var(--wg-red);
+    font: 700 12px/1 var(--wg-font);
+    letter-spacing: .08em;
+  }
+
+  .gaku-sheet.wabun .wg-margin {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+  }
+  .gaku-sheet.wabun .wg-margin > .wg-mark:last-child { margin-top: 0; }
+
+  .gaku-sheet.wabun .wg-score,
+  .gaku-sheet.wabun .wg-info,
+  .gaku-sheet.wabun .wg-side { display: none; }
+
+  .gaku-sheet.wabun .wg-top {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .gaku-sheet.wabun .wg-head {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: auto;
+    width: 100%;
+  }
+  /* モバイルは再生順のまま: 字数|発信局 / 番号|受付 */
+  .gaku-sheet.wabun .wg-field-count,
+  .gaku-sheet.wabun .wg-field-office,
+  .gaku-sheet.wabun .wg-field-number,
+  .gaku-sheet.wabun .wg-field-time {
+    grid-column: auto;
+  }
+  .gaku-sheet.wabun .wg-field {
+    min-height: 0;
+    padding: 6px 8px;
+    border-left: 0;
+    border-top: 1.5px solid var(--wg-red);
+  }
+  .gaku-sheet.wabun .wg-field-count,
+  .gaku-sheet.wabun .wg-field-office { border-top: 0; }
+  .gaku-sheet.wabun .wg-field-count,
+  .gaku-sheet.wabun .wg-field-number { border-right: 1.5px solid var(--wg-red); }
+  .gaku-sheet.wabun .wg-field-kind { display: none; }
+  .gaku-sheet.wabun .wg-label {
+    letter-spacing: .08em;
+    text-indent: 0;
+    font-size: 10px;
+    white-space: normal;
+  }
+  .gaku-sheet.wabun .wg-v {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    font-size: 15px;
+    letter-spacing: .04em;
+    line-height: 1.3;
+  }
+  .gaku-sheet.wabun .wg-time {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px 4px;
+  }
+  .gaku-sheet.wabun .wg-unit {
+    margin: 0;
+    position: static;
+  }
+  .gaku-sheet.wabun .wg-unit-mark {
+    position: static;
+    display: inline-flex;
+    margin-left: 2px;
+  }
+  .gaku-sheet.wabun .wg-note {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    font-size: 13px;
+  }
+
+  .gaku-sheet.wabun .wg-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    height: auto;
+    grid-template-columns: none;
+    grid-template-rows: none;
+  }
+  .gaku-sheet.wabun .wg-info,
+  .gaku-sheet.wabun .wg-notes,
+  .gaku-sheet.wabun .gaku-wabun-grid,
+  .gaku-sheet.wabun .wg-address,
+  .gaku-sheet.wabun .wg-side {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .gaku-sheet.wabun .wg-address {
+    display: flex;
+    flex-direction: column-reverse;
+    height: auto;
+    width: 100%;
+    border: 1.5px solid var(--wg-red);
+  }
+  .gaku-sheet.wabun .wg-addr-col {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px 8px;
+    min-height: 0;
+    padding: 6px 8px;
+    border-right: 0;
+    border-top: 1.5px dotted var(--wg-red);
+  }
+  .gaku-sheet.wabun .wg-addr-col:last-child { border-top: 0; }
+  .gaku-sheet.wabun .wg-addr-col.first {
+    padding-top: 6px;
+    border-right: 0;
+  }
+  .gaku-sheet.wabun .wg-addr-col:not(.first):not(:has(.wg-v)):not(:has(.wg-addr-mark)) { display: none; }
+  .gaku-sheet.wabun .wg-addr-mark { position: static; }
+  .gaku-sheet.wabun .wg-addr-col .wg-v {
+    font-size: 15px;
+    letter-spacing: .06em;
+  }
+
+  /*
+   * 本文は横書き（左→右に10字 × 6行）。
+   * inline の固定 px トラックだと幅が余って赤地が見えるので 1fr に差し替える。
+   */
+  .gaku-sheet.wabun .gaku-wabun-grid,
+  .gaku-sheet.wabun .gaku-wabun-grid.is-ltr {
+    width: 100%;
+    max-width: 100%;
+    align-self: stretch;
+    box-sizing: border-box;
+    overflow: hidden;
+    gap: 1.5px;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) 2px repeat(5, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) 2px repeat(3, minmax(0, 1fr)) !important;
+    aspect-ratio: 10 / 6.4;
+    height: auto;
+  }
+  .gaku-sheet.wabun .gaku-cell {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    font-size: clamp(13px, 3.6vw, 20px);
+  }
+
+  .gaku-sheet.wabun .wg-notes {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    margin: 0;
+    padding: 8px 0 0;
+    border-top: 1.5px dashed color-mix(in srgb, var(--wg-green) 55%, transparent);
+    background: var(--wg-paper);
+  }
+  .gaku-sheet.wabun .wg-end.muted { display: none; }
+  .gaku-sheet.wabun .wg-notes.is-empty { display: none; }
+  .gaku-sheet.wabun .wg-end {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1.5px solid color-mix(in srgb, var(--wg-green) 50%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--wg-green) 8%, var(--wg-paper));
+  }
+  .gaku-sheet.wabun .wg-end em {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    font-size: 12px;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .gaku-sheet.wabun .wg-mark {
+    flex-direction: row;
+    gap: 4px;
+  }
+  .gaku-sheet.wabun .wg-mark b {
+    flex-direction: row;
+    gap: 2px;
+  }
+  .gaku-sheet.wabun .wg-mark .dit { width: 5px; height: 5px; }
+  .gaku-sheet.wabun .wg-mark .dah { width: 12px; height: 3px; }
+
+  .gaku-sheet.wabun.continuation .wg-top,
+  .gaku-sheet.wabun.continuation .wg-address,
+  .gaku-sheet.wabun.continuation .wg-margin { display: none; }
+
+  /* 枚の間は薄く。巨大なダークギャップにしない */
+  .exam-listen-panel .gaku-stack,
+  .exam-result-gaku .gaku-stack {
+    gap: 12px;
+  }
+  .gaku-sheet.wabun + .gaku-sheet.wabun {
+    margin-top: 0;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(in srgb, var(--wg-red) 28%, transparent);
+  }
 }
 
 /* 額表の印刷／PDF（ブラウザの「PDFに保存」） */

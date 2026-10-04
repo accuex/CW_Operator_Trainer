@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useSyncExternalStore } from 'react';
 import { INTERNATIONAL_MORSE, WABUN_MORSE, expandWabunVoicing } from '@/lib/morse';
 import type { AlphabetType } from '@/lib/types';
 import type { ExamLedger } from '@/lib/training';
@@ -13,6 +13,16 @@ import {
   WABUN_ROWS_PER_PAGE,
   formatWabunFilingTimePlay,
 } from '@/lib/training';
+
+/** 和文額表のモバイル横書き切替（exam.css の max-width: 760px と揃える） */
+const WABUN_MOBILE_MQ = '(max-width: 760px)';
+function subscribeWabunMobile(onChange: () => void) {
+  const media = window.matchMedia(WABUN_MOBILE_MQ);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
+}
+const getWabunMobileSnapshot = () => window.matchMedia(WABUN_MOBILE_MQ).matches;
+const getWabunMobileServerSnapshot = () => false;
 
 /** playText 先頭から見たモールス符号数（空白除く。和文濁音は展開） */
 export function countPlaySymbols(text: string, alphabet: AlphabetType): number {
@@ -268,27 +278,37 @@ function WabunBodyGrid({
   bodyOffset: number;
   sheet: number;
 }) {
-  const cols = WABUN_COLS_PER_PAGE;
-  const rows = WABUN_ROWS_PER_PAGE;
+  // モバイル横書き: 左→右に10字 × 上→下に6行（帳票の縦10×横6を90°読み替え）
+  const horizontal = useSyncExternalStore(
+    subscribeWabunMobile,
+    getWabunMobileSnapshot,
+    getWabunMobileServerSnapshot,
+  );
+  const cols = horizontal ? WABUN_ROWS_PER_PAGE : WABUN_COLS_PER_PAGE;
+  const rows = horizontal ? WABUN_COLS_PER_PAGE : WABUN_ROWS_PER_PAGE;
+  const colBlock = horizontal ? WABUN_ROWS_PER_BLOCK : WABUN_COLS_PER_BLOCK;
+  const rowBlock = horizontal ? WABUN_COLS_PER_BLOCK : WABUN_ROWS_PER_BLOCK;
   return (
     <div
-      className="gaku-wabun-grid"
+      className={`gaku-wabun-grid${horizontal ? ' is-ltr' : ''}`}
       style={{
-        gridTemplateColumns: `repeat(${WABUN_COLS_PER_BLOCK}, var(--wg-cell)) 2px repeat(${WABUN_COLS_PER_BLOCK}, var(--wg-cell))`,
-        gridTemplateRows: `repeat(${WABUN_ROWS_PER_BLOCK}, var(--wg-cell)) 2px repeat(${WABUN_ROWS_PER_BLOCK}, var(--wg-cell))`,
+        gridTemplateColumns: `repeat(${colBlock}, var(--wg-cell)) 2px repeat(${colBlock}, var(--wg-cell))`,
+        gridTemplateRows: `repeat(${rowBlock}, var(--wg-cell)) 2px repeat(${rowBlock}, var(--wg-cell))`,
       }}
     >
       {Array.from({ length: cols * rows }, (_, cell) => {
         const col = cell % cols;
         const row = Math.floor(cell / cols);
-        const visualCol = cols - 1 - col;
-        const charIndex = visualCol * rows + row;
-        const gridCol = col < WABUN_COLS_PER_BLOCK ? col + 1 : col + 2;
-        const gridRow = row < WABUN_ROWS_PER_BLOCK ? row + 1 : row + 2;
+        const charIndex = horizontal
+          ? row * cols + col
+          : (cols - 1 - col) * rows + row;
+        const gridCol = col < colBlock ? col + 1 : col + 2;
+        const gridRow = row < rowBlock ? row + 1 : row + 2;
+        const layoutKey = horizontal ? 'h' : 'v';
         const ch = bodyChars[charIndex];
         if (!ch) {
           return (
-            <span key={`c-${sheet}-${cell}`} className="gaku-cell empty" style={{ gridColumn: gridCol, gridRow }} />
+            <span key={`c-${sheet}-${layoutKey}-${cell}`} className="gaku-cell empty" style={{ gridColumn: gridCol, gridRow }} />
           );
         }
         const span = expandWabunVoicing(ch).length;
@@ -300,7 +320,7 @@ function WabunBodyGrid({
         const current = reached && before <= local && local < before + span;
         return (
           <span
-            key={`c-${sheet}-${cell}`}
+            key={`c-${sheet}-${layoutKey}-${cell}`}
             className={`gaku-cell${current ? ' listen-now' : heard ? ' listen-heard' : ' listen-wait'}`}
             style={{ gridColumn: gridCol, gridRow }}
           >
@@ -308,8 +328,8 @@ function WabunBodyGrid({
           </span>
         );
       })}
-      <i className="gaku-wabun-gutter v" style={{ gridColumn: WABUN_COLS_PER_BLOCK + 1, gridRow: '1 / -1' }} />
-      <i className="gaku-wabun-gutter h" style={{ gridColumn: '1 / -1', gridRow: WABUN_ROWS_PER_BLOCK + 1 }} />
+      <i className="gaku-wabun-gutter v" style={{ gridColumn: colBlock + 1, gridRow: '1 / -1' }} />
+      <i className="gaku-wabun-gutter h" style={{ gridColumn: '1 / -1', gridRow: rowBlock + 1 }} />
     </div>
   );
 }
@@ -421,8 +441,9 @@ function WabunGakuForm({
 
       {!continuation && (
         <div className="wg-margin">
-          <WabunMark letters={['、']} local={L('sep1')} span={1} label="、（区切り）" />
+          {/* 再生順 = 横書き左→右。PC 帳票は CSS で「、」を下へずらす */}
           {hasHrhr && <WabunMark letters={['H', 'R', 'H', 'R']} local={L('hrhr')} span={4} label="HR HR（呼出し）" />}
+          <WabunMark letters={['、']} local={L('sep1')} span={1} label="、（区切り）" />
         </div>
       )}
 
@@ -433,8 +454,35 @@ function WabunGakuForm({
             <tr><th colSpan={2}>合</th><td /></tr>
           </tbody>
         </table>
+        {/* DOM は再生順（字数→発信局→番号→受付）。PC 帳票の左右順は CSS grid-column で戻す */}
         <div className="wg-head">
-          <div className="wg-field">
+          <div className="wg-field wg-field-count">
+            <span className="wg-label">字数</span>
+            {!continuation && (
+              <div className="wg-vals">
+                <span className="wg-v">{highlightPlayText(toKanjiDigits(ledger.count), alphabet, L('count'), `wk${sheetKey}`)}</span>
+              </div>
+            )}
+          </div>
+          <div className="wg-field wg-field-office">
+            <span className="wg-label">発信局</span>
+            {!continuation && (
+              <div className="wg-vals">
+                <span className="wg-v">{highlightPlayText(toKanjiDigits(office.rest), alphabet, L('office') - (office.prefix ? 2 : 0), `wo${sheetKey}`)}</span>
+                {office.prefix && <span className="wg-note">{highlightPlayText(office.prefix, alphabet, L('office'), `wop${sheetKey}`)}</span>}
+              </div>
+            )}
+          </div>
+          <div className="wg-field wg-field-number">
+            <span className="wg-label">番号</span>
+            {!continuation && (
+              <div className="wg-vals">
+                <span className="wg-v">{highlightPlayText(toKanjiDigits(serial.rest), alphabet, L('number') - (serial.prefix ? 2 : 0), `wn${sheetKey}`)}</span>
+                {serial.prefix && <span className="wg-note">{highlightPlayText(serial.prefix, alphabet, L('number'), `wnp${sheetKey}`)}</span>}
+              </div>
+            )}
+          </div>
+          <div className="wg-field wg-field-time">
             <span className="wg-label">受付</span>
             {!continuation && (
               <div className="wg-time">
@@ -453,38 +501,16 @@ function WabunGakuForm({
               </div>
             )}
           </div>
-          <div className="wg-field">
-            <span className="wg-label">番号</span>
-            {!continuation && (
-              <div className="wg-vals">
-                <span className="wg-v">{highlightPlayText(toKanjiDigits(serial.rest), alphabet, L('number') - (serial.prefix ? 2 : 0), `wn${sheetKey}`)}</span>
-                {serial.prefix && <span className="wg-note">{highlightPlayText(serial.prefix, alphabet, L('number'), `wnp${sheetKey}`)}</span>}
-              </div>
-            )}
-          </div>
-          <div className="wg-field">
-            <span className="wg-label">発信局</span>
-            {!continuation && (
-              <div className="wg-vals">
-                <span className="wg-v">{highlightPlayText(toKanjiDigits(office.rest), alphabet, L('office') - (office.prefix ? 2 : 0), `wo${sheetKey}`)}</span>
-                {office.prefix && <span className="wg-note">{highlightPlayText(office.prefix, alphabet, L('office'), `wop${sheetKey}`)}</span>}
-              </div>
-            )}
-          </div>
-          <div className="wg-field">
-            <span className="wg-label">字数</span>
-            {!continuation && (
-              <div className="wg-vals">
-                <span className="wg-v">{highlightPlayText(toKanjiDigits(ledger.count), alphabet, L('count'), `wk${sheetKey}`)}</span>
-              </div>
-            )}
-          </div>
-          <div className="wg-field">
+          <div className="wg-field wg-field-kind">
             <span className="wg-label">種類</span>
           </div>
         </div>
       </div>
 
+      {/*
+        DOM 順はモバイル縦積み用: 名あて → 本文 → 区切り。
+        PC の横並びは CSS grid-column で固定（auto-placement / order に頼らない）。
+      */}
       <div className="wg-main">
         <div className="wg-info" aria-hidden="true">
           <div><span>評価</span></div>
@@ -492,17 +518,6 @@ function WabunGakuForm({
           <div><span>受験番号</span></div>
           <div><span>名前</span></div>
         </div>
-        <div className="wg-notes">
-          <span className={`wg-end${endToken === '[ラタ]' ? '' : ' muted'}`}>
-            <WabunMark letters={['[ラタ]']} local={endToken === '[ラタ]' ? L('end') : -1} span={1} label="ラタ（終わり）" muted={endToken !== '[ラタ]'} />
-            <em>（終わりの場合）</em>
-          </span>
-          <span className={`wg-end${endToken === 'ウホ' ? '' : ' muted'}`}>
-            <WabunMark letters={['ウ', 'ホ']} local={endToken === 'ウホ' ? L('end') : -1} span={2} label="ウホ（改ページ）" muted={endToken !== 'ウホ'} />
-            <em>（改ページの場合）</em>
-          </span>
-        </div>
-        <WabunBodyGrid bodyChars={bodyChars} localHeard={localHeard} bodyOffset={at.body} sheet={sheetKey} />
         <div className="wg-address">
           {[3, 2, 1, 0].map((column) => (
             <div key={`addr-${column}`} className={`wg-addr-col${column === 0 ? ' first' : ''}`}>
@@ -522,6 +537,17 @@ function WabunGakuForm({
               )}
             </div>
           ))}
+        </div>
+        <WabunBodyGrid bodyChars={bodyChars} localHeard={localHeard} bodyOffset={at.body} sheet={sheetKey} />
+        <div className={`wg-notes${endToken ? '' : ' is-empty'}`}>
+          <span className={`wg-end${endToken === '[ラタ]' ? '' : ' muted'}`}>
+            <WabunMark letters={['[ラタ]']} local={endToken === '[ラタ]' ? L('end') : -1} span={1} label="ラタ（終わり）" muted={endToken !== '[ラタ]'} />
+            <em>（終わりの場合）</em>
+          </span>
+          <span className={`wg-end${endToken === 'ウホ' ? '' : ' muted'}`}>
+            <WabunMark letters={['ウ', 'ホ']} local={endToken === 'ウホ' ? L('end') : -1} span={2} label="ウホ（改ページ）" muted={endToken !== 'ウホ'} />
+            <em>（改ページの場合）</em>
+          </span>
         </div>
         <div className="wg-side" aria-hidden="true">
           <div><span className="wg-label">特別<br />取扱</span></div>

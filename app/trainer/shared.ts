@@ -5,7 +5,7 @@ import { COURSE_CATALOG, COURSE_DEFAULT_UNLOCK, KIND_LABEL, type CharacterKind }
 import { readProgressMeter } from '@/lib/progressMeter';
 import type { CardProgress, TrainerProfile } from '@/lib/types';
 
-export type View = 'home' | 'learn' | 'train' | 'levelup' | 'queue' | 'analysis' | 'exam' | 'collection' | 'settings';
+export type View = 'home' | 'learn' | 'train' | 'levelup' | 'queue' | 'analysis' | 'exam' | 'collection' | 'settings' | 'account';
 export type QueueSource = 'international' | 'wabun' | 'visual' | 'phonetic' | 'digits' | 'kana';
 export interface ViewMeta {
   id: View;
@@ -25,6 +25,7 @@ export const views: ViewMeta[] = [
   { id: 'collection', label: 'COLLECTION', title: 'カード図鑑', icon: 'collection', primary: true },
   { id: 'analysis', label: 'ANALYSIS', title: '苦手分析', icon: 'analysis', primary: false },
   { id: 'settings', label: 'SETTINGS', title: '設定', icon: 'settings', primary: false },
+  { id: 'account', label: 'ACCOUNT', title: 'マイページ', icon: 'account', primary: false },
 ];
 export const viewMeta = (id: View) => views.find((item) => item.id === id) ?? views[0];
 export const audioEngine = new MorseAudioEngine();

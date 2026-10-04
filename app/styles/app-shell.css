@@ -42,9 +42,24 @@
 }
 .brand-mark i { width: 5px; height: 5px; border-radius: 3px; background: #2a1c00; }
 .brand-mark i.dah { width: 11px; }
-.brand-text { display: grid; line-height: 1.1; }
+.brand-text { display: grid; line-height: 1.1; min-width: 0; }
 .brand-text b { font: 800 16px var(--font-display); }
-.brand-text small { color: var(--gold); font: 700 10px var(--font-mono); letter-spacing: .3em; }
+.brand-text small,
+.brand-sub {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--gold);
+  font: 700 10px var(--font-mono);
+  letter-spacing: .3em;
+}
+.brand-ver {
+  color: var(--muted);
+  font: 600 9px/1 var(--font-mono);
+  letter-spacing: .02em;
+  opacity: .8;
+  transform: translateY(-0.5px);
+}
 
 .nav { display: flex; flex-direction: column; gap: 4px; }
 .nav-item {
@@ -78,6 +93,15 @@
   border-radius: 0 4px 4px 0;
   background: var(--gold);
 }
+
+.sidebar-logout {
+  margin-top: 8px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding-top: 12px;
+}
+.sidebar-logout:hover { color: var(--coral); }
 
 .sidebar-foot {
   margin-top: auto;
@@ -245,8 +269,8 @@
   background: linear-gradient(135deg, var(--surface-3), var(--surface-2));
   border: 1.5px solid var(--gold);
   color: var(--gold);
-  font: 800 14px var(--font-display);
 }
+.profile-avatar svg { display: block; }
 .profile-text { display: grid; line-height: 1.15; max-width: 150px; }
 .profile-text b { font: 800 13px var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-text small { color: var(--muted); font: 700 11px var(--font-display); }

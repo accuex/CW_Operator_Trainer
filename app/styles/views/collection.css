@@ -33,7 +33,11 @@
 .collection-hero-ring .progress-ring-label b small { font-size: 16px; }
 .collection-hero-ring .progress-ring-label span { color: var(--muted); font: 800 10px var(--font-mono); letter-spacing: .2em; }
 
-.collection-toolbar { margin-bottom: 18px; }
+.collection-toolbar { display: grid; gap: 12px; margin-bottom: 18px; }
+.collection-empty { padding: 22px; color: var(--text-2); }
+.collection-empty p { margin: 0; }
+.achievement-blurb { margin: 0 0 14px; color: var(--text-2); line-height: 1.55; }
+.achievement-item.locked .collection-item-meta b { letter-spacing: .12em; }
 
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 14px; }
 .collection-item {
@@ -55,9 +59,11 @@
 .collection-item-meta small { color: var(--faint); font: 700 10px var(--font-mono); }
 .collection-item-meta b { font: 800 15px var(--font-display); color: var(--text-2); }
 .collection-item.acquired .collection-item-meta b { color: var(--gold); }
+.collection-item.locked .collection-item-meta b { color: var(--muted); }
 .collection-item-meter { position: relative; height: 5px; margin: -2px 4px 0; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
 .collection-item-meter i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: linear-gradient(90deg, var(--gold-2), var(--gold)); }
-.collection-item.status-unfound .signal-card { opacity: .7; }
+/* 裏向きの未発見だけ薄く。全解放で表が出ているカードは進捗ステータスで暗くしない */
+.collection-item.status-unfound.locked .signal-card { opacity: .7; }
 
 /* Detail drawer */
 .card-drawer-backdrop {

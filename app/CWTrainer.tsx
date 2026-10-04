@@ -2,7 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { courseMeta } from '@/lib/course';
-import { DEFAULT_PROFILE, DEFAULT_SETTINGS, addAnswer, addSession, getAnswers, getProfile, getSessions, loadSettings, normalizeProfile, saveProfile, saveSettings } from '@/lib/storage';
+import { applyAchievements, achievementById } from '@/lib/achievements';
+import { APP_VERSION } from '@/lib/appMeta';
+import { loadAuthSession } from '@/lib/api/authSession';
+import {
+  AUTH_SYNC_EVENT,
+  clearSyncRevision,
+  notifyAuthSync,
+  pushAnswers,
+  pushSessions,
+  schedulePushState,
+  syncPreferCloud,
+  type CloudSnapshot,
+} from '@/lib/api/cloudSync';
+import { logout } from '@/lib/api/client';
+import { DEFAULT_PROFILE, DEFAULT_SETTINGS, addAnswer, addSession, getAnswers, getProfile, getSessions, loadSettings, normalizeProfile, saveDataMeta, saveProfile, saveSettings } from '@/lib/storage';
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from '@/lib/types';
 import { type View, views, viewMeta, audioEngine, goalLabel, scopeLabel, pathToView } from '@/app/trainer/shared';
 import { playerStats, DAILY_GOAL } from '@/app/trainer/progress';
@@ -18,8 +32,10 @@ import { AnalysisView } from '@/app/views/AnalysisView';
 import { ExamView } from '@/app/views/ExamView';
 import { CollectionView } from '@/app/views/CollectionView';
 import { SettingsView } from '@/app/views/SettingsView';
+import { AccountView } from '@/app/views/AccountView';
 import { Onboarding } from '@/app/views/Onboarding';
 import { trackPageView } from '@/app/components/GoogleAnalytics';
+import { markSfxBackground, unlockSfx, wakeSfx } from '@/app/trainer/sfx';
 
 const AUDIO_STATUS_LABEL: Record<string, string> = {
   READY: '待機中',
@@ -47,18 +63,108 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   /** 一総通ナビを同じ画面でもう一度押したら科目選択へ戻す */
   const [examDeskResetEpoch, setExamDeskResetEpoch] = useState(0);
   const [speedOpen, setSpeedOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(() => Boolean(loadAuthSession()));
   const speedWrapRef = useRef<HTMLDivElement>(null);
+  const applyingCloudRef = useRef(false);
+
+  const announce = useCallback((message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(''), 2600);
+  }, []);
+
+  const applyCloudSnapshot = useCallback((snap: CloudSnapshot) => {
+    applyingCloudRef.current = true;
+    setProfile(snap.profile);
+    setSettings(snap.settings);
+    setAnswers(snap.answers);
+    setSessions(snap.sessions);
+    window.setTimeout(() => { applyingCloudRef.current = false; }, 0);
+  }, []);
+
+  const pullCloudPreferred = useCallback(async (announceMessage?: string) => {
+    if (!loadAuthSession()) return;
+    try {
+      const snap = await syncPreferCloud();
+      if (!snap) return;
+      if (!snap.seededFromLocal) applyCloudSnapshot(snap);
+      if (announceMessage) announce(announceMessage);
+      else if (!snap.seededFromLocal) announce('クラウドの学習データを読み込みました');
+      else announce('この端末のデータをクラウドへ保存しました');
+    } catch {
+      // オフライン等は端末データを継続
+    }
+  }, [announce, applyCloudSnapshot]);
 
   useEffect(() => {
-    Promise.all([getProfile(), getAnswers(), getSessions()]).then(([savedProfile, savedAnswers, savedSessions]) => {
+    Promise.all([getProfile(), getAnswers(), getSessions()]).then(async ([savedProfile, savedAnswers, savedSessions]) => {
       setProfile(normalizeProfile(savedProfile)); setAnswers(savedAnswers); setSessions(savedSessions); setSettings(loadSettings()); setReady(true);
+      void saveDataMeta();
+      if (loadAuthSession()) await pullCloudPreferred();
     }).catch(() => { setSettings(loadSettings()); setReady(true); });
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => undefined);
     return () => audioEngine.stop();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { if (!ready) return; saveSettings(settings); }, [settings, ready]);
-  useEffect(() => { if (!ready) return; saveProfile(profile).catch(() => undefined); }, [profile, ready]);
+  useEffect(() => {
+    const onAuthSync = (event: Event) => {
+      const reason = (event as CustomEvent<{ reason?: string }>).detail?.reason;
+      if (reason === 'logout') {
+        clearSyncRevision();
+        setSignedIn(false);
+        return;
+      }
+      setSignedIn(Boolean(loadAuthSession()));
+      void pullCloudPreferred(reason === 'login' ? 'ログイン同期しました（クラウド優先）' : undefined);
+    };
+    window.addEventListener(AUTH_SYNC_EVENT, onAuthSync);
+    return () => window.removeEventListener(AUTH_SYNC_EVENT, onAuthSync);
+  }, [pullCloudPreferred]);
+
+  // YouTube 等で音声セッションを奪われたあと: Context を捨て、次のタップで作り直す
+  useEffect(() => {
+    let needsGestureUnlock = false;
+    const onBackground = () => {
+      needsGestureUnlock = true;
+      audioEngine.markBackground();
+      markSfxBackground();
+    };
+    const onForeground = () => {
+      if (document.visibilityState && document.visibilityState !== 'visible') return;
+      // soft wake は残すが、dirty なら次の gesture まで触らない
+      void audioEngine.wake();
+      void wakeSfx();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') onBackground();
+      else onForeground();
+    };
+    const unlockFromGesture = () => {
+      if (!needsGestureUnlock && !audioEngine.isDirty) return;
+      needsGestureUnlock = false;
+      void audioEngine.unlock();
+      void unlockSfx();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onBackground);
+    window.addEventListener('pageshow', onForeground);
+    document.addEventListener('pointerdown', unlockFromGesture, true);
+    document.addEventListener('touchstart', unlockFromGesture, { capture: true, passive: true });
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onBackground);
+      window.removeEventListener('pageshow', onForeground);
+      document.removeEventListener('pointerdown', unlockFromGesture, true);
+      document.removeEventListener('touchstart', unlockFromGesture, true);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ready || applyingCloudRef.current) return;
+    saveSettings(settings);
+    saveProfile(profile).catch(() => undefined);
+    schedulePushState(profile, settings);
+  }, [settings, profile, ready]);
   useEffect(() => {
     const onPop = () => setView(pathToView(location.pathname));
     window.addEventListener('popstate', onPop);
@@ -97,9 +203,22 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   };
 
   const record = useCallback((answer: AnswerLog) => {
-    setAnswers((old) => [...old, answer]); addAnswer(answer).catch(() => undefined);
+    setAnswers((old) => [...old, answer]);
+    addAnswer(answer).catch(() => undefined);
+    void pushAnswers(answer);
   }, []);
-  const announce = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2600); };
+
+  useEffect(() => {
+    if (!ready) return;
+    const { profile: next, unlocked } = applyAchievements(profile, answers, sessions);
+    if (unlocked.length === 0) return;
+    setProfile(next);
+    const first = achievementById(unlocked[0])?.title ?? unlocked[0];
+    announce(unlocked.length === 1 ? `実績GET: ${first}` : `実績GET: ${first} ほか${unlocked.length - 1}`);
+    // 進捗系だけ再評価（ナビの lastMode では回さない）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, answers, sessions, profile.cards, profile.koch, profile.achievements]);
+
   const stopAudio = () => {
     audioEngine.stop();
     if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
@@ -108,7 +227,9 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   };
 
   const onSession = useCallback((session: SessionRecord) => {
-    setSessions((old) => [...old, session]); addSession(session).catch(() => undefined);
+    setSessions((old) => [...old, session]);
+    addSession(session).catch(() => undefined);
+    void pushSessions(session);
   }, []);
 
   const stats = useMemo(() => playerStats(profile, answers), [profile, answers]);
@@ -124,7 +245,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
     exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} />,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
-    settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} />,
+    settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} onNavigate={navigate} />,
+    account: <AccountView announce={announce} onNavigate={navigate} />,
   }[view];
 
   return (
@@ -132,7 +254,13 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
       <aside className="sidebar" aria-label="メインナビゲーション">
         <button type="button" className="brand" onClick={() => navigate('home')} aria-label="ホームへ">
           <span className="brand-mark" aria-hidden="true"><i /><i className="dah" /><i /><i className="dah" /></span>
-          <span className="brand-text"><b>CW Operator</b><small>TRAINER</small></span>
+          <span className="brand-text">
+            <b>CW Operator</b>
+            <small className="brand-sub">
+              <span>TRAINER</span>
+              <span className="brand-ver">v{APP_VERSION}</span>
+            </small>
+          </span>
         </button>
         <nav className="nav">
           {views.map((item) => (
@@ -151,6 +279,23 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <span className="nav-label">{item.title}</span>
             </button>
           ))}
+          {signedIn && (
+            <button
+              type="button"
+              className="nav-item secondary sidebar-logout"
+              onClick={() => {
+                logout();
+                setSignedIn(false);
+                notifyAuthSync('logout');
+                navigate('account');
+                announce('ログアウトしました');
+              }}
+              title="ログアウト"
+            >
+              <Icon name="logout" size={22} />
+              <span className="nav-label">ログアウト</span>
+            </button>
+          )}
         </nav>
         <div className="sidebar-foot">
           <div className="sidebar-goal">
@@ -203,8 +348,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             <button type="button" onClick={stopAudio} className={`stop-button ${live ? 'live' : ''}`} aria-label="音声を停止">
               <Icon name="stop" size={14} /><span>{AUDIO_STATUS_LABEL[audioStatus] ?? audioStatus}</span>
             </button>
-            <button type="button" className="profile-button" onClick={() => navigate('settings')} title={`目的: ${goalLabel(profile.goal)} / 範囲: ${scopeLabel(profile)}`}>
-              <span className="profile-avatar" aria-hidden="true">{(courseMeta(profile.learnCourse)?.label ?? 'CW').slice(0, 1)}</span>
+            <button type="button" className="profile-button" onClick={() => navigate('account')} title={`マイページ / 目的: ${goalLabel(profile.goal)} / 範囲: ${scopeLabel(profile)}`} aria-label="マイページ">
+              <span className="profile-avatar" aria-hidden="true"><Icon name="account" size={18} /></span>
               <span className="profile-text"><b>{courseMeta(profile.learnCourse)?.label ?? 'コース未選択'}</b><small>{goalLabel(profile.goal)}</small></span>
             </button>
           </div>

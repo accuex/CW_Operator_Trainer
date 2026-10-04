@@ -54,8 +54,14 @@ export function TrainView({ settings, setSettings, record, setAudioStatus, answe
   const play = async (chosen = nextSymbol()) => {
     setSymbol(chosen); setInput(''); setResult(null); setHintVisible(false); setStartedAt(performance.now()); setAudioStatus('PLAYING');
     setPlaying(true); setHasPlayed(true);
-    const handle = await audioEngine.play(chosen, alphabet, settings);
-    handle.finished.then(() => { setPlaying(false); setAudioStatus('READY'); inputRef.current?.focus(); });
+    try {
+      await audioEngine.unlock();
+      const handle = await audioEngine.play(chosen, alphabet, settings);
+      await handle.finished;
+    } catch { /* aborted / blocked */ }
+    setPlaying(false);
+    setAudioStatus('READY');
+    inputRef.current?.focus();
   };
   const submit = () => {
     if (!input.trim()) return;

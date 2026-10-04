@@ -15,6 +15,21 @@
 }
 .signal-card.family-wabun { --family: var(--family-wabun); }
 .signal-card.family-kigo { --family: var(--family-kigo); }
+.signal-card.family-signal { --family: var(--gold); }
+.achievement-face .face-crest b { color: var(--gold); }
+.achievement-art-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 55%);
+  color: var(--gold);
+  font: 800 10px/1 var(--font-mono);
+  letter-spacing: .08em;
+}
+.signal-card.compact .achievement-art-badge { top: 6px; right: 6px; padding: 3px 6px; font-size: 9px; }
 .signal-card.compact { border-radius: var(--r-sm); }
 
 .signal-card-body {

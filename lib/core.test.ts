@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { confusionMatrix, weakPairs } from './analytics';
 import { CARDS, INTERNATIONAL_MORSE, WABUN_MORSE, expandWabunVoicing, resolveMnemonicSegments, tokenizeMorseInput } from './morse';
 import { cardsForCourse, selectCourseDefaults } from './course';
-import { CARD_ARTWORK, artworkFor } from './cardArtwork';
+import { CARD_ARTWORK, artworkFor, artworkUrlForRarity } from './cardArtwork';
 import { QueueEvaluator } from './queue';
 import { DEFAULT_SETTINGS } from './storage';
 import { nextSpeedFromCharacter, nextSpeedFromEffective } from './speed';
@@ -89,17 +89,17 @@ describe('course filters', () => {
 
 describe('card artwork manifest', () => {
   it('maps full international A–Z, Wabun 48 kana, and blue-series artwork', () => {
-    expect(artworkFor('international', 'F')?.artwork).toBe('/cards/international/F.webp');
-    expect(artworkFor('international', 'A')?.artwork).toBe('/cards/international/A.webp');
-    expect(artworkFor('wabun', 'ツ')?.artwork).toBe('/cards/wabun/tsu.webp');
-    expect(artworkFor('wabun', 'ア')?.artwork).toBe('/cards/wabun/a.webp');
-    expect(artworkFor('wabun', 'ヱ')?.artwork).toBe('/cards/wabun/we.webp');
-    expect(artworkFor('wabun', 'ン')?.artwork).toBe('/cards/wabun/n.webp');
-    expect(artworkFor('international', '0')?.artwork).toBe('/cards/kigo/0.webp');
-    expect(artworkFor('international', '/')?.artwork).toBe('/cards/kigo/slash.webp');
-    expect(artworkFor('international', '[BT]')?.artwork).toBe('/cards/kigo/bt.webp');
-    expect(artworkFor('wabun', 'ー')?.artwork).toBe('/cards/kigo/choon.webp');
-    expect(artworkFor('wabun', '[0]')?.artwork).toBe('/cards/kigo/abbr0.webp');
+    expect(artworkFor('international', 'F')?.artwork).toBe('/cards/international/r/F.webp');
+    expect(artworkFor('international', 'A')?.artwork).toBe('/cards/international/r/A.webp');
+    expect(artworkFor('wabun', 'ツ')?.artwork).toBe('/cards/wabun/r/tsu.webp');
+    expect(artworkFor('wabun', 'ア')?.artwork).toBe('/cards/wabun/r/a.webp');
+    expect(artworkFor('wabun', 'ヱ')?.artwork).toBe('/cards/wabun/r/we.webp');
+    expect(artworkFor('wabun', 'ン')?.artwork).toBe('/cards/wabun/r/n.webp');
+    expect(artworkFor('international', '0')?.artwork).toBe('/cards/kigo/r/0.webp');
+    expect(artworkFor('international', '/')?.artwork).toBe('/cards/kigo/r/slash.webp');
+    expect(artworkFor('international', '[BT]')?.artwork).toBe('/cards/kigo/r/bt.webp');
+    expect(artworkFor('wabun', 'ー')?.artwork).toBe('/cards/kigo/r/choon.webp');
+    expect(artworkFor('wabun', '[0]')?.artwork).toBe('/cards/kigo/r/abbr0.webp');
     const intl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').every((s) => artworkFor('international', s)?.artwork);
     const wabun = 'イロハニホヘトチリヌルヲワカヨタレソツネナラムウヰノオクヤマケフコエテアサキユメミシヱヒモセスン'.split('').every((s) => artworkFor('wabun', s)?.artwork);
     expect(intl).toBe(true);
@@ -108,6 +108,13 @@ describe('card artwork manifest', () => {
   });
   it('uses browser-safe ASCII asset paths', () => {
     expect(Object.values(CARD_ARTWORK).every(({ artwork }) => /^\/[A-Za-z0-9/_-]+\.(webp|png)$/.test(artwork))).toBe(true);
+  });
+  it('maps R artwork paths to SR/SSR folders', () => {
+    const base = '/cards/international/r/A.webp';
+    expect(artworkUrlForRarity(base, 'R')).toBe(base);
+    expect(artworkUrlForRarity(base, 'SR')).toBe('/cards/international/sr/A.webp');
+    expect(artworkUrlForRarity(base, 'SSR')).toBe('/cards/international/ssr/A.webp');
+    expect(artworkUrlForRarity(base, null)).toBe(base);
   });
   it('leaves unillustrated latin extras on the CSS fallback', () => {
     expect(artworkFor('international', ',')).toBeUndefined();

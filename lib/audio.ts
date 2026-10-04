@@ -21,14 +21,140 @@ type ActiveVoice = {
 /** 反響余韻を切るまでの待ち（ディレイ＋フィードバックが消えるまで） */
 const REVERB_RING_MS = 280;
 
+/** WebKit adds `interrupted` when another app takes the audio session. */
+type ContextState = AudioContextState | 'interrupted';
+
+const contextState = (context: AudioContext) => context.state as ContextState;
+
 export class MorseAudioEngine {
   private context: AudioContext | null = null;
   private active: ActiveVoice | null = null;
+  /** True while exam (etc.) intentionally froze the clock — ignore OS wake. */
+  private holdSuspended = false;
+  /**
+   * Set when the app loses audio to the OS / another app.
+   * Next unlock/play must recreate AudioContext inside a user gesture.
+   */
+  private needsHardUnlock = false;
+  private stateListener: ((event: Event) => void) | null = null;
+
+  private createContext() {
+    const context = new AudioContext({ latencyHint: 'interactive' });
+    this.bindStateListener(context);
+    return context;
+  }
+
+  private bindStateListener(context: AudioContext) {
+    if (this.stateListener && this.context) {
+      this.context.removeEventListener('statechange', this.stateListener);
+    }
+    this.stateListener = () => {
+      const state = contextState(context);
+      if (state === 'interrupted' || state === 'suspended') {
+        // OS / other-app took the session. Do not trust this context again.
+        if (!this.holdSuspended) this.needsHardUnlock = true;
+      }
+    };
+    context.addEventListener('statechange', this.stateListener);
+  }
+
+  /** iOS: resume alone is not enough — play a zero-length buffer in the gesture. */
+  private async prime(context: AudioContext) {
+    try {
+      if (contextState(context) !== 'running') await context.resume();
+      const buffer = context.createBuffer(1, 1, context.sampleRate);
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      source.start(0);
+    } catch {
+      /* prime is best-effort */
+    }
+  }
+
+  private async closeContext() {
+    const context = this.context;
+    this.context = null;
+    if (!context) return;
+    if (this.stateListener) {
+      try { context.removeEventListener('statechange', this.stateListener); } catch { /* ignore */ }
+      this.stateListener = null;
+    }
+    try {
+      if (contextState(context) !== 'closed') await context.close();
+    } catch { /* ignore */ }
+  }
+
+  /**
+   * App went to background or another app took audio.
+   * Drop the session so the next user gesture builds a fresh context.
+   */
+  markBackground() {
+    this.holdSuspended = false;
+    this.needsHardUnlock = true;
+    this.silenceActive();
+    void this.closeContext();
+  }
+
+  private async ensureRunning(options: { create?: boolean; force?: boolean; hard?: boolean } = {}): Promise<AudioContext | null> {
+    const create = options.create ?? true;
+    const force = options.force ?? false;
+    const hard = options.hard ?? false;
+
+    if (hard || this.needsHardUnlock) {
+      if (!create && !force && !hard) return null;
+      this.silenceActive();
+      await this.closeContext();
+      if (!create && !hard && !force) return null;
+      this.context = this.createContext();
+      try {
+        await this.context.resume();
+        await this.prime(this.context);
+      } catch { /* gesture may still be required */ }
+      if (contextState(this.context) === 'running') this.needsHardUnlock = false;
+      return this.context;
+    }
+
+    if (this.context && contextState(this.context) === 'closed') {
+      this.context = null;
+    }
+    if (!this.context) {
+      if (!create) return null;
+      this.context = this.createContext();
+    }
+    if (this.holdSuspended && !force) return this.context;
+
+    let state = contextState(this.context);
+    if (state === 'suspended' || state === 'interrupted') {
+      try {
+        await this.context.resume();
+        await this.prime(this.context);
+      } catch {
+        /* try recreate below */
+      }
+      state = contextState(this.context);
+    }
+
+    if (state !== 'running' && !this.holdSuspended) {
+      this.silenceActive();
+      await this.closeContext();
+      this.context = this.createContext();
+      try {
+        await this.context.resume();
+        await this.prime(this.context);
+      } catch { /* still blocked until next gesture */ }
+      if (contextState(this.context) === 'running') this.needsHardUnlock = false;
+    }
+
+    return this.context;
+  }
 
   private async getContext(): Promise<AudioContext> {
-    if (!this.context) this.context = new AudioContext({ latencyHint: 'interactive' });
-    if (this.context.state === 'suspended') await this.context.resume();
-    return this.context;
+    this.holdSuspended = false;
+    const hard = this.needsHardUnlock;
+    const context = await this.ensureRunning({ create: true, force: true, hard });
+    if (!context) throw new Error('AudioContext unavailable');
+    return context;
   }
 
   /**
@@ -88,6 +214,22 @@ export class MorseAudioEngine {
     const context = await this.getContext();
     this.silenceActive();
 
+    if (contextState(context) !== 'running') {
+      try {
+        await context.resume();
+        await this.prime(context);
+      } catch { /* ignore */ }
+    }
+    if (contextState(context) !== 'running') {
+      // Still dead — force one more hard recreate (gesture chain may still be warm).
+      this.needsHardUnlock = true;
+      const retry = await this.getContext();
+      if (contextState(retry) !== 'running') {
+        throw new Error('AudioContext not running');
+      }
+      return this.schedule(timeline, settings);
+    }
+
     const oscillator = context.createOscillator();
     const gain = context.createGain();
     const extras: AudioNode[] = [];
@@ -130,7 +272,6 @@ export class MorseAudioEngine {
         resolveFinished();
         return;
       }
-      // 符号本体の終了はすぐ通知。反響の余韻だけ少し残してから切断。
       resolveFinished();
       if (!settings.reverb) {
         this.active = null;
@@ -174,26 +315,43 @@ export class MorseAudioEngine {
 
   /** Ensure AudioContext is running (call from a user gesture before async work). */
   async unlock() {
-    await this.getContext();
+    this.holdSuspended = false;
+    await this.ensureRunning({ create: true, force: true, hard: this.needsHardUnlock || !this.context });
+  }
+
+  /**
+   * Soft wake after foreground — does not create a context.
+   * Hard unlock still happens on the next gesture / play.
+   */
+  async wake() {
+    if (this.holdSuspended) return;
+    if (this.needsHardUnlock || !this.context) return;
+    await this.ensureRunning({ create: false, force: false });
   }
 
   stop() {
-    if (this.context?.state === 'suspended') void this.context.resume();
+    this.holdSuspended = false;
     this.silenceActive();
   }
 
   /** Freeze scheduled tones + context clock (exam Stop). */
   async pause() {
     if (!this.context) return;
-    if (this.context.state === 'running') await this.context.suspend();
+    this.holdSuspended = true;
+    if (contextState(this.context) === 'running') await this.context.suspend();
   }
 
   /** Resume after pause (exam Continue). */
   async resume() {
-    if (!this.context) return;
-    if (this.context.state === 'suspended') await this.context.resume();
+    this.holdSuspended = false;
+    if (this.needsHardUnlock || !this.context) {
+      await this.unlock();
+      return;
+    }
+    await this.ensureRunning({ create: false, force: true });
   }
 
   get state() { return this.context?.state ?? 'closed'; }
-  get paused() { return this.context?.state === 'suspended'; }
+  get paused() { return this.holdSuspended || this.context?.state === 'suspended'; }
+  get isDirty() { return this.needsHardUnlock; }
 }

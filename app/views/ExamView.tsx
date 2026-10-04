@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ExamGakuForm, countPlaySymbols, highlightPlayText } from '@/app/components/ExamGakuForm';
+import { loadExamPrefs, saveExamPrefs } from '@/lib/examPrefs';
 import { EXAM_SHEET_GAP_SEC, EXAM_SUBJECTS, buildExamSession, examSheetGapSec, type ExamSession, type ExamSubjectId } from '@/lib/training';
 import { EXAM_PENALTY, scoreExamCopy, stripExamProcedureMarks, type ExamScore } from '@/lib/examScore';
 import type { AnswerLog, AudioSettings } from '@/lib/types';
@@ -16,14 +17,25 @@ const MANUAL_SCROLL_HOLD_MS = 4000;
 /** 前半と後半が同一（-50% 送りで継ぎ目なくループ） */
 const WARNING_MARQUEE = 'WARNING　試験開始　'.repeat(8);
 
+const SUBJECT_IDS = Object.keys(EXAM_SUBJECTS) as ExamSubjectId[];
+
+function initialExamUi() {
+  const prefs = loadExamPrefs();
+  const selected = Math.max(0, SUBJECT_IDS.indexOf(prefs.subjectId));
+  return { prefs, selected };
+}
+
 export function ExamView({ settings, setSettings, record, setAudioStatus, stopEpoch }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; record: (answer: AnswerLog) => void; setAudioStatus: (status: string) => void; stopEpoch: number }) {
-  const presets = (Object.keys(EXAM_SUBJECTS) as ExamSubjectId[]).map((id) => EXAM_SUBJECTS[id]);
-  const [selected, setSelected] = useState(2);
-  const [telegram, setTelegram] = useState(true);
+  const presets = SUBJECT_IDS.map((id) => EXAM_SUBJECTS[id]);
+  const boot = initialExamUi();
+  const [selected, setSelected] = useState(boot.selected);
+  const [telegram, setTelegram] = useState(boot.prefs.telegram);
   /** 和文本文に井戸のヰ・カギのあるヱを含める */
-  const [includeWiWe, setIncludeWiWe] = useState(false);
+  const [includeWiWe, setIncludeWiWe] = useState(boot.prefs.includeWiWe);
   /** 視聴モード: 正解を見ながら追従再生（採点なし） */
-  const [listenMode, setListenMode] = useState(false);
+  const [listenMode, setListenMode] = useState(boot.prefs.listenMode);
+  /** 視聴: セット終了後に次問題を自動再生（ひたすら聞く） */
+  const [autoContinueListen, setAutoContinueListen] = useState(boot.prefs.autoContinueListen);
   /** 開始時に固定（途中でトグルしても表示が壊れない） */
   const [sessionListenMode, setSessionListenMode] = useState(false);
   /** setup | ready | playing | paused | review — ready は出題済み・再生待ち、review は答え合わせ */
@@ -42,7 +54,23 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
   /** 入力試験: 呼称後〜第1通前の心構え中（WARNINGなし・入力フォーム表示） */
   const [isPreparing, setIsPreparing] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
-  const listenModeRef = useRef(false);
+  /** 他アプリに奪われて再生が止まった（スタートで再開） */
+  const [audioInterrupted, setAudioInterrupted] = useState(false);
+  const listenModeRef = useRef(boot.prefs.listenMode);
+  const autoContinueListenRef = useRef(boot.prefs.autoContinueListen);
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+
+  // 科目・視聴・電報トグルは画面を離れても維持
+  useEffect(() => {
+    saveExamPrefs({
+      subjectId: SUBJECT_IDS[selected] ?? 'plain',
+      telegram,
+      includeWiWe,
+      listenMode,
+      autoContinueListen,
+    });
+  }, [selected, telegram, includeWiWe, listenMode, autoContinueListen]);
   const timer = useRef<number | null>(null);
   const activeRef = useRef(false);
   const pausedRef = useRef(false);
@@ -89,6 +117,35 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
 
   useEffect(() => () => { clearTimer(); audioEngine.stop(); }, []);
 
+  // 再生中に YouTube 等へ行くと AudioContext が死ぬ。ループを止め、スタート待ちに戻す。
+  useEffect(() => {
+    const interruptPlayback = () => {
+      audioEngine.markBackground();
+      const current = phaseRef.current;
+      if (current !== 'playing' && current !== 'paused') return;
+      if (!sessionRef.current) return;
+      runIdRef.current += 1;
+      activeRef.current = false;
+      pausedRef.current = false;
+      clearTimer();
+      audioEngine.stop();
+      setAnnounceCountdown(null);
+      setIsPreparing(false);
+      setPhase('ready');
+      setAudioStatus('READY');
+      setAudioInterrupted(true);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') interruptPlayback();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', interruptPlayback);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', interruptPlayback);
+    };
+  }, [setAudioStatus]);
+
   // 視聴モード: 通（ページ）が替わったら用紙の頭へ、同じ用紙内では「今ここ」が画面外に出たら追従
   useEffect(() => {
     if (!sessionListenMode || phase !== 'playing' || sheetIndex < 0) return;
@@ -96,20 +153,28 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
     const sheet = stack?.children[sheetIndex] as HTMLElement | undefined;
     if (!stack || !sheet) return;
     const status = document.querySelector<HTMLElement>('.exam-status');
-    const stickyTop = status ? (parseFloat(getComputedStyle(status).top) || 0) + status.offsetHeight : 0;
+    // sticky 実測の下端。CSS top+height より正確（半升隠れ防止）
+    const stickyBottom = status
+      ? Math.max(status.getBoundingClientRect().bottom, (parseFloat(getComputedStyle(status).top) || 0) + status.offsetHeight)
+      : 0;
+    const mobileNav = document.querySelector<HTMLElement>('.mobile-nav');
+    const bottomInset = (mobileNav?.offsetHeight ?? 48) + 12;
     const behavior: ScrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
     if (followedSheetRef.current !== sheetIndex) {
       followedSheetRef.current = sheetIndex;
-      window.scrollTo({ top: sheet.getBoundingClientRect().top + window.scrollY - stickyTop - 12, behavior });
+      window.scrollTo({ top: sheet.getBoundingClientRect().top + window.scrollY - stickyBottom - 16, behavior });
       return;
     }
     if (wallTime() - manualScrollAtRef.current < MANUAL_SCROLL_HOLD_MS) return;
     const now = sheet.querySelector<HTMLElement>('.listen-now');
     if (!now) return;
     const rect = now.getBoundingClientRect();
-    if (rect.top >= stickyTop + 8 && rect.bottom <= window.innerHeight - 48) return;
-    const visible = window.innerHeight - stickyTop;
-    window.scrollTo({ top: rect.top + window.scrollY - stickyTop - visible * 0.35, behavior });
+    // 1枠分先に追従して、sticky 直下で半升隠れしないようにする
+    const lead = Math.max(rect.height, 36) + 12;
+    const topLimit = stickyBottom + lead;
+    const bottomLimit = window.innerHeight - bottomInset - lead;
+    if (rect.top >= topLimit && rect.bottom <= bottomLimit) return;
+    window.scrollTo({ top: rect.top + window.scrollY - topLimit, behavior });
   }, [heardCount, sheetIndex, sessionListenMode, phase]);
 
   useEffect(() => {
@@ -313,6 +378,30 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
         }
       }
       if (activeRef.current && runIdRef.current === runId) {
+        if (listenModeRef.current && autoContinueListenRef.current) {
+          // ひたすら聞く: 次の出題をそのまま再生（答え合わせに落とさない）
+          const continued = buildExamSession({
+            subjectId: preset.id,
+            telegram,
+            includeWiWe: preset.id === 'wabun' && includeWiWe,
+          });
+          clearTimer();
+          setTimeUp(false);
+          setHeardCount(0);
+          setSheetIndex(0);
+          setAnnounceCountdown(null);
+          setIsPreparing(false);
+          followedSheetRef.current = -1;
+          sessionRef.current = continued;
+          setSession(continued);
+          sourceTextRef.current = continued.playText;
+          setSourceText(continued.playText);
+          setRemaining(preset.durationSec);
+          setPhase('playing');
+          setAudioStatus('PLAYING');
+          await playSession(continued, runId);
+          return;
+        }
         if (listenModeRef.current) {
           // 視聴は最後まで聴いたら答え合わせ（額表を残す）
           finishRef.current();
@@ -449,6 +538,7 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
   const startDeskPlayback = async () => {
     const current = sessionRef.current ?? session;
     if (!current || (phase !== 'ready' && phase !== 'review')) return;
+    setAudioInterrupted(false);
     await audioEngine.unlock();
     if (sessionListenMode || listenModeRef.current) listenModeRef.current = true;
     else listenModeRef.current = false;
@@ -521,6 +611,17 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
 
   const continuePlayback = async () => {
     if (phase !== 'paused') return;
+    // 他アプリ復帰後は suspend 済みオシレータが蘇生しない → 最初から再生し直す
+    if (audioEngine.isDirty) {
+      const current = sessionRef.current ?? session;
+      if (!current) return;
+      pausedRef.current = false;
+      setAudioInterrupted(false);
+      await audioEngine.unlock();
+      if (sessionListenMode || listenModeRef.current) listenModeRef.current = true;
+      await beginSession(current);
+      return;
+    }
     pausedRef.current = false;
     setPhase('playing');
     setAudioStatus('PLAYING');
@@ -629,11 +730,36 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
                 type="checkbox"
                 role="switch"
                 checked={listenMode}
-                onChange={(event) => setListenMode(event.target.checked)}
+                onChange={(event) => {
+                  const next = event.target.checked;
+                  listenModeRef.current = next;
+                  setListenMode(next);
+                }}
               />
               <i aria-hidden="true" />
             </span>
           </label>
+          {listenMode && (
+            <label className={`exam-switch${autoContinueListen ? ' on' : ''}`}>
+              <span className="exam-switch-copy">
+                <strong>自動連続再生</strong>
+                <small>1セット終わったら次の問題を自動で再生（BGM用）</small>
+              </span>
+              <span className="exam-switch-ui">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  checked={autoContinueListen}
+                  onChange={(event) => {
+                    const next = event.target.checked;
+                    autoContinueListenRef.current = next;
+                    setAutoContinueListen(next);
+                  }}
+                />
+                <i aria-hidden="true" />
+              </span>
+            </label>
+          )}
           {preset.id === 'wabun' && (
             <label className={`exam-switch${includeWiWe ? ' on' : ''}`}>
               <span className="exam-switch-copy">
@@ -678,7 +804,9 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
           <p className="section-kicker">Rules</p>
           <p>
             {listenMode
-              ? '視聴は手書き練習と答え合わせ用です。まず問題を用意し、準備できたらスタートで再生します。筆記して額表で照合し、「次の問題」でこのまま続けられます。採点・視聴ログはありません。'
+              ? autoContinueListen
+                ? '視聴＋自動連続再生は、モールスをひたすら流すモードです。スタート後はセットが終わるたびに次の出題へ進みます。止めるときは「答え合わせ」か一時停止。採点・視聴ログはありません。'
+                : '視聴は手書き練習と答え合わせ用です。まず問題を用意し、準備できたらスタートで再生します。筆記して額表で照合し、「次の問題」でこのまま続けられます。採点・視聴ログはありません。'
               : preset.id === 'wabun'
                 ? '出題量の目安は公式どおり（和文375字・5分）。問題を用意→スタート。終了後もこの画面に残り、受信控えの下に採点と正解の額表が出ます。額表ON時は2通・5枚（枚間・通間の休止なし）。'
                 : `出題量は公式どおり（和文375 / 欧文暗語400 / 欧文普通語500字・5分）。問題を用意→スタート。終了後もこの画面で採点します。2通に分け、通間 ${EXAM_SHEET_GAP_SEC} 秒休止（和文は休止なし）。`}
@@ -737,6 +865,7 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
                 {phase === 'review' ? (sessionListenMode ? ' · 答え合わせ' : ' · 採点結果') : ''}
                 {isPreparing ? ' · 心構え' : ''}
                 {timeUp && phase !== 'review' && phase !== 'ready' ? ' · 時間切れ（再生継続）' : ''}
+                {sessionListenMode && autoContinueListen && phase !== 'review' ? ' · 連続再生' : ''}
               </span>
               {!sessionListenMode && phase !== 'review' && <span className="chip">訂正 {correctedChars}字</span>}
             </div>
@@ -799,22 +928,46 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
               )}
             </div>
           </div>
-          {sessionListenMode && (phase === 'playing' || phase === 'paused') && (
+          {sessionListenMode && (phase === 'playing' || phase === 'paused' || phase === 'ready' || phase === 'review') && (
             <div className="exam-listen-progress">
-              <span>追従 {Math.min(Math.max(0, heardCount), listenTotal)} / {listenTotal}</span>
-              <ProgressBar
-                tone="sky"
-                label="視聴の追従"
-                value={listenTotal ? Math.min(Math.max(0, heardCount), listenTotal) / listenTotal : 0}
-              />
+              {(phase === 'playing' || phase === 'paused') ? (
+                <>
+                  <span>追従 {Math.min(Math.max(0, heardCount), listenTotal)} / {listenTotal}</span>
+                  <ProgressBar
+                    tone="sky"
+                    label="視聴の追従"
+                    value={listenTotal ? Math.min(Math.max(0, heardCount), listenTotal) / listenTotal : 0}
+                  />
+                </>
+              ) : (
+                <span className="exam-listen-loop-hint">
+                  {autoContinueListen ? '連続再生オン · スタート後は次セットへ自動進行' : '1セット再生'}
+                </span>
+              )}
+              <label className={`exam-loop-toggle${autoContinueListen ? ' on' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={autoContinueListen}
+                  onChange={(event) => {
+                    const next = event.target.checked;
+                    autoContinueListenRef.current = next;
+                    setAutoContinueListen(next);
+                  }}
+                />
+                <span>自動連続再生</span>
+              </label>
             </div>
           )}
           {phase === 'ready' && (
-            <div className="exam-listen-review-bar" role="status">
+            <div className={audioInterrupted ? 'exam-audio-interrupt-bar' : 'exam-listen-review-bar'} role="status">
               <span>
-                {sessionListenMode
-                  ? '問題を用意しました。筆記の準備ができたら「スタート」で再生します。'
-                  : '問題を用意しました。心の準備ができたら「スタート」で試験を始めます。'}
+                {audioInterrupted
+                  ? '他のアプリで音声が中断されました。「スタート」を押すと最初から再生します。'
+                  : sessionListenMode
+                    ? autoContinueListen
+                      ? '問題を用意しました。「スタート」で再生。終わると次の出題へ自動で進みます。'
+                      : '問題を用意しました。筆記の準備ができたら「スタート」で再生します。'
+                    : '問題を用意しました。心の準備ができたら「スタート」で試験を始めます。'}
               </span>
             </div>
           )}
@@ -822,7 +975,9 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
             <div className="exam-listen-review-bar" role="status">
               <span>
                 {sessionListenMode
-                  ? '額表を見て答え合わせ。「スタート」で同じ問題、「次の問題」で新しい出題。戻るときは「視聴」か左の一総通メニュー。'
+                  ? autoContinueListen
+                    ? '額表を見て答え合わせ。連続再生オンのまま「スタート」すると、そのあとセット終了ごとに次問題へ進みます。'
+                    : '額表を見て答え合わせ。「スタート」で同じ問題、「次の問題」で新しい出題。戻るときは「視聴」か左の一総通メニュー。'
                   : '下に採点結果と正解の額表があります。「スタート」で同じ問題、「次の問題」で新しい出題。戻るときは「試験」か左の一総通メニュー。'}
               </span>
             </div>

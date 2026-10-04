@@ -1,16 +1,27 @@
 'use client';
 
-import { useRef, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { COURSES, courseMeta, selectCourseDefaults, type LearnCourse } from '@/lib/course';
+import { loadAuthSession } from '@/lib/api/authSession';
+import { AUTH_SYNC_EVENT } from '@/lib/api/cloudSync';
 import { exportAllData, importAllData } from '@/lib/storage';
 import { SPEED_WPM_MAX, SPEED_WPM_MIN } from '@/lib/speed';
 import type { AudioSettings, TrainerProfile } from '@/lib/types';
-import { audioEngine } from '@/app/trainer/shared';
+import { audioEngine, type View } from '@/app/trainer/shared';
 import { AudioControls } from '@/app/components/ui';
 import { Icon } from '@/app/components/icons';
 
-export function SettingsView({ settings, setSettings, profile, setProfile, onImported, announce }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; profile: TrainerProfile; setProfile: Dispatch<SetStateAction<TrainerProfile>>; onImported: () => void; announce: (message: string) => void }) {
+export function SettingsView({ settings, setSettings, profile, setProfile, onImported, announce, onNavigate }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; profile: TrainerProfile; setProfile: Dispatch<SetStateAction<TrainerProfile>>; onImported: () => void; announce: (message: string) => void; onNavigate?: (view: View) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [signedIn, setSignedIn] = useState(() => Boolean(loadAuthSession()));
+
+  useEffect(() => {
+    const sync = () => setSignedIn(Boolean(loadAuthSession()));
+    sync();
+    window.addEventListener(AUTH_SYNC_EVENT, sync);
+    return () => window.removeEventListener(AUTH_SYNC_EVENT, sync);
+  }, []);
+
   const download = async () => {
     const data = await exportAllData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -128,11 +139,57 @@ export function SettingsView({ settings, setSettings, profile, setProfile, onImp
         </div>
         <div className="panel panel-pad settings-panel">
           <div className="settings-card-head">
+            <span className="settings-icon" aria-hidden="true"><Icon name="collection" size={22} /></span>
+            <div>
+              <p className="section-kicker">ARCHIVE PREVIEW</p>
+              <h2>図鑑プレビュー</h2>
+              <p>ONの間だけ全カード・実績が見られます。図鑑で R / SR / SSR を切り替え可能。OFFにすると本当の進捗に戻ります。記録は増えません。</p>
+            </div>
+          </div>
+          <label className={`settings-switch${profile.revealAll ? ' on' : ''}`}>
+            <span className="settings-switch-copy">
+              <strong>全解放表示</strong>
+              <small>解放状況を無視して図鑑を全部見る（進捗非破壊）</small>
+            </span>
+            <span className="settings-switch-ui">
+              <input
+                type="checkbox"
+                checked={Boolean(profile.revealAll)}
+                onChange={(event) => {
+                  const next = event.target.checked;
+                  setProfile((old) => ({ ...old, revealAll: next }));
+                  announce(next ? '図鑑を全解放表示にしました' : '図鑑を通常表示に戻しました');
+                }}
+                aria-label="全解放表示のオンオフ"
+              />
+              <i aria-hidden="true" />
+            </span>
+          </label>
+        </div>
+        <div className="panel panel-pad settings-panel">
+          <div className="settings-card-head">
+            <span className="settings-icon" aria-hidden="true"><Icon name="account" size={22} /></span>
+            <div>
+              <p className="section-kicker">ACCOUNT</p>
+              <h2>マイページ</h2>
+              <p>ログイン・パスキーの追加/削除はマイページで行います。</p>
+            </div>
+          </div>
+          <button type="button" className="btn btn-primary" onClick={() => onNavigate?.('account')}>
+            <Icon name="key" size={16} />マイページを開く
+          </button>
+        </div>
+        <div className="panel panel-pad settings-panel">
+          <div className="settings-card-head">
             <span className="settings-icon" aria-hidden="true"><Icon name="lock" size={22} /></span>
             <div>
               <p className="section-kicker">DATA VAULT</p>
               <h2>データの保管</h2>
-              <p>回答の記録・カードの進捗・遅れ受信の統計を、このブラウザの中に保存します。</p>
+              <p>
+                {signedIn
+                  ? 'ログイン中は回答・カード進捗・統計をサーバー（クラウド）に保存し、他の端末でも使えます。このブラウザにも控えを残します。'
+                  : '未ログインでは回答・カード進捗・統計をこのブラウザの中だけに保存します。ログインするとサーバー同期に切り替わります。'}
+              </p>
             </div>
           </div>
           <div className="vault-actions">
@@ -140,10 +197,20 @@ export function SettingsView({ settings, setSettings, profile, setProfile, onImp
             <button type="button" className="btn btn-ghost" onClick={() => fileRef.current?.click()}>JSONを読み込む</button>
           </div>
           <input ref={fileRef} hidden type="file" accept="application/json" onChange={(event) => importFile(event.target.files?.[0])} />
-          <div className="storage-note">
-            <b>この端末に保存</b>
-            <span>サーバーには保存されません。</span>
-            <small>あなたの端末（ブラウザ）に保存されています</small>
+          <div className={`storage-note ${signedIn ? 'cloud' : 'local'}`}>
+            {signedIn ? (
+              <>
+                <b>サーバーに保存中</b>
+                <span>ログイン中の学習データはクラウドが優先です。</span>
+                <small>端末には同期用の控えも残ります</small>
+              </>
+            ) : (
+              <>
+                <b>この端末に保存</b>
+                <span>サーバーには保存されていません。</span>
+                <small>ログインするとサーバー保存に切り替わります</small>
+              </>
+            )}
           </div>
         </div>
       </div>

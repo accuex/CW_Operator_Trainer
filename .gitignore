@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+/api/vendor/
 /.pnp
 .pnp.*
 .yarn/*
