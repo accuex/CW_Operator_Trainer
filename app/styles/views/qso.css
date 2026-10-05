@@ -296,3 +296,20 @@
 .qso-condition-panel li.clean i b { background: var(--mint); }
 .qso-condition-panel li strong { text-align: right; font-family: var(--font-mono); }
 .qso-condition-panel li small { color: var(--muted, #8a93a8); text-align: right; }
+
+.qso-review-earned { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.qso-badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgb(246 196 83 / 45%);
+  background: var(--gold-soft);
+  color: var(--gold);
+  font: 800 13px var(--font-display);
+  animation: grid-in .45s var(--ease-spring) both;
+}
+.qso-badge-chip.tier-1 { border-color: rgb(208 138 82 / 50%); background: rgb(208 138 82 / 14%); color: #e3a173; }
+.qso-badge-chip.tier-2 { border-color: rgb(201 210 234 / 45%); background: rgb(201 210 234 / 12%); color: #dfe5f5; }
+.qso-badge-chip.mark { border-color: rgb(108 188 255 / 45%); background: var(--sky-soft); color: var(--sky); }

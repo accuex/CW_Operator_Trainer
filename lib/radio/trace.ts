@@ -27,7 +27,8 @@ export interface QsoTrace {
   fields: FieldResult[];
   /** Target's transmissions; `conditions` has one CONDITION_CODE letter per sent character. */
   rx: { at: number; text: string; wpm: number; cut: boolean; conditions: string }[];
-  tx: { at: number; text: string; offsetHz: number; issue?: QsoIssue }[];
+  /** `macro`: sent unchanged from a 定型 button. */
+  tx: { at: number; text: string; offsetHz: number; issue?: QsoIssue; macro?: boolean }[];
   evidence: QsoEvidence;
   adjusted: Record<string, number>;
 }

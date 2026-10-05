@@ -18,7 +18,7 @@ const seeded = (seed: number) => () => {
 };
 
 const sample = (t: number, over: Partial<BandSample> = {}): BandSample => ({
-  t, epoch: 1, listening: true, offset: 0, filter: 500, snr: 4, qrm: 0, qsb: 0, qrn: 0, ...over,
+  station: 1, t, epoch: 1, listening: true, offset: 0, filter: 500, snr: 4, qrm: 0, qsb: 0, qrn: 0, ...over,
 });
 
 /** A transmission at `start` with per-character spans, as the rig would record it. */
@@ -92,7 +92,7 @@ describe('log attribution', () => {
 
   it('blames copy on a clean band and the band under QRM', () => {
     const tx = sentAt(report, 10);
-    const records: RxRecord[] = [{ tx, epoch: 1, cutAt: null }];
+    const records: RxRecord[] = [{ tx, station: 1, epoch: 1, cutAt: null }];
     const clean = monitorOf(9, 80, () => ({}));
     const fields = scoreFields(BASIC_RST_NAME_QTH, truth, { ...truth, name: 'KIN' }, records, clean, now);
     const name = fields.find((field) => field.key === 'name')!;
@@ -109,14 +109,14 @@ describe('log attribution', () => {
     const first = tx.chars.find((span) => span.char === 'K' && tx.text.split(' ')[span.word] === 'KEN')!;
     // QRM only during the first "KEN"; the second one is clean.
     const monitor = monitorOf(9, 80, (t) => (t >= first.start - 0.05 && t <= first.end + 0.3 ? { qrm: 0.9 } : {}));
-    const [, , name] = scoreFields(BASIC_RST_NAME_QTH, truth, { ...truth, name: 'XEN' }, [{ tx, epoch: 1, cutAt: null }], monitor, now);
+    const [, , name] = scoreFields(BASIC_RST_NAME_QTH, truth, { ...truth, name: 'XEN' }, [{ tx, station: 1, epoch: 1, cutAt: null }], monitor, now);
     expect(name.cells[0]).toMatchObject({ condition: 'clean', cause: 'copy' });
   });
 
   it('calls it tuning when off the passband and timing when never sent', () => {
     const tx = sentAt(report, 10);
     const detuned = monitorOf(9, 80, () => ({ offset: 800 }));
-    const cut: RxRecord[] = [{ tx, epoch: 1, cutAt: tx.chars.find((span) => tx.text.split(' ')[span.word] === 'QTH')!.start - 0.01 }];
+    const cut: RxRecord[] = [{ tx, station: 1, epoch: 1, cutAt: tx.chars.find((span) => tx.text.split(' ')[span.word] === 'QTH')!.start - 0.01 }];
     const fields = scoreFields(BASIC_RST_NAME_QTH, truth, { call: 'JH3ABX', rst: '', name: '', qth: '' }, cut, detuned, now);
     expect(fields[0].cells[5]).toMatchObject({ condition: 'detuned', cause: 'tuning' });
     // QTH comes after the cut: never on the air.
@@ -126,7 +126,7 @@ describe('log attribution', () => {
   it('collects evidence and builds AnswerLogs that keep the environment', () => {
     const tx = sentAt(report, 10);
     const monitor = monitorOf(9, 80, () => ({ qsb: 0.8 }));
-    const fields = scoreFields(BASIC_RST_NAME_QTH, truth, { ...truth, qth: 'OSAKO' }, [{ tx, epoch: 1, cutAt: null }], monitor, now);
+    const fields = scoreFields(BASIC_RST_NAME_QTH, truth, { ...truth, qth: 'OSAKO' }, [{ tx, station: 1, epoch: 1, cutAt: null }], monitor, now);
     const evidence = collectEvidence(fields, { total: 3, onFrequency: 2, procedure: 1 });
     expect(evidence.causes).toMatchObject({ environment: 1, tuning: 1, procedure: 1, copy: 0 });
     expect(evidence.env.qsb).toEqual({ total: 17, correct: 16 });

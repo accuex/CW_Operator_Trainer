@@ -2,23 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnswerLog, AudioSettings, CopyCondition, QsoCause, QsoProfile, SessionRecord, TrainerProfile } from '@/lib/types';
-import { formatFrequency, makeQrm, nearestStation } from '@/lib/radio/band';
-import { CopyMonitor, markCut, sampleBand, type RxRecord } from '@/lib/radio/conditions';
+import { makeQrm } from '@/lib/radio/band';
+import { markCut } from '@/lib/radio/conditions';
 import { collectEvidence, fieldAnswers, scoreFields, type FieldResult } from '@/lib/radio/attribution';
-import { AXES, AXIS_SPECS, adjustDifficulty, describeMove, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
+import { AXIS_SPECS, adjustDifficulty, describeMove, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
 import { PRESETS } from '@/lib/radio/exchange';
 import { QSO_MODES, qsoMode, type QsoSession } from '@/lib/radio/modes';
 import { isProcedureIssue, MIN_TARGET_WPM } from '@/lib/radio/qso';
-import { FILTERS, RigEngine, type FilterWidth } from '@/lib/radio/rig';
-import { ScopeRenderer, hzAtRatio } from '@/lib/radio/scope';
+import { TIER_LABEL, badgeById, recordQsoOutcome, type EarnedBadge } from '@/lib/radio/badges';
 import { modeProgress, normalizeQsoProfile, recommendStage, updateSkills } from '@/lib/radio/skills';
+import { logbookEntries } from '@/lib/radio/logbook';
 import { traceRx, type QsoTrace } from '@/lib/radio/trace';
 import { addQsoTrace } from '@/lib/storage';
-import { audioEngine, nowId } from '@/app/trainer/shared';
+import { nowId } from '@/app/trainer/shared';
 import { Icon } from '@/app/components/icons';
+import { RigPanel } from './qso/RigPanel';
+import { useRig, type Capture, type PowerResult } from './qso/useRig';
 
-const START_VFO = 7_012_000;
-const SPANS = [2500, 5000, 1250] as const;
 const PREFS_KEY = 'cwot.qso.prefs';
 const LOGBOOK_SIZE = 30;
 
@@ -45,14 +45,20 @@ interface Live {
   startedAt: number;
   modeId: string;
   session: QsoSession;
-  monitor: CopyMonitor;
-  rx: RxRecord[];
+  capture: Capture;
   tx: QsoTrace['tx'];
-  /** Target WPM when each record went out (QRS changes it). */
-  rxWpm: Map<RxRecord, number>;
 }
 
-interface Review { fields: FieldResult[]; evidence: QsoEvidence; moved: Partial<Record<Axis, number>>; auto: boolean; received: string[] }
+interface Review {
+  fields: FieldResult[];
+  evidence: QsoEvidence;
+  moved: Partial<Record<Axis, number>>;
+  auto: boolean;
+  received: string[];
+  earned: EarnedBadge[];
+  /** Characters that just got their 実戦マーク. */
+  marked: string[];
+}
 
 export interface QsoViewProps {
   settings: AudioSettings;
@@ -74,12 +80,8 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const myCall = qso.myCall ?? prefs.myCall ?? 'JA1ZZZ';
   const advice = recommendStage(qso);
 
-  const [powered, setPowered] = useState(false);
-  const [vfo, setVfo] = useState(START_VFO);
-  const [filter, setFilter] = useState<FilterWidth>(500);
-  const [span, setSpan] = useState<(typeof SPANS)[number]>(2500);
-  const [hold, setHold] = useState(false);
-  const [txOn, setTxOn] = useState(false);
+  const rig = useRig({ pitch: settings.pitch, stopEpoch, levels: { af: prefs.af, noise: difficulty.noise, qrn: difficulty.qrn, qsb: difficulty.qsb } });
+  const { engineRef, txOn, newCapture } = rig;
   const [step, setStep] = useState(0);
   const [canLog, setCanLog] = useState(false);
   const [hint, setHint] = useState('電源を入れて、ウォーターフォールで CQ を出している局を探しましょう');
@@ -89,18 +91,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const [review, setReview] = useState<Review | null>(null);
   const [macros, setMacros] = useState<[string, string][]>([]);
 
-  const engineRef = useRef<RigEngine | null>(null);
   const liveRef = useRef<Live | null>(null);
-  const scopeRef = useRef<HTMLCanvasElement>(null);
-  const fallRef = useRef<HTMLCanvasElement>(null);
-  const meterRef = useRef<HTMLElement>(null);
-  const dragRef = useRef<{ x: number; vfo: number; moved: boolean; width: number } | null>(null);
-  const holdRef = useRef(hold);
-  const spanRef = useRef<number>(span);
   const settingsRef = useRef({ myCall, difficulty, modeId: mode.id });
   useEffect(() => {
-    holdRef.current = hold;
-    spanRef.current = span;
     settingsRef.current = { myCall, difficulty, modeId: mode.id };
   });
 
@@ -111,13 +104,6 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     updateQso((current) => ({ ...current, modes: { ...current.modes, [mode.id]: { ...modeProgress(current, mode.id, difficulty), ...change } } }));
   };
 
-  const tune = useCallback((hz: number) => {
-    const engine = engineRef.current;
-    if (!engine) return;
-    engine.setVfo(hz);
-    setVfo(engine.vfo);
-  }, []);
-
   const newStation = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
@@ -125,7 +111,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     const current = qsoMode(modeId);
     const preset = PRESETS[current.presets[0]];
     const session = current.createSession({ random: Math.random, myCall, vfo: engine.vfo, difficulty, preset });
-    liveRef.current = { id: `qso-${nowId()}`, startedAt: Date.now(), modeId: current.id, session, monitor: new CopyMonitor(), rx: [], tx: [], rxWpm: new Map() };
+    liveRef.current = { id: `qso-${nowId()}`, startedAt: Date.now(), modeId: current.id, session, capture: newCapture(), tx: [] };
     engine.setStations(session.stations);
     setStep(session.step);
     setCanLog(session.canLog);
@@ -133,147 +119,10 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     setLog({});
     setReview(null);
     setSent([]);
-  }, []);
+  }, [engineRef, newCapture]);
 
-  // Engine + scope lifecycle.
-  useEffect(() => {
-    const engine = new RigEngine(START_VFO);
-    engine.pitch = settings.pitch;
-    engineRef.current = engine;
-    engine.onTransmission = (station, tx) => {
-      const live = liveRef.current;
-      if (!live || station !== live.session.target) return;
-      const record: RxRecord = { tx, epoch: engine.epoch, cutAt: null };
-      live.rx.push(record);
-      live.rxWpm.set(record, station.wpm);
-    };
-    engine.onTick = (now) => {
-      const live = liveRef.current;
-      if (!live) return;
-      live.monitor.push(sampleBand({
-        t: now,
-        epoch: engine.epoch,
-        listening: engine.listening,
-        vfo: engine.vfo,
-        filter: engine.filter,
-        noise: engine.levels.noise,
-        target: live.session.target,
-        stations: engine.stations,
-        crash: engine.crashAt(now),
-      }));
-    };
-    newStation();
-    engine.start();
-
-    const renderer = scopeRef.current && fallRef.current ? new ScopeRenderer(scopeRef.current, fallRef.current) : null;
-    const observer = new ResizeObserver(() => renderer?.resize());
-    if (scopeRef.current) observer.observe(scopeRef.current);
-    let raf = 0;
-    const frame = () => {
-      raf = requestAnimationFrame(frame);
-      renderer?.frame({
-        t: engine.now(),
-        vfo: engine.vfo,
-        span: spanRef.current,
-        filter: engine.filter,
-        noise: engine.levels.noise,
-        stations: engine.stations,
-        crashes: engine.crashes,
-        hold: holdRef.current,
-        transmitting: engine.transmitting,
-      });
-      if (meterRef.current) meterRef.current.style.transform = `scaleX(${engine.meter()})`;
-    };
-    raf = requestAnimationFrame(frame);
-    const onVisibility = () => void engine.setBackground(document.visibilityState === 'hidden');
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => {
-      cancelAnimationFrame(raf);
-      observer.disconnect();
-      document.removeEventListener('visibilitychange', onVisibility);
-      engine.onTick = null;
-      engine.onTransmission = null;
-      engine.dispose();
-      engineRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- one engine per mount
-  }, []);
-
-  useEffect(() => { engineRef.current?.setPitch(settings.pitch); }, [settings.pitch]);
-  useEffect(() => {
-    engineRef.current?.setLevels({ af: prefs.af, noise: difficulty.noise, qrn: difficulty.qrn, qsb: difficulty.qsb });
-  }, [prefs.af, difficulty.noise, difficulty.qrn, difficulty.qsb]);
-  useEffect(() => { engineRef.current?.setFilter(filter); }, [filter]);
-  useEffect(() => {
-    try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* private mode */ }
-  }, [prefs]);
-
-  // Header stop button powers the rig off.
-  const firstStop = useRef(stopEpoch);
-  useEffect(() => {
-    if (stopEpoch === firstStop.current) return;
-    void engineRef.current?.powerOff();
-    setPowered(false);
-    setTxOn(false);
-  }, [stopEpoch]);
-
-  // Wheel tuning needs a non-passive listener.
-  useEffect(() => {
-    const canvases = [scopeRef.current, fallRef.current].filter(Boolean) as HTMLCanvasElement[];
-    const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      const engine = engineRef.current;
-      if (engine) tune(engine.vfo + Math.sign(event.deltaY) * (event.shiftKey ? 2 : 10));
-    };
-    for (const canvas of canvases) canvas.addEventListener('wheel', onWheel, { passive: false });
-    return () => { for (const canvas of canvases) canvas.removeEventListener('wheel', onWheel); };
-  }, [tune]);
-
-  const powerToggle = async () => {
-    const engine = engineRef.current;
-    if (!engine) return;
-    if (engine.powered) {
-      await engine.powerOff();
-      setPowered(false);
-      return;
-    }
-    audioEngine.stop();
-    try {
-      await engine.powerOn();
-      setPowered(true);
-      if (step === 0) setHint('ウォーターフォールの局をクリックすると同調します。CQ を出している局を探しましょう');
-    } catch {
-      setHint('このブラウザでは音声を出せませんでした');
-    }
-  };
-
-  const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
-    dragRef.current = { x: event.clientX, vfo: engineRef.current?.vfo ?? vfo, moved: false, width: event.currentTarget.getBoundingClientRect().width };
-  };
-  const onPointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    const drag = dragRef.current;
-    if (!drag) return;
-    const dx = event.clientX - drag.x;
-    if (Math.abs(dx) > 4) drag.moved = true;
-    if (drag.moved) tune(drag.vfo - (dx / drag.width) * span * 2);
-  };
-  const onPointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    const drag = dragRef.current;
-    dragRef.current = null;
-    const engine = engineRef.current;
-    if (!drag || drag.moved || !engine) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const hz = hzAtRatio((event.clientX - rect.left) / rect.width, engine.vfo, span);
-    const near = nearestStation(engine.stations, hz, span * 0.04);
-    tune(near ? near.rf : hz);
-  };
-  const onRigKey = (event: React.KeyboardEvent) => {
-    if (event.target instanceof HTMLInputElement) return;
-    const delta = event.shiftKey ? 50 : 10;
-    if (event.key === 'ArrowLeft') { event.preventDefault(); tune(vfo - delta); }
-    if (event.key === 'ArrowRight') { event.preventDefault(); tune(vfo + delta); }
-  };
+  // The rig's engine exists once its own effect has run; put the first station on it.
+  useEffect(() => { newStation(); }, [newStation]);
 
   const transmit = async (raw: string) => {
     const engine = engineRef.current;
@@ -282,23 +131,21 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     if (!engine || !live || !text || txOn) return;
     if (!engine.powered) { setHint('先に電源を入れてください'); return; }
     if (!myCall) { setHint('設定で自分のコールサインを入れてください'); return; }
+    const macro = macros.some(([, line]) => line.toUpperCase().replace(/\s+/g, ' ').trim() === text);
     setTxText('');
     setSent((list) => [...list, text]);
-    setTxOn(true);
-    await engine.transmit(text, difficulty.speed);
-    setTxOn(false);
-    if (engineRef.current !== engine || liveRef.current !== live || !engine.powered) return;
+    if (!(await rig.transmit(text, difficulty.speed)) || liveRef.current !== live) return;
     const { session } = live;
     const offsetHz = engine.vfo - session.target.rf;
     const reply = session.onTransmit(text, { offsetHz });
-    live.tx.push({ at: Date.now(), text, offsetHz: Math.round(offsetHz), issue: reply.issue });
+    live.tx.push({ at: Date.now(), text, offsetHz: Math.round(offsetHz), issue: reply.issue, macro });
     setHint(reply.hint);
     setStep(session.step);
     setCanLog(session.canLog);
     if (!reply.reply) return;
     const now = engine.now();
     engine.cut(session.target);
-    markCut(live.rx, engine.epoch, now);
+    markCut(live.capture.rx, engine.epoch, now, session.target.id);
     engine.send(session.target, reply.reply, 0.6 + Math.random() * 0.9);
   };
 
@@ -314,7 +161,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     if (!engine || !live || review) return;
     const { session } = live;
     const now = { t: engine.now(), epoch: engine.epoch };
-    const fields = scoreFields(session.preset, session.truth(), log, live.rx, live.monitor, now);
+    const { capture } = live;
+    const targetRx = capture.rx.filter((record) => record.station === session.target.id);
+    const fields = scoreFields(session.preset, session.truth(), log, targetRx, capture.monitor, now);
     const offFrequency = live.tx.filter((event) => event.issue === 'off-frequency').length;
     const evidence = collectEvidence(fields, {
       total: live.tx.length,
@@ -327,9 +176,16 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       ? adjustDifficulty({ difficulty: current.difficulty as DifficultyVector, votes: current.votes }, evidence, current.pinned)
       : { difficulty: current.difficulty as DifficultyVector, votes: current.votes, moved: {} };
     const endedAt = Date.now();
+    // QRS slows the target down; credit the speed it actually sent at.
+    const wpm = Math.min(difficulty.speed, ...targetRx.map((record) => capture.rxWpm.get(record) ?? difficulty.speed));
+    const outcome = {
+      fields, evidence, alphabet: session.preset.alphabet, wpm, tx: live.tx, at: endedAt,
+      complete: session.step >= mode.steps.length - 1,
+    };
+    const { earned, marked } = recordQsoOutcome(qso, outcome);
     updateQso((old) => {
       const base = modeProgress(old, live.modeId, difficulty);
-      const next = updateSkills(old, { modeId: live.modeId, alphabet: session.preset.alphabet, wpm: difficulty.speed, evidence });
+      const next = recordQsoOutcome(updateSkills(old, { modeId: live.modeId, alphabet: session.preset.alphabet, wpm, evidence }), outcome).qso;
       return {
         ...next,
         modes: {
@@ -347,7 +203,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     });
 
     const answers = fieldAnswers(fields, {
-      sessionId: live.id, timestamp: endedAt, wpm: difficulty.speed, modeId: live.modeId, presetId: session.preset.id, alphabet: session.preset.alphabet,
+      sessionId: live.id, timestamp: endedAt, wpm, modeId: live.modeId, presetId: session.preset.id, alphabet: session.preset.alphabet,
     });
     recordMany(answers);
     const cleanAccuracy = evidence.clean.total ? evidence.clean.correct / evidence.clean.total : null;
@@ -363,16 +219,17 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         modeId: live.modeId,
         presetId: session.preset.id,
         call: session.truth().call ?? '',
-        outcome: session.step >= mode.steps.length - 1 ? 'complete' : 'partial',
+        outcome: outcome.complete ? 'complete' : 'partial',
         fields: fields.length,
         fieldsCorrect: correctFields,
         cleanAccuracy,
         causes: evidence.causes,
         difficulty: { ...difficulty },
         adjusted: adjusted.moved,
+        contacts: [{ call: session.truth().call ?? '', fields: fields.length, fieldsCorrect: correctFields, outcome: outcome.complete ? 'complete' : 'partial', at: endedAt }],
       },
     });
-    const rx = traceRx(live.rx, live.monitor, now, (record) => live.rxWpm.get(record) ?? session.target.wpm);
+    const rx = traceRx(targetRx, capture.monitor, now, (record) => capture.rxWpm.get(record) ?? session.target.wpm);
     void addQsoTrace({
       id: live.id,
       startedAt: live.startedAt,
@@ -391,7 +248,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     // What actually went out, without the CQ loop repeating itself.
     const received = rx.filter((record) => !/^u*$/.test(record.conditions)).map((record) => record.text)
       .filter((text, index, list) => text !== list[index - 1]);
-    setReview({ fields, evidence, moved: adjusted.moved, auto: current.auto, received });
+    setReview({ fields, evidence, moved: adjusted.moved, auto: current.auto, received, earned, marked });
   };
 
   const setCrowd = (crowd: number) => {
@@ -419,9 +276,13 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     updateMode({ pinned });
   };
 
-  const freq = formatFrequency(vfo);
+  const onPower = (result: PowerResult) => {
+    if (result === 'on' && step === 0) setHint('ウォーターフォールの局をクリックすると同調します。CQ を出している局を探しましょう');
+    if (result === 'failed') setHint('このブラウザでは音声を出せませんでした');
+  };
+
   const preset = PRESETS[mode.presets[0]];
-  const logbook = useMemo(() => sessions.filter((session) => session.qso).slice(-LOGBOOK_SIZE).reverse(), [sessions]);
+  const logbook = useMemo(() => logbookEntries(sessions).slice(-LOGBOOK_SIZE).reverse(), [sessions]);
   const fieldResult = (key: string) => review?.fields.find((field) => field.key === key);
 
   return <section className="page-pad qso-page">
@@ -458,41 +319,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     </div>
 
     <div className="qso-grid">
-      <div className={`qso-rig ${powered ? 'on' : 'off'}`} tabIndex={0} onKeyDown={onRigKey} aria-label="受信機。左右キーで周波数を変えます">
-        <div className="rig-top">
-          <button type="button" className={`rig-power ${powered ? 'on' : ''}`} onClick={powerToggle} aria-pressed={powered}>
-            <span aria-hidden="true" />POWER
-          </button>
-          <span className={`rig-lamp tx ${txOn ? 'on' : ''}`}>TX</span>
-          <span className="rig-tag mode">CW</span>
-          <span className="rig-tag">FIL {filter >= 1000 ? `${filter / 1000}k` : filter}</span>
-          <div className="rig-freq" aria-live="off"><span>{freq.main}</span>.<small>{freq.sub}</small></div>
-        </div>
-        <div className="rig-meter">
-          <span>S</span>
-          <div className="rig-smeter"><i ref={meterRef} /></div>
-          <span className="rig-scale">1 · 3 · 5 · 7 · 9 · +20 · +40</span>
-        </div>
-        <div className="rig-scope-head"><span>−{span / 1000}k</span><span>SCOPE · CENTER</span><span>+{span / 1000}k</span></div>
-        <canvas ref={scopeRef} className="rig-scope" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={() => { dragRef.current = null; }} />
-        <canvas ref={fallRef} className="rig-fall" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={() => { dragRef.current = null; }} />
-        {!powered && (
-          <button type="button" className="rig-poweron" onClick={powerToggle}>
-            <Icon name="volume" size={20} />電源を入れて受信する
-          </button>
-        )}
-        <div className="rig-keys">
-          {FILTERS.map((width, index) => (
-            <button key={width} type="button" className={filter === width ? 'on' : ''} onClick={() => setFilter(width)}>
-              FIL{index + 1}<small>{width >= 1000 ? `${width / 1000}k` : width}</small>
-            </button>
-          ))}
-          <button type="button" onClick={() => setSpan(SPANS[(SPANS.indexOf(span) + 1) % SPANS.length])}>SPAN<small>±{span / 1000}k</small></button>
-          <button type="button" className={hold ? 'on' : ''} onClick={() => setHold(!hold)}>HOLD<small>{hold ? 'ON' : 'OFF'}</small></button>
-          <button type="button" onClick={() => tune(vfo - 50)} aria-label="50 Hz 下げる">◀<small>−50</small></button>
-          <button type="button" onClick={() => tune(vfo + 50)} aria-label="50 Hz 上げる">▶<small>+50</small></button>
-        </div>
-      </div>
+      <RigPanel rig={rig} onPower={onPower} />
 
       <div className="qso-side">
         <div className="panel panel-pad qso-status">
@@ -580,7 +407,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           <Icon name="lock" size={12} /> で固定した軸は動かしません。
         </p>
         <div className="qso-axes">
-          {AXES.map((axis) => {
+          {mode.axes.map((axis) => {
             const spec = AXIS_SPECS[axis];
             const value = difficulty[axis];
             const pinned = progress.pinned.includes(axis);
@@ -621,9 +448,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           <ol>
             {logbook.map((entry) => (
               <li key={entry.id}>
-                <time>{new Date(entry.endedAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</time>
-                <b>{entry.qso!.call}</b>
-                <span className={entry.qso!.fieldsCorrect === entry.qso!.fields ? 'perfect' : ''}>{entry.qso!.fieldsCorrect}/{entry.qso!.fields}</span>
+                <time>{new Date(entry.at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</time>
+                <b>{entry.call}</b>
+                <span className={entry.fieldsCorrect === entry.fields ? 'perfect' : ''}>{entry.fieldsCorrect}/{entry.fields}</span>
               </li>
             ))}
           </ol>
@@ -640,7 +467,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
 
 /** Post-QSO review: which characters were missed, and why. */
 function QsoReview({ review }: { review: Review }) {
-  const { fields, evidence, moved, auto, received } = review;
+  const { fields, evidence, moved, auto, received, earned, marked } = review;
   const causes = (Object.keys(CAUSE_LABEL) as (keyof typeof CAUSE_LABEL)[]).filter((cause) => evidence.causes[cause] > 0);
   const moves = (Object.entries(moved) as [Axis, number][]).map(([axis, delta]) => describeMove(axis, delta));
   const clean = evidence.clean.total ? Math.round((evidence.clean.correct / evidence.clean.total) * 100) : null;
@@ -655,6 +482,14 @@ function QsoReview({ review }: { review: Review }) {
           <span key={cause} className={`chip cause-${cause}`}>{CAUSE_LABEL[cause]} {evidence.causes[cause]}</span>
         )) : <span className="chip mint">ノーミス</span>}
       </div>
+      {(earned.length > 0 || marked.length > 0) && (
+        <div className="qso-review-earned" role="status">
+          {earned.map(({ id, tier }) => (
+            <span key={id} className={`qso-badge-chip tier-${tier}`}><Icon name="trophy" size={14} />{badgeById(id)?.title} {TIER_LABEL[tier]}</span>
+          ))}
+          {marked.length > 0 && <span className="qso-badge-chip mark"><Icon name="bolt" size={14} />実戦マーク {marked.join(' ')}</span>}
+        </div>
+      )}
       <div className="qso-review-fields">
         {fields.map((field) => (
           <div key={field.key} className="qso-review-row">

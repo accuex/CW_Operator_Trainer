@@ -6,6 +6,7 @@ import { effectiveDisplayRarity } from '@/lib/collectionReveal';
 import { CARDS, type MorseCard } from '@/lib/morse';
 import { COURSE_CATALOG, KIND_LABEL, cardsForCourse, courseMeta, type CharacterKind } from '@/lib/course';
 import { readProgressMeter } from '@/lib/progressMeter';
+import { BADGES, MARK_COUNT, MARK_WPM, TIER_LABEL, badgeTier, charMarkKey, hasCharMark, nextTier } from '@/lib/radio/badges';
 import type { AudioSettings, CardProgress, CardRarityOwned, TrainerProfile } from '@/lib/types';
 import { audioEngine, cardKey, cardStatus, CARD_STATUS_LABEL, emptyProgress, formatCode, mnemonicFor, mnemonicCategoryFor, masteryFor } from '@/app/trainer/shared';
 import { AchievementCard } from '@/app/components/AchievementCard';
@@ -17,7 +18,7 @@ const cardNumber = (card: MorseCard) => `No.${String(CARDS.indexOf(card) + 1).pa
 const achievementNumber = (item: AchievementDef) => `Ach.${String(ACHIEVEMENTS.indexOf(item) + 1).padStart(2, '0')}`;
 const CATEGORY_LABEL: Record<string, string> = { Recommended: 'おすすめ', Classic: '定番', Funny: 'おもしろ', Custom: '自作' };
 
-type ArchiveTab = 'chars' | 'achievements';
+type ArchiveTab = 'chars' | 'achievements' | 'qso';
 
 export function CollectionView({ settings, profile, setProfile, setAudioStatus }: { settings: AudioSettings; profile: TrainerProfile; setProfile: React.Dispatch<React.SetStateAction<TrainerProfile>>; setAudioStatus: (status: string) => void }) {
   const course = profile.learnCourse ?? null;
@@ -39,6 +40,10 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
     return !progress?.mastered && readProgressMeter(progress) > 0;
   }).length;
   const achievementUnlocked = ACHIEVEMENTS.filter((item) => profile.achievements?.[item.id]?.unlockedAt).length;
+  const badgeTiers = BADGES.map((badge) => badgeTier(badge, profile.qso));
+  const badgeEarned = badgeTiers.reduce<number>((sum, tier) => sum + tier, 0);
+  const charMark = (card: MorseCard) => profile.qso?.charMarks?.[charMarkKey(card.alphabet, card.symbol)];
+  const markedCount = Object.values(profile.qso?.charMarks ?? {}).filter(hasCharMark).length;
   const revealCard = (progress?: CardProgress) => Boolean(progress?.mastered) || revealAll;
   const revealAchievement = (id: AchievementDef['id']) => Boolean(profile.achievements?.[id]?.unlockedAt) || revealAll;
   const play = async (card: MorseCard) => {
@@ -100,7 +105,9 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
 
   const heroComplete = archiveTab === 'achievements'
     ? (ACHIEVEMENTS.length ? achievementUnlocked / ACHIEVEMENTS.length : 0)
-    : (cards.length ? masteredCount / cards.length : 0);
+    : archiveTab === 'qso'
+      ? badgeEarned / (BADGES.length * 3)
+      : (cards.length ? masteredCount / cards.length : 0);
 
   return <section className="page-pad collection-page">
     <div className="collection-hero panel">
@@ -111,6 +118,8 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
           ? '全解放表示中（プレビュー）。下のレア切替で R / SR / SSR を見られます。GET数は本物の進捗のまま。'
           : archiveTab === 'achievements'
             ? '条件を満たすと実績カードが解禁。未取得は中身シークレット（???）。'
+            : archiveTab === 'qso'
+              ? 'QSO シミュレーターでの実戦の証。カードのレア度とは別に、銅・銀・金の 3 段階で育ちます。'
             : course
               ? 'コース内の文字は最初から見えます。カード絵は「当てる」やコッホ昇級でGETして集めよう。'
               : '「おぼえる」でコースを選ぶと、その範囲のカードがここに並びます。学習記録は消えません。'}</p>
@@ -119,6 +128,12 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
             <>
               <span className="tally gold"><b>{achievementUnlocked}</b>GET</span>
               <span className="tally"><b>{ACHIEVEMENTS.length - achievementUnlocked}</b>未解禁</span>
+            </>
+          ) : archiveTab === 'qso' ? (
+            <>
+              <span className="tally gold"><b>{badgeTiers.filter(Boolean).length}</b>バッジ</span>
+              <span className="tally"><b>{badgeTiers.filter((tier) => tier === 3).length}</b>金</span>
+              <span className="tally sky"><b>{markedCount}</b>実戦マーク</span>
             </>
           ) : (
             <>
@@ -141,7 +156,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
       <Segmented
         label="図鑑"
         value={archiveTab}
-        options={[['chars', '文字カード'], ['achievements', '実績']]}
+        options={[['chars', '文字カード'], ['achievements', '実績'], ['qso', 'QSO バッジ']]}
         onChange={(value) => switchTab(value as ArchiveTab)}
       />
       {archiveTab === 'chars' && course && (
@@ -189,6 +204,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
               <b>{card.symbol}</b>
             </span>
             {!progress?.mastered && !revealAll && <span className="collection-item-meter"><i style={{ width: `${meter}%` }} /></span>}
+            {hasCharMark(charMark(card)) && <span className="collection-item-mark" title="QSO 実戦マーク"><Icon name="bolt" size={12} /></span>}
           </button>
         );
       })}</div>
@@ -215,6 +231,8 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
         );
       })}</div>
     )}
+
+    {archiveTab === 'qso' && <QsoBadgeBoard profile={profile} />}
 
     {selected && selectedProgress && <div className="card-drawer-backdrop" onClick={() => setSelected(null)}>
       <div className="card-drawer" role="dialog" aria-modal="true" aria-label={`${selected.symbol}のカード詳細`} onClick={(event) => event.stopPropagation()}>
@@ -256,6 +274,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
             <div><dt>連続正解</dt><dd>{selectedProgress.streak}</dd></div>
             <div><dt>聴いた回数</dt><dd>{selectedProgress.exposures ?? 0}</dd></div>
             <div><dt>分類</dt><dd className="small">{showMnemonics && selected.hasMnemonic ? (CATEGORY_LABEL[mnemonicCategoryFor(selected, selectedProgress)] ?? mnemonicCategoryFor(selected, selectedProgress)) : KIND_LABEL[selected.kind]}</dd></div>
+            <div><dt>QSO 実戦</dt><dd>{charMark(selected)?.count ?? 0}<small> 回{hasCharMark(charMark(selected)) ? ' ⚡' : ''}</small></dd></div>
             <div><dt>GET日</dt><dd className="small">{selectedProgress.masteredAt ? new Date(selectedProgress.masteredAt).toLocaleDateString('ja-JP') : '—'}</dd></div>
           </dl>
           {!selectedRevealed && <p className="detail-locked"><Icon name="lock" size={16} />「当てる」で10回以上・正答率90%以上・5連続正解でGET！</p>}
@@ -324,4 +343,51 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
       </div>
     </div>}
   </section>;
+}
+
+/** 実戦習熟バッジ: earned only in the QSO simulator, separate from card rarity. */
+function QsoBadgeBoard({ profile }: { profile: TrainerProfile }) {
+  const marks = Object.entries(profile.qso?.charMarks ?? {})
+    .map(([key, mark]) => ({ symbol: key.slice(key.indexOf(':') + 1), count: mark.count, marked: hasCharMark(mark) }))
+    .sort((a, b) => b.count - a.count);
+  return <>
+    <div className="qso-badge-grid">{BADGES.map((badge) => {
+      const tier = badgeTier(badge, profile.qso);
+      const next = nextTier(badge, profile.qso);
+      return (
+        <div key={badge.id} className={`qso-badge tier-${tier}`}>
+          <div className="qso-badge-head">
+            <span className="qso-badge-medal" aria-hidden="true"><Icon name="trophy" size={22} /></span>
+            <div>
+              <b>{badge.title}</b>
+              <span className="qso-badge-pips" aria-label={tier ? `${TIER_LABEL[tier]}を獲得` : '未獲得'}>
+                {[1, 2, 3].map((step) => <i key={step} className={step <= tier ? `on tier-${step}` : ''} />)}
+                <small>{tier ? TIER_LABEL[tier] : '未獲得'}</small>
+              </span>
+            </div>
+          </div>
+          <p>{badge.description}</p>
+          {next ? (
+            <div className="qso-badge-next">
+              <span>次の{TIER_LABEL[next.tier]}: {next.label}</span>
+              <ProgressBar value={next.goal ? next.value / next.goal : 0} tone="gold" label={`${badge.title}の進み具合`} />
+              <small>{next.value} / {next.goal} {badge.unit}</small>
+            </div>
+          ) : <p className="qso-badge-done">金まで到達しました</p>}
+        </div>
+      );
+    })}</div>
+
+    <div className="panel panel-pad qso-marks">
+      <p className="section-kicker"><Icon name="bolt" size={14} />実戦マーク</p>
+      <p>{MARK_WPM} WPM 以上・通常条件の QSO で {MARK_COUNT} 回正しく受信した字には、文字カードに ⚡ が付きます。カードのレア度は変わりません。</p>
+      {marks.length ? (
+        <ul>{marks.map((mark) => (
+          <li key={mark.symbol} className={mark.marked ? 'on' : ''} title={`${mark.count} 回`}>
+            <b>{mark.symbol}</b><small>{Math.min(mark.count, MARK_COUNT)}/{MARK_COUNT}</small>
+          </li>
+        ))}</ul>
+      ) : <p className="qso-note">まだ記録がありません。{MARK_WPM} WPM 以上で QSO すると貯まっていきます。</p>}
+    </div>
+  </>;
 }

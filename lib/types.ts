@@ -124,6 +124,19 @@ export interface QsoSessionSummary {
   difficulty: Record<string, number>;
   /** Axis changes applied after this QSO, e.g. { speed: 1 }. */
   adjusted: Record<string, number>;
+  /**
+   * Every contact in the session (a CQ run logs many; a rag-chew is one). Older
+   * records lack it; `call` / `fields` / `fieldsCorrect` / `outcome` then stand for the only contact.
+   */
+  contacts?: QsoContactSummary[];
+}
+
+export interface QsoContactSummary {
+  call: string;
+  fields: number;
+  fieldsCorrect: number;
+  outcome: 'complete' | 'partial';
+  at: number;
 }
 
 export interface QueueInputResult {
@@ -264,4 +277,26 @@ export interface QsoProfile {
     procedure: Record<string, SkillEstimate>;
   };
   modes: Record<string, QsoModeProgress>;
+  /** Raw evidence counters badges are computed from (see lib/radio/badges.ts). */
+  stats?: QsoStats;
+  /** Earned badge tiers. Never revoked when criteria change. */
+  badges?: Record<string, QsoBadgeRecord>;
+  /** Per card key (`alphabet:symbol`): clean, correct copies in fast QSOs. */
+  charMarks?: Record<string, QsoCharMark>;
 }
+
+export interface QsoStats {
+  /** Correct clean chars in QSOs copied ≥ 95% clean, by minimum WPM threshold. */
+  fastClean: Record<string, number>;
+  /** Correct chars under each condition, in QSOs that held up under it. */
+  envCorrect: Partial<Record<QsoEnvCondition, number>>;
+  /** QSOs where every transmission was within the zero-in tolerance. */
+  zeroIn: number;
+  /** Completed QSOs typed by hand with no procedure slip. */
+  freehand: number;
+  /** QSOs with the callsign field copied right. */
+  callsign: number;
+}
+
+export interface QsoBadgeRecord { tier: 1 | 2 | 3; at: number; criteriaVersion: number }
+export interface QsoCharMark { count: number; at?: number }

@@ -5,7 +5,7 @@ export type { QsoMode, QsoSession, QsoStep, SessionContext };
 
 /** Placeholder for modes that are designed but not built yet. */
 const soon = (id: string, label: string, description: string, alphabet: QsoMode['alphabet'] = 'international'): QsoMode => ({
-  id, label, description, alphabet, available: false, presets: [], steps: [],
+  id, label, description, alphabet, available: false, presets: [], axes: [], steps: [],
   createSession: () => { throw new Error(`${id} is not available yet`); },
 });
 

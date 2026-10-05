@@ -1,6 +1,6 @@
 import type { AlphabetType } from '../../types';
 import type { Station } from '../band';
-import type { DifficultyVector } from '../difficulty';
+import type { Axis, DifficultyVector } from '../difficulty';
 import type { ExchangePreset } from '../exchange';
 import type { TxResult } from '../qso';
 
@@ -47,6 +47,8 @@ export interface QsoMode {
   /** False = shown as 準備中. */
   available: boolean;
   presets: string[];
+  /** Difficulty axes this mode uses; the panel shows only these. */
+  axes: readonly Axis[];
   steps: QsoStep[];
   createSession(ctx: SessionContext): QsoSession;
 }

@@ -9,6 +9,8 @@ import type { CharSpan } from './keying';
  */
 
 export interface BandSample {
+  /** Station the sample describes (the one being copied). */
+  station: number;
   t: number;
   /** Clock epoch (the rig's clock restarts on power on/off). */
   epoch: number;
@@ -45,7 +47,7 @@ export interface BandSnapshot {
   crash: number;
 }
 
-/** Reduce the band at one instant to the numbers that matter for the target. */
+/** Reduce the band at one instant to the numbers that matter for copying `target`. */
 export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, stations, crash }: BandSnapshot): BandSample {
   const level = target.strength * target.fade;
   const half = filter / 2 + CONDITION_LIMITS.passbandSlack;
@@ -58,6 +60,7 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
   }
   const floor = 0.05 + noise * Math.sqrt(filter / 500) * 0.25;
   return {
+    station: target.id,
     t,
     epoch,
     listening,
@@ -70,21 +73,31 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
   };
 }
 
+/** Per station: 20 minutes at the rig's 100 ms tick. */
 const MAX_SAMPLES = 12_000;
 
+/**
+ * Band samples per copied station. Every station whose copy is judged (the QSO
+ * partner, each caller in a run) gets its own series, so callers overlapping one
+ * another show up as QRM to each other.
+ */
 export class CopyMonitor {
-  samples: BandSample[] = [];
+  private series = new Map<number, BandSample[]>();
 
   push(sample: BandSample) {
-    this.samples.push(sample);
-    if (this.samples.length > MAX_SAMPLES) this.samples.splice(0, this.samples.length - MAX_SAMPLES);
+    let list = this.series.get(sample.station);
+    if (!list) this.series.set(sample.station, (list = []));
+    list.push(sample);
+    if (list.length > MAX_SAMPLES) list.splice(0, list.length - MAX_SAMPLES);
   }
 
-  reset() { this.samples = []; }
+  reset() { this.series.clear(); }
 
-  /** Samples covering [start, end]; falls back to the nearest one for short characters. */
-  window(epoch: number, start: number, end: number) {
-    const same = this.samples.filter((sample) => sample.epoch === epoch);
+  samplesOf(station: number): readonly BandSample[] { return this.series.get(station) ?? []; }
+
+  /** Samples of `station` covering [start, end]; falls back to the nearest one for short characters. */
+  window(station: number, epoch: number, start: number, end: number) {
+    const same = this.samplesOf(station).filter((sample) => sample.epoch === epoch);
     const inside = same.filter((sample) => sample.t >= start - 0.05 && sample.t <= end + 0.05);
     if (inside.length) return inside;
     let best: BandSample | null = null;
@@ -120,8 +133,8 @@ export function judgeSamples(samples: BandSample[]): CharJudgement {
   return { condition: 'clean', env: rounded };
 }
 
-/** A target transmission as it actually went out: cut short, maybe never finished. */
-export interface RxRecord { tx: Transmission; epoch: number; cutAt: number | null }
+/** A copied station's transmission as it actually went out: cut short, maybe never finished. */
+export interface RxRecord { tx: Transmission; station: number; epoch: number; cutAt: number | null }
 
 export interface ClockNow { t: number; epoch: number }
 
@@ -130,13 +143,16 @@ export function judgeChar(monitor: CopyMonitor, record: RxRecord, span: CharSpan
   const cut = span.start >= (record.cutAt ?? Number.POSITIVE_INFINITY);
   const pending = record.epoch === now.epoch && span.end > now.t;
   if (cut || pending) return { condition: 'unheard', env: NO_ENV };
-  return judgeSamples(monitor.window(record.epoch, span.start, span.end));
+  return judgeSamples(monitor.window(record.station, record.epoch, span.start, span.end));
 }
 
 export const pickEasier = (a: CharJudgement | null, b: CharJudgement) =>
   !a || CONDITION_SEVERITY[b.condition] < CONDITION_SEVERITY[a.condition] ? b : a;
 
-/** The station broke off at `now`: anything of its still on the air was cut. */
-export function markCut(records: RxRecord[], epoch: number, now: number) {
-  for (const record of records) if (record.epoch === epoch && record.tx.start + record.tx.length > now) record.cutAt = now;
+/** `station` broke off at `now` (all stations when omitted): anything of its still on the air was cut. */
+export function markCut(records: RxRecord[], epoch: number, now: number, station?: number) {
+  for (const record of records) {
+    if (station !== undefined && record.station !== station) continue;
+    if (record.epoch === epoch && record.tx.start + record.tx.length > now) record.cutAt = now;
+  }
 }

@@ -175,3 +175,76 @@
 @media (max-width: 420px) {
   .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* QSO 実戦マーク on a character card */
+.collection-item-mark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sky-2);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--bg), 0 4px 10px rgb(0 0 0 / 40%);
+}
+
+/* QSO 実戦習熟バッジ */
+.qso-badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.qso-badge {
+  --medal: var(--faint);
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+}
+.qso-badge.tier-1 { --medal: #d08a52; }
+.qso-badge.tier-2 { --medal: #c9d2ea; }
+.qso-badge.tier-3 { --medal: var(--gold); border-color: rgb(246 196 83 / 35%); box-shadow: var(--shadow-gold); }
+.qso-badge-head { display: flex; align-items: center; gap: 12px; }
+.qso-badge-head b { display: block; font: 800 16px var(--font-display); color: var(--text); }
+.qso-badge-medal {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--medal);
+  color: var(--medal);
+  background: color-mix(in srgb, var(--medal) 14%, transparent);
+}
+.qso-badge.tier-0 .qso-badge-medal { border-style: dashed; opacity: .6; }
+.qso-badge-pips { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.qso-badge-pips i { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-3); }
+.qso-badge-pips i.tier-1 { background: #d08a52; }
+.qso-badge-pips i.tier-2 { background: #c9d2ea; }
+.qso-badge-pips i.tier-3 { background: var(--gold); }
+.qso-badge-pips small { margin-left: 4px; color: var(--muted); font: 700 11px var(--font-display); }
+.qso-badge p { margin: 0; color: var(--text-2); font-size: 12.5px; line-height: 1.5; }
+.qso-badge-next { display: grid; gap: 6px; }
+.qso-badge-next span { color: var(--text-2); font: 700 12px var(--font-display); }
+.qso-badge-next small { color: var(--muted); font: 700 11px var(--font-mono); text-align: right; }
+.qso-badge .qso-badge-done { color: var(--gold); font-weight: 700; }
+
+.qso-marks p { margin: 6px 0 12px; color: var(--text-2); font-size: 13px; }
+.qso-marks ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.qso-marks li {
+  display: grid;
+  justify-items: center;
+  min-width: 44px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-sunken);
+}
+.qso-marks li b { font: 800 18px var(--font-mono); color: var(--text-2); }
+.qso-marks li small { color: var(--faint); font: 700 10px var(--font-mono); }
+.qso-marks li.on { border-color: rgb(108 188 255 / 45%); background: var(--sky-soft); }
+.qso-marks li.on b { color: var(--sky); }
