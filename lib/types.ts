@@ -82,8 +82,18 @@ export interface AnswerLog {
  */
 export type CopyCondition = 'clean' | 'weak' | 'qsb' | 'qrn' | 'qrm' | 'detuned' | 'muted' | 'unheard';
 export type QsoEnvCondition = 'weak' | 'qsb' | 'qrn' | 'qrm';
-/** Why a log character was wrong. */
-export type QsoCause = 'ok' | 'copy' | 'environment' | 'tuning' | 'timing';
+/**
+ * What a character actually went through, one step past the raw condition: a character
+ * sent while we were keying (muted), or buried under another caller calling at the same
+ * time (QRM from a caller), was doubled — an operating situation, not the band.
+ */
+export type CopySituation = 'clean' | QsoEnvCondition | 'doubled' | 'detuned' | 'unheard';
+/**
+ * Why a log character was wrong. copy = clean conditions (the skill itself);
+ * environment = band (QRM / QSB / QRN / weak); doubling = it went out under our
+ * transmission or another caller's; tuning = off the passband; timing = never heard.
+ */
+export type QsoCause = 'ok' | 'copy' | 'environment' | 'doubling' | 'tuning' | 'timing';
 
 /** Raw environment numbers for a character, kept for QSO-only analysis. */
 export interface QsoCharEnv {
@@ -97,6 +107,8 @@ export interface QsoCharEnv {
   qrn: number;
   /** |target − VFO| in Hz. */
   offset: number;
+  /** Who the strongest QRM was: another caller (a doubling) or the band. Absent: no QRM. */
+  qrmFrom?: 'caller' | 'band';
 }
 
 export interface QsoAnswerMeta {
@@ -104,6 +116,8 @@ export interface QsoAnswerMeta {
   presetId: string;
   field: string;
   condition: CopyCondition;
+  /** Older records lack it (then it follows `condition`). */
+  situation?: CopySituation;
   cause: QsoCause;
   env: QsoCharEnv;
 }
@@ -174,6 +188,11 @@ export interface QsoRunSummary {
   qrlNoListen?: number;
   /** Every frequency we called CQ on, in order, and how it was checked. */
   frequencies?: QsoFrequencySummary[];
+  /** Frequencies checked properly before CQ (listened out a QRL?, clear), and ones found in use and left alone. */
+  frequencyChecks?: number;
+  busyAvoided?: number;
+  /** Complete contacts logged all-correct, per hour. */
+  cleanRate?: number;
 }
 
 /** How we took a frequency: kept for analysing operating procedure later. */
@@ -329,6 +348,8 @@ export interface QsoProfile {
     tuning?: SkillEstimate;
     /** Share of transmissions without a procedure slip, per mode. */
     procedure: Record<string, SkillEstimate>;
+    /** Whole-call copy (see CallsignSkill). Absent until a call was judged. */
+    callsign?: CallsignSkill;
   };
   modes: Record<string, QsoModeProgress>;
   /** Raw evidence counters badges are computed from (see lib/radio/badges.ts). */
@@ -337,6 +358,23 @@ export interface QsoProfile {
   badges?: Record<string, QsoBadgeRecord>;
   /** Per card key (`alphabet:symbol`): clean, correct copies in fast QSOs. */
   charMarks?: Record<string, QsoCharMark>;
+}
+
+/**
+ * A whole call, right or wrong, sorted by what its characters went through. `clean` is
+ * the call-copy skill itself; calls with any character under QRM, QSB, a doubling … go
+ * to their own bucket instead, kept for "fine normally, falls apart under QRM".
+ */
+export interface CallSkillBuckets {
+  clean?: SkillEstimate;
+  situations: Partial<Record<Exclude<CopySituation, 'clean'>, SkillEstimate>>;
+}
+
+export interface CallsignSkill {
+  /** The call as finally logged. */
+  log: CallSkillBuckets;
+  /** The first call we sent back (run modes): copy on the first hearing. */
+  first: CallSkillBuckets;
 }
 
 export interface QsoStats {
@@ -350,6 +388,13 @@ export interface QsoStats {
   freehand: number;
   /** QSOs with the callsign field copied right. */
   callsign: number;
+  /**
+   * Frequencies checked properly before a CQ: QRL?, listened QRL_LISTEN s or more, and
+   * clear — or found in use and left without calling CQ there.
+   */
+  frequencyChecks?: number;
+  /** Best clean rate (complete, all-correct contacts per hour) in a run long enough to count. */
+  bestRate?: number;
 }
 
 export interface QsoBadgeRecord { tier: 1 | 2 | 3; at: number; criteriaVersion: number }

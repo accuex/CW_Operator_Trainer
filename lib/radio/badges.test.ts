@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CopyCondition } from '../types';
-import { BADGES, BADGE_CRITERIA_VERSION, MARK_COUNT, badgeTier, nextTier, recordQsoOutcome, tierFor, type QsoOutcome } from './badges';
+import { BADGES, BADGE_CRITERIA_VERSION, MARK_COUNT, badgeTier, nextTier, recordQsoOutcome, recordRunOutcome, tierFor, type QsoOutcome, type RunOutcome } from './badges';
 import type { CharCell, FieldResult } from './attribution';
 import { emptyQsoProfile } from './skills';
 
@@ -12,13 +12,13 @@ const field = (key: string, expected: string, input = expected, condition: CopyC
   correct: expected === input,
   cells: [...expected].map((char, index): CharCell => {
     const ok = input[index] === char;
-    return { op: ok ? 'match' : 'sub', expected: char, input: input[index] ?? '', condition, cause: ok ? 'ok' : 'copy', env: null };
+    return { op: ok ? 'match' : 'sub', expected: char, input: input[index] ?? '', condition, situation: condition === 'muted' ? 'doubled' : condition, cause: ok ? 'ok' : 'copy', env: null };
   }),
 });
 
 const outcome = (over: Partial<QsoOutcome> = {}): QsoOutcome => ({
   fields: [field('call', 'JA3ABC'), field('rst', '599'), field('name', 'TARO'), field('qth', 'OSAKA')],
-  evidence: { clean: { total: 18, correct: 18 }, env: {}, causes: { copy: 0, environment: 0, tuning: 0, timing: 0, procedure: 0 }, tx: { total: 2, onFrequency: 2 } },
+  evidence: { clean: { total: 18, correct: 18 }, env: {}, causes: { copy: 0, environment: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 }, tx: { total: 2, onFrequency: 2 } },
   alphabet: 'international',
   wpm: 20,
   tx: [{ offsetHz: 10 }, { offsetHz: -5 }],
@@ -85,5 +85,33 @@ describe('QSO badges', () => {
     expect(qso.charMarks?.['international:A']?.count).toBe(MARK_COUNT * 2);
     expect(qso.charMarks?.['international:C']).toBeUndefined();
     expect(qso.charMarks?.['international:K']).toBeUndefined();
+  });
+});
+
+describe('run badges', () => {
+  const contact = (complete = true): RunOutcome['contacts'][number] => {
+    const { fields, evidence, wpm } = outcome({ complete });
+    return { fields, evidence, wpm, complete };
+  };
+  const run = (over: Partial<RunOutcome> = {}): RunOutcome => ({
+    contacts: [contact(), contact(), contact(), contact(), contact()],
+    alphabet: 'international', at: 5000, seconds: 600, frequencyChecks: 1, busyAvoided: 2, cleanContacts: 5, cleanRate: 30, ...over,
+  });
+
+  it('counts proper checks and avoided busy frequencies, never zero-in or hand keying', () => {
+    const { qso, earned } = recordRunOutcome(emptyQsoProfile(), run());
+    expect(qso.stats).toMatchObject({ frequencyChecks: 3, bestRate: 30, callsign: 5 });
+    expect(qso.stats?.zeroIn ?? 0).toBe(0);
+    expect(qso.stats?.freehand ?? 0).toBe(0);
+    expect(earned.map((badge) => badge.id)).toEqual(expect.arrayContaining(['run-rate']));
+    expect(badgeTier(BADGES.find((badge) => badge.id === 'run-rate')!, qso)).toBe(2);
+    expect(badgeTier(BADGES.find((badge) => badge.id === 'frequency-check')!, qso)).toBe(0);
+  });
+
+  it('needs a long enough run with enough clean contacts for a rate', () => {
+    expect(recordRunOutcome(emptyQsoProfile(), run({ seconds: 120 })).qso.stats?.bestRate ?? 0).toBe(0);
+    expect(recordRunOutcome(emptyQsoProfile(), run({ cleanContacts: 4 })).qso.stats?.bestRate ?? 0).toBe(0);
+    const first = recordRunOutcome(emptyQsoProfile(), run({ cleanRate: 30 })).qso;
+    expect(recordRunOutcome(first, run({ cleanRate: 12 })).qso.stats?.bestRate).toBe(30);
   });
 });

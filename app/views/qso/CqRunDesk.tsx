@@ -10,7 +10,12 @@ import type { ExchangePreset } from '@/lib/radio/exchange';
 import { fillMemory, memoryTemplates, MEMORY_KEYS, retemplate, type MemoryTempo, type MemoryVars } from '@/lib/radio/memories';
 import type { RunQsoMode } from '@/lib/radio/modes';
 import type { LogFields, RadioPort, RunIssue, RunLogEntry, RunSession } from '@/lib/radio/modes/cqRun';
-import { runSummary, scoreRun } from '@/lib/radio/runReview';
+import { cleanContacts, cleanRate, runSummary, scoreRun } from '@/lib/radio/runReview';
+import { RUN_TRACE_LIMIT, RUN_TRACE_VERSION, runTraceLine, type RunTrace, type RunTxTrace } from '@/lib/radio/runTrace';
+import { traceRx } from '@/lib/radio/trace';
+import type { EarnedBadge, RunOutcome } from '@/lib/radio/badges';
+import type { Axis } from '@/lib/radio/difficulty';
+import { addRunTrace, getRunTraces } from '@/lib/storage';
 import type { RigEngine } from '@/lib/radio/rig';
 import { nowId } from '@/app/trainer/shared';
 import { CqRunReview, type RunReviewData } from './CqRunReview';
@@ -89,6 +94,8 @@ interface Live {
   startedAt: number | null;
   txCount: number;
   procedure: number;
+  /** Our transmissions as keyed, for the detailed record. */
+  txLog: RunTxTrace[];
   /** Rebased start of the current epoch: CQ repeat counts from here when the air has none of ours yet. */
   epochStart: number;
   /**
@@ -113,6 +120,16 @@ export interface RunRecord {
   answers: AnswerLog[];
   evidence: QsoEvidence;
   wpm: number;
+  /** Per contact and run-level numbers for badges. */
+  run: Omit<RunOutcome, 'alphabet' | 'at'>;
+}
+
+/** What storing the run did: axis moves (おまかせ) and what it earned. */
+export interface RunSaved {
+  moved: Partial<Record<Axis, number>>;
+  auto: boolean;
+  earned: EarnedBadge[];
+  marked: string[];
 }
 
 export interface CqRunDeskProps {
@@ -124,7 +141,7 @@ export interface CqRunDeskProps {
   myName: string;
   myQth: string;
   onProfile: (change: { myName?: string; myQth?: string }) => void;
-  onSave: (record: RunRecord) => void;
+  onSave: (record: RunRecord) => RunSaved;
 }
 
 /** Bring the run onto the rig's clock: a power cycle starts a new epoch with a jump in time. */
@@ -175,6 +192,10 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
   const [clock, setClock] = useState(0);
   const [editMemories, setEditMemories] = useState(false);
   const [review, setReview] = useState<RunReviewData | null>(null);
+  /** Runs stored on this device (newest first), and the one opened from that list. */
+  const [records, setRecords] = useState<RunTrace[]>([]);
+  const [recordsAt, setRecordsAt] = useState(0);
+  const [viewing, setViewing] = useState<RunTrace | null>(null);
 
   const liveRef = useRef<Live | null>(null);
   const armedRef = useRef(false);
@@ -215,7 +236,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     const run = runMode.createRun({ random: Math.random, me: { call, name, qth }, difficulty: d, tempo: latest.current.prefs.tempo }, radio);
     Object.assign(live, {
       id: `run-${nowId()}`, run, capture: rig.newCapture(), qrm, epoch: engine.epoch, lastNow: engine.now(), startedAt: null,
-      txCount: 0, procedure: 0, epochStart: engine.now(), queued: null, closed: false, pending: [],
+      txCount: 0, procedure: 0, txLog: [], epochStart: engine.now(), queued: null, closed: false, pending: [],
     } satisfies Live);
     run.rebase(engine.epoch, 0);
     engine.setStations(qrm);
@@ -223,6 +244,12 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     run.populate(engine.vfo, engine.now());
     return live;
   };
+
+  useEffect(() => {
+    let alive = true;
+    getRunTraces().then((traces) => { if (alive) setRecords(traces.filter((trace) => trace.modeId === mode.id)); }).catch(() => undefined);
+    return () => { alive = false; };
+  }, [recordsAt, mode.id]);
 
   // The run lives as long as the desk; the rig taps every station message into its air.
   useEffect(() => {
@@ -327,6 +354,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
       if (live.closed) return;
       sync(live, engine);
       const { issues, intent } = live.run.transmit(text, { start: span.start, end: span.end, rf: engine.vfo });
+      live.txLog.push({ at: span.start, text, rf: engine.vfo, issues });
       if (intent.cq && !issues.length) {
         live.pending = live.pending.filter((item) => !FREQUENCY_ADVICE.has(item.text));
         setMessage((old) => (old && FREQUENCY_ADVICE.has(old.text) ? null : old));
@@ -397,6 +425,8 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     });
     const endedAt = Date.now();
     const wpmOf = (stationId: number) => live.run.agents.find((agent) => agent.id === stationId)?.station.wpm ?? difficulty.speed;
+    const wpms = Object.fromEntries(result.contacts.map((contact) => [contact.stationId, wpmOf(contact.stationId)]));
+    let saved: RunSaved | null = null;
     if (live.startedAt !== null && (result.contacts.length || result.log.length)) {
       const summary = runSummary({
         result, score, modeId: mode.id, presetId: preset.id, fieldCount: preset.fields.length, difficulty,
@@ -409,11 +439,34 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
           sessionId: live.id, timestamp: endedAt, wpm: wpmOf(contact.stationId), modeId: mode.id, presetId: preset.id, alphabet: preset.alphabet,
         });
       });
-      onSave({ id: live.id, startedAt: live.startedAt, endedAt, alphabet: preset.alphabet, summary, answers, evidence: score.evidence, wpm: difficulty.speed });
+      const contacts = score.contacts.flatMap(({ contactId, fields, evidence }) => {
+        const contact = result.contacts.find((item) => item.id === contactId);
+        return fields && contact ? [{ fields, evidence, wpm: wpmOf(contact.stationId), complete: contact.outcome === 'complete' }] : [];
+      });
+      const rate = cleanRate(result, score);
+      saved = onSave({
+        id: live.id, startedAt: live.startedAt, endedAt, alphabet: preset.alphabet, summary, answers, evidence: score.evidence, wpm: difficulty.speed,
+        run: {
+          contacts, seconds: result.stats.seconds, frequencyChecks: result.stats.frequencyChecks, busyAvoided: result.stats.busyAvoided,
+          cleanContacts: cleanContacts(result, score), cleanRate: rate,
+        },
+      });
+      // The detailed record stays on this device; the cloud gets the summary above.
+      const clock = { t: now, epoch: engine.epoch };
+      const rx: RunTrace['rx'] = {};
+      for (const agent of live.run.agents) {
+        const records = recordsOf(agent.id);
+        if (records.length) rx[agent.id] = traceRx(records, live.capture.monitor, clock, (record) => live.capture.rxWpm.get(record) ?? agent.station.wpm);
+      }
+      void addRunTrace({
+        kind: 'run', version: RUN_TRACE_VERSION, id: live.id, startedAt: live.startedAt, endedAt, modeId: mode.id, presetId: preset.id,
+        difficulty: { ...difficulty }, params: { ...live.run.params }, result, scored: score.contacts, evidence: score.evidence,
+        rx, tx: live.txLog, filter: engine.filter, wpmOf: wpms, adjusted: saved.moved, earned: saved.earned,
+      }).then(() => setRecordsAt(Date.now())).catch(() => undefined);
     }
     // Callers leave with us; the background stays.
     engine.setStations(live.qrm);
-    setReview({ result, score, filter: engine.filter, wpmOf: Object.fromEntries(result.contacts.map((contact) => [contact.stationId, wpmOf(contact.stationId)])) });
+    setReview({ result, score, filter: engine.filter, wpmOf: wpms, saved });
     say('QRT しました。振り返りを確認しましょう');
   };
 
@@ -478,6 +531,22 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     return (
       <div className="qso-side run-review-wrap">
         <CqRunReview review={review} preset={preset} onRestart={restart} />
+      </div>
+    );
+  }
+
+  if (viewing) {
+    const stored: RunReviewData = {
+      result: viewing.result,
+      score: { contacts: viewing.scored, evidence: viewing.evidence, fields: viewing.scored.flatMap((contact) => contact.fields ?? []) },
+      filter: viewing.filter,
+      wpmOf: viewing.wpmOf,
+      saved: { moved: viewing.adjusted, auto: true, earned: viewing.earned as EarnedBadge[], marked: [] },
+      stored: { at: viewing.startedAt },
+    };
+    return (
+      <div className="qso-side run-review-wrap">
+        <CqRunReview review={stored} preset={preset} onClose={() => setViewing(null)} />
       </div>
     );
   }
@@ -609,6 +678,27 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
           正誤は QRT のあとにまとめて表示します。
         </p>
       </div>
+
+      <details className="panel panel-pad run-records">
+        <summary>この端末のランの記録 <small>{records.length} / {RUN_TRACE_LIMIT}</small></summary>
+        <p className="qso-note">文字ごとの受信条件まで含む詳しい記録は、この端末だけに直近 {RUN_TRACE_LIMIT} ラン分を残します（クラウドには要約だけを保存）。</p>
+        {records.length ? (
+          <ol>
+            {records.map((trace) => {
+              const line = runTraceLine(trace);
+              return (
+                <li key={trace.id}>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setViewing(trace)} disabled={startedAt !== null}>
+                    <time>{new Date(line.at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</time>
+                    <b>{line.contacts} 交信</b>
+                    <span>{line.rate}/h・{formatSeconds(line.seconds)}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        ) : <p className="qso-note">まだ記録がありません。QRT すると、ここに残ります。</p>}
+      </details>
     </div>
   );
 }

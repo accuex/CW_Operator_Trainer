@@ -1,15 +1,15 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { AnswerLog, AudioSettings, QsoCause, QsoProfile, SessionRecord, TrainerProfile } from '@/lib/types';
+import type { AnswerLog, AudioSettings, QsoCause, QsoProfile, SessionRecord, SkillEstimate, TrainerProfile } from '@/lib/types';
 import { makeQrm } from '@/lib/radio/band';
 import { markCut } from '@/lib/radio/conditions';
 import { collectEvidence, fieldAnswers, scoreFields, type FieldResult } from '@/lib/radio/attribution';
-import { AXIS_SPECS, adjustDifficulty, describeMove, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
+import { AXES, AXIS_SPECS, adjustDifficulty, describeMove, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
 import { PRESETS } from '@/lib/radio/exchange';
 import { QSO_MODES, qsoMode, type QsoSession } from '@/lib/radio/modes';
 import { isProcedureIssue, MIN_TARGET_WPM } from '@/lib/radio/qso';
-import { TIER_LABEL, badgeById, recordQsoOutcome, type EarnedBadge } from '@/lib/radio/badges';
+import { TIER_LABEL, badgeById, recordQsoOutcome, recordRunOutcome, type EarnedBadge } from '@/lib/radio/badges';
 import { modeProgress, normalizeQsoProfile, recommendStage, updateSkills } from '@/lib/radio/skills';
 import { logbookEntries } from '@/lib/radio/logbook';
 import { traceRx, type QsoTrace } from '@/lib/radio/trace';
@@ -17,7 +17,7 @@ import { addQsoTrace } from '@/lib/storage';
 import { nowId } from '@/app/trainer/shared';
 import { Icon } from '@/app/components/icons';
 import { FieldCells } from './qso/FieldCells';
-import { CqRunDesk, type RunRecord } from './qso/CqRunDesk';
+import { CqRunDesk, type RunRecord, type RunSaved } from './qso/CqRunDesk';
 import { RigPanel } from './qso/RigPanel';
 import { useRig, type Capture, type PowerResult } from './qso/useRig';
 
@@ -25,7 +25,7 @@ const PREFS_KEY = 'cwot.qso.prefs';
 const LOGBOOK_SIZE = 30;
 
 const CAUSE_LABEL: Record<Exclude<QsoCause, 'ok'> | 'procedure', string> = {
-  copy: '受信ミス', environment: '悪条件', tuning: '同調', procedure: '手順', timing: '聴き逃し',
+  copy: '受信ミス', environment: '悪条件', doubling: 'ダブり', tuning: '同調', procedure: '手順', timing: '聴き逃し',
 };
 
 /** Rig-side preferences that are not difficulty (kept on this device). */
@@ -279,9 +279,21 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     updateMode({ pinned });
   };
 
-  /** QRT: store the run's answers and summary, and credit skills with what was copied. */
-  const saveRun = (record: RunRecord) => {
+  /**
+   * QRT: store the run's answers and summary, credit skills and badges, and retune the
+   * unpinned axes the run mode has (おまかせ) — the same evidence rules as a rag-chew.
+   */
+  const saveRun = (record: RunRecord): RunSaved => {
     recordMany(record.answers);
+    const modeId = record.summary.modeId;
+    const current = modeProgress(qso, modeId, difficulty);
+    // Axes the mode doesn't have are as good as pinned.
+    const pinned = [...current.pinned, ...AXES.filter((axis) => !mode.axes.includes(axis))];
+    const adjusted = current.auto
+      ? adjustDifficulty({ difficulty: current.difficulty as DifficultyVector, votes: current.votes }, record.evidence, pinned)
+      : { difficulty: current.difficulty as DifficultyVector, votes: current.votes, moved: {} };
+    const runOutcome = { ...record.run, alphabet: record.alphabet, at: record.endedAt };
+    const { earned, marked } = recordRunOutcome(qso, runOutcome);
     onSession({
       id: record.id,
       startedAt: record.startedAt,
@@ -290,16 +302,22 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       alphabetType: record.alphabet,
       answers: record.answers.length,
       accuracy: record.answers.length ? record.answers.filter((answer) => answer.isCorrect).length / record.answers.length : 0,
-      qso: record.summary,
+      qso: { ...record.summary, adjusted: adjusted.moved },
     });
-    const modeId = record.summary.modeId;
     const made = record.summary.contacts?.length ?? 0;
     const perfect = record.summary.contacts?.filter((contact) => contact.fields > 0 && contact.fieldsCorrect === contact.fields).length ?? 0;
     updateQso((old) => {
-      const next = updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence: record.evidence });
+      const next = recordRunOutcome(updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence: record.evidence }), runOutcome).qso;
       const base = modeProgress(old, modeId, difficulty);
-      return { ...next, modes: { ...next.modes, [modeId]: { ...base, qsos: base.qsos + made, perfect: base.perfect + perfect, lastAt: record.endedAt } } };
+      return {
+        ...next,
+        modes: {
+          ...next.modes,
+          [modeId]: { ...base, qsos: base.qsos + made, perfect: base.perfect + perfect, lastAt: record.endedAt, difficulty: adjusted.difficulty, votes: adjusted.votes },
+        },
+      };
     });
+    return { moved: adjusted.moved, auto: current.auto, earned, marked };
   };
 
   const onPower = (result: PowerResult) => {
@@ -507,6 +525,8 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           </ol>
         ) : <p className="qso-note">まだ交信がありません。最初の 1 局を探しましょう。</p>}
       </div>
+
+      <SkillPanel qso={qso} modeId={mode.id} />
     </div>
 
     <p className="qso-help">
@@ -514,6 +534,44 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       スコープはフィルタを通す前のバンド全体です。FIL を狭めると隣の局とノイズが実際に消えます。
     </p>
   </section>;
+}
+
+const SKILL_SITUATION: Record<string, string> = {
+  weak: '弱信号', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', detuned: '同調ずれ', doubled: 'ダブり', unheard: '未受信',
+};
+const skillPct = (estimate: SkillEstimate | undefined) => (estimate ? `${Math.round(estimate.value * 100)}%` : '—');
+
+/**
+ * QSO skills as estimated so far. Normal-condition numbers are the skill itself; the
+ * rest show how it holds up (QRM, QSB, doublings …) and are never mixed into it.
+ */
+function SkillPanel({ qso, modeId }: { qso: QsoProfile; modeId: string }) {
+  const { copy, robustness, procedure, tuning, callsign } = qso.skills;
+  const international = copy.international;
+  const hard = (situations: Partial<Record<string, SkillEstimate>> | undefined) => Object.entries(situations ?? {})
+    .filter(([, estimate]) => estimate && estimate.n > 0)
+    .map(([situation, estimate]) => `${SKILL_SITUATION[situation] ?? situation} ${skillPct(estimate)}`).join('・');
+  const rows: [string, string, string][] = [
+    ['通常条件の受信', skillPct(international), international ? `${international.wpm} WPM` : ''],
+    ['悪条件での受信', hard(robustness) || '—', ''],
+    ['コール（通常条件）', skillPct(callsign?.log.clean), callsign?.log.clean ? `${callsign.log.clean.n} 局` : ''],
+    ['コール（悪条件・ダブり）', hard(callsign?.log.situations) || '—', ''],
+    ['初回コール（通常条件）', skillPct(callsign?.first.clean), callsign?.first.clean ? `${callsign.first.clean.n} 局` : ''],
+    ['初回コール（悪条件・ダブり）', hard(callsign?.first.situations) || '—', ''],
+    ['手順', skillPct(procedure[modeId]), ''],
+    ['同調', skillPct(tuning), ''],
+  ];
+  return (
+    <div className="panel panel-pad qso-skills">
+      <div className="qso-panel-head"><h2>QSO スキル</h2><small>推定値</small></div>
+      <dl>
+        {rows.map(([label, value, note]) => (
+          <div key={label}><dt>{label}</dt><dd>{value}{note && <small> {note}</small>}</dd></div>
+        ))}
+      </dl>
+      <p className="qso-note">「通常条件」だけがスキルの本体です。QRM・QSB・ダブりなどで落としたものは別に数え、苦手分析にも混ぜません。</p>
+    </div>
+  );
 }
 
 /** Post-QSO review: which characters were missed, and why. */

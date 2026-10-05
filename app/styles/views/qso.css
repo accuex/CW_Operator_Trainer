@@ -241,6 +241,7 @@
 .chip.cause-environment { border-color: rgb(108 188 255 / 40%); background: var(--sky-soft); color: var(--sky); }
 .chip.cause-tuning, .chip.cause-procedure { border-color: rgb(174 146 255 / 40%); background: var(--violet-soft); color: var(--violet); }
 .chip.cause-timing { border-color: rgb(246 196 83 / 40%); background: var(--gold-soft); color: var(--gold); }
+.chip.cause-doubling { border-color: rgb(255 159 90 / 45%); background: rgb(255 159 90 / 12%); color: rgb(255 170 110); }
 .qso-review-fields { display: grid; gap: 8px; margin-bottom: 12px; }
 .qso-review-row { display: grid; grid-template-columns: 4.5em minmax(0, 1fr); align-items: center; gap: 10px; }
 .qso-review-row > span { color: var(--muted); font: 800 10.5px/1 var(--font-mono); letter-spacing: .12em; }
@@ -261,6 +262,7 @@
 .qso-chars i.cause-environment { border-color: var(--sky); background: var(--sky-soft); color: var(--sky); }
 .qso-chars i.cause-tuning { border-color: var(--violet); background: var(--violet-soft); color: var(--violet); }
 .qso-chars i.cause-timing { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
+.qso-chars i.cause-doubling { border-color: rgb(255 159 90); background: rgb(255 159 90 / 12%); color: rgb(255 170 110); }
 .qso-chars i.op-del { border-style: dashed; }
 .qso-chars i.op-ins { text-decoration: line-through; }
 .qso-settings label b { float: right; color: var(--text); font: 700 12px var(--font-mono); }
@@ -296,6 +298,9 @@
 .qso-condition-panel li.clean i b { background: var(--mint); }
 .qso-condition-panel li strong { text-align: right; font-family: var(--font-mono); }
 .qso-condition-panel li small { color: var(--muted, #8a93a8); text-align: right; }
+.qso-condition-panel h3 { margin: 18px 0 0; font-size: 13px; }
+.qso-condition-panel .qso-contrast li { grid-template-columns: 2.5em 1fr 4em; }
+.qso-condition-panel .qso-contrast b { font-family: var(--font-mono); font-size: 1.05rem; }
 
 .qso-review-earned { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
 .qso-badge-chip {
@@ -369,6 +374,15 @@
 .run-contact-head b { font: 700 15px var(--font-mono); letter-spacing: .04em; }
 .run-contact-head small { color: var(--muted); font-size: 12px; }
 .run-contacts .qso-review-fields { margin-bottom: 0; }
+.run-copy { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 8px; }
+.run-copy p { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; color: var(--text-2); font-size: 12.5px; }
+.run-copy b { margin-right: 4px; color: var(--text); font-size: 12px; }
+.run-copy small { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.run-records summary { cursor: pointer; font-weight: 700; font-size: 13px; }
+.run-records summary small { margin-left: 6px; color: var(--muted); font: 600 11px var(--font-mono); }
+.run-records ol { display: grid; gap: 4px; max-height: 240px; margin: 8px 0 0; padding: 0; overflow: auto; list-style: none; }
+.run-records li button { display: flex; gap: 10px; width: 100%; justify-content: flex-start; font-size: 12px; }
+.run-records li time { color: var(--muted); font-family: var(--font-mono); }
 .run-missed { margin: 0 0 14px; }
 .run-missed h3 { margin: 0 0 6px; font-size: 13px; }
 .run-missed ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; color: var(--text-2); font-size: 12.5px; line-height: 1.6; }
@@ -380,3 +394,11 @@
   .run-rows button { grid-template-columns: 1.4fr .7fr 1fr 1fr; font-size: 11.5px; }
 }
 .run-profile-ok { margin-top: 10px; }
+
+/* QSO skills */
+.qso-skills dl { display: grid; gap: 4px; margin: 0 0 10px; }
+.qso-skills dl div { display: grid; grid-template-columns: 11em 1fr; gap: 8px; font-size: 12.5px; }
+.qso-skills dt { color: var(--muted); }
+.qso-skills dd { margin: 0; color: var(--text); font-family: var(--font-mono); }
+.qso-skills dd small { color: var(--muted); }
+.qso-skills { grid-column: 1 / -1; }

@@ -166,7 +166,7 @@ describe('difficulty tuner', () => {
   const evidence = (over: Partial<QsoEvidence> = {}): QsoEvidence => ({
     clean: { total: 12, correct: 12 },
     env: {},
-    causes: { copy: 0, environment: 0, tuning: 0, timing: 0, procedure: 0 },
+    causes: { copy: 0, environment: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 },
     tx: { total: 3, onFrequency: 3 },
     ...over,
   });
@@ -214,7 +214,7 @@ describe('skills and recommended stage', () => {
   it('starts at S0, then reads clean copy and robustness', () => {
     expect(recommendStage(undefined).stage).toBe('S0');
     let profile = emptyQsoProfile();
-    const good: QsoEvidence = { clean: { total: 12, correct: 12 }, env: {}, causes: { copy: 0, environment: 0, tuning: 0, timing: 0, procedure: 0 }, tx: { total: 3, onFrequency: 3 } };
+    const good: QsoEvidence = { clean: { total: 12, correct: 12 }, env: {}, causes: { copy: 0, environment: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 }, tx: { total: 3, onFrequency: 3 } };
     for (let i = 0; i < 4; i += 1) profile = updateSkills(profile, { modeId: 'ragchew', alphabet: 'international', wpm: 18, evidence: good });
     profile.modes.ragchew = { qsos: 4, perfect: 4, lastAt: 0, difficulty: DEFAULT_DIFFICULTY, pinned: [], auto: true, votes: {} };
     expect(profile.skills.copy.international).toMatchObject({ value: 1, wpm: 18 });

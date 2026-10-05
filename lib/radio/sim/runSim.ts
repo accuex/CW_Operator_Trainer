@@ -1,8 +1,13 @@
-import { enqueue, schedulePending, type Station, type Transmission } from '../band';
+import type { CopySituation } from '../../types';
+import { enqueue, fadeAt, makeQrm, schedulePending, type Station, type Transmission } from '../band';
 import type { AirEvent } from '../air/ether';
+import { judgeValue } from '../attribution';
+import { CopyMonitor, sampleBand, situationOf, type RxRecord } from '../conditions';
+import { BASIC_RST_NAME_QTH } from '../exchange';
 import { keyText } from '../keying';
-import { DEFAULT_RUN_PARAMS, RunSession, type Placement, type RadioPort, type RunParams, type RunResult } from '../modes/cqRun';
+import { BUSY_HZ, DEFAULT_RUN_PARAMS, RunSession, type Placement, type RadioPort, type RunParams, type RunResult } from '../modes/cqRun';
 import type { AgentMe } from '../agents/types';
+import { scoreRun, type RunScore } from '../runReview';
 import { seeded, type Random } from '../random';
 
 /**
@@ -17,13 +22,15 @@ const LOOKAHEAD = 1.5;
 export class HeadlessRadio implements RadioPort {
   t = 0;
   stations: Station[] = [];
+  /** Background stations that are always there (QRM), like the desk's. */
+  background: Station[] = [];
   onTransmission: ((station: Station, tx: Transmission) => void) | null = null;
 
   constructor(private random: Random) {}
 
   now() { return this.t; }
   send(station: Station, text: string, delay: number) { enqueue(station, text, this.t, delay); }
-  stationsChanged(stations: Station[]) { this.stations = stations; }
+  stationsChanged(stations: Station[]) { this.stations = [...this.background, ...stations]; }
 
   /** Move the clock to `t`, scheduling whatever falls inside the lookahead. */
   advance(t: number) {
@@ -48,6 +55,11 @@ export interface BotOptions {
   cqListen: number;
   /** Receive passband, Hz. */
   filter: number;
+  /**
+   * With a band: chance of miscopying a character by what it went through (clean, QRM,
+   * doubled …). The bot's log and calls then carry those errors, judged like a human's.
+   */
+  copyErrors: Partial<Record<CopySituation, number>>;
   /** Send QRL? and listen before the first CQ on each frequency, and QSY when it is in use. */
   qrl: boolean;
   /** Seconds we listen after QRL? for an answer. */
@@ -66,8 +78,17 @@ export interface BotOptions {
 }
 
 export const PERFECT_BOT: BotOptions = {
-  callErrorRate: 0, partialRate: 0, ignoreCorrections: false, phantomRate: 0, wpm: 20, cqListen: 4, filter: 500, qrl: true, qrlListen: 4, qsyStep: 1000, blindStart: false, pick: true, cqRepeat: null,
+  callErrorRate: 0, partialRate: 0, ignoreCorrections: false, phantomRate: 0, wpm: 20, cqListen: 4, filter: 500, copyErrors: {},
+  qrl: true, qrlListen: 4, qsyStep: 1000, blindStart: false, pick: true, cqRepeat: null,
 };
+
+/** A plausible operator: rarely wrong in the clear, much more under QRM or a doubling. */
+export const HUMAN_COPY: Partial<Record<CopySituation, number>> = {
+  clean: 0.01, weak: 0.07, qsb: 0.06, qrn: 0.06, qrm: 0.12, detuned: 0.3, doubled: 0.35, unheard: 1,
+};
+
+/** Band conditions for a headless run: the rig's levels and background stations. */
+export interface SimBand { noise: number; qsb: number; qrn: number; qrm: number }
 
 export interface SimOptions {
   seed: number;
@@ -76,6 +97,8 @@ export interface SimOptions {
   bot?: Partial<BotOptions>;
   /** Residents placed around the start frequency; none unless given. */
   placement?: Placement;
+  /** Sample the band and judge copy like the app (and let the bot miscopy by condition). */
+  band?: SimBand;
   /** Run length before the bot goes QRT, seconds. */
   duration?: number;
   /** Longest wait after QRT for the last contact and every caller to settle, seconds. */
@@ -98,6 +121,12 @@ export interface SimReport {
   issues: string[];
   /** Callers waiting or holding, sampled each second until QRT. */
   waiting: { max: number; mean: number; samples: number[] };
+  /** Every caller gone and the frequency quiet before the drain ran out. */
+  settled: boolean;
+  /** With a band: the run scored as the desk scores it. */
+  score: RunScore | null;
+  rx: RxRecord[];
+  monitor: CopyMonitor | null;
 }
 
 // The developer's own call stands in for the operator.
@@ -106,12 +135,26 @@ const START_VFO = 7_012_000;
 
 interface Partner { stationId: number; sent: string; closing: boolean; since: number; agn: number }
 
-export function runSim({ seed, params, me = ME, bot: botOptions, placement, duration = 300, drain = 300, step = 0.05 }: SimOptions): SimReport {
+export function runSim({ seed, params, me = ME, bot: botOptions, placement, band, duration = 300, drain = 300, step = 0.05 }: SimOptions): SimReport {
   const random = seeded(seed);
   const bot = { ...PERFECT_BOT, ...botOptions };
   const radio = new HeadlessRadio(random);
   const run = new RunSession({ random, me, params: { ...DEFAULT_RUN_PARAMS, ...params } }, radio);
-  radio.onTransmission = (station, tx) => run.onStationTransmission(station, tx);
+  const monitor = band ? new CopyMonitor() : null;
+  const rx: RxRecord[] = [];
+  const recordOf = new Map<string, RxRecord>();
+  // A separate stream for the band, so the same seed runs the same callers with or without it.
+  const bandRandom = seeded(seed + 7919);
+  const crashes: { t: number; dur: number; level: number }[] = [];
+  if (band) radio.background = makeQrm(bandRandom, band.qrm, START_VFO, [START_VFO], 400);
+  radio.stationsChanged([]);
+  radio.onTransmission = (station, tx) => {
+    run.onStationTransmission(station, tx);
+    if (!monitor || station.role !== 'caller') return;
+    const record: RxRecord = { tx, station: station.id, epoch: 0, cutAt: null };
+    rx.push(record);
+    recordOf.set(`${station.id}@${tx.start}`, record);
+  };
   if (placement) run.populate(START_VFO, 0, placement);
   let vfo = START_VFO;
   /** Frequency check before CQ: unchecked → (QRL?) checking → clear. */
@@ -119,6 +162,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
   let qrls = 0;
   let qsys = 0;
   const issues: string[] = [];
+  let procedureTx = 0;
   const residentIds = () => new Set(run.residents.map((agent) => agent.id));
 
   const myTx: [number, number][] = [];
@@ -128,6 +172,8 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
   let txCount = 0;
   let cqs = 0;
   let partner: Partner | null = null;
+  /** The frequency we last worked a station on. */
+  let workedAt: number | null = null;
   let heard: { stationId: number; call: string; at: number }[] = [];
   const partialAsked = new Set<number>();
   const inbox: AirEvent[] = [];
@@ -140,11 +186,28 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
     busyUntil = end;
     txCount += 1;
     // Reported as keying starts, like the app does once the rig has the length.
-    issues.push(...run.transmit(text, { start, end, rf: vfo }).issues);
+    const flagged = run.transmit(text, { start, end, rf: vfo }).issues;
+    issues.push(...flagged);
+    if (flagged.length) procedureTx += 1;
   };
   const exchange = (call: string) => `${call} UR 599 NAME ${me.name} QTH ${me.qth} BK`;
   const heardByBot = (event: AirEvent) =>
     event.from !== 'me' && Math.abs(event.rf - vfo) <= bot.filter / 2 && !myTx.some(([start, end]) => start < event.end && event.start < end);
+  const transmittingAt = (at: number) => myTx.some(([start, stop]) => at >= start && at <= stop);
+  /** What the bot writes down for `value` as sent in `event`: each character miscopied by what it went through. */
+  const copyOf = (value: string, event: AirEvent) => {
+    const record = monitor ? recordOf.get(`${event.from}@${event.start}`) : undefined;
+    if (!monitor || !record) return value;
+    const judged = judgeValue(value, [record], monitor, { t: radio.t, epoch: 0 });
+    return [...value].map((char, index) => {
+      const judgement = judged[index];
+      const rate = bot.copyErrors[situationOf(judgement.condition, judgement.env)] ?? 0;
+      if (random() >= rate) return char;
+      const pool = /[0-9]/.test(char) ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      return pool[(pool.indexOf(char) + 1 + Math.floor(random() * (pool.length - 1))) % pool.length];
+    }).join('');
+  };
+  const wordAfter = (text: string, key: string) => new RegExp(`\\b${key} (\\S+)`).exec(text)?.[1] ?? '';
   const mutate = (call: string) => {
     const index = call.length - 1 - Math.floor(random() * 3);
     const letter = String.fromCharCode(65 + ((call.charCodeAt(index) - 65 + 1 + Math.floor(random() * 24)) % 26));
@@ -157,11 +220,20 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
   let t = 0;
   for (; t <= end; t = Math.round((t + step) * 1000) / 1000) {
     radio.advance(t);
+    if (band && monitor && Math.abs(t * 10 - Math.round(t * 10)) < 1e-6) {
+      for (const station of radio.stations) station.fade = fadeAt(station, t, band.qsb);
+      if (bandRandom() < band.qrn * 0.08) crashes.push({ t, dur: 0.05 + bandRandom() * 0.25, level: 0.3 + bandRandom() * 0.7 * band.qrn });
+      const crash = crashes.reduce((level, item) => (t >= item.t && t <= item.t + item.dur ? Math.max(level, item.level) : level), 0);
+      for (const target of radio.stations) {
+        if (target.role !== 'caller') continue;
+        monitor.push(sampleBand({ t, epoch: 0, listening: !transmittingAt(t), vfo, filter: bot.filter, noise: band.noise, target, stations: radio.stations, crash }));
+      }
+    }
     if (t < qrtAt && Math.abs(t - Math.round(t)) < step / 2) {
       samples.push(run.agents.filter((agent) => agent.state === 'waiting' || agent.state === 'holding').length);
     }
-    const settled = run.agents.every((agent) => agent.gone) && !run.stations.length;
-    if (t >= qrtAt && !partner && t >= busyUntil && settled) break;
+    // Residents stay on the band; a run has settled once every caller has gone.
+    if (t >= qrtAt && !partner && t >= busyUntil && run.agents.every((agent) => agent.gone)) break;
     inbox.push(...run.tick(t).filter(heardByBot));
     if (t < busyUntil) continue;
     lastTxEnd = Math.max(lastTxEnd, busyUntil);
@@ -190,10 +262,12 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
           continue;
         }
         if (/NAME [A-Z]/.test(text) && !partner.closing) {
-          run.logEntry({ call: partner.sent, rst: agent.persona.rst, name: agent.persona.name, qth: agent.persona.qth }, t);
+          const rst = wordAfter(text, 'UR') || agent.persona.rst;
+          run.logEntry({ call: partner.sent, rst: copyOf(rst, event), name: copyOf(wordAfter(text, 'NAME') || agent.persona.name, event), qth: copyOf(wordAfter(text, 'QTH') || agent.persona.qth, event) }, t);
           if (random() < bot.phantomRate) run.logEntry({ call: 'JQ9QQQ', rst: '599', name: 'X', qth: 'X' }, t);
           partner.closing = true;
           partner.since = t;
+          workedAt = vfo;
           send(`R TNX ${agent.persona.name} 73 TU DE ${me.call} QRZ?`);
           break;
         }
@@ -201,7 +275,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
           send(`NAME ${me.name} QTH ${me.qth} BK`);
           break;
         }
-        if (text.includes(agent.call) && partner.sent !== agent.call && !bot.ignoreCorrections) partner.sent = agent.call;
+        if (text.includes(agent.call) && partner.sent !== agent.call && !bot.ignoreCorrections) partner.sent = copyOf(agent.call, event);
         if (!partner.closing) {
           send(exchange(partner.sent));
           partner.since = t;
@@ -209,7 +283,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
         }
         continue;
       }
-      if (!partner && text.includes(agent.call) && !heard.some((item) => item.stationId === agent.id)) heard.push({ stationId: agent.id, call: agent.call, at: t });
+      if (!partner && text.includes(agent.call) && !heard.some((item) => item.stationId === agent.id)) heard.push({ stationId: agent.id, call: copyOf(agent.call, event), at: t });
     }
     if (t < busyUntil) continue;
     if (bot.cqRepeat !== null && !partner && !(bot.pick && heard.length) && check.state === 'clear' && t < qrtAt && cqs > 0 && t - Math.max(lastTxEnd, run.callersQuietFrom(vfo, t)) >= bot.cqRepeat) {
@@ -229,6 +303,16 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
     const inPassband = run.stations.filter((station) => Math.abs(station.rf - vfo) <= bot.filter / 2);
     const keying = inPassband.some(keyingNow);
     if (keying) lastAirAt = t;
+    // Someone else (not a caller) keying in the passband while we check, or before a run has
+    // got going here: in use, move on. Once we work stations here it's QRM on our run.
+    const resident = radio.stations.some((station) => station.role !== 'caller' && Math.abs(station.rf - vfo) <= Math.min(bot.filter / 2, BUSY_HZ) && keyingNow(station));
+    if (bot.qrl && resident && !partner && !heard.length && (check.state === 'checking' || workedAt !== vfo)) {
+      vfo += bot.qsyStep;
+      qsys += 1;
+      check = { state: 'unchecked', at: t };
+      heard = [];
+      continue;
+    }
     const partnerKeying = partner !== null && inPassband.some((station) => station.id === partner!.stationId && keyingNow(station));
     if (partnerKeying || (keying && !(heard[0] && !partner && t - heard[0].at > 1.5))) continue;
     if (partner) {
@@ -270,5 +354,10 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
     }
   }
   const waiting = { max: Math.max(0, ...samples), mean: samples.length ? samples.reduce((sum, value) => sum + value, 0) / samples.length : 0, samples };
-  return { result: run.finish(t), run, tx: txCount, cqs, qrtAt, qrls, qsys, issues, waiting };
+  const settled = run.agents.every((agent) => agent.gone) && !partner;
+  const result = run.finish(t);
+  const score = monitor ? scoreRun({
+    result, preset: BASIC_RST_NAME_QTH, recordsOf: (id) => rx.filter((record) => record.station === id), monitor, now: { t, epoch: 0 }, tx: { total: txCount, procedure: procedureTx },
+  }) : null;
+  return { result, run, tx: txCount, cqs, qrtAt, qrls, qsys, issues, waiting, settled, score, rx, monitor };
 }

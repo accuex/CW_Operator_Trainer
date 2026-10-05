@@ -1,4 +1,4 @@
-import type { CopyCondition, QsoCharEnv } from '../types';
+import type { CopyCondition, CopySituation, QsoCharEnv } from '../types';
 import { isKeyed, type Station, type Transmission } from './band';
 import type { CharSpan } from './keying';
 
@@ -22,6 +22,8 @@ export interface BandSample {
   qrm: number;
   qsb: number;
   qrn: number;
+  /** The strongest QRM was another caller (callers calling over each other). */
+  qrmCaller?: boolean;
 }
 
 /** Thresholds that turn the raw numbers into a condition label. */
@@ -32,7 +34,22 @@ export const CONDITION_SEVERITY: Record<CopyCondition, number> = {
   clean: 0, weak: 1, qsb: 2, qrn: 3, qrm: 4, detuned: 5, muted: 6, unheard: 7,
 };
 export const ENV_CONDITIONS = ['weak', 'qsb', 'qrn', 'qrm'] as const;
-export const isEnvCondition = (condition: CopyCondition) => (ENV_CONDITIONS as readonly string[]).includes(condition);
+export const isEnvCondition = (condition: CopyCondition | CopySituation) => (ENV_CONDITIONS as readonly string[]).includes(condition);
+
+/** Lower = easier; a call takes the hardest situation among its characters. */
+export const SITUATION_SEVERITY: Record<CopySituation, number> = {
+  clean: 0, weak: 1, qsb: 2, qrn: 3, qrm: 4, detuned: 5, doubled: 6, unheard: 7,
+};
+
+/**
+ * What a character went through: sent while we keyed (muted), or under another caller
+ * calling at the same time, is a doubling — operating, not the band, and not copy skill.
+ */
+export function situationOf(condition: CopyCondition, env: QsoCharEnv | null | undefined): CopySituation {
+  if (condition === 'muted') return 'doubled';
+  if (condition === 'qrm' && env?.qrmFrom === 'caller') return 'doubled';
+  return condition;
+}
 
 export interface BandSnapshot {
   t: number;
@@ -52,11 +69,16 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
   const level = target.strength * target.fade;
   const half = filter / 2 + CONDITION_LIMITS.passbandSlack;
   let qrm = 0;
+  let qrmCaller = false;
   for (const station of stations) {
     if (station === target || Math.abs(station.rf - vfo) > half || !isKeyed(station, t)) continue;
     // Closer in tone is harder to separate by ear.
     const near = Math.abs(station.rf - target.rf) < 200 ? 1 : 0.6;
-    qrm = Math.max(qrm, (station.strength * station.fade * near) / Math.max(level, 1e-3));
+    const ratio = (station.strength * station.fade * near) / Math.max(level, 1e-3);
+    if (ratio > qrm) {
+      qrm = ratio;
+      qrmCaller = station.role === 'caller';
+    }
   }
   const floor = 0.05 + noise * Math.sqrt(filter / 500) * 0.25;
   return {
@@ -70,6 +92,7 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
     qrm,
     qsb: 1 - target.fade,
     qrn: crash,
+    qrmCaller,
   };
 }
 
@@ -121,7 +144,11 @@ export function judgeSamples(samples: BandSample[]): CharJudgement {
     offset: Math.max(...samples.map((sample) => Math.abs(sample.offset))),
   };
   const round = (value: number) => Math.round(value * 100) / 100;
-  const rounded = { snr: round(env.snr), qrm: round(env.qrm), qsb: round(env.qsb), qrn: round(env.qrn), offset: Math.round(env.offset) };
+  const rounded: QsoCharEnv = { snr: round(env.snr), qrm: round(env.qrm), qsb: round(env.qsb), qrn: round(env.qrn), offset: Math.round(env.offset) };
+  if (env.qrm > 0) {
+    const worst = samples.reduce((best, sample) => (sample.qrm > best.qrm ? sample : best));
+    rounded.qrmFrom = worst.qrmCaller ? 'caller' : 'band';
+  }
   const listening = samples.filter((sample) => sample.listening).length / samples.length;
   if (listening < 0.5) return { condition: 'muted', env: rounded };
   const outside = samples.filter((sample) => Math.abs(sample.offset) > sample.filter / 2 + CONDITION_LIMITS.passbandSlack).length;

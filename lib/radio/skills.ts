@@ -1,5 +1,5 @@
-import type { AlphabetType, QsoEnvCondition, QsoModeProgress, QsoProfile, SkillEstimate } from '../types';
-import { DEFAULT_DIFFICULTY, normalizeDifficulty, type DifficultyVector } from './difficulty';
+import type { AlphabetType, CallSkillBuckets, CallsignSkill, CopySituation, QsoEnvCondition, QsoModeProgress, QsoProfile, SkillEstimate } from '../types';
+import { DEFAULT_DIFFICULTY, normalizeDifficulty, type CallTally, type DifficultyVector } from './difficulty';
 import type { QsoEvidence } from './difficulty';
 
 /**
@@ -42,6 +42,20 @@ export function ewma(prior: SkillEstimate | undefined, sample: number, weight = 
 
 const round = (estimate: SkillEstimate): SkillEstimate => ({ value: Math.round(estimate.value * 1000) / 1000, n: estimate.n });
 
+export const emptyCallsign = (): CallsignSkill => ({ log: { situations: {} }, first: { situations: {} } });
+
+/** One run's calls into the buckets: each call is one sample, clean calls apart from the rest. */
+function foldCalls(prior: CallSkillBuckets | undefined, tally: CallTally): CallSkillBuckets {
+  const out: CallSkillBuckets = { ...prior, situations: { ...prior?.situations } };
+  for (const [situation, bucket] of Object.entries(tally) as [CopySituation, { total: number; correct: number }][]) {
+    if (!bucket.total) continue;
+    const sample = bucket.correct / bucket.total;
+    if (situation === 'clean') out.clean = round(ewma(out.clean, sample, bucket.total));
+    else out.situations[situation] = round(ewma(out.situations[situation], sample, bucket.total));
+  }
+  return out;
+}
+
 export function updateSkills(
   profile: QsoProfile,
   { modeId, alphabet, wpm, evidence }: { modeId: string; alphabet: AlphabetType; wpm: number; evidence: QsoEvidence },
@@ -56,6 +70,10 @@ export function updateSkills(
   }
   for (const [condition, bucket] of Object.entries(env) as [QsoEnvCondition, { total: number; correct: number }][]) {
     if (bucket.total) skills.robustness[condition] = round(ewma(skills.robustness[condition], bucket.correct / bucket.total, Math.min(1, bucket.total / 8)));
+  }
+  if (evidence.calls) {
+    const prior = skills.callsign ?? emptyCallsign();
+    skills.callsign = { log: foldCalls(prior.log, evidence.calls.log), first: foldCalls(prior.first, evidence.calls.first) };
   }
   if (tx.total) {
     skills.tuning = round(ewma(skills.tuning, tx.onFrequency / tx.total));

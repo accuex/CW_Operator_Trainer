@@ -1,6 +1,7 @@
 import type { CopyCondition } from '../types';
 import type { FieldResult } from './attribution';
-import { judgeChar, type ClockNow, type CopyMonitor, type RxRecord } from './conditions';
+import type { CopySituation } from '../types';
+import { judgeChar, situationOf, type ClockNow, type CopyMonitor, type RxRecord } from './conditions';
 import type { QsoEvidence } from './difficulty';
 import type { QsoIssue } from './qso';
 
@@ -14,6 +15,21 @@ export const QSO_TRACE_LIMIT = 50;
 export const CONDITION_CODE: Record<CopyCondition, string> = {
   clean: 'c', weak: 'w', qsb: 's', qrn: 'n', qrm: 'q', detuned: 'd', muted: 'm', unheard: 'u',
 };
+/** Same letters, plus x = doubled (our transmission or another caller on top). */
+export const SITUATION_CODE: Record<CopySituation, string> = {
+  clean: 'c', weak: 'w', qsb: 's', qrn: 'n', qrm: 'q', detuned: 'd', doubled: 'x', unheard: 'u',
+};
+
+export interface TracedRx {
+  at: number;
+  text: string;
+  wpm: number;
+  cut: boolean;
+  /** One CONDITION_CODE letter per sent character. */
+  conditions: string;
+  /** One SITUATION_CODE letter per sent character (older traces lack it). */
+  situations?: string;
+}
 
 export interface QsoTrace {
   id: string;
@@ -25,20 +41,24 @@ export interface QsoTrace {
   truth: Record<string, string>;
   log: Record<string, string>;
   fields: FieldResult[];
-  /** Target's transmissions; `conditions` has one CONDITION_CODE letter per sent character. */
-  rx: { at: number; text: string; wpm: number; cut: boolean; conditions: string }[];
+  /** Target's transmissions. */
+  rx: TracedRx[];
   /** `macro`: sent unchanged from a 定型 button. */
   tx: { at: number; text: string; offsetHz: number; issue?: QsoIssue; macro?: boolean }[];
   evidence: QsoEvidence;
   adjusted: Record<string, number>;
 }
 
-export function traceRx(records: RxRecord[], monitor: CopyMonitor, now: ClockNow, wpm: (record: RxRecord) => number) {
-  return records.map((record) => ({
-    at: record.tx.start,
-    text: record.tx.text,
-    wpm: wpm(record),
-    cut: record.cutAt !== null && record.cutAt < record.tx.start + record.tx.length,
-    conditions: record.tx.chars.map((span) => CONDITION_CODE[judgeChar(monitor, record, span, now).condition]).join(''),
-  }));
+export function traceRx(records: RxRecord[], monitor: CopyMonitor, now: ClockNow, wpm: (record: RxRecord) => number): TracedRx[] {
+  return records.map((record) => {
+    const judged = record.tx.chars.map((span) => judgeChar(monitor, record, span, now));
+    return {
+      at: record.tx.start,
+      text: record.tx.text,
+      wpm: wpm(record),
+      cut: record.cutAt !== null && record.cutAt < record.tx.start + record.tx.length,
+      conditions: judged.map((item) => CONDITION_CODE[item.condition]).join(''),
+      situations: judged.map((item) => SITUATION_CODE[situationOf(item.condition, item.env)]).join(''),
+    };
+  });
 }

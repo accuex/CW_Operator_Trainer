@@ -55,6 +55,8 @@ export class CallerAgent implements Agent {
   busted = false;
   /** Calls we sent that were meant for this station, in order (first = our first copy). */
   readonly addressedAs: string[] = [];
+  /** When each of those started on the air (what we could have heard of it before sending is what counts). */
+  readonly addressedAt: number[] = [];
   goneReason: GoneReason | null = null;
   arrivedAt: number;
   private got: Record<AskField, boolean> = { RST: false, NAME: false, QTH: false };
@@ -76,6 +78,8 @@ export class CallerAgent implements Agent {
   private askAt: number | null = null;
   /** Extra listening before the next call after a doubling. */
   private listenOut = 0;
+  /** Start of the message of ours being heard. */
+  private hearingFrom = 0;
 
   constructor(readonly persona: StationPersona, readonly station: Station, private listenAt: number, now: number) {
     this.id = station.id;
@@ -93,6 +97,7 @@ export class CallerAgent implements Agent {
     if (this.gone || event.from !== 'me' || !event.intent) return;
     const intent = event.intent;
     this.lastHeard = Math.max(this.lastHeard, event.end);
+    this.hearingFrom = event.start;
     if (this.retryAt !== null) this.retryAt = Math.max(this.retryAt, event.end + uniform(ctx.random, this.persona.retry));
     if (this.state === 'selected' || this.state === 'exchanged') this.hearAsPartner(intent, ctx);
     else this.hearWhileCalling(intent, ctx);
@@ -174,6 +179,11 @@ export class CallerAgent implements Agent {
     this.arrivedAt += shift;
   }
 
+  private addressed(sent: string) {
+    this.addressedAs.push(sent);
+    this.addressedAt.push(this.hearingFrom);
+  }
+
   /** Waiting to be picked longer than it is willing to. */
   private waitedOut() {
     return this.waited > this.persona.waitLimit;
@@ -198,12 +208,12 @@ export class CallerAgent implements Agent {
   private hearWhileCalling(intent: OperatorIntent, ctx: AgentContext) {
     const { call } = this;
     if (intent.calls.includes(call)) {
-      this.addressedAs.push(call);
+      this.addressed(call);
       return this.select(ctx, 'call', intent);
     }
     const near = intent.calls.find((sent) => isNearCall(sent, call) && this.isClosestTo(sent, ctx));
     if (near) {
-      this.addressedAs.push(near);
+      this.addressed(near);
       if (this.corrections < MAX_CORRECTIONS) {
         this.corrections += 1;
         ctx.notify({ type: 'corrected', agent: this, heard: near });
@@ -261,7 +271,7 @@ export class CallerAgent implements Agent {
     const { call } = this;
     const forUs = intent.calls.includes(call) || intent.calls.some((sent) => isNearCall(sent, call));
     if (intent.calls.length && !forUs) return this.leave('dropped', ctx);
-    if (forUs) this.addressedAs.push(intent.calls.find((sent) => sent === call || isNearCall(sent, call))!);
+    if (forUs) this.addressed(intent.calls.find((sent) => sent === call || isNearCall(sent, call))!);
     this.nudged = false;
 
     if (this.state === 'selected') {

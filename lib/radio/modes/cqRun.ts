@@ -105,6 +105,10 @@ export interface RunContact {
   truth: LogFields;
   /** Calls we sent meant for it, first = our first copy. */
   sentCalls: string[];
+  /** When each of those went on the air. */
+  sentAt: number[];
+  /** Doublings between it and us. */
+  doublings: number;
   corrections: number;
   /** Partial calls we sent before picking it. */
   partials: number;
@@ -148,6 +152,11 @@ export interface FrequencyUse {
   busyCqs: number;
   /** Times a station there asked us to QSY. */
   qsyAsked: number;
+  /**
+   * A CQ went out there clear: the frequency is ours. Someone who turns up later is QRM on
+   * our run, not a frequency in use — only the QSOs that were there before us still count.
+   */
+  held?: boolean;
 }
 
 /** Where residents go when the run starts. Omitted fields are drawn from `busy`. */
@@ -188,6 +197,13 @@ export interface RunResult {
     callers: number;
     /** Doublings between us and callers. */
     doublings: number;
+    /**
+     * Frequencies checked as they should be: QRL?, listened QRL_LISTEN s or more, nobody
+     * there, then CQ (never in use while we called there).
+     */
+    frequencyChecks: number;
+    /** Frequencies a QRL? found in use (answered, or heard busy) that we left without a CQ. */
+    busyAvoided: number;
   };
 }
 
@@ -210,7 +226,8 @@ export class RunSession {
   private partialsTotal = 0;
   private seq = 0;
   private notes: AgentNote[] = [];
-  private qrls: { rf: number; at: number; end: number }[] = [];
+  /** QRL?s we sent; `busy` is judged once its listen is over, while the air still remembers it. */
+  private qrls: { rf: number; at: number; end: number; busy?: boolean }[] = [];
   /** Start of the transmission that last let new listeners find us. */
   private foundAt: number | null = null;
   private frequencyList: FrequencyUse[] = [];
@@ -250,9 +267,11 @@ export class RunSession {
   get keyedUntil() { return this.ether.keyedUntil('me'); }
 
   /** Is `rf` in use by someone other than us and our callers, as heard on the air by `at`? */
-  frequencyBusy(rf: number, at: number) {
+  frequencyBusy(rf: number, at: number, held = false) {
     const ours = new Set<number>(this.agents.map((agent) => agent.id));
-    return this.ether.activeNear(rf, BUSY_HZ, at - BUSY_SECONDS, (party) => party === 'me' || ours.has(party), at);
+    const residents = new Set<number>(this.residents.map((agent) => agent.id));
+    const ignore = (party: number | 'me') => party === 'me' || ours.has(party as number) || (held && !residents.has(party as number));
+    return this.ether.activeNear(rf, BUSY_HZ, at - BUSY_SECONDS, ignore, at);
   }
 
   /**
@@ -356,16 +375,17 @@ export class RunSession {
     if (intent.cq && !intent.mentionsMe) issues.push('cq-without-call');
     let busy = false;
     if (intent.cq) {
-      busy = this.frequencyBusy(rf, start);
+      let use = this.frequencyList.find((item) => Math.abs(item.rf - rf) <= QRL_HZ);
+      busy = this.frequencyBusy(rf, start, use?.held);
       const qrl = this.pendingQrl(rf, start);
       const asked = qrl !== null || this.qrls.some((item) => Math.abs(item.rf - rf) <= QRL_HZ && item.at < start && start - item.end <= QRL_VALID);
       const listened = qrl ? Math.max(0, start - qrl.end) : null;
-      let use = this.frequencyList.find((item) => Math.abs(item.rf - rf) <= QRL_HZ);
       if (!use) {
         use = { rf, firstCqAt: start, qrlFirst: asked, qrlListen: listened, lastCqAt: start, busyCqs: 0, qsyAsked: 0 };
         this.frequencyList.push(use);
       }
       use.lastCqAt = start;
+      if (!busy) use.held = true;
       if (busy) {
         use.busyCqs += 1;
         issues.push(asked ? 'busy-frequency' : 'cq-without-qrl');
@@ -402,6 +422,7 @@ export class RunSession {
       }
     }
     for (const agent of everyone) agent.tick(now, this.ctx);
+    this.judgeQrls(now);
     const before = this.lastStations;
     const after = this.stations;
     if (after.length !== before.length || after.some((station, index) => station !== before[index])) {
@@ -490,8 +511,30 @@ export class RunSession {
         qrlNoListen: this.qrlNoListen,
         callers: this.agents.length,
         doublings: this.agents.reduce((sum, agent) => sum + agent.doublings, 0),
+        frequencyChecks: this.frequencyList.filter((use) => use.qrlFirst && use.qrlListen !== null && use.qrlListen >= QRL_LISTEN && use.busyCqs === 0).length,
+        busyAvoided: this.busyAvoided(now),
       },
     };
+  }
+
+  /** QRL?s that found the frequency in use, with no CQ of ours there afterwards — one per frequency. */
+  /** Was each QRL?'s frequency in use? Judged as its listen ends (or at `now`, at the latest). */
+  private judgeQrls(now: number, final = false) {
+    for (const qrl of this.qrls) {
+      if (qrl.busy !== undefined || (!final && now < qrl.end + QRL_LISTEN)) continue;
+      qrl.busy = this.frequencyBusy(qrl.rf, Math.min(now, qrl.end + QRL_LISTEN));
+    }
+  }
+
+  private busyAvoided(now: number) {
+    this.judgeQrls(now, true);
+    const avoided: number[] = [];
+    for (const qrl of this.qrls) {
+      const cqAfter = this.frequencyList.some((use) => Math.abs(use.rf - qrl.rf) <= QRL_HZ && use.lastCqAt > qrl.at);
+      if (cqAfter || avoided.some((rf) => Math.abs(rf - qrl.rf) <= QRL_HZ)) continue;
+      if (qrl.busy) avoided.push(qrl.rf);
+    }
+    return avoided.length;
   }
 
   private lastStations: Station[] = [];
@@ -544,6 +587,8 @@ export class RunSession {
           stationId: agent.id,
           truth: { call: persona.call, rst: persona.rst, name: persona.name, qth: persona.qth },
           sentCalls: [],
+          sentAt: [],
+          doublings: 0,
           corrections: 0,
           partials: this.partialsPending,
           asks: 0,
@@ -591,7 +636,7 @@ export class RunSession {
   private refresh(contact: RunContact): RunContact {
     const agent = this.agents.find((item) => item.id === contact.stationId);
     if (!agent) return { ...contact };
-    return { ...contact, sentCalls: [...agent.addressedAs], corrections: agent.corrections, busted: agent.busted };
+    return { ...contact, sentCalls: [...agent.addressedAs], sentAt: [...agent.addressedAt], doublings: agent.doublings, corrections: agent.corrections, busted: agent.busted };
   }
 
   /**

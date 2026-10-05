@@ -4,7 +4,7 @@ import { logbookEntries } from './logbook';
 
 const summary = (over: Partial<QsoSessionSummary> = {}): QsoSessionSummary => ({
   modeId: 'ragchew', presetId: 'basic-rst-name-qth', call: 'JA3ABC', outcome: 'complete', fields: 4, fieldsCorrect: 3,
-  cleanAccuracy: 1, causes: { copy: 0, environment: 0, tuning: 0, timing: 0, procedure: 0 }, difficulty: {}, adjusted: {}, ...over,
+  cleanAccuracy: 1, causes: { copy: 0, environment: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 }, difficulty: {}, adjusted: {}, ...over,
 });
 const session = (id: string, qso?: QsoSessionSummary): SessionRecord => ({
   id, startedAt: 0, endedAt: 500, mode: 'qso', alphabetType: 'international', answers: 0, accuracy: 0, qso,

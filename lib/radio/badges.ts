@@ -3,6 +3,7 @@ import { isEnvCondition } from './conditions';
 import type { FieldResult } from './attribution';
 import type { QsoEvidence } from './difficulty';
 import type { QsoIssue } from './qso';
+import { QRL_LISTEN } from './modes/cqRun';
 
 /**
  * 実戦習熟バッジ and per-character 実戦マーク. Separate from card rarity: they
@@ -23,6 +24,9 @@ export const FAST_WPM_STEPS = [15, 20, 25, 30] as const;
 export const ENV_ACCURACY = 0.85;
 export const ENV_MIN_CHARS = 4;
 export const ZERO_IN_HZ = 30;
+/** A run counts toward the rate badge from this long, with at least this many clean contacts. */
+export const RATE_MIN_SECONDS = 300;
+export const RATE_MIN_CONTACTS = 5;
 
 /** A character gets its mark after this many clean, correct copies at MARK_WPM or faster. */
 export const MARK_WPM = 18;
@@ -35,7 +39,8 @@ export interface BadgeDef { id: string; title: string; description: string; unit
 
 const fast = (wpm: number) => (stats: QsoStats) => stats.fastClean[wpm] ?? 0;
 const env = (condition: QsoEnvCondition) => (stats: QsoStats) => stats.envCorrect[condition] ?? 0;
-const counter = (key: 'zeroIn' | 'freehand' | 'callsign') => (stats: QsoStats) => stats[key];
+const counter = (key: 'zeroIn' | 'freehand' | 'callsign' | 'frequencyChecks') => (stats: QsoStats) => stats[key] ?? 0;
+const bestRate = (stats: QsoStats) => stats.bestRate ?? 0;
 const counted = (value: BadgeTierDef['value'], goals: [number, number, number], unit: string): BadgeDef['tiers'] =>
   goals.map((goal) => ({ goal, label: `${goal} ${unit}`, value })) as BadgeDef['tiers'];
 
@@ -58,6 +63,25 @@ export const BADGES: BadgeDef[] = [
   { id: 'zero-in', title: 'ゼロイン', description: `すべての送信を相手の ±${ZERO_IN_HZ} Hz 以内で出した QSO の数`, unit: 'QSO', tiers: counted(counter('zeroIn'), [10, 30, 100], 'QSO') },
   { id: 'freehand', title: '手打ち運用', description: '定型ボタンを使わず、手順ミスなしで最後まで終えた QSO の数', unit: 'QSO', tiers: counted(counter('freehand'), [10, 30, 100], 'QSO') },
   { id: 'callsign', title: 'コールサイン', description: '相手のコールサインを正しくログに書けた QSO の数', unit: 'QSO', tiers: counted(counter('callsign'), [10, 50, 150], 'QSO') },
+  {
+    id: 'frequency-check',
+    title: '周波数確認',
+    description: `CQ の前に QRL? を出して ${QRL_LISTEN} 秒以上聴き、空いていると確かめてから CQ を出した周波数（使用中と分かって CQ を控えた周波数も数えます）`,
+    unit: '回',
+    tiers: counted(counter('frequencyChecks'), [5, 20, 50], '回'),
+  },
+  {
+    id: 'run-rate',
+    title: 'CQ ランのレート',
+    description: `${RATE_MIN_SECONDS / 60} 分以上のランで、全項目を正しくログした完了交信の 1 時間あたりの数（最高記録）`,
+    unit: '/h',
+    tiers: [
+      // RST / NAME / QTH runs top out near 40/h even keyed fast (headless sims); 20 is a steady run.
+      { goal: 20, label: '20 局/h', value: bestRate },
+      { goal: 30, label: '30 局/h', value: bestRate },
+      { goal: 40, label: '40 局/h', value: bestRate },
+    ],
+  },
 ];
 
 export const badgeById = (id: string) => BADGES.find((badge) => badge.id === id);
@@ -143,6 +167,11 @@ export function recordQsoOutcome(qso: QsoProfile, outcome: QsoOutcome): { qso: Q
     }
   }
 
+  const { badges, earned } = award(qso, stats, at);
+  return { qso: { ...qso, stats, charMarks, badges }, earned, marked };
+}
+
+function award(qso: QsoProfile, stats: QsoStats, at: number) {
   const badges: Record<string, QsoBadgeRecord> = { ...qso.badges };
   const earned: EarnedBadge[] = [];
   for (const badge of BADGES) {
@@ -152,5 +181,40 @@ export function recordQsoOutcome(qso: QsoProfile, outcome: QsoOutcome): { qso: Q
       earned.push({ id: badge.id, tier: tier as 1 | 2 | 3 });
     }
   }
-  return { qso: { ...qso, stats, charMarks, badges }, earned, marked };
+  return { badges, earned };
+}
+
+export interface RunOutcome {
+  /** Every contact with a log line judged; `tx` stays empty (zero-in and hand keying are rag-chew badges). */
+  contacts: Omit<QsoOutcome, 'tx' | 'at' | 'alphabet'>[];
+  alphabet: AlphabetType;
+  at: number;
+  seconds: number;
+  /** Frequencies checked properly before CQ, and ones found in use and left alone (see RunResult.stats). */
+  frequencyChecks: number;
+  busyAvoided: number;
+  /** Clean contacts and their rate per hour. */
+  cleanContacts: number;
+  cleanRate: number;
+}
+
+/** Fold a whole run in: each contact like a QSO, then the run's own procedure and rate. */
+export function recordRunOutcome(qso: QsoProfile, run: RunOutcome): { qso: QsoProfile; earned: EarnedBadge[]; marked: string[] } {
+  let next = qso;
+  const marked: string[] = [];
+  for (const contact of run.contacts) {
+    const folded = recordQsoOutcome(next, { ...contact, tx: [], at: run.at, alphabet: run.alphabet });
+    next = folded.qso;
+    marked.push(...folded.marked);
+  }
+  const stats = normalizeStats(next.stats);
+  stats.frequencyChecks = (stats.frequencyChecks ?? 0) + run.frequencyChecks + run.busyAvoided;
+  if (run.seconds >= RATE_MIN_SECONDS && run.cleanContacts >= RATE_MIN_CONTACTS) stats.bestRate = Math.max(stats.bestRate ?? 0, Math.round(run.cleanRate));
+  next = { ...next, stats, badges: award(next, stats, run.at).badges };
+  // Everything the run lifted, from what was held before it.
+  const earned = BADGES.flatMap((badge): EarnedBadge[] => {
+    const tier = next.badges?.[badge.id]?.tier;
+    return tier && tier > (qso.badges?.[badge.id]?.tier ?? 0) ? [{ id: badge.id, tier }] : [];
+  });
+  return { qso: next, earned, marked };
 }

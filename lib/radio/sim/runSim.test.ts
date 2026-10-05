@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runSim, type SimOptions } from './runSim';
+import { HUMAN_COPY, runSim, type SimBand, type SimOptions } from './runSim';
 
 const SEEDS = Array.from({ length: 40 }, (_, index) => index + 1);
 const batch = (options: Omit<SimOptions, 'seed'>) => SEEDS.map((seed) => runSim({ seed, ...options }));
@@ -139,5 +139,43 @@ describe('headless CQ run', () => {
       expect(report.result.stats.qrlNoListen).toBe(0);
       expect(report.result.frequencies[0].qrlListen).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it('counts a QRL? that found the frequency in use, and the check before a clear CQ', () => {
+    const busy = batch({ placement: { onFrequency: true, nearby: 0 } });
+    // Some hear the QSO before they even ask (no QRL?, so nothing to credit).
+    expect(busy.filter((report) => report.result.stats.busyAvoided >= 1).length).toBeGreaterThan(SEEDS.length * 0.4);
+    for (const report of busy) expect(report.result.stats.frequencyChecks).toBe(report.result.frequencies.filter((use) => use.qrlFirst).length);
+    const hasty = batch({ bot: { qrlListen: 1, cqListen: 1 } });
+    for (const report of hasty) expect(report.result.stats.frequencyChecks).toBe(0);
+  });
+});
+
+describe('headless CQ run on a live band', () => {
+  const BAND: SimBand = { noise: 0.4, qsb: 0.5, qrn: 0.4, qrm: 3 };
+  const reports = SEEDS.slice(0, 20).map((seed) => runSim({ seed, placement: {}, band: BAND, bot: { copyErrors: HUMAN_COPY, filter: 2400 }, duration: 400, drain: 900 }));
+
+  it('settles, keeps its frequency and scores every contact', () => {
+    for (const report of reports) {
+      expect(report.settled).toBe(true);
+      // Stations turning up on a frequency we already hold are QRM on us, not a busy CQ.
+      expect(report.result.stats.busyCqs).toBe(0);
+      expect(report.score!.contacts).toHaveLength(report.result.contacts.length);
+      for (const contact of report.score!.contacts) expect(contact.firstCall).not.toBeNull();
+    }
+  });
+
+  it('sorts what was copied by situation, doubled apart from band conditions', () => {
+    const cells = reports.flatMap((report) => report.score!.fields.flatMap((field) => field.cells));
+    const seen = new Set(cells.map((cell) => cell.situation));
+    for (const situation of ['clean', 'qrm', 'doubled'] as const) expect(seen.has(situation), situation).toBe(true);
+    expect(['qsb', 'qrn', 'weak'].some((situation) => seen.has(situation as never))).toBe(true);
+    const BAND_SITUATIONS = ['weak', 'qsb', 'qrn', 'qrm'];
+    for (const cell of cells.filter((item) => item.op === 'sub' || item.op === 'del')) {
+      const expected = cell.situation === 'doubled' ? 'doubling' : cell.situation === 'clean' ? 'copy' : BAND_SITUATIONS.includes(cell.situation) ? 'environment' : cell.cause;
+      expect(cell.cause).toBe(expected);
+    }
+    const evidence = reports.map((report) => report.score!.evidence);
+    expect(evidence.every((item) => item.calls && Object.keys(item.calls.first).length > 0)).toBe(true);
   });
 });

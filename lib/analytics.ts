@@ -1,4 +1,4 @@
-import type { AnswerLog } from './types';
+import type { AnswerLog, CopySituation } from './types';
 
 export interface ConfusionCell { correct: string; input: string; count: number; rate: number }
 export interface WeakPair { a: string; b: string; count: number; reverse: number; total: number }
@@ -56,15 +56,59 @@ export const forWeakAnalysis = (logs: AnswerLog[], includeEnvironment = false) =
 
 export interface ConditionRow { condition: string; answers: number; accuracy: number }
 
-/** QSO copy accuracy per reception condition (clean vs QRM vs QSB …). */
-export function qsoConditionBreakdown(logs: AnswerLog[]): ConditionRow[] {
+/** What a QSO character went through; older records have only the condition (muted = we keyed over it). */
+export const situationOfLog = (log: AnswerLog): CopySituation | null => {
+  if (!log.qso) return null;
+  return log.qso.situation ?? (log.qso.condition === 'muted' ? 'doubled' : log.qso.condition);
+};
+
+/**
+ * QSO copy accuracy per situation (clean vs QRM vs QSB vs doubled …), optionally for
+ * one log field (`call` → how calls hold up under each).
+ */
+export function qsoConditionBreakdown(logs: AnswerLog[], field?: string): ConditionRow[] {
   const buckets = new Map<string, { total: number; correct: number }>();
   for (const log of logs) {
-    if (!log.qso) continue;
-    const bucket = buckets.get(log.qso.condition) ?? { total: 0, correct: 0 };
+    const situation = situationOfLog(log);
+    if (!situation || (field && log.qso?.field !== field)) continue;
+    const bucket = buckets.get(situation) ?? { total: 0, correct: 0 };
     bucket.total += 1;
     if (log.isCorrect) bucket.correct += 1;
-    buckets.set(log.qso.condition, bucket);
+    buckets.set(situation, bucket);
   }
   return [...buckets.entries()].map(([condition, { total, correct }]) => ({ condition, answers: total, accuracy: correct / total }));
+}
+
+export interface ConditionContrast { symbol: string; clean: number; cleanAnswers: number; situation: CopySituation; accuracy: number; answers: number }
+
+/**
+ * Characters copied well normally that fall apart under one situation: "R is fine,
+ * but not under QRM". Needs enough of both; the worst situation per character.
+ */
+export function conditionContrast(logs: AnswerLog[], { minClean = 5, minHard = 3, cleanAbove = 0.85, gap = 0.25 } = {}): ConditionContrast[] {
+  const bySymbol = new Map<string, Map<CopySituation, { total: number; correct: number }>>();
+  for (const log of logs) {
+    const situation = situationOfLog(log);
+    if (!situation || situation === 'unheard') continue;
+    const map = bySymbol.get(log.correctSymbol) ?? new Map();
+    const bucket = map.get(situation) ?? { total: 0, correct: 0 };
+    bucket.total += 1;
+    if (log.isCorrect) bucket.correct += 1;
+    map.set(situation, bucket);
+    bySymbol.set(log.correctSymbol, map);
+  }
+  const out: ConditionContrast[] = [];
+  for (const [symbol, map] of bySymbol) {
+    const clean = map.get('clean');
+    if (!clean || clean.total < minClean || clean.correct / clean.total < cleanAbove) continue;
+    let worst: ConditionContrast | null = null;
+    for (const [situation, bucket] of map) {
+      if (situation === 'clean' || bucket.total < minHard) continue;
+      const accuracy = bucket.correct / bucket.total;
+      if (clean.correct / clean.total - accuracy < gap) continue;
+      if (!worst || accuracy < worst.accuracy) worst = { symbol, clean: clean.correct / clean.total, cleanAnswers: clean.total, situation, accuracy, answers: bucket.total };
+    }
+    if (worst) out.push(worst);
+  }
+  return out.sort((a, b) => a.accuracy - b.accuracy);
 }

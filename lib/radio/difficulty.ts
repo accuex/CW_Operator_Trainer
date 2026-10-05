@@ -1,4 +1,4 @@
-import type { QsoCauseCounts, QsoEnvCondition } from '../types';
+import type { CopySituation, QsoCauseCounts, QsoEnvCondition } from '../types';
 
 /**
  * Difficulty is a vector, not a stage: each axis moves on its own evidence.
@@ -44,12 +44,19 @@ export const targetDrift = (d: DifficultyVector, random: () => number) => (rando
 
 /* ── Auto adjust ─────────────────────────────────────────────────────────── */
 
+/** Whole calls by situation. */
+export type CallTally = Partial<Record<CopySituation, { total: number; correct: number }>>;
+
 /** What one QSO tells us about each axis. */
 export interface QsoEvidence {
   /** Clean-condition characters: copy skill at this speed. */
   clean: { total: number; correct: number };
   /** Characters under each band condition. */
   env: Partial<Record<QsoEnvCondition, { total: number; correct: number }>>;
+  /** Characters lost to a doubling (our transmission or another caller on top). No axis moves on these. */
+  doubled?: { total: number; correct: number };
+  /** Whole calls: as logged, and as we first sent them back (run modes). */
+  calls?: { log: CallTally; first: CallTally };
   causes: QsoCauseCounts;
   /** Transmissions made / made on frequency. */
   tx: { total: number; onFrequency: number };
