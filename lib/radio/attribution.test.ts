@@ -113,6 +113,12 @@ describe('log attribution', () => {
     expect(name.cells[0]).toMatchObject({ condition: 'clean', cause: 'copy' });
   });
 
+  it('finds a cut-number report on the air (5NN is 599)', () => {
+    const tx = sentAt('R UR 5NN NAME KEN QTH OSAKA BK', 10);
+    const fields = scoreFields(BASIC_RST_NAME_QTH, { ...truth, rst: '599' }, { ...truth, rst: '599' }, [{ tx, station: 1, epoch: 1, cutAt: null }], monitorOf(9, 80, () => ({})), now);
+    expect(fields[1].cells.map((cell) => cell.condition)).toEqual(['clean', 'clean', 'clean']);
+  });
+
   it('calls it tuning when off the passband and timing when never sent', () => {
     const tx = sentAt(report, 10);
     const detuned = monitorOf(9, 80, () => ({ offset: 800 }));
@@ -219,9 +225,17 @@ describe('skills and recommended stage', () => {
   });
 });
 
+describe('mode registry', () => {
+  it('offers the CQ run as a run mode', () => {
+    expect(qsoMode('cq-run').kind).toBe('run');
+    expect(qsoMode('no-such-mode').id).toBe('ragchew');
+  });
+});
+
 describe('ragchew mode', () => {
   it('runs the exchange through the mode interface', () => {
     const mode = qsoMode('ragchew');
+    if (mode.kind !== 'single') throw new Error('ragchew is a single-contact mode');
     const session = mode.createSession({ random: seeded(9), myCall: 'JA1ZZZ', vfo: 7_012_000, difficulty: DEFAULT_DIFFICULTY, preset: BASIC_RST_NAME_QTH });
     expect(session.stations[0]).toBe(session.target);
     expect(session.stations).toHaveLength(1 + DEFAULT_DIFFICULTY.crowd);

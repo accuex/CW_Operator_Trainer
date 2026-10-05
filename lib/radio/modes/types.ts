@@ -3,6 +3,9 @@ import type { Station } from '../band';
 import type { Axis, DifficultyVector } from '../difficulty';
 import type { ExchangePreset } from '../exchange';
 import type { TxResult } from '../qso';
+import type { AgentMe } from '../agents/types';
+import type { Random } from '../random';
+import type { RadioPort, RunSession } from './cqRun';
 
 /**
  * A QSO mode is an independent game (rag-chew, CQ run, contest, pile-up, wabun …),
@@ -39,7 +42,7 @@ export interface QsoSession {
   macros(log: Record<string, string>): [string, string][];
 }
 
-export interface QsoMode {
+interface QsoModeBase {
   id: string;
   label: string;
   description: string;
@@ -49,6 +52,29 @@ export interface QsoMode {
   presets: string[];
   /** Difficulty axes this mode uses; the panel shows only these. */
   axes: readonly Axis[];
+}
+
+/** One contact with one station per session (rag-chew). */
+export interface SingleQsoMode extends QsoModeBase {
+  kind: 'single';
   steps: QsoStep[];
   createSession(ctx: SessionContext): QsoSession;
 }
+
+export interface RunContext {
+  random: Random;
+  me: AgentMe;
+  difficulty: DifficultyVector;
+}
+
+/**
+ * We hold a frequency and work station after station until QRT (CQ run; later
+ * pileup-run and contest-run). The session lives on the shared air; the rig feeds it
+ * through `radio`.
+ */
+export interface RunQsoMode extends QsoModeBase {
+  kind: 'run';
+  createRun(ctx: RunContext, radio: RadioPort): RunSession;
+}
+
+export type QsoMode = SingleQsoMode | RunQsoMode;

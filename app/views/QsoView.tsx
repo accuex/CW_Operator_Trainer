@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { AnswerLog, AudioSettings, CopyCondition, QsoCause, QsoProfile, SessionRecord, TrainerProfile } from '@/lib/types';
+import type { AnswerLog, AudioSettings, QsoCause, QsoProfile, SessionRecord, TrainerProfile } from '@/lib/types';
 import { makeQrm } from '@/lib/radio/band';
 import { markCut } from '@/lib/radio/conditions';
 import { collectEvidence, fieldAnswers, scoreFields, type FieldResult } from '@/lib/radio/attribution';
@@ -16,6 +16,8 @@ import { traceRx, type QsoTrace } from '@/lib/radio/trace';
 import { addQsoTrace } from '@/lib/storage';
 import { nowId } from '@/app/trainer/shared';
 import { Icon } from '@/app/components/icons';
+import { FieldCells } from './qso/FieldCells';
+import { CqRunDesk, type RunRecord } from './qso/CqRunDesk';
 import { RigPanel } from './qso/RigPanel';
 import { useRig, type Capture, type PowerResult } from './qso/useRig';
 
@@ -24,9 +26,6 @@ const LOGBOOK_SIZE = 30;
 
 const CAUSE_LABEL: Record<Exclude<QsoCause, 'ok'> | 'procedure', string> = {
   copy: '受信ミス', environment: '悪条件', tuning: '同調', procedure: '手順', timing: '聴き逃し',
-};
-const CONDITION_SHORT: Record<CopyCondition, string> = {
-  clean: '', weak: '弱', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', detuned: 'ずれ', muted: '送信中', unheard: '未',
 };
 
 /** Rig-side preferences that are not difficulty (kept on this device). */
@@ -104,11 +103,13 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     updateQso((current) => ({ ...current, modes: { ...current.modes, [mode.id]: { ...modeProgress(current, mode.id, difficulty), ...change } } }));
   };
 
+  /** Put a fresh station on the band for a single-QSO mode (a run puts up its own callers). */
   const newStation = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
     const { myCall, difficulty, modeId } = settingsRef.current;
     const current = qsoMode(modeId);
+    if (current.kind !== 'single') return;
     const preset = PRESETS[current.presets[0]];
     const session = current.createSession({ random: Math.random, myCall, vfo: engine.vfo, difficulty, preset });
     liveRef.current = { id: `qso-${nowId()}`, startedAt: Date.now(), modeId: current.id, session, capture: newCapture(), tx: [] };
@@ -121,8 +122,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     setSent([]);
   }, [engineRef, newCapture]);
 
-  // The rig's engine exists once its own effect has run; put the first station on it.
-  useEffect(() => { newStation(); }, [newStation]);
+  // The rig's engine exists once its own effect has run; put the first station on it,
+  // and a fresh one whenever we come back to a single-QSO mode (a run desk sets up its own band).
+  useEffect(() => { newStation(); }, [mode.id, newStation]);
 
   const transmit = async (raw: string) => {
     const engine = engineRef.current;
@@ -158,7 +160,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const submitLog = () => {
     const engine = engineRef.current;
     const live = liveRef.current;
-    if (!engine || !live || review) return;
+    if (!engine || !live || review || mode.kind !== 'single') return;
     const { session } = live;
     const now = { t: engine.now(), epoch: engine.epoch };
     const { capture } = live;
@@ -251,10 +253,11 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     setReview({ fields, evidence, moved: adjusted.moved, auto: current.auto, received, earned, marked });
   };
 
+  /** Rag-chew only: a run keeps its background for the whole run (the next run gets the new count). */
   const setCrowd = (crowd: number) => {
     const engine = engineRef.current;
     const live = liveRef.current;
-    if (!engine || !live) return;
+    if (!engine || !live || mode.kind !== 'single') return;
     const qrm = engine.stations.filter((station) => station.role === 'qrm');
     const next = crowd < qrm.length ? qrm.slice(0, crowd) : [...qrm, ...makeQrm(Math.random, crowd - qrm.length, engine.vfo, [live.session.target.rf])];
     engine.setStations([live.session.target, ...next]);
@@ -274,6 +277,29 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const togglePin = (axis: Axis) => {
     const pinned = progress.pinned.includes(axis) ? progress.pinned.filter((item) => item !== axis) : [...progress.pinned, axis];
     updateMode({ pinned });
+  };
+
+  /** QRT: store the run's answers and summary, and credit skills with what was copied. */
+  const saveRun = (record: RunRecord) => {
+    recordMany(record.answers);
+    onSession({
+      id: record.id,
+      startedAt: record.startedAt,
+      endedAt: record.endedAt,
+      mode: 'qso',
+      alphabetType: record.alphabet,
+      answers: record.answers.length,
+      accuracy: record.answers.length ? record.answers.filter((answer) => answer.isCorrect).length / record.answers.length : 0,
+      qso: record.summary,
+    });
+    const modeId = record.summary.modeId;
+    const made = record.summary.contacts?.length ?? 0;
+    const perfect = record.summary.contacts?.filter((contact) => contact.fields > 0 && contact.fieldsCorrect === contact.fields).length ?? 0;
+    updateQso((old) => {
+      const next = updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence: record.evidence });
+      const base = modeProgress(old, modeId, difficulty);
+      return { ...next, modes: { ...next.modes, [modeId]: { ...base, qsos: base.qsos + made, perfect: base.perfect + perfect, lastAt: record.endedAt } } };
+    });
   };
 
   const onPower = (result: PowerResult) => {
@@ -312,19 +338,35 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       ))}
     </div>
 
-    <div className="qso-advice">
-      <span className="chip gold">おすすめ {advice.stage}</span>
-      <p><b>{advice.title}</b> — {advice.reason}</p>
-      {advice.preset && <button type="button" className="btn btn-ghost btn-sm" onClick={applyAdvice}>この条件にする</button>}
-    </div>
+    {mode.kind === 'single' && (
+      <div className="qso-advice">
+        <span className="chip gold">おすすめ {advice.stage}</span>
+        <p><b>{advice.title}</b> — {advice.reason}</p>
+        {advice.preset && <button type="button" className="btn btn-ghost btn-sm" onClick={applyAdvice}>この条件にする</button>}
+      </div>
+    )}
 
     <div className="qso-grid">
       <RigPanel rig={rig} onPower={onPower} />
 
+      {mode.kind === 'run' ? (
+        <CqRunDesk
+          key={mode.id}
+          rig={rig}
+          mode={mode}
+          preset={preset}
+          difficulty={difficulty}
+          myCall={myCall}
+          myName={qso.myName ?? ''}
+          myQth={qso.myQth ?? ''}
+          onProfile={(change) => updateQso((old) => ({ ...old, ...change }))}
+          onSave={saveRun}
+        />
+      ) : (
       <div className="qso-side">
         <div className="panel panel-pad qso-status">
           <ol className="qso-steps">
-            {mode.steps.map((item, index) => (
+            {(mode.kind === 'single' ? mode.steps : []).map((item, index) => (
               <li key={item.id} className={index < step || review ? 'done' : index === step ? 'current' : ''}>
                 <b>{index + 1}</b>{item.label}
               </li>
@@ -380,18 +422,19 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
             })}
           </div>
           {review ? (
-            <button type="button" className="btn btn-success btn-block" onClick={newStation}>次の局を探す</button>
+            <button type="button" className="btn btn-success btn-block" onClick={() => newStation()}>次の局を探す</button>
           ) : (
             <div className="qso-log-actions">
               <button type="button" className="btn btn-primary" onClick={submitLog} disabled={!canLog}>ログ確定</button>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={newStation}>別の局にする</button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => newStation()}>別の局にする</button>
             </div>
           )}
         </div>
       </div>
+      )}
     </div>
 
-    {review && <QsoReview review={review} />}
+    {review && mode.kind === 'single' && <QsoReview review={review} />}
 
     <div className="qso-bottom">
       <div className="panel panel-pad qso-settings">
@@ -436,6 +479,14 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           <label className="qso-mycall">
             <span>自分のコールサイン</span>
             <input value={myCall} onChange={(event) => updateQso((old) => ({ ...old, myCall: event.target.value.toUpperCase().replace(/[^A-Z0-9/]/g, '') }))} maxLength={10} autoCapitalize="characters" spellCheck={false} />
+          </label>
+          <label className="qso-mycall">
+            <span>自分の名前（交換用）</span>
+            <input value={qso.myName ?? ''} onChange={(event) => updateQso((old) => ({ ...old, myName: event.target.value.toUpperCase().replace(/[^A-Z]/g, '') }))} maxLength={10} placeholder="MASA" autoCapitalize="characters" spellCheck={false} />
+          </label>
+          <label className="qso-mycall">
+            <span>自分の QTH（交換用）</span>
+            <input value={qso.myQth ?? ''} onChange={(event) => updateQso((old) => ({ ...old, myQth: event.target.value.toUpperCase().replace(/[^A-Z]/g, '') }))} maxLength={12} placeholder="TOKYO" autoCapitalize="characters" spellCheck={false} />
           </label>
           <label>AF 音量 <b>{Math.round(prefs.af * 100)}</b><input type="range" min={0} max={1} step={0.01} value={prefs.af} onChange={(event) => setPrefs({ ...prefs, af: Number(event.target.value) })} /></label>
         </div>
@@ -494,14 +545,7 @@ function QsoReview({ review }: { review: Review }) {
         {fields.map((field) => (
           <div key={field.key} className="qso-review-row">
             <span>{field.label}</span>
-            <div className="qso-chars">
-              {field.cells.map((cell, index) => (
-                <i key={index} className={`cause-${cell.cause} op-${cell.op}`} title={cell.op === 'match' ? '正解' : `${cell.expected || '—'} → ${cell.input || '（なし）'}`}>
-                  {cell.expected || cell.input}
-                  {cell.op !== 'ins' && CONDITION_SHORT[cell.condition] && <small>{CONDITION_SHORT[cell.condition]}</small>}
-                </i>
-              ))}
-            </div>
+            <FieldCells field={field} />
           </div>
         ))}
       </div>

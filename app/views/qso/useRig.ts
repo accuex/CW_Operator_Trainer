@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Station } from '@/lib/radio/band';
+import type { Station, Transmission } from '@/lib/radio/band';
 import { CopyMonitor, sampleBand, type RxRecord } from '@/lib/radio/conditions';
 import { RigEngine, type FilterWidth, type RigLevels } from '@/lib/radio/rig';
 import { ScopeRenderer } from '@/lib/radio/scope';
@@ -27,6 +27,10 @@ export const isCopied = (station: Station) => station.role !== 'qrm';
 
 export type PowerResult = 'on' | 'off' | 'failed';
 
+/** Every station message the rig schedules, background QRM included (absolute times, `epoch`). */
+export type StationTap = (station: Station, tx: Transmission, epoch: number) => void;
+export type KeyedSpan = { start: number; end: number; epoch: number };
+
 export interface UseRigOptions {
   pitch: number;
   /** Header stop button: powers the rig off when it changes. */
@@ -50,6 +54,8 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
 
   const engineRef = useRef<RigEngine | null>(null);
   const captureRef = useRef<Capture | null>(null);
+  /** A mode that keeps its own air (CQ run) listens here. */
+  const tapRef = useRef<StationTap | null>(null);
   const scopeRef = useRef<HTMLCanvasElement>(null);
   const fallRef = useRef<HTMLCanvasElement>(null);
   const meterRef = useRef<HTMLElement>(null);
@@ -72,6 +78,7 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
     engine.pitch = pitch;
     engineRef.current = engine;
     engine.onTransmission = (station, tx) => {
+      tapRef.current?.(station, tx, engine.epoch);
       const capture = captureRef.current;
       if (!capture || !isCopied(station)) return;
       const record: RxRecord = { tx, station: station.id, epoch: engine.epoch, cutAt: null };
@@ -185,12 +192,15 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
     }
   };
 
-  /** Key `text` on the air. True when it went out completely on the same, still powered rig. */
-  const transmit = async (text: string, wpm: number) => {
+  /**
+   * Key `text` on the air. True when it went out completely on the same, still powered rig.
+   * `onKeyed` hears the on-air span the moment it is fixed (before the audio starts).
+   */
+  const transmit = async (text: string, wpm: number, onKeyed?: (span: KeyedSpan) => void) => {
     const engine = engineRef.current;
     if (!engine?.powered) return false;
     setTxOn(true);
-    await engine.transmit(text, wpm);
+    await engine.transmit(text, wpm, wpm, onKeyed);
     setTxOn(false);
     return engineRef.current === engine && engine.powered;
   };
@@ -198,6 +208,7 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   return {
     engineRef,
     captureRef,
+    tapRef,
     scopeRef,
     fallRef,
     meterRef,

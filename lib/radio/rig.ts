@@ -169,13 +169,18 @@ export class RigEngine {
     voice.chirp?.gain.cancelScheduledValues(now);
   }
 
-  /** Key our own transmitter. Resolves when the last element ends. */
-  transmit(text: string, wpm: number, effectiveWpm = wpm): Promise<number> {
+  /**
+   * Key our own transmitter. Resolves when the last element ends. `onKeyed` gets the
+   * on-air span (engine clock, current epoch) as soon as it is fixed — before the
+   * first element sounds — so stations can hear our carrier while we send.
+   */
+  transmit(text: string, wpm: number, effectiveWpm = wpm, onKeyed?: (span: { start: number; end: number; epoch: number }) => void): Promise<number> {
     const ctx = this.ctx;
     const rx = this.rx;
     if (!ctx || !rx) return Promise.resolve(0);
     const { marks, length } = keyText(text, { wpm, effectiveWpm });
     const t0 = Math.max(ctx.currentTime, this.txUntil) + 0.05;
+    onKeyed?.({ start: t0, end: t0 + length, epoch: this.epoch });
     const osc = ctx.createOscillator();
     const key = ctx.createGain();
     osc.frequency.value = this.pitch;

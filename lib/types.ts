@@ -129,14 +129,40 @@ export interface QsoSessionSummary {
    * records lack it; `call` / `fields` / `fieldsCorrect` / `outcome` then stand for the only contact.
    */
   contacts?: QsoContactSummary[];
+  /** CQ run numbers (run modes only). */
+  run?: QsoRunSummary;
 }
+
+/**
+ * How one contact ended. A rag-chew is complete or partial; a run also tells a
+ * contact with no closing, one cut short and one made under a wrong call (bust).
+ */
+export type QsoContactOutcome = 'complete' | 'partial' | 'no-closing' | 'incomplete' | 'bust';
 
 export interface QsoContactSummary {
   call: string;
   fields: number;
   fieldsCorrect: number;
-  outcome: 'complete' | 'partial';
+  outcome: QsoContactOutcome;
   at: number;
+}
+
+export interface QsoRunSummary {
+  seconds: number;
+  /** Contacts made on the air (exchange done). */
+  contacts: number;
+  /** Complete contacts per hour. */
+  rate: number;
+  /** Share of contacts whose first call we sent was right. */
+  firstCallAccuracy: number | null;
+  partials: number;
+  corrections: number;
+  busts: number;
+  nil: number;
+  unlogged: number;
+  dupes: number;
+  /** Callers who called and left unworked. */
+  missed: number;
 }
 
 export interface QueueInputResult {
@@ -266,6 +292,9 @@ export interface QsoModeProgress {
 export interface QsoProfile {
   version: 1;
   myCall?: string;
+  /** Our name and QTH as sent in an exchange (CQ run). */
+  myName?: string;
+  myQth?: string;
   skills: {
     /** Clean-condition copy accuracy, with the speed it was measured at. */
     copy: Partial<Record<AlphabetType, SkillEstimate & { wpm: number }>>;

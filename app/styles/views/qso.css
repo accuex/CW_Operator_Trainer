@@ -313,3 +313,70 @@
 .qso-badge-chip.tier-1 { border-color: rgb(208 138 82 / 50%); background: rgb(208 138 82 / 14%); color: #e3a173; }
 .qso-badge-chip.tier-2 { border-color: rgb(201 210 234 / 45%); background: rgb(201 210 234 / 12%); color: #dfe5f5; }
 .qso-badge-chip.mark { border-color: rgb(108 188 255 / 45%); background: var(--sky-soft); color: var(--sky); }
+
+/* CQ Run desk */
+.run-status dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0 0 12px; }
+.run-status dl div, .run-numbers div { min-width: 0; padding: 8px 10px; border-radius: var(--r-sm); background: var(--surface-sunken); }
+.run-status dt, .run-numbers dt { color: var(--muted); font: 800 10px/1.2 var(--font-mono); letter-spacing: .08em; }
+.run-status dd, .run-numbers dd { margin: 4px 0 0; color: var(--text); font: 700 16px/1.2 var(--font-mono); white-space: nowrap; }
+.run-status dd small, .run-numbers dd small { color: var(--muted); font-size: 11px; font-weight: 600; }
+.run-status dd.on { color: var(--mint); }
+.run-fkeys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.run-fkeys .btn { justify-content: flex-start; gap: 6px; min-width: 0; padding-inline: 8px; overflow: hidden; white-space: nowrap; }
+.run-fkeys kbd { min-width: 2.2em; padding: 1px 4px; border: 1px solid var(--line-2); border-radius: 4px; color: var(--muted); font: 700 10.5px var(--font-mono); text-align: center; }
+.run-log-row { display: grid; grid-template-columns: 1.6fr .8fr 1fr 1.2fr; gap: 6px; align-items: end; }
+.run-log-row label { display: grid; gap: 4px; min-width: 0; }
+.run-log-row span { color: var(--muted); font: 800 10px/1 var(--font-mono); letter-spacing: .1em; }
+.run-log-row input { min-width: 0; padding-inline: 6px; font-family: var(--font-mono); letter-spacing: .04em; }
+.run-log-row .btn { grid-column: 1 / -1; }
+.run-rows { display: grid; gap: 2px; max-height: 220px; margin: 10px 0 0; padding: 0; overflow: auto; list-style: none; }
+.run-rows button {
+  display: grid;
+  grid-template-columns: 1.6fr .8fr 1fr 1.2fr;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--text-2);
+  font: 600 12.5px var(--font-mono);
+  text-align: left;
+  cursor: pointer;
+}
+.run-rows b { color: var(--text); }
+.run-rows button:hover, .run-rows li.editing button { background: var(--surface-sunken); }
+.run-control-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.run-interval, .run-timer { display: flex; align-items: center; gap: 8px; color: var(--text-2); font-size: 12.5px; }
+.run-interval input { width: 110px; }
+.run-memories { display: grid; gap: 8px; margin-bottom: 12px; }
+.run-memories label { display: grid; gap: 4px; }
+.run-memories span { color: var(--muted); font: 800 10.5px/1 var(--font-mono); }
+.run-memories input { font: 600 12px var(--font-mono); }
+.run-controls kbd { padding: 1px 5px; border: 1px solid var(--line-2); border-radius: 4px; font: 600 10.5px var(--font-mono); }
+
+/* CQ Run review: spans both columns under the rig. */
+.run-review-wrap { grid-column: 1 / -1; }
+.run-review { margin-top: 0; }
+.run-numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0 0 12px; }
+.run-numbers dd { font-size: 20px; }
+.run-contacts { display: grid; gap: 12px; margin: 0 0 14px; padding: 0; list-style: none; }
+.run-contacts > li { padding: 10px 12px; border: 1px solid var(--line); border-left-width: 3px; border-radius: var(--r-sm); }
+.run-contacts > li.outcome-complete { border-left-color: var(--mint); }
+.run-contacts > li.outcome-bust { border-left-color: var(--coral); }
+.run-contacts > li.outcome-no-closing, .run-contacts > li.outcome-incomplete { border-left-color: var(--gold); }
+.run-contact-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.run-contact-head b { font: 700 15px var(--font-mono); letter-spacing: .04em; }
+.run-contact-head small { color: var(--muted); font-size: 12px; }
+.run-contacts .qso-review-fields { margin-bottom: 0; }
+.run-missed { margin: 0 0 14px; }
+.run-missed h3 { margin: 0 0 6px; font-size: 13px; }
+.run-missed ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; color: var(--text-2); font-size: 12.5px; line-height: 1.6; }
+.run-missed b { font-family: var(--font-mono); color: var(--text); }
+
+@media (max-width: 560px) {
+  .run-status dl, .run-numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .run-log-row { grid-template-columns: 1fr 1fr; }
+  .run-rows button { grid-template-columns: 1.4fr .7fr 1fr 1fr; font-size: 11.5px; }
+}
+.run-profile-ok { margin-top: 10px; }

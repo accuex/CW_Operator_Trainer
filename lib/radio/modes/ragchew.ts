@@ -1,12 +1,13 @@
 import { makeQrm, makeStation } from '../band';
 import { AXES, targetDrift, targetStrength } from '../difficulty';
 import { cqText, makeTarget, MIN_TARGET_WPM, respond, type QsoPhase } from '../qso';
-import type { QsoMode, QsoSession, SessionContext } from './types';
+import type { QsoSession, SessionContext, SingleQsoMode } from './types';
 
 const STEP_OF: Record<QsoPhase, number> = { cq: 0, report: 1, done: 2 };
 
 /** Answer someone's CQ and trade RST / name / QTH. */
-export const ragchew: QsoMode = {
+export const ragchew: SingleQsoMode = {
+  kind: 'single',
   id: 'ragchew',
   label: 'ラグチュー',
   description: 'CQ を出している局を呼んで、RST・名前・QTH を交換する基本の 1 対 1 交信',

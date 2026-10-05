@@ -52,12 +52,20 @@ export interface CharCell extends AlignCell { condition: CopyCondition; cause: Q
 export interface FieldResult { key: string; label: string; expected: string; input: string; correct: boolean; cells: CharCell[] }
 
 /** Easiest judgement for each character of `value`, across every time it was sent. */
-export function judgeValue(value: string, records: RxRecord[], monitor: CopyMonitor, now: ClockNow): CharJudgement[] {
+export function judgeValue(
+  value: string,
+  records: RxRecord[],
+  monitor: CopyMonitor,
+  now: ClockNow,
+  /** Words that normalise alike are the same value (5NN is 599). */
+  normalize: (text: string) => string = (text) => text,
+): CharJudgement[] {
   const best: (CharJudgement | null)[] = Array.from({ length: value.length }, () => null);
+  const target = normalize(value);
   for (const record of records) {
     const words = record.tx.text.toUpperCase().split(/\s+/).filter(Boolean);
     words.forEach((word, wordIndex) => {
-      if (word !== value) return;
+      if (word !== value && normalize(word) !== target) return;
       for (const span of record.tx.chars) {
         if (span.word !== wordIndex || span.index >= value.length) continue;
         best[span.index] = pickEasier(best[span.index], judgeChar(monitor, record, span, now));
@@ -78,7 +86,7 @@ export function scoreFields(
   return preset.fields.map((field) => {
     const expected = field.normalize(truth[field.key] ?? '');
     const input = field.normalize(log[field.key] ?? '');
-    const judged = judgeValue(truth[field.key] ?? '', records, monitor, now);
+    const judged = judgeValue(truth[field.key] ?? '', records, monitor, now, field.normalize);
     let index = 0;
     const cells = align(expected, input).map((cell): CharCell => {
       if (cell.op === 'ins') return { ...cell, condition: 'clean', cause: 'copy', env: null };

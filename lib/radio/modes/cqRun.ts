@@ -129,6 +129,7 @@ export class RunSession {
   private partialsPending = 0;
   private partialsTotal = 0;
   private seq = 0;
+  private notes: AgentNote[] = [];
   private readonly personas: PersonaSource;
   private readonly ctx: AgentContext;
 
@@ -317,7 +318,13 @@ export class RunSession {
     return agent.station.queue.length > 0 || agent.station.busyUntil > this.radio.now();
   }
 
+  /** What the agents said since the last call (for coaching), oldest first. */
+  drainNotes(): AgentNote[] {
+    return this.notes.splice(0);
+  }
+
   private onNote(note: AgentNote) {
+    this.notes.push(note);
     const agent = note.agent as CallerAgent;
     const now = this.radio.now();
     switch (note.type) {
