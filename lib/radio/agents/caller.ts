@@ -1,0 +1,302 @@
+import { makeStation, type Station } from '../band';
+import type { AirEvent } from '../air/ether';
+import { isNearCall, matchesPartial, callDistance, type AskField, type OperatorIntent } from '../air/intent';
+import type { StationPersona } from '../air/persona';
+import { uniform, type Random } from '../random';
+import { askText, callText, confirmText, correctionText, exchangeText, fieldsText, finalText, nudgeText, partialReply } from './templates';
+import type { Agent, AgentContext, GoneReason } from './types';
+
+/**
+ * A station answering our CQ.
+ *
+ *   arriving ─(CQ/QRZ)→ waiting ─(our call / partial match)→ selected ─(our exchange)→ exchanged ─(TU/73)→ done
+ *   waiting ─(someone else picked)→ holding ─(QRZ/TU/CQ)→ waiting
+ *   waiting ─(a call 1–2 letters off)→ corrects, at most MAX_CORRECTIONS times, then plays along or leaves
+ *   any ─(patience used up / LEAVE_AFTER of silence)→ gone
+ */
+
+export type CallerState = 'arriving' | 'waiting' | 'holding' | 'selected' | 'exchanged' | 'done' | 'gone';
+
+export const MAX_CORRECTIONS = 2;
+export const NUDGE_AFTER = 15;
+export const LEAVE_AFTER = 30;
+/** Spawned but never heard a CQ to answer. */
+export const ARRIVE_TIMEOUT = 10;
+export const QRS_STEP = 4;
+/** On QRZ?/AGN? some waiting callers sit one round out. */
+export const REST_RATE = 0.25;
+
+const FIELD_ORDER: AskField[] = ['RST', 'NAME', 'QTH'];
+
+export class CallerAgent implements Agent {
+  readonly id: number;
+  readonly key: number;
+  readonly rxWidth: number;
+  state: CallerState = 'arriving';
+  callsMade = 0;
+  corrections = 0;
+  /** Played along with a wrong call. */
+  busted = false;
+  /** Calls we sent that were meant for this station, in order (first = our first copy). */
+  readonly addressedAs: string[] = [];
+  goneReason: GoneReason | null = null;
+  arrivedAt: number;
+  private got: Record<AskField, boolean> = { RST: false, NAME: false, QTH: false };
+  private heardName = false;
+  private lastTx: string | null = null;
+  private retryAt: number | null = null;
+  private lastHeard: number;
+  private nudged = false;
+
+  constructor(readonly persona: StationPersona, readonly station: Station, private listenAt: number, now: number) {
+    this.id = station.id;
+    this.key = station.id;
+    this.rxWidth = persona.rxWidth;
+    this.arrivedAt = now;
+    this.lastHeard = now;
+  }
+
+  get gone() { return this.state === 'done' || this.state === 'gone'; }
+  get call() { return this.persona.call; }
+  listenRf() { return this.listenAt; }
+
+  hear(event: AirEvent, ctx: AgentContext) {
+    if (this.gone || event.from !== 'me' || !event.intent) return;
+    const intent = event.intent;
+    this.lastHeard = Math.max(this.lastHeard, event.end);
+    if (this.retryAt !== null) this.retryAt = Math.max(this.retryAt, event.end + uniform(ctx.random, this.persona.retry));
+    if (this.state === 'selected' || this.state === 'exchanged') this.hearAsPartner(intent, ctx);
+    else this.hearWhileCalling(intent, ctx);
+  }
+
+  tick(now: number, ctx: AgentContext) {
+    if (this.gone) return;
+    if (ctx.hearsKeying(this, 'me')) {
+      // We are on the air: nobody calls over us, and the frequency is plainly alive.
+      this.lastHeard = Math.max(this.lastHeard, now);
+      if (this.state === 'waiting') this.retryAt = null;
+      return;
+    }
+    // Someone answering us (or calling): the frequency is alive, worth waiting on.
+    // Patience still bounds callers who only hear each other.
+    if (ctx.hearsKeying(this)) this.lastHeard = Math.max(this.lastHeard, now);
+    const sending = this.station.queue.length > 0 || this.station.busyUntil > now;
+    // Silence counts from whichever came last: hearing us, or finishing our own message.
+    const quiet = sending ? 0 : now - Math.max(this.lastHeard, this.station.busyUntil);
+    switch (this.state) {
+      case 'arriving':
+        if (now - this.arrivedAt > ARRIVE_TIMEOUT) this.leave('never-called', ctx);
+        return;
+      case 'waiting':
+        if (quiet > LEAVE_AFTER) return this.leave('timeout', ctx);
+        if (sending) return;
+        this.retryAt ??= Math.max(now, this.station.busyUntil) + uniform(ctx.random, this.persona.retry);
+        if (now < this.retryAt) return;
+        if (this.callsMade >= this.persona.patience) this.leave('patience', ctx);
+        else this.callAgain(ctx, 0.1);
+        return;
+      case 'holding':
+        if (quiet > LEAVE_AFTER) this.leave('timeout', ctx);
+        return;
+      case 'selected':
+      case 'exchanged': {
+        if (sending) return;
+        if (quiet > LEAVE_AFTER) this.leave('timeout', ctx);
+        else if (quiet > NUDGE_AFTER && !this.nudged) {
+          this.nudged = true;
+          this.say(ctx, nudgeText(this.persona, ctx.me.call), 0.1);
+        }
+      }
+    }
+  }
+
+  rebase(shift: number) {
+    if (this.retryAt !== null) this.retryAt += shift;
+    this.lastHeard += shift;
+    this.arrivedAt += shift;
+  }
+
+  private hearWhileCalling(intent: OperatorIntent, ctx: AgentContext) {
+    const { call } = this;
+    if (intent.calls.includes(call)) {
+      this.addressedAs.push(call);
+      return this.select(ctx, 'call', intent);
+    }
+    const near = intent.calls.find((sent) => isNearCall(sent, call) && this.isClosestTo(sent, ctx));
+    if (near) {
+      this.addressedAs.push(near);
+      if (this.corrections < MAX_CORRECTIONS) {
+        this.corrections += 1;
+        ctx.notify({ type: 'corrected', agent: this, heard: near });
+        this.say(ctx, correctionText(this.persona));
+        this.state = 'waiting';
+        this.retryAt = null;
+        return;
+      }
+      if (ctx.random() < 0.5) {
+        this.busted = true;
+        return this.select(ctx, 'bust', intent);
+      }
+      return this.leave('ignored-correction', ctx);
+    }
+    if (intent.calls.length) {
+      // Someone else got picked: stand by. A call that fits nobody: keep waiting.
+      if (this.othersAddressed(intent, ctx)) this.state = this.state === 'arriving' ? 'arriving' : 'holding';
+      return;
+    }
+    if (intent.partial) {
+      if (this.state === 'arriving') return;
+      if (matchesPartial(call, intent.partial)) {
+        this.say(ctx, partialReply(this.persona));
+        this.state = 'waiting';
+        this.retryAt = null;
+      } else {
+        this.state = 'holding';
+      }
+      return;
+    }
+    if (intent.report || intent.fields.name || intent.fields.qth) {
+      // An exchange with no call: whoever is the only one calling takes it.
+      const calling = ctx.peers().filter((peer) => peer.state === 'waiting');
+      if (this.state === 'waiting' && calling.length === 1 && calling[0] === this) this.select(ctx, 'single', intent);
+      return;
+    }
+    const cq = intent.cq && intent.mentionsMe;
+    if (this.state === 'holding') {
+      if (cq || intent.qrz || intent.closing) this.callAgain(ctx);
+      return;
+    }
+    if (this.state === 'arriving') {
+      if (cq || intent.qrz) this.callAgain(ctx);
+      return;
+    }
+    if (cq || intent.qrz || intent.agn || intent.qrs) {
+      if (intent.qrs) this.slowDown();
+      if ((intent.qrz || intent.agn) && ctx.random() < REST_RATE) return;
+      this.callAgain(ctx);
+    }
+  }
+
+  private hearAsPartner(intent: OperatorIntent, ctx: AgentContext) {
+    const { call } = this;
+    const forUs = intent.calls.includes(call) || intent.calls.some((sent) => isNearCall(sent, call));
+    if (intent.calls.length && !forUs) return this.leave('dropped', ctx);
+    if (forUs) this.addressedAs.push(intent.calls.find((sent) => sent === call || isNearCall(sent, call))!);
+    this.nudged = false;
+
+    if (this.state === 'selected') {
+      if ((intent.agn || intent.qrs) && this.lastTx) {
+        if (intent.qrs) this.slowDown();
+        return this.say(ctx, this.lastTx);
+      }
+      return this.takeExchange(intent, ctx);
+    }
+
+    // exchanged: our exchange is out, waiting for TU / 73.
+    if (intent.ask.length) return this.say(ctx, fieldsText(this.persona, FIELD_ORDER.filter((field) => intent.ask.includes(field))));
+    if (intent.agn || intent.qrs) {
+      if (intent.qrs) this.slowDown();
+      return this.say(ctx, exchangeText(this.persona, ctx.me, this.heardName));
+    }
+    if (intent.closing) {
+      this.say(ctx, finalText(this.persona, ctx.me));
+      this.state = 'done';
+      ctx.notify({ type: 'closed', agent: this });
+      return;
+    }
+    if (intent.qrz || intent.cq) {
+      // Moved on without a TU: the QSO stands, unacknowledged.
+      this.state = 'done';
+      return;
+    }
+    if (forUs && intent.report) this.say(ctx, exchangeText(this.persona, ctx.me, this.heardName));
+  }
+
+  private select(ctx: AgentContext, via: 'call' | 'single' | 'bust', intent: OperatorIntent) {
+    this.state = 'selected';
+    this.nudged = false;
+    ctx.notify({ type: 'selected', agent: this, via });
+    this.takeExchange(intent, ctx);
+  }
+
+  /** Collect RST / our name / our QTH; answer with our exchange once all three are in. */
+  private takeExchange(intent: OperatorIntent, ctx: AgentContext) {
+    const { me } = ctx;
+    const named = intent.fields.name !== undefined || (me.name !== '' && intent.tokens.includes(me.name));
+    const placed = intent.fields.qth !== undefined || (me.qth !== '' && intent.tokens.includes(me.qth));
+    const fresh = Boolean(intent.report) || named || placed;
+    this.got.RST ||= Boolean(intent.report);
+    this.got.NAME ||= named || me.name === '';
+    this.got.QTH ||= placed || me.qth === '';
+    this.heardName ||= named;
+    const missing = FIELD_ORDER.filter((field) => !this.got[field]);
+    if (!missing.length) {
+      this.say(ctx, exchangeText(this.persona, me, this.heardName));
+      this.state = 'exchanged';
+      ctx.notify({ type: 'exchanged', agent: this });
+    } else if (fresh || this.got.RST || this.got.NAME || this.got.QTH) {
+      this.say(ctx, askText(this.persona, missing));
+      ctx.notify({ type: 'asked', agent: this, fields: missing });
+    } else {
+      this.say(ctx, confirmText(this.persona));
+    }
+  }
+
+  private callAgain(ctx: AgentContext, delay?: number) {
+    this.say(ctx, callText(this.persona, ctx.me.call), delay);
+    this.callsMade += 1;
+    this.state = 'waiting';
+    this.retryAt = null;
+    ctx.notify({ type: 'called', agent: this });
+  }
+
+  private say(ctx: AgentContext, text: string, delay = uniform(ctx.random, this.persona.reaction)) {
+    this.lastTx = text;
+    ctx.send(this, text, delay);
+  }
+
+  private slowDown() {
+    this.station.wpm = Math.max(this.persona.qrsFloor, this.station.wpm - QRS_STEP);
+  }
+
+  private leave(reason: GoneReason, ctx: AgentContext) {
+    this.state = 'gone';
+    this.goneReason = reason;
+    ctx.notify({ type: 'gone', agent: this, reason });
+  }
+
+  /** Of everyone on frequency, this call is the one `sent` most likely meant (nobody has it exactly). */
+  private isClosestTo(sent: string, ctx: AgentContext) {
+    const rivals = ctx.peers().filter((peer): peer is CallerAgent => peer instanceof CallerAgent && !peer.gone && peer !== this);
+    if (rivals.some((peer) => peer.call === sent)) return false;
+    const mine = callDistance(sent, this.call);
+    return rivals.every((peer) => {
+      if (!isNearCall(sent, peer.call)) return true;
+      const theirs = callDistance(sent, peer.call);
+      return mine < theirs || (mine === theirs && this.id < peer.id);
+    });
+  }
+
+  private othersAddressed(intent: OperatorIntent, ctx: AgentContext) {
+    return ctx.peers().some((peer) => peer !== this && peer instanceof CallerAgent && !peer.gone
+      && intent.calls.some((sent) => sent === peer.call || isNearCall(sent, peer.call)));
+  }
+}
+
+/** A caller tuned to our CQ at `listenRf`, keying `offsetHz` off it. */
+export function createCaller(persona: StationPersona, { random, listenRf, now }: { random: Random; listenRf: number; now: number }) {
+  const station = makeStation(random, {
+    role: 'caller',
+    call: persona.call,
+    rf: Math.round(listenRf + persona.offsetHz),
+    wpm: persona.wpm,
+    strength: persona.strength,
+    jitter: persona.jitter,
+    drift: 0,
+    chirp: 0,
+    gap: [1, 2],
+    loop: null,
+    nextAt: Number.POSITIVE_INFINITY,
+  });
+  return new CallerAgent(persona, station, listenRf, now);
+}

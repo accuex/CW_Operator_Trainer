@@ -1,7 +1,9 @@
+import { normalizeCall, parseIntent } from './air/intent';
 import { randomSuffix } from './band';
 import { normalizeRst, normalizeWord } from './exchange';
 
 export { normalizeRst };
+export { isCallsign, normalizeCall, tokensOf } from './air/intent';
 
 /**
  * One rag-chew QSO with a station calling CQ:
@@ -22,14 +24,14 @@ export const TUNE_TOLERANCE_HZ = 150;
 export const MIN_TARGET_WPM = 8;
 
 /** QTH → call area digit, so the call and QTH agree like on the real band. */
-const QTH_AREA: [string, number][] = [
+export const QTH_AREA: [string, number][] = [
   ['TOKYO', 1], ['YOKOHAMA', 1], ['CHIBA', 1], ['NAGOYA', 2], ['SHIZUOKA', 2], ['OSAKA', 3], ['KYOTO', 3], ['KOBE', 3],
   ['HIROSHIMA', 4], ['OKAYAMA', 4], ['MATSUYAMA', 5], ['KOCHI', 5], ['FUKUOKA', 6], ['KUMAMOTO', 6], ['SENDAI', 7], ['AOMORI', 7],
   ['SAPPORO', 8], ['HAKODATE', 8], ['KANAZAWA', 9], ['TOYAMA', 9], ['NIIGATA', 0], ['NAGANO', 0],
 ];
-const NAMES = ['HIRO', 'KEN', 'TARO', 'YUKI', 'AKI', 'MASA', 'NORI', 'TAKA', 'SHIN', 'JUN', 'MIKI', 'KAZU', 'TOSHI', 'YOSHI', 'NAO', 'EMI'];
-const JA_PREFIX = ['JA', 'JH', 'JR', 'JE', 'JF', 'JG', 'JI', 'JJ', 'JK', 'JL', 'JM', 'JN', 'JO', 'JP', 'JS'];
-const RST = ['599', '599', '589', '579', '579', '569', '559'];
+export const NAMES = ['HIRO', 'KEN', 'TARO', 'YUKI', 'AKI', 'MASA', 'NORI', 'TAKA', 'SHIN', 'JUN', 'MIKI', 'KAZU', 'TOSHI', 'YOSHI', 'NAO', 'EMI'];
+export const JA_PREFIX = ['JA', 'JH', 'JR', 'JE', 'JF', 'JG', 'JI', 'JJ', 'JK', 'JL', 'JM', 'JN', 'JO', 'JP', 'JS'];
+export const RST = ['599', '599', '589', '579', '579', '569', '559'];
 
 const pick = <T,>(list: readonly T[], random: () => number) => list[Math.floor(random() * list.length)];
 
@@ -50,10 +52,6 @@ export const reportText = (t: QsoTarget, myCall: string) =>
 export const finalText = (t: QsoTarget, myCall: string) => `${myCall} DE ${t.call} R TNX FB QSO = 73 TU ${myCall} DE ${t.call} EE`;
 export const qrzText = (t: QsoTarget) => `QRZ? DE ${t.call} K`;
 
-export const tokensOf = (text: string) => text.toUpperCase().replace(/[^A-Z0-9/?=\s]/g, ' ').split(/\s+/).filter(Boolean);
-export const normalizeCall = (call: string) => call.toUpperCase().replace(/[^A-Z0-9/]/g, '');
-/** Plausible amateur call: prefix with a digit, then 1–4 letters. */
-export const isCallsign = (call: string) => /^[A-Z0-9]{1,3}[0-9][A-Z]{1,4}$/.test(normalizeCall(call));
 
 export interface TxResult {
   phase: QsoPhase;
@@ -75,7 +73,8 @@ export const isProcedureIssue = (issue: QsoIssue | undefined) => issue === 'miss
 export interface TxContext { myCall: string; offsetHz: number }
 
 export function respond(phase: QsoPhase, target: QsoTarget, tx: string, { myCall, offsetHz }: TxContext): TxResult {
-  const tokens = tokensOf(tx);
+  const intent = parseIntent(tx, myCall);
+  const { tokens } = intent;
   const me = normalizeCall(myCall);
   const base = { phase, reply: null, heard: false, slower: 0 };
   if (!tokens.length) return { ...base, hint: '送信する文を入れてください' };
@@ -84,21 +83,21 @@ export function respond(phase: QsoPhase, target: QsoTarget, tx: string, { myCall
   }
   const heard = { ...base, heard: true };
   const last = phase === 'cq' ? cqText(target) : phase === 'report' ? reportText(target, me) : finalText(target, me);
-  const qrs = tokens.includes('QRS');
-  if (qrs || tokens.includes('AGN') || tokens.includes('AGN?') || tokens.every((token) => token === '?')) {
-    if (phase === 'cq' && !tokens.includes(me)) return { ...heard, reply: last, hint: 'もう一度 CQ を出してくれます' };
+  const { qrs } = intent;
+  if (qrs || intent.agn) {
+    if (phase === 'cq' && !intent.mentionsMe) return { ...heard, reply: last, hint: 'もう一度 CQ を出してくれます' };
     if (phase !== 'cq') {
       return { ...heard, reply: last, slower: qrs ? 4 : 0, hint: qrs ? '少しゆっくり、もう一度送ってくれます' : 'もう一度送ってくれます' };
     }
   }
   if (phase === 'cq') {
-    if (tokens.includes(me)) {
+    if (intent.mentionsMe) {
       return { ...heard, phase: 'report', reply: reportText(target, me), hint: '応答あり！ RST・名前・QTH をログに書き取りましょう' };
     }
     return { ...heard, issue: 'missing-call', reply: qrzText(target), hint: '自分のコールサインを入れて呼びましょう（例: 相手 DE 自分 K）' };
   }
   if (phase === 'report') {
-    const reported = tokens.some((token) => /^[1-5][1-9N][1-9N]$/.test(token)) || tokens.some((token) => ['R', 'TU', 'TNX', '73'].includes(token));
+    const reported = intent.report !== null || intent.roger || tokens.some((token) => ['TU', 'TNX', '73'].includes(token));
     if (reported) return { ...heard, phase: 'done', reply: finalText(target, me), hint: '交信成立。最後の 73 を聴いたら、ログを確定しましょう' };
     return { ...heard, issue: 'missing-report', hint: 'こちらのレポートを送りましょう（例: R TNX UR 599 73）' };
   }

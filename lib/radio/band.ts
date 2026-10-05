@@ -5,7 +5,8 @@ import { keyText, type CharSpan, type Mark } from './keying';
  * Pure (no Web Audio) so the scheduler can run on any clock and be tested.
  */
 
-export type StationRole = 'qrm' | 'target';
+/** qrm: background chatter · target: the rag-chew partner · caller: answers our CQ · occupant: already using a frequency. */
+export type StationRole = 'qrm' | 'target' | 'caller' | 'occupant';
 
 export interface Station {
   id: number;
