@@ -72,4 +72,24 @@ describe('headless CQ run', () => {
     for (const report of crowd) expect(report.run.agents.every((agent) => agent.gone)).toBe(true);
     expect(contactsOf(crowd).length).toBeGreaterThan(SEEDS.length);
   });
+
+  it('checks the frequency with QRL? and moves off a QSO in progress', () => {
+    const busy = batch({ placement: { onFrequency: true, nearby: 1 } });
+    for (const report of busy) {
+      expect(report.issues.filter((issue) => issue === 'cq-without-qrl' || issue === 'busy-frequency')).toEqual([]);
+      expect(report.qsys).toBeGreaterThanOrEqual(1);
+      expect(report.result.frequencies.every((use) => use.qrlFirst && use.busyCqs === 0)).toBe(true);
+      expect(report.run.agents.every((agent) => agent.gone)).toBe(true);
+    }
+    expect(contactsOf(busy).length).toBeGreaterThan(SEEDS.length);
+    expect(contactsOf(busy).every((contact) => contact.outcome === 'complete')).toBe(true);
+  });
+
+  it('calling CQ on top of a QSO is flagged, and the bot QSYs when asked', () => {
+    const careless = batch({ placement: { onFrequency: true, nearby: 0 }, bot: { qrl: false, blindStart: true } });
+    const flagged = careless.filter((report) => report.result.stats.busyCqs > 0);
+    expect(flagged.length).toBeGreaterThan(SEEDS.length * 0.6);
+    for (const report of flagged) expect(report.issues).toContain('cq-without-qrl');
+    expect(careless.filter((report) => report.qsys > 0).length).toBeGreaterThan(SEEDS.length * 0.5);
+  });
 });

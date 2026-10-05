@@ -59,7 +59,15 @@ const writePrefs = (prefs: RunPrefs) => {
 const ISSUE_TEXT: Record<RunIssue, string> = {
   'cq-without-call': 'CQ に自分のコールが入っていません。誰が呼んでいるのか相手にわかりません',
   'no-call': '複数の局が呼んでいます。誰に送ったのかわかるよう、相手のコールを付けましょう',
+  'cq-without-qrl': 'QRL? を出さずに CQ を出しました。この周波数は使用中です。VFO を動かし、聴いて F6（QRL?）で確かめてから CQ を出しましょう',
+  'busy-frequency': 'QRL? は出しましたが、この周波数は使用中でした（返事や近くの信号がありました）。QRL? のあと数秒聴き、空いていなければ QSY してから CQ を出しましょう',
 };
+/** A CQ on someone else's QSO stops CQ repeat: moving is the operator's call. */
+const BUSY_ISSUES: RunIssue[] = ['cq-without-qrl', 'busy-frequency'];
+const QRL_ANSWERED = 'QRL? に返事がありました。この周波数は使用中です。VFO を動かして別の周波数を探しましょう';
+const QSY_ASKED = 'この周波数で交信中の局から QSY を求められています。VFO を 1 kHz ほど動かし、聴いて QRL? で確かめてから CQ を出しましょう';
+/** Advice about a busy frequency, cleared once a CQ goes out clean elsewhere. */
+const FREQUENCY_ADVICE = new Set([QRL_ANSWERED, QSY_ASKED, ...BUSY_ISSUES.map((issue) => ISSUE_TEXT[issue])]);
 
 /** One run on the air: the session, what we copied, and the clock bookkeeping between rig and run. */
 interface Live {
@@ -73,11 +81,14 @@ interface Live {
   startedAt: number | null;
   txCount: number;
   procedure: number;
-  /** When our last transmission ends (engine clock). */
-  lastTxEnd: number;
-  sending: boolean;
-  /** A message keyed while we were still sending: it goes out right after (CQ repeat never queues). */
-  queued: string | null;
+  /** Rebased start of the current epoch: CQ repeat counts from here when the air has none of ours yet. */
+  epochStart: number;
+  /**
+   * A message keyed while we were still on the air: it goes out once the air says our
+   * transmitter is clear (CQ repeat never queues). A UI reservation only — whether we are
+   * keying is always read from the run's ether.
+   */
+  queued: { text: string; cq: boolean } | null;
   closed: boolean;
   /** Coaching that waits until the station has finished sending what it is about. */
   pending: { stationId: number; station: Station; text: string }[];
@@ -113,7 +124,7 @@ function sync(live: Live, engine: RigEngine) {
   if (engine.epoch !== live.epoch) {
     live.run.rebase(engine.epoch, now - live.lastNow);
     live.epoch = engine.epoch;
-    live.lastTxEnd = now;
+    live.epochStart = now;
   }
   live.lastNow = now;
   return now;
@@ -131,6 +142,8 @@ function coachFor(note: AgentNote, run: RunSession): string | null {
     case 'gone':
       return run.contacts.some((contact) => contact.stationId === note.agent.id && contact.status === 'dropped')
         ? '交信中の局が去りました。F1 で CQ に戻りましょう' : null;
+    case 'qrl-answered': return QRL_ANSWERED;
+    case 'qsy-asked': return QSY_ASKED;
     default: return null;
   }
 }
@@ -159,7 +172,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
   const callRef = useRef<HTMLInputElement>(null);
   const latest = useRef({ prefs, difficulty, myCall, myName, myQth, form, review, mode, preset });
   // Handlers the run loop and key listener call (they always see this render's values).
-  const actions = useRef<{ send: (text: string, cq?: boolean) => Promise<void>; qrt: () => void; memory: (index: number) => void; escape: () => void } | null>(null);
+  const actions = useRef<{ send: (text: string, cq?: boolean, repeat?: boolean) => Promise<void>; qrt: () => void; memory: (index: number) => void; escape: () => void } | null>(null);
   useEffect(() => {
     latest.current = { prefs, difficulty, myCall, myName, myQth, form, review, mode, preset };
   });
@@ -188,10 +201,12 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     const run = runMode.createRun({ random: Math.random, me: { call, name, qth }, difficulty: d }, radio);
     Object.assign(live, {
       id: `run-${nowId()}`, run, capture: rig.newCapture(), qrm, epoch: engine.epoch, lastNow: engine.now(), startedAt: null,
-      txCount: 0, procedure: 0, lastTxEnd: -Infinity, sending: false, queued: null, closed: false, pending: [],
+      txCount: 0, procedure: 0, epochStart: engine.now(), queued: null, closed: false, pending: [],
     } satisfies Live);
     run.rebase(engine.epoch, 0);
     engine.setStations(qrm);
+    // QSOs already going on: maybe right here (QRL? finds out), a few more up and down the band.
+    run.populate(engine.vfo, engine.now());
     return live;
   };
 
@@ -232,10 +247,16 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
         live.pending = live.pending.filter((item) => !ready.includes(item));
         setMessage({ text: ready[ready.length - 1].text, coach: true });
       }
-      if (armedRef.current && p.repeat && engine.powered && !live.sending && now - live.lastTxEnd >= p.interval) {
-        void actions.current?.send(fillMemory(p.templates[0], { MYCALL: latest.current.myCall }), true);
+      // Whether we are on the air comes from the air itself, not from what the UI has queued.
+      const clear = !live.run.keying(now) && live.run.keyedUntil <= now;
+      if (clear && live.queued && engine.powered) {
+        const next = live.queued;
+        live.queued = null;
+        void actions.current?.send(next.text, next.cq);
+      } else if (clear && armedRef.current && p.repeat && engine.powered && now - Math.max(live.run.keyedUntil, live.epochStart) >= p.interval) {
+        void actions.current?.send(fillMemory(p.templates[0], { MYCALL: latest.current.myCall }), true, true);
       }
-      if (p.timer && live.startedAt && !live.sending && Date.now() >= live.startedAt + p.timer * 60_000) actions.current?.qrt();
+      if (p.timer && live.startedAt && clear && Date.now() >= live.startedAt + p.timer * 60_000) actions.current?.qrt();
       const second = Math.floor(Date.now() / 1000);
       if (second !== lastSecond) {
         lastSecond = second;
@@ -245,24 +266,32 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     return () => clearInterval(timer);
   }, [engineRef]);
 
-  /** Key `raw`; the run hears it the moment its span on the air is fixed (before the audio). */
-  const send = async (raw: string, cq = false) => {
+  /**
+   * Key `raw`; the run hears it the moment its span on the air is fixed (before the audio).
+   * `cq` keeps CQ repeat armed; `repeat` marks the repeat itself, which never waits in line.
+   */
+  const send = async (raw: string, cq = false, repeat = false) => {
     const engine = engineRef.current;
     const live = liveRef.current;
     const text = raw.toUpperCase().replace(/\s+/g, ' ').trim();
     if (!engine || !live || live.closed || !text) return;
     if (!engine.powered) { say('先に電源を入れてください'); return; }
     if (!cq) setArmed(false);
-    if (live.sending) {
-      if (!cq) live.queued = text;
+    const now = sync(live, engine);
+    if (live.run.keyedUntil > now) {
+      // Still on the air (the run's ether says so): hold it until we are clear.
+      if (!repeat) live.queued = { text, cq };
       return;
     }
-    live.sending = true;
     setSent((list) => [...list.slice(-40), text]);
     await rig.transmit(text, difficulty.speed, (span) => {
       if (live.closed) return;
       sync(live, engine);
-      const { issues } = live.run.transmit(text, { start: span.start, end: span.end, rf: engine.vfo });
+      const { issues, intent } = live.run.transmit(text, { start: span.start, end: span.end, rf: engine.vfo });
+      if (intent.cq && !issues.length) {
+        live.pending = live.pending.filter((item) => !FREQUENCY_ADVICE.has(item.text));
+        setMessage((old) => (old && FREQUENCY_ADVICE.has(old.text) ? null : old));
+      }
       if (live.startedAt === null) {
         live.startedAt = Date.now();
         setStartedAt(live.startedAt);
@@ -271,13 +300,9 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
       if (issues.length) {
         live.procedure += 1;
         setMessage({ text: ISSUE_TEXT[issues[0]], coach: true });
+        if (issues.some((issue) => BUSY_ISSUES.includes(issue))) setArmed(false);
       }
-      live.lastTxEnd = span.end;
     });
-    live.sending = false;
-    const next = live.queued;
-    live.queued = null;
-    if (next && liveRef.current === live) await send(next);
   };
 
   // {NAME} falls back to the line just logged, so Enter then F3 still thanks them by name.
@@ -399,7 +424,12 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
   const elapsed = startedAt && clock ? Math.max(0, (clock - startedAt) / 1000) : 0;
   const rate = elapsed >= 60 ? Math.round((rows.length * 3600) / elapsed) : null;
   const left = prefs.timer && startedAt ? Math.max(0, prefs.timer * 60 - elapsed) : null;
-  const status = message ?? { text: powered ? 'F1 で CQ を出しましょう。呼んでくる局がいないか、CQ の合間によく聴いてください' : '電源を入れて、F1 で CQ を出しましょう', coach: false };
+  const status = message ?? {
+    text: powered
+      ? 'まず周波数を聴き、F6（QRL?）で使用中でないか確かめましょう。返事がなければ F1 で CQ。CQ の合間には呼んでくる局をよく聴いてください'
+      : '電源を入れ、周波数を聴いて F6（QRL?）で確かめてから F1 で CQ を出しましょう',
+    coach: false,
+  };
   const updateForm = (key: keyof LogFields, value: string) => {
     if (key === 'call') setArmed(false);
     setForm((old) => ({ ...old, [key]: value.toUpperCase() }));
@@ -527,7 +557,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
           </div>
         )}
         <p className="qso-note">
-          <kbd>F1</kbd>〜<kbd>F8</kbd> メモリー送信　<kbd>Esc</kbd> CQ リピート停止（送信待ちも取消）　送信中に押したキーは、今の送信が終わるとすぐ送ります。CALL 欄に <code>3AB?</code> と入れて <kbd>F5</kbd> で部分コール。
+          <kbd>F1</kbd>〜<kbd>F8</kbd> メモリー送信　<kbd>Esc</kbd> CQ リピート停止（送信待ちも取消）　送信中に押したキーは、今の送信が終わるとすぐ送ります。CQ の前に <kbd>F6</kbd> QRL? で周波数が空いているか確かめ、返事があれば VFO を動かして（QSY）確かめ直します。CALL 欄に <code>3AB?</code> と入れて <kbd>F5</kbd> で部分コール。
           正誤は QRT のあとにまとめて表示します。
         </p>
       </div>

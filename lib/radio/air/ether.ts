@@ -76,9 +76,18 @@ export class Ether {
       && event.start <= t && t < event.end && Math.abs(event.rf - listener.listenRf()) <= listener.rxWidth / 2);
   }
 
-  /** Someone other than `except` keyed within ±`within` Hz of `rf` since `since`. */
-  activeNear(rf: number, within: number, since: number, except: AirParty = 'me') {
-    return this.log.some((event) => event.from !== except && event.end >= since && Math.abs(event.rf - rf) <= within);
+  /**
+   * Someone keyed within ±`within` Hz of `rf` since `since` — the frequency is in use.
+   * `except` names who doesn't count (a party, or a test: our own callers aren't "someone else").
+   */
+  activeNear(rf: number, within: number, since: number, except: AirParty | ((party: AirParty) => boolean) = 'me') {
+    const ignored = typeof except === 'function' ? except : (party: AirParty) => party === except;
+    return this.log.some((event) => !ignored(event.from) && event.end >= since && Math.abs(event.rf - rf) <= within);
+  }
+
+  /** When `party`'s latest transmission on the air ends (−∞ if none this epoch, or long ago). The air, not a UI flag, says who is keying. */
+  keyedUntil(party: AirParty) {
+    return this.log.reduce((latest, event) => (event.from === party ? Math.max(latest, event.end) : latest), Number.NEGATIVE_INFINITY);
   }
 
   /** New clock (rig power cycled): nothing from before compares any more. */

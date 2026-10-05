@@ -1,6 +1,7 @@
+import { formatFrequency } from '@/lib/radio/band';
 import type { GoneReason } from '@/lib/radio/agents/types';
 import type { ExchangePreset } from '@/lib/radio/exchange';
-import type { ContactOutcome, MissedCaller, RunResult } from '@/lib/radio/modes/cqRun';
+import type { ContactOutcome, FrequencyUse, MissedCaller, RunResult } from '@/lib/radio/modes/cqRun';
 import type { RunScore } from '@/lib/radio/runReview';
 import { FieldCells } from './FieldCells';
 
@@ -31,6 +32,11 @@ export function missedLine(caller: MissedCaller, filter: number) {
   return `${strengthLabel(caller.strength)}・${caller.wpm} WPM・${offset}${outside}・${caller.calls} 回呼んで${GONE_LABEL[caller.reason]}`;
 }
 
+function frequencyLine(use: FrequencyUse) {
+  const check = use.qrlFirst ? 'QRL? で確かめてから CQ' : 'QRL? なしで CQ';
+  return use.busyCqs ? `${check}・使用中に ${use.busyCqs} 回 CQ` : `${check}・空いていました`;
+}
+
 const formatDuration = (seconds: number) => `${Math.floor(seconds / 60)} 分 ${Math.round(seconds % 60)} 秒`;
 
 /** After QRT: the run's numbers, every contact character by character, and who we never picked up. */
@@ -46,6 +52,7 @@ export function CqRunReview({ review, preset, onRestart }: { review: RunReviewDa
     ['NIL（交信していない局のログ）', stats.nil, 'cause-procedure'],
     ['ログ漏れ', stats.unlogged, 'cause-procedure'],
     ['重複ログ', stats.dupes, 'cause-procedure'],
+    ['使用中の周波数で CQ', stats.busyCqs, 'cause-procedure'],
     ['拾えなかった局', result.missed.length, 'cause-timing'],
   ];
   const nil = result.log.filter((entry) => entry.verdict === 'nil');
@@ -109,6 +116,16 @@ export function CqRunReview({ review, preset, onRestart }: { review: RunReviewDa
           })}
         </ol>
       ) : <p className="qso-note">交信は成立しませんでした。CQ のあと、呼んでくる局のコールを聴き取って F2 で交換を送りましょう。</p>}
+
+      {result.frequencies.length > 0 && (
+        <div className="run-missed">
+          <h3>周波数の確認</h3>
+          <ul>{result.frequencies.map((use) => {
+            const { main, sub } = formatFrequency(use.rf);
+            return <li key={use.rf}><b>{main}.{sub}</b> — {frequencyLine(use)}</li>;
+          })}</ul>
+        </div>
+      )}
 
       {nil.length > 0 && (
         <div className="run-missed">

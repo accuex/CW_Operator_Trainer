@@ -3,6 +3,7 @@ import { Ether, type AirEvent } from '../air/ether';
 import { callDistance, isNearCall, normalizeCall, parseIntent, type OperatorIntent } from '../air/intent';
 import { RandomPersonaSource, type PersonaSource } from '../air/persona';
 import { CallerAgent, createCaller } from '../agents/caller';
+import { createOccupantPair, type OccupantPair } from '../agents/occupant';
 import type { Agent, AgentContext, AgentMe, AgentNote, GoneReason } from '../agents/types';
 import { normalizeRst, normalizeWord } from '../exchange';
 import { poisson, type Random } from '../random';
@@ -21,8 +22,11 @@ export type ContactStatus = 'open' | 'exchanged' | 'closed' | 'dropped';
 /** How a contact ended, judged at QRT. */
 export type ContactOutcome = 'complete' | 'no-closing' | 'incomplete' | 'bust';
 export type LogVerdict = 'ok' | 'nil' | 'dupe';
-/** Procedure slips spotted in our own transmission. */
-export type RunIssue = 'cq-without-call' | 'no-call';
+/**
+ * Procedure slips spotted in our own transmission. A CQ on a frequency in use is
+ * 'cq-without-qrl' if we never asked, 'busy-frequency' if we asked first (and it was in use all the same).
+ */
+export type RunIssue = 'cq-without-call' | 'no-call' | 'cq-without-qrl' | 'busy-frequency';
 
 export interface RunParams {
   /** Centre speed of callers, WPM. */
@@ -33,9 +37,22 @@ export interface RunParams {
   spread: number;
   /** 0–1, weaker callers as it rises. */
   weak: number;
+  /** Chance a QSO is already going on where we start, 0–0.5. */
+  busy: number;
 }
 
-export const DEFAULT_RUN_PARAMS: RunParams = { speed: 16, callers: 0.8, spread: 80, weak: 0.15 };
+export const DEFAULT_RUN_PARAMS: RunParams = { speed: 16, callers: 0.8, spread: 80, weak: 0.15, busy: 0.35 };
+
+/** "In use": someone else keyed within ±BUSY_HZ of our frequency in the last BUSY_SECONDS. */
+export const BUSY_HZ = 250;
+export const BUSY_SECONDS = 20;
+/** A QRL? counts for a CQ within this many Hz and seconds of it. */
+export const QRL_HZ = 100;
+export const QRL_VALID = 60;
+/** Callers who still come to a CQ on top of someone else's QSO. */
+export const BUSY_ARRIVALS = 0.3;
+/** One-sided QSOs (we hear only one of the two) among those placed. */
+export const ONE_SIDED_RATE = 0.35;
 
 /** What the rig does for the run. */
 export interface RadioPort {
@@ -92,12 +109,32 @@ export interface MissedCaller {
 
 export interface RunTxResult { intent: OperatorIntent; issues: RunIssue[] }
 
+/** A frequency we called CQ on (the record procedure badges will count from). */
+export interface FrequencyUse {
+  rf: number;
+  firstCqAt: number;
+  /** We sent QRL? there before the first CQ. */
+  qrlFirst: boolean;
+  /** CQs we sent there while it was in use. */
+  busyCqs: number;
+}
+
+/** Where residents go when the run starts. Omitted fields are drawn from `busy`. */
+export interface Placement {
+  /** A QSO right on our frequency. */
+  onFrequency?: boolean;
+  /** Further QSOs elsewhere within a few kHz. */
+  nearby?: number;
+  oneSided?: boolean;
+}
+
 export interface RunResult {
   contacts: (RunContact & { outcome: ContactOutcome; logIds: string[] })[];
   log: (RunLogEntry & { verdict: LogVerdict })[];
   /** Contacts made on the air but never logged. */
   unlogged: string[];
   missed: MissedCaller[];
+  frequencies: FrequencyUse[];
   stats: {
     seconds: number;
     contacts: number;
@@ -111,6 +148,8 @@ export interface RunResult {
     nil: number;
     unlogged: number;
     dupes: number;
+    /** CQs sent on a frequency in use. */
+    busyCqs: number;
   };
 }
 
@@ -120,6 +159,9 @@ const QRZ_ARRIVALS = 0.5;
 export class RunSession {
   readonly ether = new Ether();
   readonly agents: CallerAgent[] = [];
+  /** Stations living on the band regardless of us (QSOs in progress); free play adds more kinds. */
+  readonly residents: Agent[] = [];
+  readonly occupants: OccupantPair[] = [];
   private contactList: RunContact[] = [];
   private logList: RunLogEntry[] = [];
   private partner: CallerAgent | null = null;
@@ -130,6 +172,8 @@ export class RunSession {
   private partialsTotal = 0;
   private seq = 0;
   private notes: AgentNote[] = [];
+  private qrls: { rf: number; at: number }[] = [];
+  private frequencyList: FrequencyUse[] = [];
   private readonly personas: PersonaSource;
   private readonly ctx: AgentContext;
 
@@ -153,7 +197,49 @@ export class RunSession {
   }
 
   get partnerCall() { return this.partner && !this.partner.gone ? this.partner.call : null; }
-  get stations(): Station[] { return this.agents.filter((agent) => this.onAir(agent)).map((agent) => agent.station); }
+  get stations(): Station[] {
+    return [...this.agents, ...this.residents].filter((agent) => this.onAir(agent)).map((agent) => agent.station);
+  }
+  get frequencies(): readonly FrequencyUse[] { return this.frequencyList; }
+
+  /** Our transmitter is keyed at `now` — read from the air, not from what the UI has queued. */
+  keying(now: number) { return this.ether.transmittingAt('me', now); }
+  /** When our latest transmission ends (−∞ if none on the air recently). */
+  get keyedUntil() { return this.ether.keyedUntil('me'); }
+
+  /** Is `rf` in use by someone other than us and our callers, as heard on the air? */
+  frequencyBusy(rf: number, at: number) {
+    const ours = new Set<number>(this.agents.map((agent) => agent.id));
+    return this.ether.activeNear(rf, BUSY_HZ, at - BUSY_SECONDS, (party) => party === 'me' || ours.has(party));
+  }
+
+  /**
+   * Put the band's residents around where we start at `rf`: maybe a QSO right on it
+   * (chance `busy`), and a couple more within a few kHz so a QSY can land on one too.
+   */
+  populate(rf: number, now: number, placement: Placement = {}) {
+    const { random, params } = this.config;
+    const onFrequency = placement.onFrequency ?? random() < params.busy;
+    const nearby = placement.nearby ?? 1 + Math.floor(random() * 2);
+    const spots: number[] = [];
+    if (onFrequency) spots.push(rf + Math.round((random() - 0.5) * 2 * 150));
+    for (let guard = 0; spots.length < nearby + (onFrequency ? 1 : 0) && guard < 50; guard += 1) {
+      const spot = Math.round(rf + (random() < 0.5 ? -1 : 1) * (700 + random() * 2300));
+      if (spots.every((other) => Math.abs(other - spot) > 600) && Math.abs(spot - rf) > 600) spots.push(spot);
+    }
+    for (const spot of spots) {
+      const active = [...this.agents, ...this.residents].map((agent) => (agent as CallerAgent).station.call);
+      const request = { random, speed: params.speed, weak: params.weak * 0.5, spread: 0, active };
+      const pair = createOccupantPair([this.personas.next(request), this.personas.next(request)], random, {
+        rf: spot, now, oneSided: placement.oneSided ?? random() < ONE_SIDED_RATE,
+      });
+      this.occupants.push(pair);
+      this.residents.push(...pair.agents);
+    }
+    this.lastStations = this.stations;
+    this.radio.stationsChanged(this.lastStations);
+    return this.occupants;
+  }
   get contacts(): readonly RunContact[] { return this.contactList.map((contact) => this.refresh(contact)); }
   get log(): readonly RunLogEntry[] { return this.logList; }
 
@@ -189,11 +275,27 @@ export class RunSession {
       this.partialsTotal += 1;
     }
     if (intent.cq && !intent.mentionsMe) issues.push('cq-without-call');
+    if (intent.qrl) this.qrls.push({ rf, at: start });
+    let busy = false;
+    if (intent.cq) {
+      busy = this.frequencyBusy(rf, start);
+      const asked = this.qrls.some((qrl) => Math.abs(qrl.rf - rf) <= QRL_HZ && start - qrl.at <= QRL_VALID && qrl.at < start);
+      let use = this.frequencyList.find((item) => Math.abs(item.rf - rf) <= QRL_HZ);
+      if (!use) {
+        use = { rf, firstCqAt: start, qrlFirst: asked, busyCqs: 0 };
+        this.frequencyList.push(use);
+      }
+      if (busy) {
+        use.busyCqs += 1;
+        issues.push(asked ? 'busy-frequency' : 'cq-without-qrl');
+      }
+    }
     const exchangeOnly = (intent.report || intent.fields.name) && !intent.calls.length;
     if (exchangeOnly && !partner && this.agents.filter((agent) => agent.state === 'waiting').length > 1) issues.push('no-call');
 
-    const arrivals = intent.cq && intent.mentionsMe ? params.callers
-      : (intent.qrz || (intent.closing && intent.mentionsMe)) ? params.callers * QRZ_ARRIVALS : 0;
+    // Arrival rate only (patience and re-calls live on the callers): tuned separately in Stage 4.
+    const arrivals = (intent.cq && intent.mentionsMe ? params.callers
+      : (intent.qrz || (intent.closing && intent.mentionsMe)) ? params.callers * QRZ_ARRIVALS : 0) * (busy ? BUSY_ARRIVALS : 1);
     this.spawn(poisson(random, arrivals), rf, end);
 
     this.ether.emit({ from: 'me', text, intent, rf, start, end });
@@ -203,12 +305,13 @@ export class RunSession {
   /** Deliver what has ended on the air, run every agent's clock, drop stations that left. Returns delivered events. */
   tick(now: number): AirEvent[] {
     const due = this.ether.deliver(now);
+    const everyone: Agent[] = [...this.agents, ...this.residents];
     for (const event of due) {
-      for (const agent of this.agents) {
+      for (const agent of everyone) {
         if (!agent.gone && this.ether.hears(agent, event)) agent.hear(event, this.ctx);
       }
     }
-    for (const agent of this.agents) agent.tick(now, this.ctx);
+    for (const agent of everyone) agent.tick(now, this.ctx);
     const before = this.lastStations;
     const after = this.stations;
     if (after.length !== before.length || after.some((station, index) => station !== before[index])) {
@@ -221,7 +324,7 @@ export class RunSession {
   /** Clock moved to a new epoch (rig power cycled) shifted by `shift` seconds. */
   rebase(epoch: number, shift: number) {
     this.ether.setEpoch(epoch);
-    for (const agent of this.agents) agent.rebase(shift);
+    for (const agent of [...this.agents, ...this.residents]) agent.rebase(shift);
   }
 
   /** Write one log line; it is tied to the contact it most likely records. */
@@ -280,6 +383,7 @@ export class RunSession {
       log,
       unlogged,
       missed: this.missed(),
+      frequencies: this.frequencyList.map((use) => ({ ...use })),
       stats: {
         seconds,
         contacts: made.length,
@@ -291,6 +395,7 @@ export class RunSession {
         nil: log.filter((entry) => entry.verdict === 'nil').length,
         unlogged: unlogged.length,
         dupes: log.filter((entry) => entry.verdict === 'dupe').length,
+        busyCqs: this.frequencyList.reduce((sum, use) => sum + use.busyCqs, 0),
       },
     };
   }
@@ -303,7 +408,7 @@ export class RunSession {
     const { random, params } = this.config;
     const now = Math.max(at, this.radio.now());
     for (let index = 0; index < count; index += 1) {
-      const active = this.agents.filter((agent) => !agent.gone).map((agent) => agent.call);
+      const active = [...this.agents, ...this.residents].filter((agent) => !agent.gone).map((agent) => agent.station.call);
       const persona = this.personas.next({ random, speed: params.speed, weak: params.weak, spread: params.spread, active });
       this.agents.push(createCaller(persona, { random, listenRf: rf, now }));
     }
@@ -313,7 +418,7 @@ export class RunSession {
   }
 
   /** Still keying, about to key, or on frequency. */
-  private onAir(agent: CallerAgent) {
+  private onAir(agent: Agent) {
     if (!agent.gone) return true;
     return agent.station.queue.length > 0 || agent.station.busyUntil > this.radio.now();
   }
@@ -325,7 +430,8 @@ export class RunSession {
 
   private onNote(note: AgentNote) {
     this.notes.push(note);
-    const agent = note.agent as CallerAgent;
+    if (!(note.agent instanceof CallerAgent)) return;
+    const agent = note.agent;
     const now = this.radio.now();
     switch (note.type) {
       case 'selected': {

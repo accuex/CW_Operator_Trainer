@@ -22,7 +22,11 @@ export type AgentNote =
   | { type: 'asked'; agent: Agent; fields: AskField[] }
   | { type: 'exchanged'; agent: Agent }
   | { type: 'closed'; agent: Agent }
-  | { type: 'gone'; agent: Agent; reason: GoneReason };
+  | { type: 'gone'; agent: Agent; reason: GoneReason }
+  /** A station using the frequency answered our QRL? ("C", "QRL"…). */
+  | { type: 'qrl-answered'; agent: Agent }
+  /** A station using the frequency asked us to move ("QRL PSE QSY"). */
+  | { type: 'qsy-asked'; agent: Agent };
 
 export interface AgentContext {
   now(): number;
