@@ -25,7 +25,21 @@ function initialExamUi() {
   return { prefs, selected };
 }
 
-export function ExamView({ settings, setSettings, record, setAudioStatus, stopEpoch }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; record: (answer: AnswerLog) => void; setAudioStatus: (status: string) => void; stopEpoch: number }) {
+export function ExamView({
+  settings,
+  setSettings,
+  record,
+  setAudioStatus,
+  stopEpoch,
+  announce,
+}: {
+  settings: AudioSettings;
+  setSettings: (settings: AudioSettings) => void;
+  record: (answer: AnswerLog) => void;
+  setAudioStatus: (status: string) => void;
+  stopEpoch: number;
+  announce: (message: string) => void;
+}) {
   const presets = SUBJECT_IDS.map((id) => EXAM_SUBJECTS[id]);
   const boot = initialExamUi();
   const [selected, setSelected] = useState(boot.selected);
@@ -597,8 +611,29 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
     setListenMode((value) => !value);
   };
 
-  const printForms = () => {
-    window.print();
+  /** 額表は画面と同じ DOM/CSS を使う（再現度優先）。ダイアログで「PDFに保存」。 */
+  const saveGakuPdf = () => {
+    if (!session) {
+      announce('先に問題を用意してください');
+      return;
+    }
+    const previousTitle = document.title;
+    const stamp = new Date().toISOString().slice(0, 10);
+    const kind = sessionListenMode || listenModeRef.current ? '視聴' : '試験';
+    document.title = `CWOT-額表-${preset.title}-${kind}-${stamp}`;
+    document.body.classList.add('print-gaku');
+    const restore = () => {
+      document.title = previousTitle;
+      document.body.classList.remove('print-gaku');
+      window.removeEventListener('afterprint', restore);
+    };
+    window.addEventListener('afterprint', restore);
+    announce('印刷ダイアログで「PDFに保存」を選んでください');
+    window.setTimeout(() => {
+      window.print();
+      // afterprint が来ない環境向けの保険
+      window.setTimeout(restore, 60_000);
+    }, 50);
   };
 
   const stopPlayback = async () => {
@@ -890,8 +925,8 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
                       <Icon name="repeat" size={16} />もう一度
                     </button>
                   )}
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={printForms} title="額表を印刷／PDF保存">
-                    <Icon name="printer" size={16} />印刷
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={saveGakuPdf} title="額表をPDF保存（印刷ダイアログ）">
+                    <Icon name="printer" size={16} />PDF保存
                   </button>
                   <button type="button" className="btn btn-ghost btn-sm" onClick={exitListenDesk} title="科目選択画面に戻る">
                     戻る
@@ -904,8 +939,8 @@ export function ExamView({ settings, setSettings, record, setAudioStatus, stopEp
                       <button type="button" className="btn btn-ghost btn-sm" onClick={renewProblem} title="新しい出題に差し替え（再生はスタート押し待ち）">
                         <Icon name="sparkle" size={16} />次の問題
                       </button>
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={printForms} title="いまの額表を印刷／PDF保存">
-                        <Icon name="printer" size={16} />印刷
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={saveGakuPdf} title="いまの額表をPDF保存（印刷ダイアログ）">
+                        <Icon name="printer" size={16} />PDF保存
                       </button>
                     </>
                   )}

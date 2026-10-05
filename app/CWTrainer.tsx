@@ -243,7 +243,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     levelup: <LevelUpView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} record={record} setAudioStatus={setAudioStatus} onSession={onSession} />,
     queue: <QueueView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} onSession={onSession} />,
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
-    exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} />,
+    exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} />,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
     settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} onNavigate={navigate} />,
     account: <AccountView announce={announce} onNavigate={navigate} />,

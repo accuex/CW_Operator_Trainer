@@ -1365,7 +1365,7 @@
   }
 }
 
-/* 額表の印刷／PDF（ブラウザの「PDFに保存」） */
+/* 額表の印刷／PDF（React DOM をそのまま。ブラウザの「PDFに保存」） */
 @media print {
   @page { size: A4 landscape; margin: 8mm; }
 
@@ -1377,9 +1377,14 @@
   .sidebar,
   .app-header,
   .mobile-nav,
+  .toast,
   .exam-status,
   .exam-warning,
   .exam-setup,
+  .exam-copy,
+  .exam-listen-progress,
+  .exam-listen-review-bar,
+  .exam-audio-interrupt-bar,
   .exam-result-hero,
   .exam-score-breakdown,
   .exam-result-gaku > .section-kicker,
@@ -1393,22 +1398,29 @@
     display: none !important;
   }
 
-  .exam-result.has-gaku {
+  .exam-result.has-gaku,
+  .exam-result-gaku,
+  .exam-listen-panel,
+  .exam-listen-panel.is-review {
     display: block !important;
     max-width: none !important;
     margin: 0 !important;
+    padding: 0 !important;
     background: #fff !important;
+    overflow: visible !important;
   }
 
-  .app-main {
+  .app-main,
+  .app-frame,
+  .view-stage {
     margin: 0 !important;
     min-height: 0 !important;
+    background: #fff !important;
   }
 
   .exam-page,
   .exam-terminal,
   .exam-terminal.listen-mode,
-  .exam-listen-panel,
   .page-pad {
     max-width: none !important;
     width: 100% !important;
@@ -1422,6 +1434,7 @@
   .gaku-stack {
     display: block !important;
     gap: 0 !important;
+    overflow: visible !important;
   }
 
   .gaku-sheet {
@@ -1429,7 +1442,7 @@
     page-break-after: always;
     break-inside: avoid;
     box-shadow: none !important;
-    margin: 0 auto !important;
+    margin: 0 auto 0 !important;
   }
 
   .gaku-sheet:last-child {
@@ -1439,12 +1452,16 @@
 
   .gaku-sheet.is-active { box-shadow: none !important; }
 
+  /* 印刷時は追従ハイライトを消して正式な額表見た目に */
   .listen-heard,
   .listen-now,
   .listen-wait,
   .wg-mark.listen-heard,
   .wg-mark.listen-now,
-  .wg-mark.listen-wait {
+  .wg-mark.listen-wait,
+  .gaku-cell.listen-heard,
+  .gaku-cell.listen-now,
+  .gaku-cell.listen-wait {
     background: none !important;
     box-shadow: none !important;
     color: inherit !important;
