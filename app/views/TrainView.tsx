@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { summary, weakPairs } from '@/lib/analytics';
+import { summary, weakPairs, forWeakAnalysis } from '@/lib/analytics';
 import { CARDS, alphabetSymbols } from '@/lib/morse';
 import { randomCallsign, randomGroup, randomWord } from '@/lib/training';
 import type { AlphabetType, AnswerLog, AudioSettings, TrainingMode } from '@/lib/types';
@@ -29,7 +29,7 @@ const toKatakana = (value: string) => value.replace(/[\u3041-\u3096]/g, (char) =
 
 const speedGrade = (ms: number) => (ms < 700 ? 'PERFECT!' : ms < 1400 ? 'GREAT!' : 'GOOD');
 
-export function TrainView({ settings, setSettings, record, setAudioStatus, answers, kochPool }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; record: (answer: AnswerLog) => void; setAudioStatus: (status: string) => void; answers: AnswerLog[]; kochPool: string[] }) {
+export function TrainView({ settings, setSettings, record, setAudioStatus, answers, kochPool }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; record: (answer: AnswerLog) => void; setAudioStatus: (status: string) => void; answers: AnswerLog[]; kochPool: Record<AlphabetType, string[]> }) {
   const [alphabet, setAlphabet] = useState<AlphabetType>('international');
   const [mode, setMode] = useState<TrainingMode>('sound');
   const [symbol, setSymbol] = useState('K');
@@ -80,7 +80,7 @@ export function TrainView({ settings, setSettings, record, setAudioStatus, answe
     if (!playing) playSfx(correct ? (nextStreak >= 5 && nextStreak % 5 === 0 ? 'combo' : 'hit') : 'miss', settings.volume);
   };
   const stats = summary(sessionAnswers);
-  const pair = weakPairs(answers.filter((answer) => answer.alphabetType === alphabet))[0];
+  const pair = weakPairs(forWeakAnalysis(answers).filter((answer) => answer.alphabetType === alphabet))[0];
   const promptForMode = () => {
     if (mode === 'groups') return randomGroup(alphabet, 5);
     if (mode === 'plain') return Array.from({ length: 3 }, () => randomWord(alphabet)).join(' ');
@@ -88,7 +88,8 @@ export function TrainView({ settings, setSettings, record, setAudioStatus, answe
     if (mode === 'callsigns') return randomCallsign();
     if (mode === 'custom') return customText || 'CQ';
     if (mode === 'weak-pair' && pair) return Math.random() < .8 ? (Math.random() < .5 ? pair.a : pair.b) : nextSymbol();
-    if (mode === 'koch') return randomGroup(alphabet, 1, alphabet === 'wabun' ? ['イ','ロ','ハ','ニ','ホ','ヘ'] : kochPool);
+    // 1 文字の即答なので、和文は単独で送らない記号（゛ 、 など）を除いたカナだけ。
+    if (mode === 'koch') return randomGroup(alphabet, 1, alphabet === 'wabun' ? kochPool.wabun.filter((item) => /^[\u30A1-\u30FA]$/.test(item)) : kochPool.international);
     return nextSymbol();
   };
   const longAnswer = ['groups','plain','words','callsigns','custom'].includes(mode);

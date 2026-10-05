@@ -1,0 +1,385 @@
+import { cutStation, enqueue, fadeAt, schedulePending, type Station, type Transmission } from './band';
+import { keyText, type Mark } from './keying';
+
+/**
+ * Multi-voice receiver for the QSO simulator.
+ *
+ *   station osc ─ key ─ amp ┐
+ *   band noise ─────────────┼─ bus ─ BPF ─ BPF ─ AGC ─ AF ─ out
+ *   QRN crashes ────────────┘          └─ meter
+ *
+ * Audio pitch = BFO pitch + (station RF − VFO), so tuning sweeps the tone and the
+ * IF filter really removes neighbours. Runs on a performance clock with no audio
+ * until powerOn() so the scope is alive before the user taps.
+ */
+
+export interface Crash { t: number; dur: number; level: number }
+export interface RigLevels { af: number; noise: number; qrn: number; qsb: number }
+export const FILTERS = [250, 500, 2400] as const;
+export type FilterWidth = (typeof FILTERS)[number];
+
+interface Voice { osc: OscillatorNode; key: GainNode; amp: GainNode; chirp: GainNode | null; chirpSource: ConstantSourceNode | null }
+interface Rx { bus: GainNode; f1: BiquadFilterNode; f2: BiquadFilterNode; agc: DynamicsCompressorNode; af: GainNode; meter: AnalyserNode; noise: GainNode; noiseBuffer: AudioBuffer; meterData: Float32Array<ArrayBuffer> }
+
+const LOOKAHEAD = 1.5;
+const TICK_MS = 100;
+const RAMP = 0.004;
+const AUDIBLE = [40, 4000] as const;
+
+type AudioContextCtor = typeof AudioContext;
+const audioContextCtor = (): AudioContextCtor | null => {
+  if (typeof window === 'undefined') return null;
+  return window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioContextCtor }).webkitAudioContext ?? null;
+};
+
+export class RigEngine {
+  vfo: number;
+  pitch = 600;
+  filter: FilterWidth = 500;
+  levels: RigLevels = { af: 0.6, noise: 0.35, qrn: 0.4, qsb: 0.5 };
+  stations: Station[] = [];
+  crashes: Crash[] = [];
+  txUntil = 0;
+  random: () => number;
+  /** Bumped whenever the clock source changes (power on/off); times from other epochs don't compare. */
+  epoch = 0;
+  /** A station's message was scheduled (absolute times, current epoch). */
+  onTransmission: ((station: Station, tx: Transmission) => void) | null = null;
+  /** Called after every scheduler tick, e.g. to sample band conditions. */
+  onTick: ((now: number) => void) | null = null;
+
+  private ctx: AudioContext | null = null;
+  private rx: Rx | null = null;
+  private voices = new Map<number, Voice>();
+  private timer: ReturnType<typeof setInterval> | null = null;
+
+  constructor(vfo = 7_012_000, random: () => number = Math.random) {
+    this.vfo = vfo;
+    this.random = random;
+  }
+
+  get powered() { return this.ctx !== null; }
+  get transmitting() { return this.now() < this.txUntil; }
+  now() { return this.ctx ? this.ctx.currentTime : performance.now() / 1000; }
+
+  /** Start the scheduler (visual only until powerOn). */
+  start() {
+    if (this.timer) return;
+    this.timer = setInterval(() => this.tick(), TICK_MS);
+    this.tick();
+  }
+
+  /** Must run inside a user gesture (iOS). */
+  async powerOn() {
+    if (this.ctx) return;
+    const Ctor = audioContextCtor();
+    if (!Ctor) throw new Error('Web Audio unavailable');
+    const ctx = new Ctor({ latencyHint: 'interactive' });
+    this.ctx = ctx;
+    this.epoch += 1;
+    // iOS: play one silent frame in the gesture so the context unlocks.
+    const silent = ctx.createBufferSource();
+    silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    silent.connect(ctx.destination);
+    silent.start();
+    this.rx = this.buildReceiver(ctx);
+    this.applyFilter();
+    this.applyLevels();
+    for (const station of this.stations) {
+      this.resetClock(station);
+      this.attach(station);
+    }
+    try { await ctx.resume(); } catch { /* resumes on next gesture */ }
+    this.tick();
+  }
+
+  async powerOff() {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    for (const station of this.stations) this.detach(station);
+    this.ctx = null;
+    this.rx = null;
+    this.txUntil = 0;
+    this.epoch += 1;
+    for (const station of this.stations) this.resetClock(station);
+    try { await ctx.close(); } catch { /* already closed */ }
+  }
+
+  /** Suspend audio while the tab is hidden; the scheduler restarts cleanly on resume. */
+  async setBackground(hidden: boolean) {
+    if (!this.ctx) return;
+    try {
+      if (hidden) await this.ctx.suspend();
+      else await this.ctx.resume();
+    } catch { /* ignore */ }
+  }
+
+  dispose() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = null;
+    void this.powerOff();
+  }
+
+  setStations(next: Station[]) {
+    const keep = new Set(next.map((station) => station.id));
+    for (const station of this.stations) if (!keep.has(station.id)) this.detach(station);
+    for (const station of next) {
+      if (this.voices.has(station.id)) continue;
+      this.resetClock(station);
+      if (this.ctx) this.attach(station);
+    }
+    this.stations = next;
+  }
+
+  setVfo(hz: number) {
+    this.vfo = Math.round(hz);
+    this.retune();
+  }
+
+  setPitch(hz: number) {
+    this.pitch = hz;
+    this.applyFilter();
+    this.retune();
+  }
+
+  setFilter(width: FilterWidth) {
+    this.filter = width;
+    this.applyFilter();
+  }
+
+  setLevels(levels: Partial<RigLevels>) {
+    this.levels = { ...this.levels, ...levels };
+    this.applyLevels();
+  }
+
+  /** Queue a reply from a station `delay` seconds from now. */
+  send(station: Station, text: string, delay = 0.8) {
+    enqueue(station, text, this.now(), delay);
+    this.tick();
+  }
+
+  /** Stop a station mid-message (it heard you break in). */
+  cut(station: Station) {
+    const now = this.now();
+    cutStation(station, now);
+    const voice = this.voices.get(station.id);
+    if (!voice) return;
+    voice.key.gain.cancelScheduledValues(now);
+    voice.key.gain.setValueAtTime(0, now);
+    voice.chirp?.gain.cancelScheduledValues(now);
+  }
+
+  /** Key our own transmitter. Resolves when the last element ends. */
+  transmit(text: string, wpm: number, effectiveWpm = wpm): Promise<number> {
+    const ctx = this.ctx;
+    const rx = this.rx;
+    if (!ctx || !rx) return Promise.resolve(0);
+    const { marks, length } = keyText(text, { wpm, effectiveWpm });
+    const t0 = Math.max(ctx.currentTime, this.txUntil) + 0.05;
+    const osc = ctx.createOscillator();
+    const key = ctx.createGain();
+    osc.frequency.value = this.pitch;
+    key.gain.value = 0;
+    osc.connect(key).connect(ctx.destination);
+    applyKeying(key.gain, marks, t0, 0.22);
+    osc.start(t0);
+    osc.stop(t0 + length + 0.05);
+    // Receiver mutes while we key (no full break-in).
+    rx.af.gain.setTargetAtTime(0, t0, 0.01);
+    rx.af.gain.setTargetAtTime(this.levels.af, t0 + length, 0.05);
+    this.txUntil = t0 + length;
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(length), (t0 + length - ctx.currentTime) * 1000);
+    });
+  }
+
+  /** 0–1 S-meter from the post-filter signal. */
+  meter() {
+    const rx = this.rx;
+    if (!rx) return 0;
+    rx.meter.getFloatTimeDomainData(rx.meterData);
+    let sum = 0;
+    for (const value of rx.meterData) sum += value * value;
+    const db = 10 * Math.log10(sum / rx.meterData.length + 1e-9);
+    return Math.max(0, Math.min(1, (db + 60) / 52));
+  }
+
+  audioFrequency(station: Station) { return this.pitch + (station.rf - this.vfo); }
+
+  /** Receiver on and not keying our own transmitter. */
+  get listening() { return this.powered && !this.transmitting; }
+
+  /** Strongest static crash active at t (0 = quiet). */
+  crashAt(t: number) {
+    let level = 0;
+    for (const crash of this.crashes) if (t >= crash.t && t <= crash.t + crash.dur) level = Math.max(level, crash.level);
+    return level;
+  }
+
+  private tick() {
+    const now = this.now();
+    for (const station of this.stations) {
+      for (const tx of schedulePending(station, now, now + LOOKAHEAD, this.random)) {
+        this.play(station, tx.marks);
+        this.onTransmission?.(station, tx);
+      }
+      station.fade = fadeAt(station, now, this.levels.qsb);
+      if (station.drift) station.rf += station.drift * (TICK_MS / 1000);
+      this.updateVoice(station, 0.3);
+    }
+    if (this.random() < this.levels.qrn * 0.08) this.crash(0.3 + this.random() * 0.7 * this.levels.qrn);
+    this.crashes = this.crashes.filter((crash) => now < crash.t + crash.dur + 0.2);
+    this.onTick?.(now);
+  }
+
+  private play(station: Station, marks: Mark[]) {
+    const voice = this.voices.get(station.id);
+    if (!voice) return;
+    applyKeying(voice.key.gain, marks, 0, 1);
+    if (voice.chirp) {
+      for (const [start] of marks) {
+        voice.chirp.gain.setValueAtTime(-station.chirp, start);
+        voice.chirp.gain.setTargetAtTime(0, start, 0.015);
+      }
+    }
+  }
+
+  private crash(level: number) {
+    const t = this.now();
+    const dur = 0.05 + this.random() * 0.25;
+    this.crashes.push({ t, dur, level });
+    const ctx = this.ctx;
+    const rx = this.rx;
+    if (!ctx || !rx) return;
+    const source = ctx.createBufferSource();
+    source.buffer = rx.noiseBuffer;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(level * 1.5, t + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    source.connect(gain).connect(rx.bus);
+    source.start(t, this.random());
+    source.stop(t + dur + 0.05);
+    source.onended = () => gain.disconnect();
+  }
+
+  private retune() {
+    for (const station of this.stations) this.updateVoice(station, 0.03);
+  }
+
+  private updateVoice(station: Station, smoothing: number) {
+    const voice = this.voices.get(station.id);
+    const ctx = this.ctx;
+    if (!voice || !ctx) return;
+    const freq = this.audioFrequency(station);
+    // Opposite sideband / far out of the passband: silent rather than mirrored.
+    const audible = freq > AUDIBLE[0] && freq < AUDIBLE[1];
+    voice.osc.frequency.setTargetAtTime(Math.max(AUDIBLE[0], freq), ctx.currentTime, Math.min(smoothing, 0.05));
+    voice.amp.gain.setTargetAtTime(audible ? station.strength * 0.5 * station.fade : 0, ctx.currentTime, smoothing);
+  }
+
+  private resetClock(station: Station) {
+    station.marks = [];
+    station.busyUntil = 0;
+    if (station.nextAt !== Number.POSITIVE_INFINITY || station.queue.length) station.nextAt = this.now() + this.random() * 3;
+  }
+
+  private attach(station: Station) {
+    const ctx = this.ctx;
+    const rx = this.rx;
+    if (!ctx || !rx || this.voices.has(station.id)) return;
+    const osc = ctx.createOscillator();
+    const key = ctx.createGain();
+    const amp = ctx.createGain();
+    key.gain.value = 0;
+    amp.gain.value = 0;
+    osc.connect(key).connect(amp).connect(rx.bus);
+    let chirp: GainNode | null = null;
+    let chirpSource: ConstantSourceNode | null = null;
+    if (station.chirp) {
+      chirpSource = ctx.createConstantSource();
+      chirp = ctx.createGain();
+      chirp.gain.value = 0;
+      chirpSource.connect(chirp).connect(osc.frequency);
+      chirpSource.start();
+    }
+    osc.frequency.value = Math.max(AUDIBLE[0], this.audioFrequency(station));
+    osc.start();
+    this.voices.set(station.id, { osc, key, amp, chirp, chirpSource });
+  }
+
+  private detach(station: Station) {
+    const voice = this.voices.get(station.id);
+    if (!voice) return;
+    this.voices.delete(station.id);
+    try {
+      voice.osc.stop();
+      voice.chirpSource?.stop();
+      voice.amp.disconnect();
+    } catch { /* torn down */ }
+  }
+
+  private buildReceiver(ctx: AudioContext): Rx {
+    const bus = ctx.createGain();
+    const f1 = ctx.createBiquadFilter();
+    const f2 = ctx.createBiquadFilter();
+    f1.type = 'bandpass';
+    f2.type = 'bandpass';
+    const agc = ctx.createDynamicsCompressor();
+    agc.threshold.value = -30;
+    agc.ratio.value = 8;
+    agc.attack.value = 0.003;
+    agc.release.value = 0.25;
+    const af = ctx.createGain();
+    const meter = ctx.createAnalyser();
+    meter.fftSize = 1024;
+    bus.connect(f1).connect(f2).connect(agc).connect(af).connect(ctx.destination);
+    f2.connect(meter);
+
+    // Band noise: white plus a low-passed rumble, looped.
+    const length = ctx.sampleRate * 2;
+    const noiseBuffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    let brown = 0;
+    for (let index = 0; index < length; index += 1) {
+      brown = 0.97 * brown + 0.03 * (Math.random() * 2 - 1);
+      data[index] = (Math.random() * 2 - 1) * 0.6 + brown * 3;
+    }
+    const source = ctx.createBufferSource();
+    source.buffer = noiseBuffer;
+    source.loop = true;
+    const noise = ctx.createGain();
+    source.connect(noise).connect(bus);
+    source.start();
+    return { bus, f1, f2, agc, af, meter, noise, noiseBuffer, meterData: new Float32Array(meter.fftSize) };
+  }
+
+  private applyFilter() {
+    const ctx = this.ctx;
+    const rx = this.rx;
+    if (!ctx || !rx) return;
+    for (const filter of [rx.f1, rx.f2]) {
+      filter.frequency.setTargetAtTime(this.pitch, ctx.currentTime, 0.01);
+      filter.Q.setTargetAtTime(this.pitch / this.filter, ctx.currentTime, 0.01);
+    }
+    // Narrow filters lose level; make up for it so switching doesn't jump in loudness.
+    rx.bus.gain.setTargetAtTime(this.filter === 2400 ? 0.5 : this.filter === 500 ? 1.6 : 3, ctx.currentTime, 0.02);
+  }
+
+  private applyLevels() {
+    const ctx = this.ctx;
+    const rx = this.rx;
+    if (!ctx || !rx) return;
+    if (!this.transmitting) rx.af.gain.setTargetAtTime(this.levels.af, ctx.currentTime, 0.02);
+    rx.noise.gain.setTargetAtTime(this.levels.noise * 0.25, ctx.currentTime, 0.02);
+  }
+}
+
+function applyKeying(param: AudioParam, marks: Mark[], offset: number, level: number) {
+  for (const [start, end] of marks) {
+    param.setValueAtTime(0, offset + start);
+    param.linearRampToValueAtTime(level, offset + start + RAMP);
+    param.setValueAtTime(level, offset + end);
+    param.linearRampToValueAtTime(0, offset + end + RAMP);
+  }
+}

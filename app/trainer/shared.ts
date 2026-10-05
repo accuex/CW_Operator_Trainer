@@ -5,7 +5,7 @@ import { COURSE_CATALOG, COURSE_DEFAULT_UNLOCK, KIND_LABEL, type CharacterKind }
 import { readProgressMeter } from '@/lib/progressMeter';
 import type { CardProgress, TrainerProfile } from '@/lib/types';
 
-export type View = 'home' | 'learn' | 'train' | 'levelup' | 'queue' | 'analysis' | 'exam' | 'collection' | 'settings' | 'account';
+export type View = 'home' | 'learn' | 'train' | 'levelup' | 'queue' | 'analysis' | 'exam' | 'qso' | 'collection' | 'settings' | 'account';
 export type QueueSource = 'international' | 'wabun' | 'visual' | 'phonetic' | 'digits' | 'kana';
 export interface ViewMeta {
   id: View;
@@ -22,6 +22,7 @@ export const views: ViewMeta[] = [
   { id: 'levelup', label: 'LEVEL UP', title: 'レベル試験', icon: 'trophy', primary: true },
   { id: 'queue', label: 'QUEUE', title: '遅れ受信', icon: 'queue', primary: false },
   { id: 'exam', label: 'EXAM', title: '一総通 試験', icon: 'exam', primary: true },
+  { id: 'qso', label: 'QSO', title: 'QSO 交信', icon: 'radio', primary: false },
   { id: 'collection', label: 'COLLECTION', title: 'カード図鑑', icon: 'collection', primary: true },
   { id: 'analysis', label: 'ANALYSIS', title: '苦手分析', icon: 'analysis', primary: false },
   { id: 'settings', label: 'SETTINGS', title: '設定', icon: 'settings', primary: false },

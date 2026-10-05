@@ -2,9 +2,11 @@ import { APP_VERSION, SCHEMA_VERSION, currentDataMeta, currentExportMeta, type D
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from './types';
 import { clampSpeedWpm } from './speed';
 import { COURSE_DEFAULT_UNLOCK } from './course';
+import { normalizeQsoProfile } from './radio/skills';
+import { QSO_TRACE_LIMIT, type QsoTrace } from './radio/trace';
 
 const DB_NAME = 'cw-operator-trainer';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const SETTINGS_KEY = 'cwot:settings';
 const META_KEY = 'meta';
 
@@ -33,6 +35,7 @@ export function normalizeProfile(profile: TrainerProfile | null | undefined): Tr
     achievements: profile?.achievements ?? {},
     revealAll: Boolean(profile?.revealAll),
   };
+  if (profile?.qso) merged.qso = normalizeQsoProfile(profile.qso);
   if (merged.learnCourse && (!merged.unlockedKinds || merged.unlockedKinds.length === 0)) {
     merged.unlockedKinds = [...COURSE_DEFAULT_UNLOCK[merged.learnCourse]];
   }
@@ -47,6 +50,8 @@ function openDatabase(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains('answers')) db.createObjectStore('answers', { keyPath: 'id' }).createIndex('timestamp', 'timestamp');
       if (!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions', { keyPath: 'id' }).createIndex('startedAt', 'startedAt');
       if (!db.objectStoreNames.contains('profile')) db.createObjectStore('profile');
+      // v2: QSO review traces. Device-only, never synced or exported.
+      if (!db.objectStoreNames.contains('qsoTraces')) db.createObjectStore('qsoTraces', { keyPath: 'id' }).createIndex('startedAt', 'startedAt');
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -68,6 +73,24 @@ export const addAnswer = (answer: AnswerLog) => transaction('answers', 'readwrit
 export const getAnswers = () => transaction<AnswerLog[]>('answers', 'readonly', (store) => store.getAll());
 export const addSession = (session: SessionRecord) => transaction('sessions', 'readwrite', (store) => store.put(session));
 export const getSessions = () => transaction<SessionRecord[]>('sessions', 'readonly', (store) => store.getAll());
+
+/** Store a QSO trace and drop all but the newest QSO_TRACE_LIMIT. */
+export async function addQsoTrace(trace: QsoTrace) {
+  const db = await openDatabase();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction('qsoTraces', 'readwrite');
+    const store = tx.objectStore('qsoTraces');
+    store.put(trace);
+    const keys = store.index('startedAt').getAllKeys();
+    keys.onsuccess = () => {
+      const ids = keys.result;
+      for (const id of ids.slice(0, Math.max(0, ids.length - QSO_TRACE_LIMIT))) store.delete(id);
+    };
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+export const getQsoTrace = (id: string) => transaction<QsoTrace | undefined>('qsoTraces', 'readonly', (store) => store.get(id));
 
 async function replaceStoreAll<T>(storeName: 'answers' | 'sessions', items: T[]) {
   const db = await openDatabase();

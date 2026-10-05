@@ -1,6 +1,6 @@
 'use client';
 
-import { summary, weakPairs } from '@/lib/analytics';
+import { summary, weakPairs, forWeakAnalysis } from '@/lib/analytics';
 import { CARDS } from '@/lib/morse';
 import { cardsForCourse, courseMeta } from '@/lib/course';
 import type { AnswerLog, SessionRecord, TrainerProfile } from '@/lib/types';
@@ -13,8 +13,9 @@ import { TradingCard } from '@/app/components/TradingCard';
 interface Tile { view: View; icon: IconName; title: string; body: string; meta: string; tone: string }
 
 export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { answers: AnswerLog[]; sessions: SessionRecord[]; profile: TrainerProfile; stats: PlayerStats; onNavigate: (view: View) => void }) {
-  const totals = summary(answers);
-  const pairs = weakPairs(answers);
+  const copied = forWeakAnalysis(answers);
+  const totals = summary(copied);
+  const pairs = weakPairs(copied);
   const lastQueue = [...sessions].reverse().find((session) => session.queue)?.queue;
   const course = profile.learnCourse ?? null;
   const courseCards = cardsForCourse(CARDS, course, profile.unlockedKinds ?? []);

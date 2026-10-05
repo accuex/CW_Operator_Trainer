@@ -76,6 +76,8 @@ function isCloudEmpty(
     || profile.learnCourse
     || (profile.cards && typeof profile.cards === 'object' && Object.keys(profile.cards as object).length > 0)
     || profile.koch
+    || profile.kochWabun
+    || profile.qso
     || (Array.isArray(profile.unlockedKinds) && profile.unlockedKinds.length > 0)
     || (typeof profile.totalTrainingMs === 'number' && profile.totalTrainingMs > 0),
   );

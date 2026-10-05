@@ -1,16 +1,22 @@
-import { KOCH_MAX_LESSON, KOCH_PASS_ACCURACY, isKochComplete, kochBest, kochChars, kochNewChars, normalizeKoch } from '@/lib/koch';
+import { KOCH_PASS_ACCURACY, isKochComplete, kochBest, kochChars, kochMaxLesson, kochNewChars, kochProgressOf } from '@/lib/koch';
 import { readProgressMeter } from '@/lib/progressMeter';
-import type { AnswerLog, TrainerProfile } from '@/lib/types';
+import type { AlphabetType, AnswerLog, TrainerProfile } from '@/lib/types';
+
+/** 表示の主になるコッホ。和文コースだけ和文、ほかは欧文。 */
+export const primaryKochAlphabet = (profile: Pick<TrainerProfile, 'learnCourse'>): AlphabetType =>
+  profile.learnCourse === 'amateur-wabun' ? 'wabun' : 'international';
 
 /**
- * Level = Koch レベル試験の進捗（profile.koch）。
+ * Level = Koch レベル試験の進捗（欧文 profile.koch / 和文 profile.kochWabun）。
  * XP・連続日数・今日の目標はログからの表示用集計で、保存しない。
  */
 export const DAILY_GOAL = 40;
 
 export interface PlayerStats {
   xp: number;
-  /** Koch レッスン（1–40）。 */
+  /** Level を表すコッホ（欧文 / 和文）。 */
+  kochAlphabet: AlphabetType;
+  /** Koch レッスン（欧文 1–40 / 和文 1–52）。 */
   level: number;
   maxLevel: number;
   /** 現レベルのベスト正解率 / 合格ライン（0–1）。 */
@@ -40,8 +46,10 @@ export function playerStats(profile: TrainerProfile, answers: AnswerLog[], now =
   const correct = answers.filter((answer) => answer.isCorrect).length;
   const xp = Math.round(meterXp + correct * 2 + answers.length + mastered * 50);
 
-  const koch = normalizeKoch(profile.koch);
-  const kochComplete = isKochComplete(koch);
+  const kochAlphabet = primaryKochAlphabet(profile);
+  const koch = kochProgressOf(profile, kochAlphabet);
+  const maxLevel = kochMaxLesson(kochAlphabet);
+  const kochComplete = isKochComplete(koch, kochAlphabet);
   const levelBest = kochBest(koch, koch.level);
   const nextLesson = koch.level + 1;
 
@@ -58,12 +66,13 @@ export function playerStats(profile: TrainerProfile, answers: AnswerLog[], now =
 
   return {
     xp,
+    kochAlphabet,
     level: koch.level,
-    maxLevel: KOCH_MAX_LESSON,
+    maxLevel,
     levelProgress: kochComplete ? 1 : Math.min(1, levelBest / KOCH_PASS_ACCURACY),
     levelBest,
-    levelChars: kochChars(koch.level).length,
-    nextChar: kochComplete || nextLesson > KOCH_MAX_LESSON ? null : kochNewChars(nextLesson)[0],
+    levelChars: kochChars(koch.level, kochAlphabet).length,
+    nextChar: kochComplete || nextLesson > maxLevel ? null : kochNewChars(nextLesson, kochAlphabet)[0],
     kochComplete,
     streakDays,
     todayAnswers: todayLogs.length,

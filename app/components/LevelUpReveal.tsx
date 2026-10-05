@@ -1,19 +1,23 @@
 'use client';
 
 import { useEffect } from 'react';
-import { INTERNATIONAL_MORSE } from '@/lib/morse';
+import { morseFor } from '@/lib/morse';
+import type { AlphabetType } from '@/lib/types';
 import { Icon } from '@/app/components/icons';
 import { formatCode } from '@/app/trainer/shared';
 import { playSfx } from '@/app/trainer/sfx';
 
 const SPARKS = Array.from({ length: 18 }, (_, index) => index);
 
-export function LevelUpReveal({ from, to, unlocked, complete = false, volume, onClose, onContinue }: {
+export function LevelUpReveal({ from, to, unlocked, complete = false, alphabet = 'international', totalChars = 41, volume, onClose, onContinue }: {
   from: number;
   to: number;
   /** Characters added by the new level. Empty when the final lesson is cleared. */
   unlocked: string[];
   complete?: boolean;
+  alphabet?: AlphabetType;
+  /** 全レベル制覇時に表示する総文字数。 */
+  totalChars?: number;
   volume: number;
   onClose: () => void;
   onContinue?: () => void;
@@ -40,7 +44,7 @@ export function LevelUpReveal({ from, to, unlocked, complete = false, volume, on
           <Icon name="chevron-right" size={28} />
           <span className="levelup-to">{complete ? 'MASTER' : `Lv.${to}`}</span>
         </div>
-        <h2 className="levelup-title">{complete ? 'コッホ 全41文字 制覇！' : '昇級試験 合格！'}</h2>
+        <h2 className="levelup-title">{complete ? `${alphabet === 'wabun' ? '和文コッホ' : 'コッホ'} 全${totalChars}文字 制覇！` : '昇級試験 合格！'}</h2>
         {unlocked.length > 0 && (
           <div className="levelup-unlock">
             <small>新しい文字</small>
@@ -48,7 +52,7 @@ export function LevelUpReveal({ from, to, unlocked, complete = false, volume, on
               {unlocked.map((symbol) => (
                 <span key={symbol} className="levelup-char">
                   <b>{symbol}</b>
-                  <em>{formatCode(INTERNATIONAL_MORSE[symbol] ?? '')}</em>
+                  <em>{formatCode(morseFor(symbol, alphabet) ?? '')}</em>
                 </span>
               ))}
             </div>

@@ -4,7 +4,7 @@ export type IconName =
   | 'home' | 'learn' | 'train' | 'queue' | 'analysis' | 'exam' | 'collection' | 'settings' | 'account'
   | 'play' | 'stop' | 'pause' | 'flame' | 'star' | 'check' | 'x' | 'lock' | 'key' | 'chevron-right'
   | 'chevron-left' | 'volume' | 'sparkle' | 'trophy' | 'target' | 'bolt' | 'repeat' | 'ear' | 'printer'
-  | 'eye' | 'eye-off' | 'fingerprint' | 'logout';
+  | 'eye' | 'eye-off' | 'fingerprint' | 'logout' | 'radio';
 
 const paths: Record<IconName, React.ReactNode> = {
   home: <><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V20h14V9.5" /><path d="M10 20v-6h4v6" /></>,
@@ -15,6 +15,7 @@ const paths: Record<IconName, React.ReactNode> = {
   exam: <><path d="M6 3h9l4 4v14H6z" /><path d="M14 3v5h5" /><path d="M9 13h7M9 17h5" /></>,
   collection: <><rect x="3" y="3" width="8" height="8" rx="2" /><rect x="13" y="3" width="8" height="8" rx="2" /><rect x="3" y="13" width="8" height="8" rx="2" /><path d="m17 13 1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.5-2.5 1.5.6-2.8-2.1-1.9 2.8-.3z" /></>,
   settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></>,
+  radio: <><rect x="3" y="9" width="18" height="12" rx="2" /><path d="M7 9 17 3" /><circle cx="15.5" cy="15" r="3" /><path d="M6 13h4M6 17h4" /></>,
   account: <><circle cx="12" cy="8" r="4" /><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6" /></>,
   key: <><circle cx="8" cy="14" r="3" /><path d="M10.5 12.5 20 3l2 2-2 2 2 2-3 1-2-2-2 2z" /></>,
   play: <path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5Z" fill="currentColor" stroke="none" />,

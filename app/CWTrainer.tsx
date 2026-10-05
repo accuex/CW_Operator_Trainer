@@ -20,7 +20,7 @@ import { DEFAULT_PROFILE, DEFAULT_SETTINGS, addAnswer, addSession, getAnswers, g
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from '@/lib/types';
 import { type View, views, viewMeta, audioEngine, goalLabel, scopeLabel, pathToView } from '@/app/trainer/shared';
 import { playerStats, DAILY_GOAL } from '@/app/trainer/progress';
-import { kochChars } from '@/lib/koch';
+import { kochChars, kochProgressOf } from '@/lib/koch';
 import { Ring, SpeedPairControls } from '@/app/components/ui';
 import { Icon } from '@/app/components/icons';
 import { Dashboard } from '@/app/views/Dashboard';
@@ -30,6 +30,7 @@ import { LevelUpView } from '@/app/views/LevelUpView';
 import { QueueView } from '@/app/views/QueueView';
 import { AnalysisView } from '@/app/views/AnalysisView';
 import { ExamView } from '@/app/views/ExamView';
+import { QsoView } from '@/app/views/QsoView';
 import { CollectionView } from '@/app/views/CollectionView';
 import { SettingsView } from '@/app/views/SettingsView';
 import { AccountView } from '@/app/views/AccountView';
@@ -208,6 +209,13 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     void pushAnswers(answer);
   }, []);
 
+  const recordMany = useCallback((list: AnswerLog[]) => {
+    if (!list.length) return;
+    setAnswers((old) => [...old, ...list]);
+    for (const answer of list) addAnswer(answer).catch(() => undefined);
+    void pushAnswers(list);
+  }, []);
+
   useEffect(() => {
     if (!ready) return;
     const { profile: next, unlocked } = applyAchievements(profile, answers, sessions);
@@ -233,17 +241,23 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   }, []);
 
   const stats = useMemo(() => playerStats(profile, answers), [profile, answers]);
+  const kochPools = useMemo(() => ({
+    international: kochChars(kochProgressOf(profile, 'international').level, 'international'),
+    wabun: kochChars(kochProgressOf(profile, 'wabun').level, 'wabun'),
+  }), [profile]);
   const current = viewMeta(view);
   const live = audioStatus === 'PLAYING' || audioStatus === 'ANNOUNCE';
 
   const content = {
     home: <Dashboard answers={answers} sessions={sessions} profile={profile} stats={stats} onNavigate={navigate} />,
     learn: <LearnView settings={settings} profile={profile} setProfile={setProfile} record={record} setAudioStatus={setAudioStatus} announce={announce} onNavigate={navigate} />,
-    train: <TrainView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} answers={answers} kochPool={kochChars(stats.level)} />,
+    train: <TrainView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} answers={answers} kochPool={kochPools} />,
     levelup: <LevelUpView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} record={record} setAudioStatus={setAudioStatus} onSession={onSession} />,
     queue: <QueueView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} onSession={onSession} />,
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
     exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} />,
+    // Client-only: canvas, Web Audio and localStorage prefs.
+    qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
     settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} onNavigate={navigate} />,
     account: <AccountView announce={announce} onNavigate={navigate} />,

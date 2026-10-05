@@ -15,7 +15,8 @@ export type TrainingMode =
   | 'weak-character'
   | 'weak-pair'
   | 'queue'
-  | 'exam';
+  | 'exam'
+  | 'qso';
 
 export interface AudioSettings {
   pitch: number;
@@ -70,6 +71,59 @@ export interface AnswerLog {
   isCorrect: boolean;
   isEarly: boolean;
   sessionId: string;
+  /** Present only for characters copied in a QSO (mode 'qso'). */
+  qso?: QsoAnswerMeta;
+}
+
+/**
+ * Reception conditions while a character was on the air (best of its repeats).
+ * clean = copyable; qrm/qsb/qrn/weak = band environment; detuned = off the passband;
+ * muted = we were transmitting / receiver off; unheard = never played before the log.
+ */
+export type CopyCondition = 'clean' | 'weak' | 'qsb' | 'qrn' | 'qrm' | 'detuned' | 'muted' | 'unheard';
+export type QsoEnvCondition = 'weak' | 'qsb' | 'qrn' | 'qrm';
+/** Why a log character was wrong. */
+export type QsoCause = 'ok' | 'copy' | 'environment' | 'tuning' | 'timing';
+
+/** Raw environment numbers for a character, kept for QSO-only analysis. */
+export interface QsoCharEnv {
+  /** Target level over the noise floor in the passband (≈ SNR, linear). */
+  snr: number;
+  /** Strongest other signal in the passband relative to the target. */
+  qrm: number;
+  /** Fading depth 0–1 (1 − QSB factor). */
+  qsb: number;
+  /** Strongest static crash 0–1. */
+  qrn: number;
+  /** |target − VFO| in Hz. */
+  offset: number;
+}
+
+export interface QsoAnswerMeta {
+  modeId: string;
+  presetId: string;
+  field: string;
+  condition: CopyCondition;
+  cause: QsoCause;
+  env: QsoCharEnv;
+}
+
+export type QsoCauseCounts = Record<Exclude<QsoCause, 'ok'>, number> & { procedure: number };
+
+/** Synced per-QSO summary (the detailed trace stays on the device). */
+export interface QsoSessionSummary {
+  modeId: string;
+  presetId: string;
+  call: string;
+  outcome: 'complete' | 'partial';
+  fields: number;
+  fieldsCorrect: number;
+  /** Accuracy on clean characters only (copy skill). */
+  cleanAccuracy: number | null;
+  causes: QsoCauseCounts;
+  difficulty: Record<string, number>;
+  /** Axis changes applied after this QSO, e.g. { speed: 1 }. */
+  adjusted: Record<string, number>;
 }
 
 export interface QueueInputResult {
@@ -135,7 +189,7 @@ export interface AchievementProgress {
 
 /** Koch 法レベル試験の進捗。レッスン番号はキーを文字列化して保存。 */
 export interface KochProgress {
-  /** 挑戦中のレッスン（1–40）。昇級試験に合格すると +1。 */
+  /** 挑戦中のレッスン（欧文 1–40 / 和文 1–52）。昇級試験に合格すると +1。 */
   level: number;
   /** レッスンごとのベスト正解率 0–1（練習・試験とも）。 */
   best: Record<string, number>;
@@ -154,11 +208,15 @@ export interface TrainerProfile {
   /** Achievement archive unlocks keyed by AchievementId. */
   achievements?: Record<string, AchievementProgress>;
   koch?: KochProgress;
+  /** 和文コッホの進捗（欧文とは別ラダー）。 */
+  kochWabun?: KochProgress;
   /**
    * Collection preview: ignore unlock state and show all cards/achievements
    * (SSR art). Does not mutate mastered / rarityOwned / unlockedAt.
    */
   revealAll?: boolean;
+  /** QSO simulator skills and per-mode progress (summary only; traces stay local). */
+  qso?: QsoProfile;
   totalTrainingMs: number;
   lastMode: string;
 }
@@ -172,4 +230,38 @@ export interface SessionRecord {
   answers: number;
   accuracy: number;
   queue?: QueueMetrics;
+  qso?: QsoSessionSummary;
+}
+
+/** EWMA estimate with its evidence count. */
+export interface SkillEstimate { value: number; n: number }
+
+export interface QsoModeProgress {
+  qsos: number;
+  perfect: number;
+  lastAt: number;
+  /** Current difficulty per axis (see lib/radio/difficulty.ts). */
+  difficulty: Record<string, number>;
+  /** Axes the user fixed; auto-adjust leaves them alone. */
+  pinned: string[];
+  /** おまかせ: adjust unpinned axes after each QSO. */
+  auto: boolean;
+  /** Staircase votes per axis (+ up / − down), reset when the axis moves. */
+  votes: Record<string, number>;
+}
+
+export interface QsoProfile {
+  version: 1;
+  myCall?: string;
+  skills: {
+    /** Clean-condition copy accuracy, with the speed it was measured at. */
+    copy: Partial<Record<AlphabetType, SkillEstimate & { wpm: number }>>;
+    /** Copy accuracy under each band condition. */
+    robustness: Partial<Record<QsoEnvCondition, SkillEstimate>>;
+    /** Share of transmissions made on frequency. */
+    tuning?: SkillEstimate;
+    /** Share of transmissions without a procedure slip, per mode. */
+    procedure: Record<string, SkillEstimate>;
+  };
+  modes: Record<string, QsoModeProgress>;
 }

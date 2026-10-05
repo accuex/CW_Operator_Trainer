@@ -45,3 +45,26 @@ export function summary(logs: AnswerLog[]) {
     early: logs.filter((log) => log.isEarly).length,
   };
 }
+
+/**
+ * Weak-character analysis ignores QSO characters missed because of the band
+ * (QRM / QSB / QRN / weak), tuning or timing — only clean-condition copy counts.
+ * Set `includeEnvironment` to see everything. The records themselves are kept.
+ */
+export const isCleanCopy = (log: AnswerLog) => !log.qso || log.qso.condition === 'clean';
+export const forWeakAnalysis = (logs: AnswerLog[], includeEnvironment = false) => (includeEnvironment ? logs : logs.filter(isCleanCopy));
+
+export interface ConditionRow { condition: string; answers: number; accuracy: number }
+
+/** QSO copy accuracy per reception condition (clean vs QRM vs QSB …). */
+export function qsoConditionBreakdown(logs: AnswerLog[]): ConditionRow[] {
+  const buckets = new Map<string, { total: number; correct: number }>();
+  for (const log of logs) {
+    if (!log.qso) continue;
+    const bucket = buckets.get(log.qso.condition) ?? { total: 0, correct: 0 };
+    bucket.total += 1;
+    if (log.isCorrect) bucket.correct += 1;
+    buckets.set(log.qso.condition, bucket);
+  }
+  return [...buckets.entries()].map(([condition, { total, correct }]) => ({ condition, answers: total, accuracy: correct / total }));
+}

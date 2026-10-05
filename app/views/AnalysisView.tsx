@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useState, type CSSProperties } from 'react';
-import { confusionMatrix, summary, weakPairs } from '@/lib/analytics';
+import { confusionMatrix, forWeakAnalysis, qsoConditionBreakdown, summary, weakPairs } from '@/lib/analytics';
 import type { AlphabetType, AnswerLog, SessionRecord } from '@/lib/types';
 import { type View, pct, fmtLatency } from '@/app/trainer/shared';
 import { Metric, EmptyState, Segmented } from '@/app/components/ui';
@@ -10,7 +10,12 @@ import { Icon } from '@/app/components/icons';
 export function AnalysisView({ answers, sessions, onNavigate }: { answers: AnswerLog[]; sessions: SessionRecord[]; onNavigate: (view: View) => void }) {
   const [alphabet, setAlphabet] = useState<'all' | AlphabetType>('all');
   const [queue, setQueue] = useState<'all' | '0' | '1' | '2' | '3'>('all');
-  const filtered = answers.filter((answer) => (alphabet === 'all' || answer.alphabetType === alphabet) && (queue === 'all' || answer.queueTarget === Number(queue)));
+  const [qsoEnv, setQsoEnv] = useState<'off' | 'on'>('off');
+  const scoped = answers.filter((answer) => (alphabet === 'all' || answer.alphabetType === alphabet) && (queue === 'all' || answer.queueTarget === Number(queue)));
+  // QSO characters missed under QRM / QSB / QRN etc. are kept but left out unless asked for.
+  const filtered = forWeakAnalysis(scoped, qsoEnv === 'on');
+  const qsoRows = qsoConditionBreakdown(scoped);
+  const hiddenQso = scoped.length - forWeakAnalysis(scoped).length;
   const stats = summary(filtered);
   const matrix = confusionMatrix(filtered);
   const pairs = weakPairs(filtered);
@@ -40,6 +45,14 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
             onChange={(value) => setQueue(value as typeof queue)}
             options={[['all', 'すべて'], ['0', 'Queue 0'], ['1', 'Queue 1'], ['2', 'Queue 2'], ['3', 'Queue 3']]}
           />
+          {qsoRows.length > 0 && (
+            <Segmented
+              label="QSO の悪条件下のミス"
+              value={qsoEnv}
+              onChange={(value) => setQsoEnv(value as typeof qsoEnv)}
+              options={[['off', '含めない'], ['on', `含める（${hiddenQso}字）`]]}
+            />
+          )}
         </div>
       </div>
       <div className="analysis-kpis">
@@ -120,6 +133,7 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
           </button>
         </aside>
       </div>
+      {qsoRows.length > 0 && <QsoConditionPanel rows={qsoRows} />}
       <div className="insight-band">
         <div className="insight-copy">
           <p className="section-kicker">NEXT ACTION</p>
@@ -131,5 +145,36 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
         </button>
       </div>
     </section>
+  );
+}
+
+const CONDITION_LABEL: Record<string, string> = {
+  clean: '通常', weak: '弱信号', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', detuned: '同調ずれ', muted: '送信中・電源オフ', unheard: '未受信',
+};
+const CONDITION_ORDER = Object.keys(CONDITION_LABEL);
+
+/** QSO copy by reception condition: "clean is fine, QRM is not" shows up here. */
+function QsoConditionPanel({ rows }: { rows: { condition: string; answers: number; accuracy: number }[] }) {
+  const sorted = [...rows].sort((a, b) => CONDITION_ORDER.indexOf(a.condition) - CONDITION_ORDER.indexOf(b.condition));
+  return (
+    <div className="panel panel-pad qso-condition-panel">
+      <div className="panel-head">
+        <div>
+          <p className="section-kicker">QSO CONDITIONS</p>
+          <h2>受信環境ごとの QSO ログ正解率</h2>
+          <small>苦手分析は「通常」だけを使います。悪条件のミスは上のスイッチで含められます。</small>
+        </div>
+      </div>
+      <ul>
+        {sorted.map((row) => (
+          <li key={row.condition} className={row.condition === 'clean' ? 'clean' : ''}>
+            <span>{CONDITION_LABEL[row.condition] ?? row.condition}</span>
+            <i><b style={{ width: `${Math.round(row.accuracy * 100)}%` }} /></i>
+            <strong>{pct(row.accuracy)}</strong>
+            <small>{row.answers}字</small>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

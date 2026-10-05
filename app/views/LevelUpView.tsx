@@ -3,11 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PlaybackHandle } from '@/lib/audio';
 import {
-  KOCH_DURATIONS, KOCH_MAX_LESSON, KOCH_ORDER, KOCH_PASS_ACCURACY, applyKochResult, buildKochText, isKochCleared,
-  kochBest, kochChars, kochNewChars, normalizeKoch, scoreKochCopy, type KochDuration, type KochScore,
+  KOCH_DURATIONS, KOCH_PASS_ACCURACY, applyKochResult, buildKochText, isKochCleared,
+  kochBest, kochChars, kochMaxLesson, kochNewChars, kochOrder, kochProgressKey, kochProgressOf, scoreKochCopy,
+  type KochDuration, type KochScore,
 } from '@/lib/koch';
-import { INTERNATIONAL_MORSE } from '@/lib/morse';
-import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from '@/lib/types';
+import { morseFor } from '@/lib/morse';
+import { romajiToWabun } from '@/lib/wabunInput';
+import type { AlphabetType, AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from '@/lib/types';
+import { primaryKochAlphabet } from '@/app/trainer/progress';
 import { audioEngine, formatCode, nowId, pct } from '@/app/trainer/shared';
 import { playSfx } from '@/app/trainer/sfx';
 import { AudioControls, ProgressBar, Ring, Segmented } from '@/app/components/ui';
@@ -16,13 +19,31 @@ import { LevelUpReveal } from '@/app/components/LevelUpReveal';
 
 type Mode = 'practice' | 'test';
 type Phase = 'setup' | 'running' | 'result';
-type ResultMeta = { lesson: number; isTest: boolean; leveledUp: boolean; minutes: number };
+type ResultMeta = { lesson: number; isTest: boolean; leveledUp: boolean; minutes: number; alphabet: AlphabetType };
 type Reveal = { from: number; to: number; unlocked: string[]; complete: boolean };
 
 /** Event-handler clock; keeps Date.now out of the component body for the purity lint. */
 const clock = () => Date.now();
 
-const lessonLabel = (lesson: number) => (lesson === 1 ? 'K, M' : KOCH_ORDER[lesson]);
+/** 和文の記号は字面だけだと分かりにくいので名前を添える。 */
+const SIGN_NAME: Record<string, string> = { '゛': '濁点', '゜': '半濁点', '、': '区切', '」': '段落', 'ー': '長音' };
+const charLabel = (symbol: string) => (SIGN_NAME[symbol] ? `${symbol}（${SIGN_NAME[symbol]}）` : symbol);
+const lessonLabel = (lesson: number, alphabet: AlphabetType) => kochNewChars(lesson, alphabet).map(charLabel).join(', ');
+
+const TRACK_COPY: Record<AlphabetType, { kicker: string; title: string; lead: string; placeholder: string }> = {
+  international: {
+    kicker: 'Koch Method · Level Up',
+    title: 'コッホ法 レベル試験',
+    lead: '少ない文字から、完成した速さの音で聴き取る。',
+    placeholder: '聞こえた文字をそのまま入力。区切りの空白は自由（採点では無視）。',
+  },
+  wabun: {
+    kicker: 'Wabun Koch · Level Up',
+    title: '和文コッホ レベル試験',
+    lead: 'よく使う字から、まぎらわしい字を離して 1 字ずつ増やす和文版コッホ法。゛ も 1 字として聴き取る。',
+    placeholder: 'ローマ字でそのまま入力（ka→カ、ga→カ゛）。@ = ゛、[ = ゜、, = 、、] = 」。かな入力も可。',
+  },
+};
 
 export function LevelUpView({ settings, setSettings, profile, setProfile, record, setAudioStatus, onSession }: {
   settings: AudioSettings;
@@ -33,7 +54,13 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
   setAudioStatus: (status: string) => void;
   onSession: (session: SessionRecord) => void;
 }) {
-  const koch = normalizeKoch(profile.koch);
+  /** null = follow the course (profile loads asynchronously). */
+  const [track, setTrack] = useState<AlphabetType | null>(null);
+  const alphabet = track ?? primaryKochAlphabet(profile);
+  const koch = kochProgressOf(profile, alphabet);
+  const order = kochOrder(alphabet);
+  const maxLesson = kochMaxLesson(alphabet);
+  const copyText = TRACK_COPY[alphabet];
   const [mode, setMode] = useState<Mode>('test');
   /** null = follow the current level (profile loads asynchronously). */
   const [practiceLesson, setPracticeLesson] = useState<number | null>(null);
@@ -52,10 +79,10 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
   const startedAtRef = useRef(0);
 
   const lesson = mode === 'test' ? koch.level : Math.min(practiceLesson ?? koch.level, koch.level);
-  const chars = kochChars(lesson);
-  const fresh = kochNewChars(lesson);
+  const chars = kochChars(lesson, alphabet);
+  const fresh = kochNewChars(lesson, alphabet);
   const levelBest = kochBest(koch, koch.level);
-  const allCleared = isKochCleared(koch, KOCH_MAX_LESSON);
+  const allCleared = isKochCleared(koch, maxLesson);
 
   const clearTimer = () => {
     if (timerRef.current) window.clearInterval(timerRef.current);
@@ -70,7 +97,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
 
   const preview = async (symbol: string) => {
     if (phase === 'running') return;
-    const code = INTERNATIONAL_MORSE[symbol];
+    const code = morseFor(symbol, alphabet);
     if (!code) return;
     setAudioStatus('PLAYING');
     const handle = await audioEngine.playSymbol(symbol, code, settings, 3);
@@ -82,7 +109,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     runRef.current = run;
     clearTimer();
     audioEngine.stop();
-    const nextText = buildKochText(lesson, minutes, settings);
+    const nextText = buildKochText(lesson, minutes, settings, Math.random, alphabet);
     setText(nextText);
     setCopy('');
     setScore(null);
@@ -93,7 +120,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     startedAtRef.current = clock();
     setAudioStatus('PLAYING');
     try {
-      const handle = await audioEngine.play(nextText, 'international', settings);
+      const handle = await audioEngine.play(nextText, alphabet, settings);
       if (runRef.current !== run) { handle.stop(); return; }
       playbackRef.current = handle;
       const duration = Math.max(0.1, handle.timeline.duration);
@@ -132,13 +159,15 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     runRef.current += 1;
     stopPlayback();
     setAudioStatus('READY');
-    const scored = scoreKochCopy(text, copy);
+    const scored = scoreKochCopy(text, copy, alphabet);
     const isTest = mode === 'test';
     const before = koch.level;
-    const applied = applyKochResult(profile.koch, { lesson, accuracy: scored.accuracy, isTest });
-    setProfile((old) => ({ ...old, koch: applyKochResult(old.koch, { lesson, accuracy: scored.accuracy, isTest }).progress }));
+    const key = kochProgressKey(alphabet);
+    const result = { lesson, accuracy: scored.accuracy, isTest };
+    const applied = applyKochResult(profile[key], result, clock(), alphabet);
+    setProfile((old) => ({ ...old, [key]: applyKochResult(old[key], result, clock(), alphabet).progress }));
     setScore(scored);
-    setResultMeta({ lesson, isTest, leveledUp: applied.leveledUp, minutes });
+    setResultMeta({ lesson, isTest, leveledUp: applied.leveledUp, minutes, alphabet });
     setPhase('result');
 
     const sessionId = `koch-${nowId()}`;
@@ -146,19 +175,19 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     scored.cells.forEach((cell) => {
       if (cell.op === 'ins') return;
       record({
-        id: nowId(), timestamp: now, alphabetType: 'international', correctSymbol: cell.expected, inputSymbol: cell.input,
+        id: nowId(), timestamp: now, alphabetType: alphabet, correctSymbol: cell.expected, inputSymbol: cell.input,
         characterSpeed: settings.characterSpeed, effectiveSpeed: settings.effectiveSpeed, queueTarget: 0, actualQueueDepth: 0,
         stimulusTime: now, inputTime: now, responseLatency: 0, mode: 'koch', isCorrect: cell.op === 'match', isEarly: false, sessionId,
       });
     });
     onSession({
-      id: sessionId, startedAt: startedAtRef.current || now, endedAt: now, mode: 'koch', alphabetType: 'international',
+      id: sessionId, startedAt: startedAtRef.current || now, endedAt: now, mode: 'koch', alphabetType: alphabet,
       answers: scored.total, accuracy: scored.accuracy,
     });
 
-    const firstFullClear = applied.cleared && before === KOCH_MAX_LESSON && !allCleared;
+    const firstFullClear = applied.cleared && before === maxLesson && !allCleared;
     if (applied.leveledUp || firstFullClear) {
-      setReveal({ from: before, to: applied.progress.level, unlocked: firstFullClear ? [] : kochNewChars(applied.progress.level), complete: firstFullClear });
+      setReveal({ from: before, to: applied.progress.level, unlocked: firstFullClear ? [] : kochNewChars(applied.progress.level, alphabet), complete: firstFullClear });
     } else {
       playSfx(scored.passed ? 'reveal' : 'miss', settings.volume);
     }
@@ -170,6 +199,22 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     setPhase('setup');
     setMode('test');
     if (unlocked[0]) void preview(unlocked[0]);
+  };
+
+  const switchTrack = (next: AlphabetType) => {
+    if (phase === 'running' || next === alphabet) return;
+    setTrack(next);
+    setPracticeLesson(null);
+    setMode('test');
+    setScore(null);
+    setResultMeta(null);
+    setPhase('setup');
+  };
+
+  const onCopyChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = event.target.value;
+    const composing = (event.nativeEvent as InputEvent).isComposing;
+    setCopy(alphabet === 'wabun' && !composing ? romajiToWabun(value) : value);
   };
 
   const passLine = Math.round(KOCH_PASS_ACCURACY * 100);
@@ -196,10 +241,16 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
   return <section className="page-pad koch-page">
     <div className="page-title">
       <div>
-        <p className="section-kicker">Koch Method · Level Up</p>
-        <h1>コッホ法 レベル試験</h1>
-        <p>少ない文字から、完成した速さの音で聴き取る。昇級試験で {passLine}% 以上なら次の文字が解放されます。実効速度は自由。</p>
+        <p className="section-kicker">{copyText.kicker}</p>
+        <h1>{copyText.title}</h1>
+        <p>{copyText.lead}昇級試験で {passLine}% 以上なら次の文字が解放されます。実効速度は自由。</p>
       </div>
+      <Segmented
+        label="文字種"
+        value={alphabet}
+        onChange={(value) => switchTrack(value as AlphabetType)}
+        options={[['international', '欧文'], ['wabun', '和文']]}
+      />
     </div>
 
     <div className="koch-hero panel">
@@ -208,13 +259,13 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
           <small>Lv.</small><b>{koch.level}</b>
         </Ring>
         <div className="koch-level-text">
-          <span>{kochChars(koch.level).length} 文字を聴き取り中 · 全 {KOCH_MAX_LESSON} レベル</span>
-          <b>{allCleared ? '全レベル クリア！' : `次は「${lessonLabel(Math.min(KOCH_MAX_LESSON, koch.level + 1))}」`}</b>
+          <span>{kochChars(koch.level, alphabet).length} 文字を聴き取り中 · 全 {maxLesson} レベル</span>
+          <b>{allCleared ? '全レベル クリア！' : `次は「${lessonLabel(Math.min(maxLesson, koch.level + 1), alphabet)}」`}</b>
           <small>このレベルのベスト {levelBest ? pct(levelBest) : '—'} / 合格 {passLine}%</small>
         </div>
       </div>
       <ol className="koch-ladder" aria-label="解放済みの文字">
-        {KOCH_ORDER.map((symbol, index) => {
+        {order.map((symbol, index) => {
           const unlockedAt = Math.max(1, index);
           const state = unlockedAt < koch.level ? 'unlocked' : unlockedAt === koch.level ? 'current' : unlockedAt === koch.level + 1 ? 'next' : 'locked';
           return (
@@ -239,14 +290,14 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
                 <span className="koch-field-label">レベル</span>
                 <select value={lesson} onChange={(event) => setPracticeLesson(Number(event.target.value))} aria-label="練習するレベル">
                   {Array.from({ length: koch.level }, (_, index) => index + 1).map((value) => (
-                    <option key={value} value={value}>Lv.{value} · {lessonLabel(value)}（{kochChars(value).length}文字）</option>
+                    <option key={value} value={value}>Lv.{value} · {lessonLabel(value, alphabet)}（{kochChars(value, alphabet).length}文字）</option>
                   ))}
                 </select>
               </label>
             ) : (
               <p className="koch-test-note">
                 <Icon name="trophy" size={16} />
-                {allCleared ? '全レベル合格済み。腕試しにもう一度どうぞ。' : `Lv.${koch.level} の昇級試験。${passLine}% 以上で「${lessonLabel(koch.level + 1)}」が解放されます。`}
+                {allCleared ? '全レベル合格済み。腕試しにもう一度どうぞ。' : `Lv.${koch.level} の昇級試験。${passLine}% 以上で「${lessonLabel(koch.level + 1, alphabet)}」が解放されます。`}
               </p>
             )}
             <div className="koch-setup-row">
@@ -258,9 +309,9 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
               <span className="koch-field-label">{lesson === koch.level ? 'このレベルの新しい文字' : 'このレベルで加わった文字'}</span>
               <div className="koch-new-chars">
                 {fresh.map((symbol) => (
-                  <button key={symbol} type="button" className="koch-new-char" onClick={() => void preview(symbol)} aria-label={`${symbol} を聴く`}>
+                  <button key={symbol} type="button" className="koch-new-char" onClick={() => void preview(symbol)} aria-label={`${charLabel(symbol)} を聴く`}>
                     <b>{symbol}</b>
-                    <em>{formatCode(INTERNATIONAL_MORSE[symbol] ?? '')}</em>
+                    <em>{formatCode(morseFor(symbol, alphabet) ?? '')}</em>
                     <small><Icon name="volume" size={13} />聴く</small>
                   </button>
                 ))}
@@ -289,12 +340,12 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
             <textarea
               className="koch-copy"
               value={copy}
-              onChange={(event) => setCopy(event.target.value)}
+              onChange={onCopyChange}
               onKeyDown={(event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) { event.preventDefault(); finish(); } }}
-              placeholder="聞こえた文字をそのまま入力。区切りの空白は自由（採点では無視）。"
+              placeholder={copyText.placeholder}
               aria-label="受信した文字"
               autoFocus
-              autoCapitalize="characters"
+              autoCapitalize={alphabet === 'wabun' ? 'off' : 'characters'}
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
@@ -376,7 +427,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
                   onClick={() => { setMode(value === koch.level && !cleared ? 'test' : 'practice'); setPracticeLesson(value); setPhase('setup'); }}
                 >
                   <span className="koch-lesson-no">Lv.{value}</span>
-                  <b>{lessonLabel(value)}</b>
+                  <b>{lessonLabel(value, alphabet)}</b>
                   <span className="koch-lesson-best">{best ? pct(best) : '—'}</span>
                   {cleared ? <Icon name="check" size={16} /> : <span className="koch-lesson-dot" aria-hidden="true" />}
                 </button>
@@ -393,6 +444,8 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
         to={reveal.to}
         unlocked={reveal.unlocked}
         complete={reveal.complete}
+        alphabet={alphabet}
+        totalChars={order.length}
         volume={settings.volume}
         onClose={() => setReveal(null)}
         onContinue={continueAfterLevelUp}
