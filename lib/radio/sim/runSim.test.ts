@@ -165,14 +165,17 @@ describe('headless CQ run on a live band', () => {
     }
   });
 
-  it('sorts what was copied by situation, doubled apart from band conditions', () => {
+  it('sorts what was copied by situation, overlaps and doublings apart from band conditions', () => {
     const cells = reports.flatMap((report) => report.score!.fields.flatMap((field) => field.cells));
     const seen = new Set(cells.map((cell) => cell.situation));
-    for (const situation of ['clean', 'qrm', 'doubled'] as const) expect(seen.has(situation), situation).toBe(true);
+    for (const situation of ['clean', 'qrm', 'overlap'] as const) expect(seen.has(situation), situation).toBe(true);
+    // An overlap is another caller keyed over the character; a doubling is only ever our own transmission.
+    for (const cell of cells.filter((item) => item.situation === 'overlap')) expect(cell.env?.overlap?.n).toBeGreaterThan(0);
+    for (const cell of cells.filter((item) => item.situation === 'doubled')) expect(cell.condition).toBe('muted');
     expect(['qsb', 'qrn', 'weak'].some((situation) => seen.has(situation as never))).toBe(true);
     const BAND_SITUATIONS = ['weak', 'qsb', 'qrn', 'qrm'];
     for (const cell of cells.filter((item) => item.op === 'sub' || item.op === 'del')) {
-      const expected = cell.situation === 'doubled' ? 'doubling' : cell.situation === 'clean' ? 'copy' : BAND_SITUATIONS.includes(cell.situation) ? 'environment' : cell.cause;
+      const expected = cell.situation === 'doubled' ? 'doubling' : cell.situation === 'overlap' ? 'overlap' : cell.situation === 'clean' ? 'copy' : BAND_SITUATIONS.includes(cell.situation) ? 'environment' : cell.cause;
       expect(cell.cause).toBe(expected);
     }
     const evidence = reports.map((report) => report.score!.evidence);

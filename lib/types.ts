@@ -84,16 +84,29 @@ export type CopyCondition = 'clean' | 'weak' | 'qsb' | 'qrn' | 'qrm' | 'detuned'
 export type QsoEnvCondition = 'weak' | 'qsb' | 'qrn' | 'qrm';
 /**
  * What a character actually went through, one step past the raw condition: a character
- * sent while we were keying (muted), or buried under another caller calling at the same
- * time (QRM from a caller), was doubled — an operating situation, not the band.
+ * buried under another caller keying at the same time (QRM from a caller) was an
+ * overlap; one sent while we were keying (muted) was doubled — our doubling. Neither
+ * is the band. Records from before overlap existed file both under doubled.
  */
-export type CopySituation = 'clean' | QsoEnvCondition | 'doubled' | 'detuned' | 'unheard';
+export type CopySituation = 'clean' | QsoEnvCondition | 'overlap' | 'doubled' | 'detuned' | 'unheard';
 /**
  * Why a log character was wrong. copy = clean conditions (the skill itself);
- * environment = band (QRM / QSB / QRN / weak); doubling = it went out under our
- * transmission or another caller's; tuning = off the passband; timing = never heard.
+ * environment = band (QRM / QSB / QRN / weak); overlap = another caller keyed over it;
+ * doubling = it went out under our transmission; tuning = off the passband; timing = never heard.
  */
-export type QsoCause = 'ok' | 'copy' | 'environment' | 'doubling' | 'tuning' | 'timing';
+export type QsoCause = 'ok' | 'copy' | 'environment' | 'overlap' | 'doubling' | 'tuning' | 'timing';
+
+/** Other callers keyed over a character: the strongest of them against the one copied. */
+export interface QsoOverlapEnv {
+  /** Callers keying at once besides the one copied (most at any instant of the character). */
+  n: number;
+  /** |strongest − copied| tone, Hz. */
+  dHz: number;
+  /** Strongest over copied, dB (positive: it was louder). */
+  dB: number;
+  /** Strongest − copied, WPM. */
+  dWpm: number;
+}
 
 /** Raw environment numbers for a character, kept for QSO-only analysis. */
 export interface QsoCharEnv {
@@ -107,8 +120,10 @@ export interface QsoCharEnv {
   qrn: number;
   /** |target − VFO| in Hz. */
   offset: number;
-  /** Who the strongest QRM was: another caller (a doubling) or the band. Absent: no QRM. */
+  /** Who the strongest QRM was: another caller (an overlap) or the band. Absent: no QRM. */
   qrmFrom?: 'caller' | 'band';
+  /** Other callers actually keying during the character (absent: none). */
+  overlap?: QsoOverlapEnv;
 }
 
 export interface QsoAnswerMeta {
@@ -120,9 +135,15 @@ export interface QsoAnswerMeta {
   situation?: CopySituation;
   cause: QsoCause;
   env: QsoCharEnv;
+  /**
+   * Set when the miss wasn't this character's copy at all (a pileup: a look-alike
+   * station, a lid's interference, a logging slip): kept, but out of weak-character analysis.
+   */
+  blame?: string;
 }
 
-export type QsoCauseCounts = Record<Exclude<QsoCause, 'ok'>, number> & { procedure: number };
+/** `overlap` is absent on records from before it was told apart from doubling. */
+export type QsoCauseCounts = Record<Exclude<QsoCause, 'ok' | 'overlap'>, number> & { overlap?: number; procedure: number };
 
 /** Synced per-QSO summary (the detailed trace stays on the device). */
 export interface QsoSessionSummary {
@@ -145,6 +166,39 @@ export interface QsoSessionSummary {
   contacts?: QsoContactSummary[];
   /** CQ run numbers (run modes only). */
   run?: QsoRunSummary;
+  /** Pileup numbers (pileup-run only): counts, never the trace. */
+  pileup?: QsoPileupSummary;
+}
+
+/** Why a pileup went wrong where it did (see lib/radio/pileup/analysis.ts). */
+export type PileupCause = 'reception' | 'overlap' | 'weak' | 'environment' | 'doubling' | 'similar' | 'interference' | 'procedure' | 'logging';
+/** Stations that answered the cue a pick was made from. */
+export type PileupCrowd = '1' | '2' | '3+';
+
+/** The synced side of a pileup run: what it says about the operator, no trace. */
+export interface QsoPileupSummary {
+  level: string;
+  picks: number;
+  /** Calls we sent that the station was keying over (it never heard them). */
+  doubledPicks: number;
+  partials: number;
+  /** Partials nobody / several on the frequency fit. */
+  emptyPartials: number;
+  crowdedPartials: number;
+  /** Picks that started with a partial, and of them the ones worked right with a call fitting that partial. */
+  narrowings: number;
+  narrowed: number;
+  /** First call sent right, by how many stations answered the cue it was picked from (look-alike and lid cases left out). */
+  firstCall: Partial<Record<PileupCrowd, { total: number; correct: number }>>;
+  /** Contacts with a look-alike on the frequency at the pick, and of them the ones logged right. */
+  similarMet: number;
+  similarRight: number;
+  hijacks: number;
+  /** Off-cue answers from eager and lid callers. */
+  eager: number;
+  lid: number;
+  causes: Partial<Record<PileupCause, number>>;
+  cleanRate: number;
 }
 
 /**
@@ -331,6 +385,8 @@ export interface QsoModeProgress {
   auto: boolean;
   /** Staircase votes per axis (+ up / − down), reset when the axis moves. */
   votes: Record<string, number>;
+  /** Pileup: the level `difficulty` was set from (おまかせ moves it from there). */
+  level?: string;
 }
 
 export interface QsoProfile {
@@ -350,6 +406,8 @@ export interface QsoProfile {
     procedure: Record<string, SkillEstimate>;
     /** Whole-call copy (see CallsignSkill). Absent until a call was judged. */
     callsign?: CallsignSkill;
+    /** Pileup skills, kept apart from callsign (see PileupSkill). */
+    pileup?: PileupSkill;
   };
   modes: Record<string, QsoModeProgress>;
   /** Raw evidence counters badges are computed from (see lib/radio/badges.ts). */
@@ -377,6 +435,39 @@ export interface CallsignSkill {
   first: CallSkillBuckets;
 }
 
+/**
+ * Pileup skills, each from its own evidence: a look-alike, a lid or our own doubling
+ * never counts against call copy. Clean first calls are shared with callsign.
+ */
+export interface PileupSkill {
+  /** First call right, picked from one station in the clear (no look-alike, no lid). */
+  copy?: SkillEstimate;
+  /** …picked from two or more answering at once. */
+  overlap?: SkillEstimate;
+  /** Picks begun with a partial that ended worked right, with a call fitting it. */
+  narrowing?: SkillEstimate;
+  /** Contacts with a look-alike on the frequency logged right. */
+  similar?: SkillEstimate;
+  /** Calls sent with the station clear (not keying over them). */
+  timing?: SkillEstimate;
+  /** Log lines without a logging slip. */
+  logging?: SkillEstimate;
+}
+
+/** Pileup counters for its badges. */
+export interface PileupStats {
+  /** Complete contacts logged right. */
+  contacts: number;
+  /** …of them picked with a partial that fit. */
+  narrowed: number;
+  /** …of them made with a look-alike on the frequency. */
+  similar: number;
+  /** Runs long enough to count with at most one doubled call. */
+  calmRuns: number;
+  /** Best clean rate in a run long enough to count. */
+  bestRate: number;
+}
+
 export interface QsoStats {
   /** Correct clean chars in QSOs copied ≥ 95% clean, by minimum WPM threshold. */
   fastClean: Record<string, number>;
@@ -395,6 +486,7 @@ export interface QsoStats {
   frequencyChecks?: number;
   /** Best clean rate (complete, all-correct contacts per hour) in a run long enough to count. */
   bestRate?: number;
+  pileup?: PileupStats;
 }
 
 export interface QsoBadgeRecord { tier: 1 | 2 | 3; at: number; criteriaVersion: number }

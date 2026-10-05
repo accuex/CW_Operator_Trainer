@@ -215,6 +215,31 @@ describe('CallerAgent', () => {
     expect(calm.said(calm.agents[0]).length).toBe(quiet + 1);
   });
 
+  it('a novice calls over traffic and is slower to ask again after a doubling in QSO', () => {
+    // Someone else (not us) keying: a seasoned caller holds, a novice calls anyway.
+    for (const [style, calls] of [['twice', 1], ['novice', 2]] as const) {
+      const { agents: [a], say, tick, said, ctx } = setupWith({ style }, 'JH3ABC');
+      say('CQ DE JA1ZZZ K');
+      ctx.hearsKeying = (_agent, party) => party === undefined;
+      tick(a.persona.retry[1] + 1);
+      expect(said(a), style).toHaveLength(calls);
+    }
+    // Our message lost under its own: seasoned asks within its retry, a novice 2 s later.
+    const asked: Record<string, boolean[]> = {};
+    for (const style of ['twice', 'novice'] as const) {
+      const { agents: [a], say, doubleWith, tick, said } = setupWith({ style }, 'JH3ABC');
+      say('CQ DE JA1ZZZ K');
+      say('JH3ABC UR 599 NAME MASA QTH TOKYO BK');
+      const before = said(a).length;
+      doubleWith(a);
+      tick(0.6);
+      const early = said(a).length > before;
+      tick(2);
+      asked[style] = [early, said(a).length > before];
+    }
+    expect(asked).toEqual({ twice: [true, true], novice: [false, true] });
+  });
+
   it('moves on after waiting too long to be picked, however lively the frequency', () => {
     const { agents: [a, b], say, tick, ctx } = setupWith({ waitLimit: 40, patience: 9 }, 'JH3ABC', 'JA1XYZ');
     say('CQ DE JA1ZZZ K');

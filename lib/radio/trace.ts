@@ -1,6 +1,6 @@
 import type { CopyCondition } from '../types';
 import type { FieldResult } from './attribution';
-import type { CopySituation } from '../types';
+import type { CopySituation, QsoOverlapEnv } from '../types';
 import { judgeChar, situationOf, type ClockNow, type CopyMonitor, type RxRecord } from './conditions';
 import type { QsoEvidence } from './difficulty';
 import type { QsoIssue } from './qso';
@@ -15,9 +15,9 @@ export const QSO_TRACE_LIMIT = 50;
 export const CONDITION_CODE: Record<CopyCondition, string> = {
   clean: 'c', weak: 'w', qsb: 's', qrn: 'n', qrm: 'q', detuned: 'd', muted: 'm', unheard: 'u',
 };
-/** Same letters, plus x = doubled (our transmission or another caller on top). */
+/** Same letters, plus o = overlap (another caller keyed over it), x = doubled (our transmission). */
 export const SITUATION_CODE: Record<CopySituation, string> = {
-  clean: 'c', weak: 'w', qsb: 's', qrn: 'n', qrm: 'q', detuned: 'd', doubled: 'x', unheard: 'u',
+  clean: 'c', weak: 'w', qsb: 's', qrn: 'n', qrm: 'q', overlap: 'o', detuned: 'd', doubled: 'x', unheard: 'u',
 };
 
 export interface TracedRx {
@@ -29,6 +29,8 @@ export interface TracedRx {
   conditions: string;
   /** One SITUATION_CODE letter per sent character (older traces lack it). */
   situations?: string;
+  /** Other callers keyed over a character, by its index in `conditions` (absent: none did). */
+  overlaps?: Record<number, QsoOverlapEnv>;
 }
 
 export interface QsoTrace {
@@ -52,6 +54,8 @@ export interface QsoTrace {
 export function traceRx(records: RxRecord[], monitor: CopyMonitor, now: ClockNow, wpm: (record: RxRecord) => number): TracedRx[] {
   return records.map((record) => {
     const judged = record.tx.chars.map((span) => judgeChar(monitor, record, span, now));
+    const overlaps: Record<number, QsoOverlapEnv> = {};
+    judged.forEach((item, index) => { if (item.env.overlap) overlaps[index] = item.env.overlap; });
     return {
       at: record.tx.start,
       text: record.tx.text,
@@ -59,6 +63,7 @@ export function traceRx(records: RxRecord[], monitor: CopyMonitor, now: ClockNow
       cut: record.cutAt !== null && record.cutAt < record.tx.start + record.tx.length,
       conditions: judged.map((item) => CONDITION_CODE[item.condition]).join(''),
       situations: judged.map((item) => SITUATION_CODE[situationOf(item.condition, item.env)]).join(''),
+      ...(Object.keys(overlaps).length ? { overlaps } : {}),
     };
   });
 }

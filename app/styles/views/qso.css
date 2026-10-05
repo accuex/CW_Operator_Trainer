@@ -241,6 +241,7 @@
 .chip.cause-environment { border-color: rgb(108 188 255 / 40%); background: var(--sky-soft); color: var(--sky); }
 .chip.cause-tuning, .chip.cause-procedure { border-color: rgb(174 146 255 / 40%); background: var(--violet-soft); color: var(--violet); }
 .chip.cause-timing { border-color: rgb(246 196 83 / 40%); background: var(--gold-soft); color: var(--gold); }
+.chip.cause-overlap { border-color: rgb(255 120 190 / 45%); background: rgb(255 120 190 / 12%); color: rgb(255 140 200); }
 .chip.cause-doubling { border-color: rgb(255 159 90 / 45%); background: rgb(255 159 90 / 12%); color: rgb(255 170 110); }
 .qso-review-fields { display: grid; gap: 8px; margin-bottom: 12px; }
 .qso-review-row { display: grid; grid-template-columns: 4.5em minmax(0, 1fr); align-items: center; gap: 10px; }
@@ -262,6 +263,7 @@
 .qso-chars i.cause-environment { border-color: var(--sky); background: var(--sky-soft); color: var(--sky); }
 .qso-chars i.cause-tuning { border-color: var(--violet); background: var(--violet-soft); color: var(--violet); }
 .qso-chars i.cause-timing { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
+.qso-chars i.cause-overlap { border-color: rgb(255 120 190); background: rgb(255 120 190 / 12%); color: rgb(255 140 200); }
 .qso-chars i.cause-doubling { border-color: rgb(255 159 90); background: rgb(255 159 90 / 12%); color: rgb(255 170 110); }
 .qso-chars i.op-del { border-style: dashed; }
 .qso-chars i.op-ins { text-decoration: line-through; }
@@ -394,6 +396,68 @@
   .run-rows button { grid-template-columns: 1.4fr .7fr 1fr 1fr; font-size: 11.5px; }
 }
 .run-profile-ok { margin-top: 10px; }
+
+/* Pileup desk */
+.pileup-level-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.pileup-phase { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 13.5px; }
+.pileup-phase b { color: var(--text); }
+.pileup-tx { padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--coral) 20%, transparent); color: var(--coral); font: 700 11px var(--font-mono); }
+.pileup-queued { color: var(--gold); font: 600 12px var(--font-mono); }
+.pileup-coach { border-left: 3px solid var(--gold); }
+.pileup-path { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 8px; padding: 0; list-style: none; }
+.pileup-path li { padding: 2px 8px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--text-2); font: 700 12px var(--font-mono); letter-spacing: .04em; }
+.pileup-path li + li::before { content: '›'; margin-right: 6px; color: var(--faint); }
+.pileup-fields { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; gap: 8px; align-items: end; }
+.pileup-fields label { display: grid; gap: 4px; min-width: 0; }
+.pileup-fields span { color: var(--muted); font: 800 10px/1 var(--font-mono); letter-spacing: .1em; }
+.pileup-fields input { min-width: 0; font: 700 18px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.pileup-5nn { align-self: end; min-height: 40px; }
+.pileup-preview { margin: 8px 0 10px; color: var(--text-2); font-size: 13px; }
+.pileup-preview b { color: var(--text); font-family: var(--font-mono); letter-spacing: .04em; }
+.pileup-preview small { margin-left: 6px; color: var(--muted); }
+.pileup-preview kbd, .pileup-help kbd { padding: 1px 5px; border: 1px solid var(--line-2); border-radius: 4px; font: 600 10.5px var(--font-mono); }
+.pileup-fkeys { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.pileup-touch { display: none; grid-template-columns: 1fr 1fr 1fr .6fr; gap: 6px; margin-bottom: 10px; }
+/* What Enter sends gets the whole first row, so the full text shows. */
+.pileup-touch .pileup-touch-go { grid-column: 1 / -1; order: -1; justify-content: flex-start; }
+.pileup-touch .btn { min-width: 0; min-height: 44px; padding-inline: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--font-mono); }
+.pileup-touch-more { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.pileup-row { display: flex; gap: 12px; padding: 4px 8px; font: 600 12.5px var(--font-mono); }
+.pileup-help { line-height: 1.9; }
+
+.pileup-review-head { margin: 4px 0 8px; font-size: 14px; }
+.pileup-advice { margin-bottom: 14px; }
+.pileup-chain { margin: 0 0 8px; color: var(--text-2); font: 600 12.5px var(--font-mono); line-height: 1.6; overflow-wrap: anywhere; }
+.pileup-steps { display: grid; gap: 6px; margin: 0; padding: 0 0 0 4px; list-style: none; }
+.pileup-steps > li { padding: 4px 0 4px 10px; border-left: 2px solid var(--line); }
+.pileup-step-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.pileup-step-head code { color: var(--text); font: 700 12.5px var(--font-mono); }
+.pileup-step-head small { color: var(--muted); font-size: 11.5px; }
+.pileup-responders { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; color: var(--muted); font-size: 11.5px; }
+.pileup-role { display: inline-flex; gap: 4px; align-items: baseline; padding: 1px 7px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--text); font: 700 11.5px var(--font-mono); }
+.pileup-role small { color: var(--muted); font: 600 10.5px var(--font-sans, inherit); }
+.pileup-role.role-match, .pileup-role.role-partner { border-color: var(--mint); }
+.pileup-role.role-near { border-color: var(--gold); }
+.pileup-role.role-off { border-color: var(--coral); }
+.pileup-callers { margin-top: 4px; font-size: 12px; }
+.pileup-callers summary { cursor: pointer; color: var(--muted); }
+.pileup-callers table { width: 100%; margin-top: 4px; border-collapse: collapse; font: 12px var(--font-mono); }
+.pileup-callers th { color: var(--muted); font-weight: 600; text-align: left; }
+.pileup-callers th, .pileup-callers td { padding: 2px 6px; white-space: nowrap; }
+.pileup-callers tr.fit td { background: color-mix(in srgb, var(--mint) 12%, transparent); }
+.pileup-review .run-numbers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pileup-review .run-missed h3 small { margin-left: 4px; color: var(--muted); font: 600 11px var(--font-mono); }
+.pileup-callers { overflow-x: auto; }
+
+@media (max-width: 720px) {
+  .pileup-touch { display: grid; }
+  .pileup-fkeys { display: none; }
+  .pileup-fields { grid-template-columns: minmax(0, 1fr) 5.5em auto; }
+  .pileup-help { display: none; }
+}
+@media (max-width: 560px) {
+  .pileup-review .run-numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* QSO skills */
 .qso-skills dl { display: grid; gap: 4px; margin: 0 0 10px; }

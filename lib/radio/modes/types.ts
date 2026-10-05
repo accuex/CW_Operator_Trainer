@@ -79,4 +79,12 @@ export interface RunQsoMode extends QsoModeBase {
   createRun(ctx: RunContext, radio: RadioPort): RunSession;
 }
 
-export type QsoMode = SingleQsoMode | RunQsoMode;
+/**
+ * A pileup: everyone calls at once and we pull one call at a time out of it. It has its
+ * own desk, which picks the level (no difficulty axes yet) and starts PileupSession itself.
+ */
+export interface PileupQsoMode extends QsoModeBase {
+  kind: 'pileup';
+}
+
+export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode;

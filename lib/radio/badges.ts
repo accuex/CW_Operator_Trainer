@@ -1,9 +1,10 @@
-import type { AlphabetType, QsoBadgeRecord, QsoCharMark, QsoEnvCondition, QsoProfile, QsoStats } from '../types';
+import type { AlphabetType, PileupStats, QsoBadgeRecord, QsoCharMark, QsoEnvCondition, QsoProfile, QsoStats } from '../types';
 import { isEnvCondition } from './conditions';
 import type { FieldResult } from './attribution';
 import type { QsoEvidence } from './difficulty';
 import type { QsoIssue } from './qso';
 import { QRL_LISTEN } from './modes/cqRun';
+import type { PileupOutcome } from './pileup/learning';
 
 /**
  * 実戦習熟バッジ and per-character 実戦マーク. Separate from card rarity: they
@@ -28,6 +29,12 @@ export const ZERO_IN_HZ = 30;
 export const RATE_MIN_SECONDS = 300;
 export const RATE_MIN_CONTACTS = 5;
 
+/** A pileup run counts toward its rate and timing badges from this long, with at least this many picks. */
+export const PILEUP_RUN_SECONDS = 300;
+export const PILEUP_RUN_PICKS = 5;
+/** …and as calm with at most this many calls sent over the station (doubled). */
+export const PILEUP_CALM_DOUBLED = 1;
+
 /** A character gets its mark after this many clean, correct copies at MARK_WPM or faster. */
 export const MARK_WPM = 18;
 export const MARK_COUNT = 5;
@@ -41,6 +48,7 @@ const fast = (wpm: number) => (stats: QsoStats) => stats.fastClean[wpm] ?? 0;
 const env = (condition: QsoEnvCondition) => (stats: QsoStats) => stats.envCorrect[condition] ?? 0;
 const counter = (key: 'zeroIn' | 'freehand' | 'callsign' | 'frequencyChecks') => (stats: QsoStats) => stats[key] ?? 0;
 const bestRate = (stats: QsoStats) => stats.bestRate ?? 0;
+const pileup = (key: keyof PileupStats) => (stats: QsoStats) => stats.pileup?.[key] ?? 0;
 const counted = (value: BadgeTierDef['value'], goals: [number, number, number], unit: string): BadgeDef['tiers'] =>
   goals.map((goal) => ({ goal, label: `${goal} ${unit}`, value })) as BadgeDef['tiers'];
 
@@ -82,16 +90,42 @@ export const BADGES: BadgeDef[] = [
       { goal: 40, label: '40 局/h', value: bestRate },
     ],
   },
+  // Pileup goals below were checked against headless runs (lib/radio/sim/pileupLearning.test.ts): a 7-minute
+  // run at 中級 gives an average bot ~6 right contacts, ~3 narrowed picks and ~1 look-alike worked; clean
+  // rates run 25–60/h (a skilled ear at 入門・初級 reaches ~75–80).
+  { id: 'pileup', title: 'パイルアップ', description: 'パイルアップで、正しいコールでログし最後まで終えた交信の数（1 局目から数えます）', unit: '局', tiers: counted(pileup('contacts'), [1, 50, 300], '局') },
+  { id: 'pileup-partial', title: 'partial で絞る', description: 'partial から始めて、送った断片に当てはまる局を正しく拾って交信を終えた数', unit: '回', tiers: counted(pileup('narrowed'), [3, 25, 100], '回') },
+  { id: 'pileup-similar', title: '似たコールを聞き分ける', description: '似たコールの局が同時に呼んでいた中で、正しいコールで交信を終えた数', unit: '回', tiers: counted(pileup('similar'), [2, 10, 40], '回') },
+  {
+    id: 'pileup-calm',
+    title: 'ダブらない',
+    description: `${PILEUP_RUN_SECONDS / 60} 分以上・${PILEUP_RUN_PICKS} 回以上コールを送ったパイルアップで、相手の送信に重ねてしまったのが ${PILEUP_CALM_DOUBLED} 回以下だったラン`,
+    unit: 'ラン',
+    tiers: counted(pileup('calmRuns'), [1, 10, 30], 'ラン'),
+  },
+  {
+    id: 'pileup-rate',
+    title: 'パイルアップのレート',
+    description: `${PILEUP_RUN_SECONDS / 60} 分以上のパイルアップで、全項目を正しくログした完了交信の 1 時間あたりの数（最高記録）`,
+    unit: '/h',
+    tiers: [
+      { goal: 40, label: '40 局/h', value: pileup('bestRate') },
+      { goal: 60, label: '60 局/h', value: pileup('bestRate') },
+      { goal: 75, label: '75 局/h', value: pileup('bestRate') },
+    ],
+  },
 ];
 
 export const badgeById = (id: string) => BADGES.find((badge) => badge.id === id);
+
+export const emptyPileupStats = (): PileupStats => ({ contacts: 0, narrowed: 0, similar: 0, calmRuns: 0, bestRate: 0 });
 
 export const emptyStats = (): QsoStats => ({ fastClean: {}, envCorrect: {}, zeroIn: 0, freehand: 0, callsign: 0 });
 
 export function normalizeStats(raw: Partial<QsoStats> | undefined): QsoStats {
   const base = emptyStats();
   if (!raw || typeof raw !== 'object') return base;
-  return { ...base, ...raw, fastClean: { ...raw.fastClean }, envCorrect: { ...raw.envCorrect } };
+  return { ...base, ...raw, fastClean: { ...raw.fastClean }, envCorrect: { ...raw.envCorrect }, ...(raw.pileup ? { pileup: { ...emptyPileupStats(), ...raw.pileup } } : {}) };
 }
 
 /** Tier the counters currently support (0 = none). Tiers must be met in order. */
@@ -196,6 +230,8 @@ export interface RunOutcome {
   /** Clean contacts and their rate per hour. */
   cleanContacts: number;
   cleanRate: number;
+  /** A pileup: its own counters, and no CQ-run rate or frequency checks. */
+  pileup?: PileupOutcome;
 }
 
 /** Fold a whole run in: each contact like a QSO, then the run's own procedure and rate. */
@@ -208,8 +244,11 @@ export function recordRunOutcome(qso: QsoProfile, run: RunOutcome): { qso: QsoPr
     marked.push(...folded.marked);
   }
   const stats = normalizeStats(next.stats);
-  stats.frequencyChecks = (stats.frequencyChecks ?? 0) + run.frequencyChecks + run.busyAvoided;
-  if (run.seconds >= RATE_MIN_SECONDS && run.cleanContacts >= RATE_MIN_CONTACTS) stats.bestRate = Math.max(stats.bestRate ?? 0, Math.round(run.cleanRate));
+  if (run.pileup) foldPileup(stats, run.pileup);
+  else {
+    stats.frequencyChecks = (stats.frequencyChecks ?? 0) + run.frequencyChecks + run.busyAvoided;
+    if (run.seconds >= RATE_MIN_SECONDS && run.cleanContacts >= RATE_MIN_CONTACTS) stats.bestRate = Math.max(stats.bestRate ?? 0, Math.round(run.cleanRate));
+  }
   next = { ...next, stats, badges: award(next, stats, run.at).badges };
   // Everything the run lifted, from what was held before it.
   const earned = BADGES.flatMap((badge): EarnedBadge[] => {
@@ -217,4 +256,15 @@ export function recordRunOutcome(qso: QsoProfile, run: RunOutcome): { qso: QsoPr
     return tier && tier > (qso.badges?.[badge.id]?.tier ?? 0) ? [{ id: badge.id, tier }] : [];
   });
   return { qso: next, earned, marked };
+}
+
+function foldPileup(stats: QsoStats, run: PileupOutcome) {
+  const pile = { ...emptyPileupStats(), ...stats.pileup };
+  pile.contacts += run.contacts;
+  pile.narrowed += run.narrowed;
+  pile.similar += run.similar;
+  const counts = run.seconds >= PILEUP_RUN_SECONDS && run.picks >= PILEUP_RUN_PICKS;
+  if (counts && run.doubledPicks <= PILEUP_CALM_DOUBLED) pile.calmRuns += 1;
+  if (counts && run.contacts >= RATE_MIN_CONTACTS) pile.bestRate = Math.max(pile.bestRate, Math.round(run.cleanRate));
+  stats.pileup = pile;
 }

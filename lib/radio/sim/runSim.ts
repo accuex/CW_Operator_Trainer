@@ -82,9 +82,9 @@ export const PERFECT_BOT: BotOptions = {
   qrl: true, qrlListen: 4, qsyStep: 1000, blindStart: false, pick: true, cqRepeat: null,
 };
 
-/** A plausible operator: rarely wrong in the clear, much more under QRM or a doubling. */
+/** A plausible operator: rarely wrong in the clear, much more under QRM, an overlap or a doubling. */
 export const HUMAN_COPY: Partial<Record<CopySituation, number>> = {
-  clean: 0.01, weak: 0.07, qsb: 0.06, qrn: 0.06, qrm: 0.12, detuned: 0.3, doubled: 0.35, unheard: 1,
+  clean: 0.01, weak: 0.07, qsb: 0.06, qrn: 0.06, qrm: 0.12, overlap: 0.35, detuned: 0.3, doubled: 0.35, unheard: 1,
 };
 
 /** Band conditions for a headless run: the rig's levels and background stations. */
@@ -104,7 +104,12 @@ export interface SimOptions {
   /** Longest wait after QRT for the last contact and every caller to settle, seconds. */
   drain?: number;
   step?: number;
+  /** Every transmission on the air, ours ('me') and every station's, as it is keyed (golden tests). */
+  onAir?: (event: SimAirEvent) => void;
 }
+
+/** One transmission as the sim saw it go out. */
+export interface SimAirEvent { from: 'me' | number; text: string; rf: number; start: number; end: number; wpm?: number }
 
 export interface SimReport {
   result: RunResult;
@@ -135,7 +140,7 @@ const START_VFO = 7_012_000;
 
 interface Partner { stationId: number; sent: string; closing: boolean; since: number; agn: number }
 
-export function runSim({ seed, params, me = ME, bot: botOptions, placement, band, duration = 300, drain = 300, step = 0.05 }: SimOptions): SimReport {
+export function runSim({ seed, params, me = ME, bot: botOptions, placement, band, duration = 300, drain = 300, step = 0.05, onAir }: SimOptions): SimReport {
   const random = seeded(seed);
   const bot = { ...PERFECT_BOT, ...botOptions };
   const radio = new HeadlessRadio(random);
@@ -149,6 +154,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, band
   if (band) radio.background = makeQrm(bandRandom, band.qrm, START_VFO, [START_VFO], 400);
   radio.stationsChanged([]);
   radio.onTransmission = (station, tx) => {
+    onAir?.({ from: station.id, text: tx.text, rf: station.rf, start: tx.start, end: tx.start + tx.length, wpm: station.wpm });
     run.onStationTransmission(station, tx);
     if (!monitor || station.role !== 'caller') return;
     const record: RxRecord = { tx, station: station.id, epoch: 0, cutAt: null };
@@ -185,6 +191,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, band
     myTx.push([start, end]);
     busyUntil = end;
     txCount += 1;
+    onAir?.({ from: 'me', text, rf: vfo, start, end });
     // Reported as keying starts, like the app does once the rig has the length.
     const flagged = run.transmit(text, { start, end, rf: vfo }).issues;
     issues.push(...flagged);

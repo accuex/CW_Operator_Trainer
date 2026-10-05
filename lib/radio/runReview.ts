@@ -4,6 +4,7 @@ import { situationOf, type ClockNow, type CopyMonitor, type RxRecord } from './c
 import type { DifficultyVector, QsoEvidence } from './difficulty';
 import type { ExchangePreset } from './exchange';
 import type { RunResult } from './modes/cqRun';
+import type { RunBooks } from './modes/runCore';
 
 /**
  * Judging a finished run: every contact's log line is scored character by character
@@ -32,7 +33,8 @@ export interface RunScore {
 }
 
 export interface RunScoreInput {
-  result: RunResult;
+  /** Any run's books (a CQ run, a pileup …). */
+  result: Pick<RunBooks, 'contacts' | 'log'>;
   preset: ExchangePreset;
   /** What we received from one station. */
   recordsOf(stationId: number): RxRecord[];
@@ -72,7 +74,7 @@ export function scoreRun({ result, preset, recordsOf, monitor, now, tx }: RunSco
 }
 
 /** Complete contacts with every field logged right. */
-export function cleanContacts(result: RunResult, score: RunScore) {
+export function cleanContacts(result: Pick<RunBooks, 'contacts'>, score: RunScore) {
   return result.contacts.filter((contact) => {
     const fields = score.contacts.find((item) => item.contactId === contact.id)?.fields;
     return contact.outcome === 'complete' && Boolean(fields?.every((field) => field.correct));
@@ -80,7 +82,7 @@ export function cleanContacts(result: RunResult, score: RunScore) {
 }
 
 /** …per hour. */
-export const cleanRate = (result: RunResult, score: RunScore) => (result.stats.seconds > 0 ? (cleanContacts(result, score) * 3600) / result.stats.seconds : 0);
+export const cleanRate = (result: Pick<RunBooks, 'contacts' | 'stats'>, score: RunScore) => (result.stats.seconds > 0 ? (cleanContacts(result, score) * 3600) / result.stats.seconds : 0);
 
 export interface RunSummaryInput {
   result: RunResult;

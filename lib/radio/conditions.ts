@@ -1,4 +1,4 @@
-import type { CopyCondition, CopySituation, QsoCharEnv } from '../types';
+import type { CopyCondition, CopySituation, QsoCharEnv, QsoOverlapEnv } from '../types';
 import { isKeyed, type Station, type Transmission } from './band';
 import type { CharSpan } from './keying';
 
@@ -24,7 +24,12 @@ export interface BandSample {
   qrn: number;
   /** The strongest QRM was another caller (callers calling over each other). */
   qrmCaller?: boolean;
+  /** Other callers keyed in the passband at `t` (absent: none). */
+  overlap?: SampleOverlap;
 }
+
+/** Callers keyed over the copied one at an instant; the loudest of them (`ratio`: its level over the copied one's). */
+export interface SampleOverlap extends QsoOverlapEnv { ratio: number }
 
 /** Thresholds that turn the raw numbers into a condition label. */
 export const CONDITION_LIMITS = { snr: 1.2, qrm: 0.4, qsb: 0.5, qrn: 0.45, passbandSlack: 20 } as const;
@@ -38,18 +43,21 @@ export const isEnvCondition = (condition: CopyCondition | CopySituation) => (ENV
 
 /** Lower = easier; a call takes the hardest situation among its characters. */
 export const SITUATION_SEVERITY: Record<CopySituation, number> = {
-  clean: 0, weak: 1, qsb: 2, qrn: 3, qrm: 4, detuned: 5, doubled: 6, unheard: 7,
+  clean: 0, weak: 1, qsb: 2, qrn: 3, qrm: 4, overlap: 5, detuned: 6, doubled: 7, unheard: 8,
 };
 
 /**
- * What a character went through: sent while we keyed (muted), or under another caller
- * calling at the same time, is a doubling — operating, not the band, and not copy skill.
+ * What a character went through: under another caller keying at the same time, an
+ * overlap; sent while we keyed (muted), our doubling. Operating, not the band, and
+ * not copy skill.
  */
 export function situationOf(condition: CopyCondition, env: QsoCharEnv | null | undefined): CopySituation {
   if (condition === 'muted') return 'doubled';
-  if (condition === 'qrm' && env?.qrmFrom === 'caller') return 'doubled';
+  if (condition === 'qrm' && env?.qrmFrom === 'caller') return 'overlap';
   return condition;
 }
+
+const DB = (ratio: number) => 20 * Math.log10(Math.max(ratio, 1e-6));
 
 export interface BandSnapshot {
   t: number;
@@ -70,6 +78,7 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
   const half = filter / 2 + CONDITION_LIMITS.passbandSlack;
   let qrm = 0;
   let qrmCaller = false;
+  let overlap: SampleOverlap | undefined;
   for (const station of stations) {
     if (station === target || Math.abs(station.rf - vfo) > half || !isKeyed(station, t)) continue;
     // Closer in tone is harder to separate by ear.
@@ -79,6 +88,12 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
       qrm = ratio;
       qrmCaller = station.role === 'caller';
     }
+    if (station.role !== 'caller') continue;
+    const n = (overlap?.n ?? 0) + 1;
+    const louder = (station.strength * station.fade) / Math.max(level, 1e-3);
+    if (!overlap || louder > overlap.ratio) {
+      overlap = { n, ratio: louder, dHz: Math.abs(station.rf - target.rf), dB: DB(louder), dWpm: station.wpm - target.wpm };
+    } else overlap.n = n;
   }
   const floor = 0.05 + noise * Math.sqrt(filter / 500) * 0.25;
   return {
@@ -93,6 +108,7 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
     qsb: 1 - target.fade,
     qrn: crash,
     qrmCaller,
+    ...(overlap ? { overlap } : {}),
   };
 }
 
@@ -149,6 +165,8 @@ export function judgeSamples(samples: BandSample[]): CharJudgement {
     const worst = samples.reduce((best, sample) => (sample.qrm > best.qrm ? sample : best));
     rounded.qrmFrom = worst.qrmCaller ? 'caller' : 'band';
   }
+  const overlap = overlapOf(samples);
+  if (overlap) rounded.overlap = overlap;
   const listening = samples.filter((sample) => sample.listening).length / samples.length;
   if (listening < 0.5) return { condition: 'muted', env: rounded };
   const outside = samples.filter((sample) => Math.abs(sample.offset) > sample.filter / 2 + CONDITION_LIMITS.passbandSlack).length;
@@ -158,6 +176,22 @@ export function judgeSamples(samples: BandSample[]): CharJudgement {
   if (env.qsb > CONDITION_LIMITS.qsb) return { condition: 'qsb', env: rounded };
   if (env.snr < CONDITION_LIMITS.snr) return { condition: 'weak', env: rounded };
   return { condition: 'clean', env: rounded };
+}
+
+/**
+ * Other callers actually keying while the character was: the most at any one sample,
+ * and the strongest of them (at the sample it was strongest). Null when none keyed.
+ */
+export function overlapOf(samples: readonly BandSample[]): QsoOverlapEnv | null {
+  let strongest: SampleOverlap | null = null;
+  let n = 0;
+  for (const { overlap } of samples) {
+    if (!overlap) continue;
+    n = Math.max(n, overlap.n);
+    if (!strongest || overlap.ratio > strongest.ratio) strongest = overlap;
+  }
+  if (!strongest) return null;
+  return { n, dHz: Math.round(strongest.dHz), dB: Math.round(strongest.dB * 10) / 10, dWpm: Math.round(strongest.dWpm) };
 }
 
 /** A copied station's transmission as it actually went out: cut short, maybe never finished. */

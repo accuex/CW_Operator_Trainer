@@ -25,6 +25,16 @@ export interface OperatorIntent {
   qrs: boolean;
   /** Partial call asked for: "3ABC?" → "3ABC". */
   partial: string | null;
+  /*
+   * The three below are present only when sent, so an intent recorded before they
+   * existed reads (and serialises) exactly as it did.
+   */
+  /** Callsign-shaped words asked about ("JA3AB?"); they are in `calls` too. A pileup reads them as partials. */
+  queried?: string[];
+  /** The fragment or call just before AGN ("3AB AGN?" → "3AB"): only stations it fits are asked to call again. */
+  agnFor?: string;
+  /** QRX: stand by. */
+  qrx?: true;
   /** Callsign-shaped words other than the sender's own, in order. */
   calls: string[];
   /** The sender's own call appears anywhere. */
@@ -44,7 +54,7 @@ export interface OperatorIntent {
 /** Procedure words and Q-codes; never a partial call or a field value. */
 const KEYWORDS = new Set([
   'CQ', 'DE', 'K', 'KN', 'BK', 'AR', 'SK', 'BT', 'R', 'RR', 'ROGER', 'QSL', 'TU', 'TNX', 'TKS', '73', 'EE', 'CUL', 'GB', 'GL',
-  'QRZ', 'QRL', 'QRS', 'QRQ', 'QSY', 'AGN', 'PSE', 'UR', 'RST', 'RPRT', 'NAME', 'OP', 'QTH', 'HW', 'GM', 'GA', 'GE', 'GN',
+  'QRZ', 'QRL', 'QRS', 'QRX', 'QRQ', 'QSY', 'AGN', 'PSE', 'UR', 'RST', 'RPRT', 'NAME', 'OP', 'QTH', 'HW', 'GM', 'GA', 'GE', 'GN',
   'FB', 'OM', 'YL', 'ES', 'FER', 'CALL', 'IS', 'HR', 'TEST', 'NR', 'DR', 'ALL', 'SRI', 'C', 'YES', 'NO', 'OK', '?', '=',
 ]);
 const CLOSING = new Set(['TU', '73', 'EE', 'SK', 'CUL', 'GB']);
@@ -74,12 +84,14 @@ export function parseIntent(text: string, ownCall: string): OperatorIntent {
   const has = (...words: string[]) => tokens.some((token) => words.includes(token));
 
   const calls: string[] = [];
+  const queried: string[] = [];
   let partial: string | null = null;
   tokens.forEach((token, index) => {
     const word = bare(token);
     if (!word || KEYWORDS.has(word)) return;
     if (isCallsign(word)) {
       if (word !== me && !calls.includes(word)) calls.push(word);
+      if (word !== me && asks(tokens, index) && !queried.includes(word)) queried.push(word);
       return;
     }
     if (partial === null && asks(tokens, index) && FRAGMENT.test(word) && !REPORT.test(word)) partial = word;
@@ -93,6 +105,9 @@ export function parseIntent(text: string, ownCall: string): OperatorIntent {
   });
 
   const reportToken = tokens.find((token) => REPORT.test(token));
+  const agnAt = tokens.findIndex((token) => bare(token) === 'AGN');
+  const beforeAgn = agnAt > 0 ? bare(tokens[agnAt - 1]) : '';
+  const agnFor = beforeAgn && beforeAgn !== me && !KEYWORDS.has(beforeAgn) && FRAGMENT.test(beforeAgn) && !REPORT.test(beforeAgn) ? beforeAgn : null;
   return {
     text,
     tokens,
@@ -102,6 +117,9 @@ export function parseIntent(text: string, ownCall: string): OperatorIntent {
     agn: has('AGN', 'AGN?') || (tokens.length > 0 && tokens.every((token) => token === '?')),
     qrs: has('QRS', 'QRS?'),
     partial,
+    ...(queried.length ? { queried } : {}),
+    ...(agnFor ? { agnFor } : {}),
+    ...(has('QRX', 'QRX?') ? { qrx: true as const } : {}),
     calls,
     mentionsMe: tokens.some((token) => bare(token) === me),
     deMe: tokens.some((token, index) => token === 'DE' && bare(tokens[index + 1] ?? '') === me),
@@ -133,3 +151,23 @@ export const isNearCall = (sent: string, actual: string) =>
   sent !== actual && Math.abs(sent.length - actual.length) <= 1 && callDistance(sent, actual) <= 2;
 
 export const matchesPartial = (call: string, partial: string) => call.includes(partial);
+
+/**
+ * Fewest edits turning `partial` into some piece of `call` (approximate substring match):
+ * 0 = it is in the call, 1 = one letter off a piece of it ("3ABD" in JA3ABC).
+ */
+export function partialDistance(call: string, partial: string) {
+  // Sellers: like edit distance, but the piece of the call may start anywhere for free.
+  let row = Array.from({ length: call.length + 1 }, () => 0);
+  for (let i = 1; i <= partial.length; i += 1) {
+    const next = [i];
+    for (let j = 1; j <= call.length; j += 1) {
+      next[j] = Math.min(row[j] + 1, next[j - 1] + 1, row[j - 1] + (partial[i - 1] === call[j - 1] ? 0 : 1));
+    }
+    row = next;
+  }
+  return Math.min(...row);
+}
+
+/** One letter off a piece of `call`, but not in it (a 2-letter piece is one letter off nearly anything: never near). */
+export const nearPartial = (call: string, partial: string) => partial.length >= 3 && !matchesPartial(call, partial) && partialDistance(call, partial) === 1;

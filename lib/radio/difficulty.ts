@@ -6,7 +6,9 @@ import type { CopySituation, QsoCauseCounts, QsoEnvCondition } from '../types';
  * drift — never "the QSO failed, so slow everything down".
  */
 
-export const AXES = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak', 'drift'] as const;
+export const AXES = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak', 'drift', 'pile', 'stack', 'even', 'manners', 'timing', 'similar'] as const;
+/** The axes every mode had before pileup-run; rag-chew uses all of these. */
+export const BAND_AXES = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak', 'drift'] as const satisfies readonly Axis[];
 export type Axis = (typeof AXES)[number];
 export type DifficultyVector = Record<Axis, number>;
 
@@ -20,9 +22,17 @@ export const AXIS_SPECS: Record<Axis, AxisSpec> = {
   noise: { label: 'ノイズ', min: 0, max: 1, step: 0.05, hint: 'バンド全体のザーッという雑音' },
   weak: { label: '弱信号', min: 0, max: 1, step: 0.05, hint: '相手局の信号の弱さ' },
   drift: { label: 'ドリフト', min: 0, max: 1, step: 0.1, hint: '相手局の周波数がじわじわずれる' },
+  pile: { label: '呼ぶ局数', min: 2, max: 30, step: 1, unit: '局', hint: '同時に呼んでくる局のおおよその数' },
+  stack: { label: '集中度', min: 20, max: 200, step: 5, unit: 'Hz', hint: '呼ぶ局のオフセットの広がり（小さいほど同じ所に集まる）' },
+  even: { label: '強弱差', min: 0, max: 12, step: 0.5, unit: 'dB', hint: '呼ぶ局どうしの強さの差（小さいほど聞き分けにくい）' },
+  manners: { label: '荒れ', min: 0, max: 1, step: 0.05, hint: '0 は親切（近い断片にも返す・2 回呼ぶ）、1 は荒れ（割り込み・テールエンド・聞こえていない局）' },
+  timing: { label: '一斉度', min: 0, max: 1, step: 0.05, hint: '呼び始めの揃い方（大きいほど一斉に呼ぶ）' },
+  similar: { label: '似たコール', min: 0, max: 0.4, step: 0.02, hint: '呼んでくる局のうち、すでに呼んでいる局と似たコールの局の割合' },
 };
 
-export const DEFAULT_DIFFICULTY: DifficultyVector = { speed: 14, crowd: 3, qsb: 0.25, qrn: 0.2, noise: 0.3, weak: 0.15, drift: 0 };
+export const DEFAULT_DIFFICULTY: DifficultyVector = {
+  speed: 14, crowd: 3, qsb: 0.25, qrn: 0.2, noise: 0.3, weak: 0.15, drift: 0, pile: 3, stack: 100, even: 6, manners: 0.25, timing: 0.25, similar: 0.12,
+};
 
 export const clampAxis = (axis: Axis, value: number) => {
   const { min, max, step } = AXIS_SPECS[axis];
@@ -53,7 +63,9 @@ export interface QsoEvidence {
   clean: { total: number; correct: number };
   /** Characters under each band condition. */
   env: Partial<Record<QsoEnvCondition, { total: number; correct: number }>>;
-  /** Characters lost to a doubling (our transmission or another caller on top). No axis moves on these. */
+  /** Characters under another caller keying at the same time. No axis moves on these (yet). */
+  overlap?: { total: number; correct: number };
+  /** Characters lost to our doubling (sent while we keyed). No axis moves on these. */
   doubled?: { total: number; correct: number };
   /** Whole calls: as logged, and as we first sent them back (run modes). */
   calls?: { log: CallTally; first: CallTally };
@@ -71,7 +83,13 @@ const MIN_ENV = 4;
 const VOTES_TO_MOVE = 2;
 /** Never retune more than this many axes after one QSO. */
 const MAX_MOVES = 2;
-const STEP_SIZE: Record<Axis, number> = { speed: 1, crowd: 1, qsb: 0.1, qrn: 0.1, noise: 0.1, weak: 0.1, drift: 0.1 };
+const STEP_SIZE: Record<Axis, number> = {
+  speed: 1, crowd: 1, qsb: 0.1, qrn: 0.1, noise: 0.1, weak: 0.1, drift: 0.1, pile: 1, stack: 10, even: 0.5, manners: 0.05, timing: 0.05, similar: 0.04,
+};
+/** Axes that get harder as the number falls (a tighter stack, a smaller strength spread). */
+const HARDER_DOWN: ReadonlySet<Axis> = new Set(['stack', 'even']);
+/** One step on an axis from `value`: a big pile moves by more than one caller. */
+const stepOf = (axis: Axis, value: number) => (axis === 'pile' ? Math.max(1, Math.round(value * 0.15)) : STEP_SIZE[axis]);
 
 const rate = (bucket: { total: number; correct: number }) => bucket.correct / bucket.total;
 
@@ -105,10 +123,15 @@ export function voteAxes(e: QsoEvidence): Partial<Record<Axis, -1 | 1>> {
 export interface AdjustState { difficulty: DifficultyVector; votes: Partial<Record<Axis, number>> }
 export interface AdjustResult extends AdjustState { moved: Partial<Record<Axis, number>> }
 
-/** Accumulate votes, then move at most MAX_MOVES unpinned axes (speed first, then easier-first). */
-export function adjustDifficulty(state: AdjustState, evidence: QsoEvidence, pinned: readonly string[] = []): AdjustResult {
+export type AxisVotes = Partial<Record<Axis, -1 | 1>>;
+
+/**
+ * Accumulate votes, then move at most MAX_MOVES unpinned axes (speed first, then easier-first).
+ * A vote is +1 harder / −1 easier whichever way the axis's number goes; a mode with its
+ * own evidence (pileup) hands its votes in as `fresh`.
+ */
+export function adjustDifficulty(state: AdjustState, evidence: QsoEvidence, pinned: readonly string[] = [], fresh: AxisVotes = voteAxes(evidence)): AdjustResult {
   const votes = { ...state.votes };
-  const fresh = voteAxes(evidence);
   for (const axis of AXES) {
     const vote = fresh[axis];
     if (!vote || pinned.includes(axis)) continue;
@@ -122,7 +145,7 @@ export function adjustDifficulty(state: AdjustState, evidence: QsoEvidence, pinn
   const moved: Partial<Record<Axis, number>> = {};
   for (const axis of ready.slice(0, MAX_MOVES)) {
     const direction = Math.sign(votes[axis] ?? 0);
-    const next = clampAxis(axis, difficulty[axis] + direction * STEP_SIZE[axis]);
+    const next = clampAxis(axis, difficulty[axis] + direction * (HARDER_DOWN.has(axis) ? -1 : 1) * stepOf(axis, difficulty[axis]));
     votes[axis] = 0;
     if (next === difficulty[axis]) continue;
     moved[axis] = Math.round((next - difficulty[axis]) * 100) / 100;
@@ -133,6 +156,8 @@ export function adjustDifficulty(state: AdjustState, evidence: QsoEvidence, pinn
 
 export function describeMove(axis: Axis, delta: number) {
   const spec = AXIS_SPECS[axis];
-  if (axis === 'speed' || axis === 'crowd') return `${spec.label} ${delta > 0 ? '+' : ''}${delta} ${spec.unit}`;
+  if (axis === 'speed' || axis === 'crowd' || axis === 'pile') return `${spec.label} ${delta > 0 ? '+' : ''}${delta} ${spec.unit}`;
+  if (axis === 'stack') return `${spec.label}を${delta < 0 ? '少し高く（呼ぶ局が近くに集まる）' : '少し低く（呼ぶ局が散らばる）'}`;
+  if (axis === 'similar') return `${spec.label}を${delta > 0 ? '少し多く' : '少し少なく'}`;
   return `${spec.label}を${delta > 0 ? '少し強く' : '少し弱く'}`;
 }

@@ -1,4 +1,4 @@
-import type { AnswerLog, CopySituation } from './types';
+import type { AnswerLog, CopySituation, PileupCause, PileupCrowd, SessionRecord } from './types';
 
 export interface ConfusionCell { correct: string; input: string; count: number; rate: number }
 export interface WeakPair { a: string; b: string; count: number; reverse: number; total: number }
@@ -48,11 +48,14 @@ export function summary(logs: AnswerLog[]) {
 
 /**
  * Weak-character analysis ignores QSO characters missed because of the band
- * (QRM / QSB / QRN / weak), tuning or timing — only clean-condition copy counts.
+ * (QRM / QSB / QRN / weak), tuning or timing — only clean-condition copy counts. A
+ * character another caller keyed over (even below the QRM line), or one whose miss was
+ * blamed on something else (a pileup look-alike, a lid, a log slip), isn't clean copy either.
  * Set `includeEnvironment` to see everything. The records themselves are kept.
  */
-export const isCleanCopy = (log: AnswerLog) => !log.qso || log.qso.condition === 'clean';
-export const forWeakAnalysis = (logs: AnswerLog[], includeEnvironment = false) => (includeEnvironment ? logs : logs.filter(isCleanCopy));
+export const isCleanCopy = (log: AnswerLog) => !log.qso || (log.qso.condition === 'clean' && !log.qso.blame && !log.qso.env?.overlap);
+/** Weak-pair input: clean copy only, or every condition — never a miss that was a look-alike's, a lid's or a slip's (blame). */
+export const forWeakAnalysis = (logs: AnswerLog[], includeEnvironment = false) => logs.filter(includeEnvironment ? (log) => !log.qso?.blame : isCleanCopy);
 
 export interface ConditionRow { condition: string; answers: number; accuracy: number }
 
@@ -111,4 +114,51 @@ export function conditionContrast(logs: AnswerLog[], { minClean = 5, minHard = 3
     if (worst) out.push(worst);
   }
   return out.sort((a, b) => a.accuracy - b.accuracy);
+}
+
+export interface PileupBreakdown {
+  runs: number;
+  picks: number;
+  doubledPicks: number;
+  /** First calls right, by how many stations answered at once. */
+  firstCall: Record<PileupCrowd, { total: number; correct: number }>;
+  similarMet: number;
+  similarRight: number;
+  narrowings: number;
+  narrowed: number;
+  causes: Partial<Record<PileupCause, number>>;
+  /** What stands out, from the numbers alone. */
+  findings: PileupFinding[];
+}
+export type PileupFinding = 'crowd-weak' | 'similar-mixups' | 'doubling-often' | 'narrowing-weak';
+
+const FINDING_MIN = 6;
+
+/** Every stored pileup summary added up (cloud summaries are enough: counts only). */
+export function pileupBreakdown(sessions: Pick<SessionRecord, 'qso'>[]): PileupBreakdown | null {
+  const runs = sessions.flatMap((session) => (session.qso?.pileup ? [session.qso.pileup] : []));
+  if (!runs.length) return null;
+  const firstCall = { '1': { total: 0, correct: 0 }, '2': { total: 0, correct: 0 }, '3+': { total: 0, correct: 0 } };
+  const out: PileupBreakdown = { runs: runs.length, picks: 0, doubledPicks: 0, firstCall, similarMet: 0, similarRight: 0, narrowings: 0, narrowed: 0, causes: {}, findings: [] };
+  for (const run of runs) {
+    out.picks += run.picks;
+    out.doubledPicks += run.doubledPicks;
+    out.similarMet += run.similarMet;
+    out.similarRight += run.similarRight;
+    out.narrowings += run.narrowings;
+    out.narrowed += run.narrowed;
+    for (const crowd of ['1', '2', '3+'] as const) {
+      firstCall[crowd].total += run.firstCall[crowd]?.total ?? 0;
+      firstCall[crowd].correct += run.firstCall[crowd]?.correct ?? 0;
+    }
+    for (const [cause, count] of Object.entries(run.causes) as [PileupCause, number][]) out.causes[cause] = (out.causes[cause] ?? 0) + count;
+  }
+  const rate = (tally: { total: number; correct: number }) => tally.correct / tally.total;
+  const alone = firstCall['1'];
+  const crowded = firstCall['3+'];
+  if (crowded.total >= FINDING_MIN && alone.total >= FINDING_MIN && rate(alone) - rate(crowded) >= 0.2) out.findings.push('crowd-weak');
+  if ((out.causes.similar ?? 0) >= 3 && out.similarMet && out.similarRight / out.similarMet < 0.8) out.findings.push('similar-mixups');
+  if (out.picks >= FINDING_MIN * 2 && out.doubledPicks / out.picks >= 0.15) out.findings.push('doubling-often');
+  if (out.narrowings >= FINDING_MIN && out.narrowed / out.narrowings < 0.5) out.findings.push('narrowing-weak');
+  return out;
 }

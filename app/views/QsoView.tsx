@@ -5,7 +5,9 @@ import type { AnswerLog, AudioSettings, QsoCause, QsoProfile, SessionRecord, Ski
 import { makeQrm } from '@/lib/radio/band';
 import { markCut } from '@/lib/radio/conditions';
 import { collectEvidence, fieldAnswers, scoreFields, type FieldResult } from '@/lib/radio/attribution';
-import { AXES, AXIS_SPECS, adjustDifficulty, describeMove, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
+import { AXES, AXIS_SPECS, adjustDifficulty, describeMove, normalizeDifficulty, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
+import { PILEUP_ADAPT_AXES, updatePileupSkills } from '@/lib/radio/pileup/learning';
+import { isPileupLevel, pileupAxesOf, pileupLevel, type PileupLevelId } from '@/lib/radio/modes/pileupLevels';
 import { PRESETS } from '@/lib/radio/exchange';
 import { QSO_MODES, qsoMode, type QsoSession } from '@/lib/radio/modes';
 import { isProcedureIssue, MIN_TARGET_WPM } from '@/lib/radio/qso';
@@ -18,6 +20,7 @@ import { nowId } from '@/app/trainer/shared';
 import { Icon } from '@/app/components/icons';
 import { FieldCells } from './qso/FieldCells';
 import { CqRunDesk, type RunRecord, type RunSaved } from './qso/CqRunDesk';
+import { PileupDesk, PILEUP_RIG_LEVELS } from './qso/PileupDesk';
 import { RigPanel } from './qso/RigPanel';
 import { useRig, type Capture, type PowerResult } from './qso/useRig';
 
@@ -25,7 +28,7 @@ const PREFS_KEY = 'cwot.qso.prefs';
 const LOGBOOK_SIZE = 30;
 
 const CAUSE_LABEL: Record<Exclude<QsoCause, 'ok'> | 'procedure', string> = {
-  copy: '受信ミス', environment: '悪条件', doubling: 'ダブり', tuning: '同調', procedure: '手順', timing: '聴き逃し',
+  copy: '受信ミス', environment: '悪条件', overlap: '重なり', doubling: 'ダブり', tuning: '同調', procedure: '手順', timing: '聴き逃し',
 };
 
 /** Rig-side preferences that are not difficulty (kept on this device). */
@@ -79,7 +82,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const myCall = qso.myCall ?? prefs.myCall ?? 'JA1ZZZ';
   const advice = recommendStage(qso);
 
-  const rig = useRig({ pitch: settings.pitch, stopEpoch, levels: { af: prefs.af, noise: difficulty.noise, qrn: difficulty.qrn, qsb: difficulty.qsb } });
+  // The pileup's band is its own (its levels don't use these axes yet).
+  const band = mode.kind === 'pileup' ? PILEUP_RIG_LEVELS : difficulty;
+  const rig = useRig({ pitch: settings.pitch, stopEpoch, levels: { af: prefs.af, noise: band.noise, qrn: band.qrn, qsb: band.qsb } });
   const { engineRef, txOn, newCapture } = rig;
   const [step, setStep] = useState(0);
   const [canLog, setCanLog] = useState(false);
@@ -287,11 +292,16 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     recordMany(record.answers);
     const modeId = record.summary.modeId;
     const current = modeProgress(qso, modeId, difficulty);
-    // Axes the mode doesn't have are as good as pinned.
-    const pinned = [...current.pinned, ...AXES.filter((axis) => !mode.axes.includes(axis))];
+    const { pileup } = record;
+    // Axes the mode doesn't have are as good as pinned; a pileup moves only the axes its causes speak for.
+    const pinned = [...current.pinned, ...AXES.filter((axis) => !(pileup ? (PILEUP_ADAPT_AXES as readonly Axis[]) : mode.axes).includes(axis))];
+    // A pileup starts from the axes it ran at; votes carry over only within the same level.
+    const state = pileup
+      ? { difficulty: normalizeDifficulty(pileup.axes, current.difficulty as DifficultyVector), votes: current.level === pileup.level ? current.votes : {} }
+      : { difficulty: current.difficulty as DifficultyVector, votes: current.votes };
     const adjusted = current.auto
-      ? adjustDifficulty({ difficulty: current.difficulty as DifficultyVector, votes: current.votes }, record.evidence, pinned)
-      : { difficulty: current.difficulty as DifficultyVector, votes: current.votes, moved: {} };
+      ? adjustDifficulty(state, record.evidence, pinned, pileup ? pileup.votes : undefined)
+      : { ...state, moved: {} };
     const runOutcome = { ...record.run, alphabet: record.alphabet, at: record.endedAt };
     const { earned, marked } = recordRunOutcome(qso, runOutcome);
     onSession({
@@ -307,17 +317,27 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     const made = record.summary.contacts?.length ?? 0;
     const perfect = record.summary.contacts?.filter((contact) => contact.fields > 0 && contact.fieldsCorrect === contact.fields).length ?? 0;
     updateQso((old) => {
-      const next = recordRunOutcome(updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence: record.evidence }), runOutcome).qso;
+      const skilled = updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence: record.evidence });
+      const next = recordRunOutcome(pileup ? updatePileupSkills(skilled, pileup.analysis) : skilled, runOutcome).qso;
       const base = modeProgress(old, modeId, difficulty);
       return {
         ...next,
         modes: {
           ...next.modes,
-          [modeId]: { ...base, qsos: base.qsos + made, perfect: base.perfect + perfect, lastAt: record.endedAt, difficulty: adjusted.difficulty, votes: adjusted.votes },
+          [modeId]: {
+            ...base, qsos: base.qsos + made, perfect: base.perfect + perfect, lastAt: record.endedAt, difficulty: adjusted.difficulty, votes: adjusted.votes,
+            ...(pileup ? { level: pileup.level } : {}),
+          },
         },
       };
     });
     return { moved: adjusted.moved, auto: current.auto, earned, marked };
+  };
+
+  /** Where a pileup level starts: as おまかせ left it when that is the level last run, else the level's own axes. */
+  const pileupAxesFor = (level: PileupLevelId) => {
+    const axes = pileupLevel(level).axes;
+    return progress.level === level ? pileupAxesOf(progress.difficulty, axes) : axes;
   };
 
   const onPower = (result: PowerResult) => {
@@ -367,7 +387,21 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     <div className="qso-grid">
       <RigPanel rig={rig} onPower={onPower} />
 
-      {mode.kind === 'run' ? (
+      {mode.kind === 'pileup' ? (
+        <PileupDesk
+          key={mode.id}
+          rig={rig}
+          myCall={myCall}
+          myName={qso.myName ?? ''}
+          myQth={qso.myQth ?? ''}
+          axesFor={pileupAxesFor}
+          stored={isPileupLevel(progress.level) ? progress.level : null}
+          auto={progress.auto}
+          onAuto={(auto) => updateMode({ auto })}
+          onResetLevel={(level) => updateMode({ level, difficulty: { ...progress.difficulty, ...pileupLevel(level).axes }, votes: {} })}
+          onSave={saveRun}
+        />
+      ) : mode.kind === 'run' ? (
         <CqRunDesk
           key={mode.id}
           rig={rig}
@@ -456,6 +490,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
 
     <div className="qso-bottom">
       <div className="panel panel-pad qso-settings">
+        {mode.kind === 'pileup' ? (
+          <>
+            <div className="qso-panel-head"><h2>設定</h2></div>
+            <p className="qso-note">パイルアップの難しさは、デスクのレベル（入門〜DX級）で選びます。おまかせ調整はまだありません。</p>
+          </>
+        ) : <>
         <div className="qso-panel-head">
           <h2>難易度</h2>
           <label className="qso-auto">
@@ -493,6 +533,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
             );
           })}
         </div>
+        </>}
         <div className="qso-rig-prefs">
           <label className="qso-mycall">
             <span>自分のコールサイン</span>
@@ -508,7 +549,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           </label>
           <label>AF 音量 <b>{Math.round(prefs.af * 100)}</b><input type="range" min={0} max={1} step={0.01} value={prefs.af} onChange={(event) => setPrefs({ ...prefs, af: Number(event.target.value) })} /></label>
         </div>
-        <p className="qso-note">速さ・弱信号・ドリフトは次の局から反映されます（QRS で相手を遅くできます）。ピッチは全体の設定に従います。</p>
+        {mode.kind !== 'pileup' && <p className="qso-note">速さ・弱信号・ドリフトは次の局から反映されます（QRS で相手を遅くできます）。ピッチは全体の設定に従います。</p>}
       </div>
 
       <div className="panel panel-pad qso-logbook">
@@ -537,13 +578,13 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
 }
 
 const SKILL_SITUATION: Record<string, string> = {
-  weak: '弱信号', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', detuned: '同調ずれ', doubled: 'ダブり', unheard: '未受信',
+  weak: '弱信号', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', overlap: '重なり', detuned: '同調ずれ', doubled: 'ダブり', unheard: '未受信',
 };
 const skillPct = (estimate: SkillEstimate | undefined) => (estimate ? `${Math.round(estimate.value * 100)}%` : '—');
 
 /**
  * QSO skills as estimated so far. Normal-condition numbers are the skill itself; the
- * rest show how it holds up (QRM, QSB, doublings …) and are never mixed into it.
+ * rest show how it holds up (QRM, QSB, overlaps, doublings …) and are never mixed into it.
  */
 function SkillPanel({ qso, modeId }: { qso: QsoProfile; modeId: string }) {
   const { copy, robustness, procedure, tuning, callsign } = qso.skills;
@@ -555,9 +596,9 @@ function SkillPanel({ qso, modeId }: { qso: QsoProfile; modeId: string }) {
     ['通常条件の受信', skillPct(international), international ? `${international.wpm} WPM` : ''],
     ['悪条件での受信', hard(robustness) || '—', ''],
     ['コール（通常条件）', skillPct(callsign?.log.clean), callsign?.log.clean ? `${callsign.log.clean.n} 局` : ''],
-    ['コール（悪条件・ダブり）', hard(callsign?.log.situations) || '—', ''],
+    ['コール（悪条件・重なり・ダブり）', hard(callsign?.log.situations) || '—', ''],
     ['初回コール（通常条件）', skillPct(callsign?.first.clean), callsign?.first.clean ? `${callsign.first.clean.n} 局` : ''],
-    ['初回コール（悪条件・ダブり）', hard(callsign?.first.situations) || '—', ''],
+    ['初回コール（悪条件・重なり・ダブり）', hard(callsign?.first.situations) || '—', ''],
     ['手順', skillPct(procedure[modeId]), ''],
     ['同調', skillPct(tuning), ''],
   ];
@@ -577,7 +618,7 @@ function SkillPanel({ qso, modeId }: { qso: QsoProfile; modeId: string }) {
 /** Post-QSO review: which characters were missed, and why. */
 function QsoReview({ review }: { review: Review }) {
   const { fields, evidence, moved, auto, received, earned, marked } = review;
-  const causes = (Object.keys(CAUSE_LABEL) as (keyof typeof CAUSE_LABEL)[]).filter((cause) => evidence.causes[cause] > 0);
+  const causes = (Object.keys(CAUSE_LABEL) as (keyof typeof CAUSE_LABEL)[]).filter((cause) => (evidence.causes[cause] ?? 0) > 0);
   const moves = (Object.entries(moved) as [Axis, number][]).map(([axis, delta]) => describeMove(axis, delta));
   const clean = evidence.clean.total ? Math.round((evidence.clean.correct / evidence.clean.total) * 100) : null;
   return (

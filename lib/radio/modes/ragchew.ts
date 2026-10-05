@@ -1,5 +1,5 @@
 import { makeQrm, makeStation } from '../band';
-import { AXES, targetDrift, targetStrength } from '../difficulty';
+import { BAND_AXES, targetDrift, targetStrength } from '../difficulty';
 import { cqText, makeTarget, MIN_TARGET_WPM, respond, type QsoPhase } from '../qso';
 import type { QsoSession, SessionContext, SingleQsoMode } from './types';
 
@@ -14,7 +14,7 @@ export const ragchew: SingleQsoMode = {
   alphabet: 'international',
   available: true,
   presets: ['basic-rst-name-qth'],
-  axes: AXES,
+  axes: BAND_AXES,
   steps: [
     { id: 'cq', label: 'CQ を探して呼ぶ' },
     { id: 'report', label: 'レポートを書き取って返す' },

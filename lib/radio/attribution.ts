@@ -6,7 +6,7 @@ import type { ExchangePreset } from './exchange';
 /**
  * Log scoring with blame: every expected character is aligned against what was
  * logged and tagged with the easiest conditions it was ever sent under, so a miss
- * becomes copy / environment / doubling / tuning / timing instead of just "wrong".
+ * becomes copy / environment / overlap / doubling / tuning / timing instead of just "wrong".
  */
 
 export type AlignOp = 'match' | 'sub' | 'del' | 'ins';
@@ -44,6 +44,7 @@ export function align(expected: string, input: string): AlignCell[] {
 export function causeOf(situation: CopySituation): Exclude<QsoCause, 'ok'> {
   if (situation === 'clean') return 'copy';
   if (isEnvCondition(situation)) return 'environment';
+  if (situation === 'overlap') return 'overlap';
   if (situation === 'doubled') return 'doubling';
   if (situation === 'detuned') return 'tuning';
   return 'timing';
@@ -100,7 +101,7 @@ export function scoreFields(
   });
 }
 
-export const emptyCauses = (): QsoCauseCounts => ({ copy: 0, environment: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 });
+export const emptyCauses = (): QsoCauseCounts => ({ copy: 0, environment: 0, overlap: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 });
 
 /** The hardest situation among a value's characters ('unheard' for nothing judged). */
 export function hardestSituation(situations: CopySituation[]): CopySituation {
@@ -124,7 +125,8 @@ export function tallyCall(tally: CallTally, call: { situation: CopySituation; co
 
 /**
  * Character-level blame plus transmit-side events → evidence for the tuner. Only band
- * conditions fill `env` (they have axes); doubled characters go to `doubled`, and
+ * conditions fill `env` (they have axes); overlapped characters go to `overlap`, our
+ * doublings to `doubled`, and
  * whole calls to `calls`, sorted by situation so a hard call never counts as a clean one.
  */
 export function collectEvidence(fields: FieldResult[], tx: { total: number; onFrequency: number; procedure: number }): QsoEvidence {
@@ -132,15 +134,19 @@ export function collectEvidence(fields: FieldResult[], tx: { total: number; onFr
   causes.procedure = tx.procedure;
   causes.tuning += tx.total - tx.onFrequency;
   const clean = { total: 0, correct: 0 };
+  const overlap = { total: 0, correct: 0 };
   const doubled = { total: 0, correct: 0 };
   const env: QsoEvidence['env'] = {};
   for (const cell of fields.flatMap((field) => field.cells)) {
     if (cell.op === 'ins') continue;
-    if (cell.cause !== 'ok') causes[cell.cause] += 1;
+    if (cell.cause !== 'ok') causes[cell.cause] = (causes[cell.cause] ?? 0) + 1;
     const ok = cell.op === 'match' ? 1 : 0;
     if (cell.situation === 'clean') {
       clean.total += 1;
       clean.correct += ok;
+    } else if (cell.situation === 'overlap') {
+      overlap.total += 1;
+      overlap.correct += ok;
     } else if (cell.situation === 'doubled') {
       doubled.total += 1;
       doubled.correct += ok;
@@ -152,7 +158,7 @@ export function collectEvidence(fields: FieldResult[], tx: { total: number; onFr
   }
   const calls = { log: {} as CallTally, first: {} as CallTally };
   tallyCall(calls.log, callOfFields(fields));
-  return { clean, env, doubled, causes, tx: { total: tx.total, onFrequency: tx.onFrequency }, calls };
+  return { clean, env, overlap, doubled, causes, tx: { total: tx.total, onFrequency: tx.onFrequency }, calls };
 }
 
 /** Add up several contacts' evidence (a run). */
@@ -165,6 +171,7 @@ export function mergeEvidence(parts: QsoEvidence[], tx: { total: number; onFrequ
   };
   for (const part of parts) {
     add(out.clean, part.clean);
+    add(out.overlap!, part.overlap);
     add(out.doubled!, part.doubled);
     for (const [condition, bucket] of Object.entries(part.env) as [QsoEnvCondition, { total: number; correct: number }][]) add((out.env[condition] ??= { total: 0, correct: 0 }), bucket);
     for (const stage of ['log', 'first'] as const) {
@@ -172,7 +179,7 @@ export function mergeEvidence(parts: QsoEvidence[], tx: { total: number; onFrequ
         add((out.calls![stage][situation] ??= { total: 0, correct: 0 }), bucket);
       }
     }
-    for (const cause of ['copy', 'environment', 'doubling', 'tuning', 'timing'] as const) out.causes[cause] += part.causes[cause] ?? 0;
+    for (const cause of ['copy', 'environment', 'overlap', 'doubling', 'tuning', 'timing'] as const) out.causes[cause] = (out.causes[cause] ?? 0) + (part.causes[cause] ?? 0);
   }
   return out;
 }
@@ -180,14 +187,20 @@ export function mergeEvidence(parts: QsoEvidence[], tx: { total: number; onFrequ
 /** One AnswerLog per expected character, environment kept alongside. */
 export function fieldAnswers(
   fields: FieldResult[],
-  base: { sessionId: string; timestamp: number; wpm: number; modeId: string; presetId: string; alphabet: AnswerLog['alphabetType'] },
+  base: {
+    sessionId: string; timestamp: number; wpm: number; modeId: string; presetId: string; alphabet: AnswerLog['alphabetType'];
+    /** A run's contact: keeps ids apart between the contacts of one session. */
+    contactId?: string;
+  },
+  /** Fields whose misses were something else's doing (see QsoAnswerMeta.blame). */
+  blame: Partial<Record<string, string>> = {},
 ): AnswerLog[] {
   const out: AnswerLog[] = [];
   for (const field of fields) {
     field.cells.forEach((cell, index) => {
       if (cell.op === 'ins') return;
       out.push({
-        id: `${base.sessionId}-${field.key}-${index}`,
+        id: `${base.sessionId}${base.contactId ? `-${base.contactId}` : ''}-${field.key}-${index}`,
         timestamp: base.timestamp,
         alphabetType: base.alphabet,
         correctSymbol: cell.expected,
@@ -211,6 +224,7 @@ export function fieldAnswers(
           situation: cell.situation,
           cause: cell.cause,
           env: cell.env ?? { snr: 0, qrm: 0, qsb: 0, qrn: 0, offset: 0 },
+          ...(blame[field.key] ? { blame: blame[field.key] } : {}),
         },
       });
     });

@@ -226,9 +226,31 @@ describe('skills and recommended stage', () => {
 });
 
 describe('mode registry', () => {
+  it('pileup axes are neither shown nor retuned for the CQ run or rag-chew', () => {
+    const pileupAxes = ['pile', 'stack', 'even', 'manners', 'timing'];
+    for (const id of ['ragchew', 'cq-run']) expect(qsoMode(id).axes.filter((axis) => pileupAxes.includes(axis))).toEqual([]);
+    // Every kind of evidence, good and bad, over and over: none of them ever moves.
+    const all = { total: 20, correct: 20 };
+    const none = { total: 20, correct: 0 };
+    const causes = { copy: 0, environment: 0, doubling: 0, tuning: 0, timing: 0, procedure: 0 };
+    let state = { difficulty: DEFAULT_DIFFICULTY, votes: {} };
+    for (const bucket of [all, none, all, all, none, none]) {
+      const evidence: QsoEvidence = { clean: bucket, env: { qrm: bucket, qsb: bucket, qrn: bucket, weak: bucket }, overlap: bucket, causes, tx: { total: 4, onFrequency: bucket === all ? 4 : 1 } };
+      const next = adjustDifficulty(state, evidence);
+      expect(Object.keys(next.moved).filter((axis) => pileupAxes.includes(axis))).toEqual([]);
+      expect(Object.keys(next.votes).filter((axis) => pileupAxes.includes(axis))).toEqual([]);
+      state = next;
+    }
+  });
+
   it('offers the CQ run as a run mode', () => {
     expect(qsoMode('cq-run').kind).toBe('run');
     expect(qsoMode('no-such-mode').id).toBe('ragchew');
+  });
+
+  it('offers the pileup with its own desk and no difficulty axes', () => {
+    expect(qsoMode('pileup').kind).toBe('pileup');
+    expect(qsoMode('pileup').axes).toEqual([]);
   });
 });
 
@@ -251,6 +273,6 @@ describe('ragchew mode', () => {
     session.onTransmit('R TU 599 73', { offsetHz: 0 });
     expect(session.step).toBe(2);
     // Unbuilt modes fall back to ragchew instead of throwing.
-    expect(qsoMode('pileup').id).toBe('ragchew');
+    expect(qsoMode('contest').id).toBe('ragchew');
   });
 });

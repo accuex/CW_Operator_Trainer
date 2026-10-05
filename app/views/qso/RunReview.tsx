@@ -1,17 +1,18 @@
+import type { ReactNode } from 'react';
 import type { CopySituation, QsoCause } from '@/lib/types';
-import { formatFrequency } from '@/lib/radio/band';
 import type { GoneReason } from '@/lib/radio/agents/types';
 import { TIER_LABEL, badgeById } from '@/lib/radio/badges';
 import { describeMove, type Axis, type CallTally } from '@/lib/radio/difficulty';
 import type { ExchangePreset } from '@/lib/radio/exchange';
-import { QRL_LISTEN, type ContactOutcome, type FrequencyUse, type MissedCaller, type RunResult } from '@/lib/radio/modes/cqRun';
+import type { ContactOutcome, MissedCaller, RunResult } from '@/lib/radio/modes/cqRun';
+import type { RunBooks } from '@/lib/radio/modes/runCore';
 import type { RunScore } from '@/lib/radio/runReview';
 import { Icon } from '@/app/components/icons';
 import { FieldCells, SITUATION_LABEL } from './FieldCells';
-import type { RunSaved } from './CqRunDesk';
+import type { RunSaved } from './RunDesk';
 
-export interface RunReviewData {
-  result: RunResult;
+export interface RunReviewData<R extends RunBooks = RunResult> {
+  result: R;
   score: RunScore;
   /** Receive filter at QRT, Hz (to say who was outside it). */
   filter: number;
@@ -22,8 +23,21 @@ export interface RunReviewData {
   stored?: { at: number };
 }
 
+/** What a mode adds to the review: its own slips and good habits, its own sections, its own words. */
+export interface RunReviewFlavor<R extends RunBooks = RunResult> {
+  /** Slips counted after the shared ones (before 拾えなかった局): [label, count, tone]. */
+  slips(result: R): [string, number, string][];
+  /** Things done right, shown as mint chips: [label, count]. */
+  good(result: R): [string, number][];
+  /** Sections after the contacts (before NIL and missed callers). */
+  sections?(result: R): ReactNode;
+  /** Shown when no contact was made. */
+  noContacts: string;
+  restartLabel: string;
+}
+
 const CAUSE_LABEL: Record<Exclude<QsoCause, 'ok'>, string> = {
-  copy: '受信ミス', environment: '悪条件', doubling: 'ダブり', tuning: '同調', timing: '聴き逃し',
+  copy: '受信ミス', environment: '悪条件', overlap: '重なり', doubling: 'ダブり', tuning: '同調', timing: '聴き逃し',
 };
 
 /** "通常 8/9・QRM 1/2・ダブり 0/1" for a call tally, clean first. */
@@ -54,17 +68,18 @@ export function missedLine(caller: MissedCaller, filter: number) {
   return `${strengthLabel(caller.strength)}・${caller.wpm} WPM・${offset}${outside}・${caller.calls} 回呼んで${GONE_LABEL[caller.reason]}`;
 }
 
-function frequencyLine(use: FrequencyUse) {
-  const listened = use.qrlListen === null ? '' : use.qrlListen < QRL_LISTEN ? `（聴いたのは ${use.qrlListen.toFixed(1)} 秒）` : `（${Math.round(use.qrlListen)} 秒聴いて）`;
-  const check = use.qrlFirst ? `QRL? で確かめて${listened}から CQ` : 'QRL? なしで CQ';
-  const asked = use.qsyAsked ? `・QSY を ${use.qsyAsked} 回求められた` : '';
-  return use.busyCqs ? `${check}・使用中に ${use.busyCqs} 回 CQ${asked}` : `${check}・空いていました${asked}`;
-}
-
 const formatDuration = (seconds: number) => `${Math.floor(seconds / 60)} 分 ${Math.round(seconds % 60)} 秒`;
 
+interface RunReviewProps<R extends RunBooks> {
+  review: RunReviewData<R>;
+  flavor: RunReviewFlavor<R>;
+  preset: ExchangePreset;
+  onRestart?: () => void;
+  onClose?: () => void;
+}
+
 /** After QRT: the run's numbers, every contact character by character, and who we never picked up. */
-export function CqRunReview({ review, preset, onRestart, onClose }: { review: RunReviewData; preset: ExchangePreset; onRestart?: () => void; onClose?: () => void }) {
+export function RunReview<R extends RunBooks>({ review, flavor, preset, onRestart, onClose }: RunReviewProps<R>) {
   const { result, score, filter, wpmOf, saved, stored } = review;
   const { stats } = result;
   const { evidence } = score;
@@ -77,14 +92,10 @@ export function CqRunReview({ review, preset, onRestart, onClose }: { review: Ru
     ['ログ漏れ', stats.unlogged, 'cause-procedure'],
     ['重複ログ', stats.dupes, 'cause-procedure'],
     ['ダブり', stats.doublings, 'cause-doubling'],
-    ['使用中の周波数で CQ', stats.busyCqs, 'cause-procedure'],
-    ['QRL? のあと聴かずに CQ', stats.qrlNoListen, 'cause-procedure'],
+    ...flavor.slips(result),
     ['拾えなかった局', result.missed.length, 'cause-timing'],
   ];
-  const good: [string, number][] = [
-    [`QRL? のあと聴いて確かめてから CQ`, stats.frequencyChecks ?? 0],
-    ['使用中と分かって CQ を控えた', stats.busyAvoided ?? 0],
-  ];
+  const good = flavor.good(result);
   const causes = (Object.keys(CAUSE_LABEL) as (keyof typeof CAUSE_LABEL)[]).filter((cause) => (evidence.causes[cause] ?? 0) > 0);
   const moves = (Object.entries(saved?.moved ?? {}) as [Axis, number][]).map(([axis, delta]) => describeMove(axis, delta));
   const firstCalls = tallyLine(evidence.calls?.first);
@@ -173,17 +184,9 @@ export function CqRunReview({ review, preset, onRestart, onClose }: { review: Ru
             );
           })}
         </ol>
-      ) : <p className="qso-note">交信は成立しませんでした。CQ のあと、呼んでくる局のコールを聴き取って F2 で交換を送りましょう。</p>}
+      ) : <p className="qso-note">{flavor.noContacts}</p>}
 
-      {result.frequencies.length > 0 && (
-        <div className="run-missed">
-          <h3>周波数の確認</h3>
-          <ul>{result.frequencies.map((use) => {
-            const { main, sub } = formatFrequency(use.rf);
-            return <li key={use.rf}><b>{main}.{sub}</b> — {frequencyLine(use)}</li>;
-          })}</ul>
-        </div>
-      )}
+      {flavor.sections?.(result)}
 
       {nil.length > 0 && (
         <div className="run-missed">
@@ -206,7 +209,7 @@ export function CqRunReview({ review, preset, onRestart, onClose }: { review: Ru
               : '難易度はそのまま（もう少し様子を見ます）。'}
         {' '}悪条件やダブりで落とした文字は苦手分析に入りません（分析画面のスイッチで表示できます）。
       </p>
-      {onRestart && <button type="button" className="btn btn-success btn-block" onClick={onRestart}>もう一度 CQ を出す</button>}
+      {onRestart && <button type="button" className="btn btn-success btn-block" onClick={onRestart}>{flavor.restartLabel}</button>}
       {onClose && <button type="button" className="btn btn-ghost btn-block" onClick={onClose}>記録の一覧に戻る</button>}
     </div>
   );

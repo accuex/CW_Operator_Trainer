@@ -17,7 +17,10 @@ export type GoneReason = 'patience' | 'waited' | 'timeout' | 'dropped' | 'ignore
 /** What an agent tells the mode that is keeping the books. */
 export type AgentNote =
   | { type: 'called'; agent: Agent }
-  | { type: 'selected'; agent: Agent; via: 'call' | 'single' | 'bust' }
+  /** 'hijack': answered a call meant for a look-alike closer to it (an eager station). */
+  | { type: 'selected'; agent: Agent; via: 'call' | 'single' | 'bust' | 'hijack' }
+  /** A station that answered a call that wasn't its own heard us call someone else, and stood back. */
+  | { type: 'released'; agent: Agent }
   | { type: 'corrected'; agent: Agent; heard: string }
   | { type: 'asked'; agent: Agent; fields: AskField[] }
   | { type: 'exchanged'; agent: Agent }
@@ -37,8 +40,8 @@ export interface AgentContext {
   /** Everyone else on the frequency (stands in for what an operator would just know). */
   peers(): readonly Agent[];
   notify(note: AgentNote): void;
-  /** The agent can hear `party` (anyone, if omitted) keying right now — known before the message is over. */
-  hearsKeying(agent: Agent, party?: AirParty): boolean;
+  /** The agent can hear `party` (anyone but `except`, if omitted) keying right now — known before the message is over. */
+  hearsKeying(agent: Agent, party?: AirParty, except?: AirParty): boolean;
   /** When the transmission of `party` the agent hears keying right now began (null: none) — to tell a doubling. */
   keyingSince(agent: Agent, party: AirParty): number | null;
 }

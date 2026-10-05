@@ -4,7 +4,7 @@ import { clampSpeedWpm } from './speed';
 import { COURSE_DEFAULT_UNLOCK } from './course';
 import { normalizeQsoProfile } from './radio/skills';
 import { QSO_TRACE_LIMIT, type QsoTrace } from './radio/trace';
-import { RUN_TRACE_LIMIT, type RunTrace } from './radio/runTrace';
+import { RUN_TRACE_LIMIT, type AnyRunTrace } from './radio/runTrace';
 
 const DB_NAME = 'cw-operator-trainer';
 const DB_VERSION = 3;
@@ -99,9 +99,9 @@ export const addQsoTrace = (trace: QsoTrace) => putCapped('qsoTraces', trace, QS
 export const getQsoTrace = (id: string) => transaction<QsoTrace | undefined>('qsoTraces', 'readonly', (store) => store.get(id));
 
 /** Store a run trace and drop all but the newest RUN_TRACE_LIMIT. */
-export const addRunTrace = (trace: RunTrace) => putCapped('runTraces', trace, RUN_TRACE_LIMIT);
+export const addRunTrace = (trace: AnyRunTrace) => putCapped('runTraces', trace, RUN_TRACE_LIMIT);
 /** Stored runs, newest first. */
-export const getRunTraces = () => transaction<RunTrace[]>('runTraces', 'readonly', (store) => store.getAll())
+export const getRunTraces = () => transaction<AnyRunTrace[]>('runTraces', 'readonly', (store) => store.getAll())
   .then((traces) => traces.sort((a, b) => b.startedAt - a.startedAt));
 
 async function replaceStoreAll<T>(storeName: 'answers' | 'sessions', items: T[]) {

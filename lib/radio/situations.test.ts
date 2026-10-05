@@ -7,7 +7,7 @@ import { emptyQsoProfile, updateSkills } from './skills';
 
 const NO_TX = { total: 0, onFrequency: 0, procedure: 0 };
 const ENV = { snr: 4, qrm: 0, qsb: 0, qrn: 0, offset: 0 };
-const conditionOf = (situation: CopySituation) => (situation === 'doubled' ? 'muted' : situation);
+const conditionOf = (situation: CopySituation) => (situation === 'doubled' ? 'muted' : situation === 'overlap' ? 'qrm' : situation);
 
 /** A field whose characters went through `situations` (one per character, the last repeated). */
 const field = (key: string, expected: string, input: string, situations: CopySituation[]): FieldResult => ({
@@ -27,15 +27,20 @@ const answers = (fields: FieldResult[]) =>
   fieldAnswers(fields, { sessionId: 's', timestamp: 0, wpm: 20, modeId: 'cq-run', presetId: 'basic', alphabet: 'international' });
 
 describe('copy situations', () => {
-  it('tells a doubling from band QRM', () => {
+  it('tells our doubling, another caller keying over, and band QRM apart', () => {
     expect(situationOf('muted', null)).toBe('doubled');
-    expect(situationOf('qrm', { ...ENV, qrm: 1.2, qrmFrom: 'caller' })).toBe('doubled');
+    expect(situationOf('muted', { ...ENV, qrm: 1.2, qrmFrom: 'caller' })).toBe('doubled');
+    expect(situationOf('qrm', { ...ENV, qrm: 1.2, qrmFrom: 'caller' })).toBe('overlap');
     expect(situationOf('qrm', { ...ENV, qrm: 1.2, qrmFrom: 'band' })).toBe('qrm');
     expect(situationOf('qsb', { ...ENV, qsb: 0.5 })).toBe('qsb');
     expect(causeOf('doubled')).toBe('doubling');
+    expect(causeOf('overlap')).toBe('overlap');
     expect(causeOf('qrm')).toBe('environment');
     expect(causeOf('clean')).toBe('copy');
     expect(hardestSituation(['clean', 'qsb', 'doubled', 'weak'])).toBe('doubled');
+    expect(hardestSituation(['clean', 'qrm', 'overlap'])).toBe('overlap');
+    expect(hardestSituation(['overlap', 'detuned'])).toBe('detuned');
+    expect(hardestSituation(['overlap', 'doubled'])).toBe('doubled');
   });
 
   it('keeps doubled characters out of clean copy and band robustness, and sorts calls by their hardest character', () => {
@@ -82,5 +87,37 @@ describe('copy situations', () => {
     const rows = qsoConditionBreakdown(logs);
     expect(rows.map((row) => row.condition).sort()).toEqual(['clean', 'doubled', 'qrm']);
     expect(qsoConditionBreakdown(logs, 'call')).toEqual([expect.objectContaining({ condition: 'doubled', answers: 3, accuracy: 0 })]);
+  });
+
+  it('keeps overlapped characters apart from our doublings and band conditions', () => {
+    const fields = [field('call', 'JA1ABC', 'JA1AXC', ['clean', 'clean', 'clean', 'overlap', 'overlap', 'doubled'])];
+    const evidence = collectEvidence(fields, NO_TX);
+    expect(evidence.clean).toEqual({ total: 3, correct: 3 });
+    expect(evidence.overlap).toEqual({ total: 2, correct: 1 });
+    expect(evidence.doubled).toEqual({ total: 1, correct: 1 });
+    expect(evidence.env).toEqual({});
+    expect(evidence.causes).toMatchObject({ copy: 0, overlap: 1, doubling: 0, environment: 0 });
+    expect(evidence.calls!.log).toEqual({ doubled: { total: 1, correct: 0 } });
+    const merged = mergeEvidence([evidence, evidence], NO_TX);
+    expect(merged.overlap).toEqual({ total: 4, correct: 2 });
+    expect(merged.causes.overlap).toBe(2);
+    // Evidence stored before overlap existed has no overlap count.
+    const old = { ...evidence, causes: { copy: 1, environment: 0, doubling: 1, tuning: 0, timing: 0, procedure: 0 } };
+    delete (old as Partial<typeof old>).overlap;
+    expect(mergeEvidence([old], NO_TX).causes).toMatchObject({ copy: 1, overlap: 0, doubling: 1 });
+  });
+
+  it('leaves overlapped characters out of weak pairs and contrasts them as 通常 → 重なり', () => {
+    const fields: FieldResult[] = [];
+    for (let index = 0; index < 8; index += 1) fields.push(field('call', 'K', 'K', ['clean']));
+    for (let index = 0; index < 4; index += 1) fields.push(field('call', 'K', 'R', ['overlap']));
+    const logs = answers(fields);
+    expect(logs.filter((log) => log.qso!.situation === 'overlap')).toHaveLength(4);
+    expect(weakPairs(forWeakAnalysis(logs))).toEqual([]);
+    expect(conditionContrast(logs)).toEqual([expect.objectContaining({ symbol: 'K', situation: 'overlap', clean: 1, accuracy: 0, answers: 4 })]);
+    expect(qsoConditionBreakdown(logs).map((row) => row.condition).sort()).toEqual(['clean', 'overlap']);
+    // A record from CQ Run v1 (callers over each other filed as doubled) stays doubled.
+    const old = { ...logs[8], qso: { ...logs[8].qso!, situation: 'doubled' as const, cause: 'doubling' as const } };
+    expect(qsoConditionBreakdown([old])).toEqual([expect.objectContaining({ condition: 'doubled' })]);
   });
 });

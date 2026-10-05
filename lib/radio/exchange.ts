@@ -39,4 +39,13 @@ export const BASIC_RST_NAME_QTH: ExchangePreset = {
   ],
 };
 
-export const PRESETS: Record<string, ExchangePreset> = { [BASIC_RST_NAME_QTH.id]: BASIC_RST_NAME_QTH };
+/** A pileup's log line: the call and the report it gave us. */
+export const PILEUP_RST: ExchangePreset = {
+  id: 'pileup-rst',
+  kind: 'builtin',
+  label: 'コール・RST',
+  alphabet: 'international',
+  fields: BASIC_RST_NAME_QTH.fields.filter((field) => field.key === 'call' || field.key === 'rst'),
+};
+
+export const PRESETS: Record<string, ExchangePreset> = { [BASIC_RST_NAME_QTH.id]: BASIC_RST_NAME_QTH, [PILEUP_RST.id]: PILEUP_RST };

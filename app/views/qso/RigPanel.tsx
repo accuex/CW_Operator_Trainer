@@ -13,7 +13,11 @@ export function RigPanel({ rig, onPower }: { rig: Rig; onPower?: (result: PowerR
   const dragRef = useRef<{ x: number; vfo: number; moved: boolean; width: number } | null>(null);
   const freq = formatFrequency(vfo);
 
-  const power = async () => onPower?.(await rig.powerToggle());
+  const power = async () => {
+    // Not `onPower?.(await …)`: without onPower that would skip powering altogether.
+    const result = await rig.powerToggle();
+    onPower?.(result);
+  };
 
   const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);

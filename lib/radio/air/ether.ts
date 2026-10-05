@@ -70,9 +70,12 @@ export class Ether {
     return !this.transmittingAt(listener.key, event.start + HEAD_SECONDS);
   }
 
-  /** `party` (anyone but the listener if omitted) is keying at `t` where `listener` would hear it — a carrier is audible before the message is understood. */
-  hearsKeying(listener: AirListener, party: AirParty | undefined, t: number) {
-    return this.log.some((event) => (party === undefined || event.from === party) && event.from !== listener.key && event.epoch === this.epoch
+  /**
+   * `party` (anyone but the listener — and `except` — if omitted) is keying at `t` where
+   * `listener` would hear it — a carrier is audible before the message is understood.
+   */
+  hearsKeying(listener: AirListener, party: AirParty | undefined, t: number, except?: AirParty) {
+    return this.log.some((event) => (party === undefined || event.from === party) && event.from !== listener.key && event.from !== except && event.epoch === this.epoch
       && event.start <= t && t < event.end && Math.abs(event.rf - listener.listenRf()) <= listener.rxWidth / 2);
   }
 

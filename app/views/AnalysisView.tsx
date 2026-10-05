@@ -1,7 +1,8 @@
 'use client';
 
 import { Fragment, useState, type CSSProperties } from 'react';
-import { conditionContrast, confusionMatrix, forWeakAnalysis, qsoConditionBreakdown, summary, weakPairs, type ConditionContrast, type ConditionRow } from '@/lib/analytics';
+import { conditionContrast, confusionMatrix, forWeakAnalysis, pileupBreakdown, qsoConditionBreakdown, summary, weakPairs, type ConditionContrast, type ConditionRow, type PileupBreakdown, type PileupFinding } from '@/lib/analytics';
+import { CAUSE_LABEL, CROWD_LABEL } from './qso/PileupReview';
 import type { AlphabetType, AnswerLog, SessionRecord } from '@/lib/types';
 import { type View, pct, fmtLatency } from '@/app/trainer/shared';
 import { Metric, EmptyState, Segmented } from '@/app/components/ui';
@@ -26,6 +27,7 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
   const queueSessions = sessions.filter((session) => session.queue);
   const stable = queueSessions.length ? queueSessions.reduce((sum, session) => sum + (session.queue?.stableDepth ?? 0), 0) / queueSessions.length : 0;
   const medals = ['gold', 'silver', 'bronze'];
+  const pileup = pileupBreakdown(sessions);
   return (
     <section className="page-pad analysis-page">
       <div className="page-title">
@@ -136,6 +138,7 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
         </aside>
       </div>
       {qsoRows.length > 0 && <QsoConditionPanel rows={qsoRows} callRows={callRows} contrast={contrast} />}
+      {pileup && <PileupPanel data={pileup} />}
       <div className="insight-band">
         <div className="insight-copy">
           <p className="section-kicker">NEXT ACTION</p>
@@ -151,7 +154,7 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
 }
 
 const CONDITION_LABEL: Record<string, string> = {
-  clean: '通常', weak: '弱信号', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', detuned: '同調ずれ', doubled: 'ダブり', unheard: '未受信',
+  clean: '通常', weak: '弱信号', qsb: 'QSB', qrn: 'QRN', qrm: 'QRM', overlap: '重なり', detuned: '同調ずれ', doubled: 'ダブり', unheard: '未受信',
 };
 const CONDITION_ORDER = Object.keys(CONDITION_LABEL);
 const bySituation = (rows: ConditionRow[]) => [...rows].sort((a, b) => CONDITION_ORDER.indexOf(a.condition) - CONDITION_ORDER.indexOf(b.condition));
@@ -207,6 +210,50 @@ function QsoConditionPanel({ rows, callRows, contrast }: { rows: ConditionRow[];
           </ul>
         </>
       )}
+    </div>
+  );
+}
+
+const FINDING: Record<PileupFinding, string> = {
+  'crowd-weak': '1 局だけのときより、3 局以上が同時に応答したときの最初のコールが大きく落ちています。partial で 1 局に絞ってから呼ぶ練習を。',
+  'similar-mixups': '似たコールの局との取り違えが続いています。違う 1 文字に注意して、コールを確かめてから 5NN を。',
+  'doubling-often': '相手がまだ送信しているうちに送り出してダブることが多めです。応答が終わるのを聞いてから送りましょう。',
+  'narrowing-weak': 'partial から始めた選局が、当てはまる局にたどり着かないことが多めです。断片は確実に聞こえた文字だけで。',
+};
+
+/** Pileup runs added up: first calls by how many answered at once, look-alikes, doublings, causes. */
+function PileupPanel({ data }: { data: PileupBreakdown }) {
+  const causes = (Object.entries(data.causes) as [keyof typeof CAUSE_LABEL, number][]).filter(([, count]) => count).sort((a, b) => b[1] - a[1]);
+  const rate = (tally: { total: number; correct: number }) => (tally.total ? tally.correct / tally.total : 0);
+  return (
+    <div className="panel panel-pad qso-condition-panel pileup-analysis-panel">
+      <div className="panel-head">
+        <div>
+          <p className="section-kicker">PILEUP</p>
+          <h2>パイルアップの最初のコール</h2>
+          <small>{data.runs} ラン・選局 {data.picks} 回（うちダブり {data.doubledPicks}）。似たコール・割り込み・ダブりのミスは受信の苦手分析に入れていません。</small>
+        </div>
+      </div>
+      <ul>
+        {(['1', '2', '3+'] as const).filter((crowd) => data.firstCall[crowd].total).map((crowd) => (
+          <li key={crowd} className={crowd === '1' ? 'clean' : ''}>
+            <span>応答 {CROWD_LABEL[crowd]}</span>
+            <i><b style={{ width: `${Math.round(rate(data.firstCall[crowd]) * 100)}%` }} /></i>
+            <strong>{pct(rate(data.firstCall[crowd]))}</strong>
+            <small>{data.firstCall[crowd].total}回</small>
+          </li>
+        ))}
+        {data.similarMet > 0 && (
+          <li>
+            <span>似たコールがいた</span>
+            <i><b style={{ width: `${Math.round((data.similarRight / data.similarMet) * 100)}%` }} /></i>
+            <strong>{pct(data.similarRight / data.similarMet)}</strong>
+            <small>{data.similarMet}交信</small>
+          </li>
+        )}
+      </ul>
+      {causes.length > 0 && <p className="muted-copy">ミスの原因：{causes.map(([cause, count]) => `${CAUSE_LABEL[cause]} ${count}`).join('・')}</p>}
+      {data.findings.map((finding) => <p key={finding} className="qso-hint">{FINDING[finding]}</p>)}
     </div>
   );
 }
