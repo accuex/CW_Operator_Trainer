@@ -68,7 +68,7 @@ describe('headless CQ run', () => {
   });
 
   it('keeps running with crowds and slow, weak callers', () => {
-    const crowd = batch({ params: { callers: 2.5, speed: 12, weak: 0.6, spread: 200 } });
+    const crowd = batch({ params: { arrivals: 5, speed: 12, weak: 0.6, spread: 200 } });
     for (const report of crowd) expect(report.run.agents.every((agent) => agent.gone)).toBe(true);
     expect(contactsOf(crowd).length).toBeGreaterThan(SEEDS.length);
   });
@@ -91,5 +91,53 @@ describe('headless CQ run', () => {
     expect(flagged.length).toBeGreaterThan(SEEDS.length * 0.6);
     for (const report of flagged) expect(report.issues).toContain('cq-without-qrl');
     expect(careless.filter((report) => report.qsys > 0).length).toBeGreaterThan(SEEDS.length * 0.5);
+  });
+
+  const meanWaiting = (reports: ReturnType<typeof batch>, from: number, to: number) =>
+    reports.reduce((sum, report) => sum + report.waiting.samples.slice(from, to).reduce((a, b) => a + b, 0) / (to - from), 0) / reports.length;
+
+  it('settles to a few waiting callers, even with CQ repeat left running and nobody picked', () => {
+    const long = { duration: 600 };
+    for (const bot of [{}, { cqRepeat: 4 }, { cqRepeat: 4, pick: false }]) {
+      const reports = batch({ ...long, bot });
+      const early = meanWaiting(reports, 120, 300);
+      const late = meanWaiting(reports, 420, 600);
+      expect(late, JSON.stringify(bot)).toBeLessThan(2.5);
+      expect(late, JSON.stringify(bot)).toBeLessThan(early * 1.5 + 0.5);
+    }
+  });
+
+  it('builds a pileup from the same callers with other parameters, and it stays bounded', () => {
+    const normal = batch({ duration: 600, bot: { cqRepeat: 4 } });
+    const pileup = batch({ duration: 600, bot: { cqRepeat: 4 }, params: { arrivals: 8, crowd: { patience: 1.6, recall: 1 } } });
+    const busy = meanWaiting(pileup, 300, 600);
+    expect(busy).toBeGreaterThan(meanWaiting(normal, 300, 600) * 3);
+    // Levels off: the last minutes add little to the ones before.
+    expect(meanWaiting(pileup, 450, 600)).toBeLessThan(meanWaiting(pileup, 300, 450) * 1.15 + 1);
+    expect(Math.max(...pileup.map((report) => report.waiting.max))).toBeLessThan(40);
+  });
+
+  it('still works callers it doubled with', () => {
+    const reports = batch({ duration: 600, bot: { cqRepeat: 4 } });
+    const doubled = reports.flatMap((report) => report.run.agents.filter((agent) => agent.doublings > 0));
+    expect(doubled.length).toBeGreaterThan(SEEDS.length);
+    const worked = doubled.filter((agent) => agent.state === 'done');
+    expect(worked.length).toBeGreaterThan(doubled.length * 0.25);
+    // Nobody gives up the moment its own call ends: there's always a chance to be answered.
+    expect(doubled.filter((agent) => agent.goneReason === 'waited').length).toBeLessThan(doubled.length * 0.5);
+    expect(reports.reduce((sum, report) => sum + report.result.stats.doublings, 0)).toBeGreaterThan(0);
+  });
+
+  it('flags CQs sent without listening after QRL?', () => {
+    const hasty = batch({ placement: { onFrequency: false, nearby: 0 }, bot: { qrlListen: 0, cqListen: 1 } });
+    for (const report of hasty) {
+      expect(report.result.stats.qrlNoListen).toBeGreaterThanOrEqual(1);
+      expect(report.issues).toContain('qrl-no-listen');
+    }
+    const careful = batch({ placement: { onFrequency: false, nearby: 0 } });
+    for (const report of careful) {
+      expect(report.result.stats.qrlNoListen).toBe(0);
+      expect(report.result.frequencies[0].qrlListen).toBeGreaterThanOrEqual(3);
+    }
   });
 });

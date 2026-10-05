@@ -8,14 +8,20 @@ const session = (seed: number) => new RunSession({ random: seeded(seed), me: ME,
 const at = { start: 0, end: 1, rf: 7_012_000 };
 
 describe('RunSession arrivals', () => {
-  it('brings λ callers per CQ and half that per QRZ?', () => {
-    const cq = session(1);
-    for (let index = 0; index < 1500; index += 1) cq.transmit('CQ DE JA1ZZZ K', at);
-    expect(cq.agents.length / 1500).toBeCloseTo(DEFAULT_RUN_PARAMS.callers, 1);
-
-    const qrz = session(2);
-    for (let index = 0; index < 1500; index += 1) qrz.transmit('QRZ? DE JA1ZZZ K', at);
-    expect(qrz.agents.length / 1500).toBeCloseTo(DEFAULT_RUN_PARAMS.callers / 2, 1);
+  it('brings callers per minute on the air, however fast we CQ', () => {
+    const perMinute = (seed: number, text: string, every: number) => {
+      const run = session(seed);
+      for (let index = 0; index < 6000; index += 1) run.transmit(text, { ...at, start: index * every, end: index * every + 1 });
+      return run.agents.length / ((6000 * every) / 60);
+    };
+    const { arrivals } = DEFAULT_RUN_PARAMS;
+    const near = (value: number, expected: number) => expect(Math.abs(value / arrivals - expected)).toBeLessThan(0.12 * expected);
+    near(perMinute(1, 'CQ DE JA1ZZZ K', 10), 1);
+    near(perMinute(2, 'CQ DE JA1ZZZ K', 4), 1);
+    near(perMinute(3, 'R TU 73 DE JA1ZZZ QRZ?', 10), 1);
+    // A bare QRZ? is found by half as many; listeners who heard us too long ago have gone.
+    near(perMinute(4, 'QRZ?', 10), 0.5);
+    near(perMinute(5, 'CQ DE JA1ZZZ K', 90), 0.5);
   });
 
   it('brings nobody to a CQ without our call, and says so', () => {

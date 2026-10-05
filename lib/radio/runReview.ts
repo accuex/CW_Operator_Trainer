@@ -100,6 +100,19 @@ export function runSummary({ result, score, modeId, presetId, fieldCount, diffic
       unlogged: result.stats.unlogged,
       dupes: result.stats.dupes,
       missed: result.missed.length,
+      tempo: result.tempo,
+      callers: result.stats.callers,
+      doublings: result.stats.doublings,
+      busyCqs: result.stats.busyCqs,
+      qrlNoListen: result.stats.qrlNoListen,
+      frequencies: result.frequencies.map((use) => ({
+        rf: use.rf,
+        at: Math.round(wallClock(use.firstCqAt)),
+        qrlFirst: use.qrlFirst,
+        qrlListen: use.qrlListen === null ? null : Math.round(use.qrlListen * 10) / 10,
+        busyCqs: use.busyCqs,
+        qsyAsked: use.qsyAsked,
+      })),
     },
   };
 }

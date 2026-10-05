@@ -77,12 +77,26 @@ export class Ether {
   }
 
   /**
-   * Someone keyed within ±`within` Hz of `rf` since `since` — the frequency is in use.
+   * Someone keyed within ±`within` Hz of `rf` between `since` and `until` — the frequency is in use.
    * `except` names who doesn't count (a party, or a test: our own callers aren't "someone else").
+   * `until` keeps out what is scheduled but not yet on the air.
    */
-  activeNear(rf: number, within: number, since: number, except: AirParty | ((party: AirParty) => boolean) = 'me') {
+  activeNear(rf: number, within: number, since: number, except: AirParty | ((party: AirParty) => boolean) = 'me', until = Number.POSITIVE_INFINITY) {
     const ignored = typeof except === 'function' ? except : (party: AirParty) => party === except;
-    return this.log.some((event) => !ignored(event.from) && event.end >= since && Math.abs(event.rf - rf) <= within);
+    return this.log.some((event) => !ignored(event.from) && event.end >= since && event.start <= until && Math.abs(event.rf - rf) <= within);
+  }
+
+  /** When the transmission of `party` that `listener` hears keying at `t` began (null: none). */
+  keyingSince(listener: AirListener, party: AirParty, t: number): number | null {
+    const event = this.log.find((item) => item.from === party && item.from !== listener.key && item.epoch === this.epoch
+      && item.start <= t && t < item.end && Math.abs(item.rf - listener.listenRf()) <= listener.rxWidth / 2);
+    return event ? event.start : null;
+  }
+
+  /** When the latest transmission from someone `who` accepts, near `rf` and begun by `until`, ends (−∞ if none). */
+  lastNear(rf: number, within: number, who: (party: AirParty) => boolean, until: number) {
+    return this.log.reduce((latest, event) => (who(event.from) && event.start <= until && Math.abs(event.rf - rf) <= within
+      ? Math.max(latest, event.end) : latest), Number.NEGATIVE_INFINITY);
   }
 
   /** When `party`'s latest transmission on the air ends (−∞ if none this epoch, or long ago). The air, not a UI flag, says who is keying. */

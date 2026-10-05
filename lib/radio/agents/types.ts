@@ -11,8 +11,8 @@ import type { Random } from '../random';
 
 export interface AgentMe { call: string; name: string; qth: string }
 
-/** Why an agent left the frequency. */
-export type GoneReason = 'patience' | 'timeout' | 'dropped' | 'ignored-correction' | 'never-called';
+/** Why an agent left the frequency. 'patience': called too often unanswered; 'waited': waited too long unpicked. */
+export type GoneReason = 'patience' | 'waited' | 'timeout' | 'dropped' | 'ignored-correction' | 'never-called';
 
 /** What an agent tells the mode that is keeping the books. */
 export type AgentNote =
@@ -39,6 +39,8 @@ export interface AgentContext {
   notify(note: AgentNote): void;
   /** The agent can hear `party` (anyone, if omitted) keying right now — known before the message is over. */
   hearsKeying(agent: Agent, party?: AirParty): boolean;
+  /** When the transmission of `party` the agent hears keying right now began (null: none) — to tell a doubling. */
+  keyingSince(agent: Agent, party: AirParty): number | null;
 }
 
 export interface Agent extends AirListener {

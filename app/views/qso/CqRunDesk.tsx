@@ -7,7 +7,7 @@ import { fieldAnswers } from '@/lib/radio/attribution';
 import type { AgentNote } from '@/lib/radio/agents/types';
 import type { DifficultyVector, QsoEvidence } from '@/lib/radio/difficulty';
 import type { ExchangePreset } from '@/lib/radio/exchange';
-import { fillMemory, memoryTemplates, MEMORY_KEYS, type MemoryVars } from '@/lib/radio/memories';
+import { fillMemory, memoryTemplates, MEMORY_KEYS, retemplate, type MemoryTempo, type MemoryVars } from '@/lib/radio/memories';
 import type { RunQsoMode } from '@/lib/radio/modes';
 import type { LogFields, RadioPort, RunIssue, RunLogEntry, RunSession } from '@/lib/radio/modes/cqRun';
 import { runSummary, scoreRun } from '@/lib/radio/runReview';
@@ -32,14 +32,18 @@ interface RunPrefs {
   coach: boolean;
   /** Run length in minutes; 0 = until QRT. */
   timer: (typeof TIMERS)[number];
+  /** Short exchange (standard) or the long rubber stamp: our keys and the callers' style. */
+  tempo: MemoryTempo;
 }
 
 const readPrefs = (): RunPrefs => {
-  const base: RunPrefs = { templates: memoryTemplates(null), repeat: true, interval: 4, coach: true, timer: 0 };
+  const base: RunPrefs = { templates: memoryTemplates(null), repeat: true, interval: 4, coach: true, timer: 0, tempo: 'short' };
   try {
     const raw = JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}') as Partial<RunPrefs>;
+    const tempo: MemoryTempo = raw.tempo === 'long' ? 'long' : 'short';
     return {
-      templates: memoryTemplates(raw.templates),
+      tempo,
+      templates: memoryTemplates(raw.templates, tempo),
       repeat: typeof raw.repeat === 'boolean' ? raw.repeat : base.repeat,
       interval: typeof raw.interval === 'number' ? Math.min(10, Math.max(2, raw.interval)) : base.interval,
       coach: typeof raw.coach === 'boolean' ? raw.coach : base.coach,
@@ -61,13 +65,17 @@ const ISSUE_TEXT: Record<RunIssue, string> = {
   'no-call': '複数の局が呼んでいます。誰に送ったのかわかるよう、相手のコールを付けましょう',
   'cq-without-qrl': 'QRL? を出さずに CQ を出しました。この周波数は使用中です。VFO を動かし、聴いて F6（QRL?）で確かめてから CQ を出しましょう',
   'busy-frequency': 'QRL? は出しましたが、この周波数は使用中でした（返事や近くの信号がありました）。QRL? のあと数秒聴き、空いていなければ QSY してから CQ を出しましょう',
+  'qrl-no-listen': 'QRL? のあと聴かずに CQ を出しました。QRL? は、そのあと数秒聴いて返事がないことを確かめるまでが確認です',
 };
 /** A CQ on someone else's QSO stops CQ repeat: moving is the operator's call. */
 const BUSY_ISSUES: RunIssue[] = ['cq-without-qrl', 'busy-frequency'];
 const QRL_ANSWERED = 'QRL? に返事がありました。この周波数は使用中です。VFO を動かして別の周波数を探しましょう';
 const QSY_ASKED = 'この周波数で交信中の局から QSY を求められています。VFO を 1 kHz ほど動かし、聴いて QRL? で確かめてから CQ を出しましょう';
+const CQ_HELD = 'QRL? のあと聴いています。数秒たって空いていれば CQ を出します（Esc で取消）';
+const CQ_CANCELLED = 'QRL? のあとに信号が聞こえたので、CQ の予約を取り消しました。この周波数は使用中です。VFO を動かして確かめ直しましょう';
+const CQ_MOVED = 'VFO を動かしたので、CQ の予約を取り消しました。新しい周波数でも聴いて QRL? で確かめましょう';
 /** Advice about a busy frequency, cleared once a CQ goes out clean elsewhere. */
-const FREQUENCY_ADVICE = new Set([QRL_ANSWERED, QSY_ASKED, ...BUSY_ISSUES.map((issue) => ISSUE_TEXT[issue])]);
+const FREQUENCY_ADVICE = new Set([QRL_ANSWERED, QSY_ASKED, CQ_HELD, CQ_CANCELLED, CQ_MOVED, ...BUSY_ISSUES.map((issue) => ISSUE_TEXT[issue])]);
 
 /** One run on the air: the session, what we copied, and the clock bookkeeping between rig and run. */
 interface Live {
@@ -84,11 +92,12 @@ interface Live {
   /** Rebased start of the current epoch: CQ repeat counts from here when the air has none of ours yet. */
   epochStart: number;
   /**
-   * A message keyed while we were still on the air: it goes out once the air says our
-   * transmitter is clear (CQ repeat never queues). A UI reservation only — whether we are
-   * keying is always read from the run's ether.
+   * A message keyed while we were still on the air, or a CQ keyed while we listen after
+   * QRL?: it goes out once the air says our transmitter is clear and, for a CQ, the run's
+   * frequency check has listened its window out. A reservation only — whether we are
+   * keying and whether the frequency is in use are always read from the run's ether.
    */
-  queued: { text: string; cq: boolean } | null;
+  queued: { text: string; cq: boolean; rf: number; held?: boolean } | null;
   closed: boolean;
   /** Coaching that waits until the station has finished sending what it is about. */
   pending: { stationId: number; station: Station; text: string }[];
@@ -187,6 +196,11 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     setPrefsState(next);
     writePrefs(next);
   };
+  /** Keys still on the old defaults follow the tempo; callers arriving from now on do too. */
+  const setTempo = (tempo: MemoryTempo) => {
+    setPrefs({ tempo, templates: retemplate(prefs.templates, prefs.tempo, tempo) });
+    liveRef.current?.run.setParams({ tempo });
+  };
 
   /** A fresh run on the current frequency, with background QRM around it. */
   const newLive = (engine: RigEngine): Live => {
@@ -198,7 +212,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
       send: (station, text, delay) => engine.send(station, text, delay),
       stationsChanged: (stations) => engine.setStations([...live.qrm, ...stations]),
     };
-    const run = runMode.createRun({ random: Math.random, me: { call, name, qth }, difficulty: d }, radio);
+    const run = runMode.createRun({ random: Math.random, me: { call, name, qth }, difficulty: d, tempo: latest.current.prefs.tempo }, radio);
     Object.assign(live, {
       id: `run-${nowId()}`, run, capture: rig.newCapture(), qrm, epoch: engine.epoch, lastNow: engine.now(), startedAt: null,
       txCount: 0, procedure: 0, epochStart: engine.now(), queued: null, closed: false, pending: [],
@@ -251,9 +265,28 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
       const clear = !live.run.keying(now) && live.run.keyedUntil <= now;
       if (clear && live.queued && engine.powered) {
         const next = live.queued;
-        live.queued = null;
-        void actions.current?.send(next.text, next.cq);
-      } else if (clear && armedRef.current && p.repeat && engine.powered && now - Math.max(live.run.keyedUntil, live.epochStart) >= p.interval) {
+        // A held CQ waits out the listen window after QRL?; anyone heard meanwhile calls it off.
+        const check = next.cq ? live.run.frequencyCheck(next.rf, now) : null;
+        if (next.cq && engine.vfo !== next.rf) {
+          live.queued = null;
+          setArmed(false);
+          setMessage({ text: CQ_MOVED, coach: true });
+        } else if (check?.state === 'busy') {
+          live.queued = null;
+          setArmed(false);
+          setMessage({ text: CQ_CANCELLED, coach: true });
+        } else if (check?.state === 'listening') {
+          if (!next.held) {
+            next.held = true;
+            setMessage({ text: CQ_HELD, coach: false });
+          }
+        } else {
+          live.queued = null;
+          void actions.current?.send(next.text, next.cq);
+        }
+      } else if (clear && armedRef.current && p.repeat && engine.powered
+        // CQ repeat listens from the later of our last message and the last caller's, so it doesn't step on a call.
+        && now - Math.max(live.run.keyedUntil, live.epochStart, live.run.callersQuietFrom(engine.vfo, now)) >= p.interval) {
         void actions.current?.send(fillMemory(p.templates[0], { MYCALL: latest.current.myCall }), true, true);
       }
       if (p.timer && live.startedAt && clear && Date.now() >= live.startedAt + p.timer * 60_000) actions.current?.qrt();
@@ -280,7 +313,13 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
     const now = sync(live, engine);
     if (live.run.keyedUntil > now) {
       // Still on the air (the run's ether says so): hold it until we are clear.
-      if (!repeat) live.queued = { text, cq };
+      if (!repeat) live.queued = { text, cq, rf: engine.vfo };
+      return;
+    }
+    if (cq && !repeat && live.run.frequencyCheck(engine.vfo, now).state === 'listening') {
+      // Keyed straight after QRL?: listen first, then CQ if nobody answered.
+      live.queued = { text, cq, rf: engine.vfo, held: true };
+      setMessage({ text: CQ_HELD, coach: false });
       return;
     }
     setSent((list) => [...list.slice(-40), text]);
@@ -527,6 +566,15 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
           <label className="run-interval">間隔 <b>{prefs.interval} 秒</b><input type="range" min={2} max={10} step={1} value={prefs.interval} onChange={(event) => setPrefs({ interval: Number(event.target.value) })} /></label>
         </div>
         <div className="run-control-row">
+          <label className="run-timer">
+            交換
+            <select value={prefs.tempo} onChange={(event) => setTempo(event.target.value === 'long' ? 'long' : 'short')}>
+              <option value="short">短め（標準）</option>
+              <option value="long">ラバースタンプ（長め）</option>
+            </select>
+          </label>
+        </div>
+        <div className="run-control-row">
           <label className="qso-auto"><input type="checkbox" checked={prefs.coach} onChange={(event) => setPrefs({ coach: event.target.checked })} />コーチ表示</label>
           <label className="run-timer">
             タイマー
@@ -548,7 +596,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
                 <input
                   value={prefs.templates[index]}
                   onChange={(event) => setPrefs({ templates: prefs.templates.map((item, at) => (at === index ? event.target.value.toUpperCase() : item)) })}
-                  onBlur={() => setPrefs({ templates: memoryTemplates(prefs.templates) })}
+                  onBlur={() => setPrefs({ templates: memoryTemplates(prefs.templates, prefs.tempo) })}
                   autoCapitalize="characters"
                   spellCheck={false}
                 />
@@ -557,7 +605,7 @@ export function CqRunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth
           </div>
         )}
         <p className="qso-note">
-          <kbd>F1</kbd>〜<kbd>F8</kbd> メモリー送信　<kbd>Esc</kbd> CQ リピート停止（送信待ちも取消）　送信中に押したキーは、今の送信が終わるとすぐ送ります。CQ の前に <kbd>F6</kbd> QRL? で周波数が空いているか確かめ、返事があれば VFO を動かして（QSY）確かめ直します。CALL 欄に <code>3AB?</code> と入れて <kbd>F5</kbd> で部分コール。
+          <kbd>F1</kbd>〜<kbd>F8</kbd> メモリー送信　<kbd>Esc</kbd> CQ リピート停止（送信待ちも取消）　送信中に押したキーは、今の送信が終わるとすぐ送ります。CQ の前に <kbd>F6</kbd> QRL? を出し、数秒聴いて返事がないことを確かめます（QRL? の直後に F1 を押すと、聴き終えてから CQ を出し、その間に信号が聞こえたら取り消します）。返事があれば VFO を動かして（QSY）確かめ直します。CQ リピートは、呼んでいる局が送り終えてから間隔を数えます。CALL 欄に <code>3AB?</code> と入れて <kbd>F5</kbd> で部分コール。
           正誤は QRT のあとにまとめて表示します。
         </p>
       </div>

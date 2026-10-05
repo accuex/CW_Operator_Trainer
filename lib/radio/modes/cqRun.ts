@@ -1,11 +1,12 @@
 import type { Station, Transmission } from '../band';
 import { Ether, type AirEvent } from '../air/ether';
 import { callDistance, isNearCall, normalizeCall, parseIntent, type OperatorIntent } from '../air/intent';
-import { RandomPersonaSource, type PersonaSource } from '../air/persona';
+import { RandomPersonaSource, type CrowdTraits, type PersonaSource } from '../air/persona';
 import { CallerAgent, createCaller } from '../agents/caller';
 import { createOccupantPair, type OccupantPair } from '../agents/occupant';
 import type { Agent, AgentContext, AgentMe, AgentNote, GoneReason } from '../agents/types';
 import { normalizeRst, normalizeWord } from '../exchange';
+import type { MemoryTempo } from '../memories';
 import { poisson, type Random } from '../random';
 
 /**
@@ -25,14 +26,30 @@ export type LogVerdict = 'ok' | 'nil' | 'dupe';
 /**
  * Procedure slips spotted in our own transmission. A CQ on a frequency in use is
  * 'cq-without-qrl' if we never asked, 'busy-frequency' if we asked first (and it was in use all the same).
+ * 'qrl-no-listen': a QRL? only checks the frequency once we have listened after it.
  */
-export type RunIssue = 'cq-without-call' | 'no-call' | 'cq-without-qrl' | 'busy-frequency';
+export type RunIssue = 'cq-without-call' | 'no-call' | 'cq-without-qrl' | 'busy-frequency' | 'qrl-no-listen';
+
+/** Short exchanges (the standard run tempo) or the long rubber stamp — callers and our memory keys alike. */
+export type ExchangeTempo = MemoryTempo;
+
+/**
+ * What a frequency check says right now: 'none' — no QRL? pending here; 'listening' — QRL?
+ * sent, still inside the listen window; 'busy' — someone was heard; 'clear' — listened, nothing.
+ */
+export type FrequencyCheck = { state: 'none' } | { state: 'listening'; until: number } | { state: 'busy' } | { state: 'clear' };
 
 export interface RunParams {
   /** Centre speed of callers, WPM. */
   speed: number;
-  /** Mean new callers per CQ. */
-  callers: number;
+  /**
+   * New listeners per minute who find us and call at our next CQ / QRZ? / TU. Per minute,
+   * not per CQ: repeating CQ faster doesn't bring more people to the band.
+   */
+  arrivals: number;
+  /** Caller patience, recall and short-exchange share (see CrowdTraits); `brief` follows `tempo` unless given. */
+  crowd: Partial<CrowdTraits>;
+  tempo: ExchangeTempo;
   /** Callers' transmit offset, ±Hz. */
   spread: number;
   /** 0–1, weaker callers as it rises. */
@@ -41,7 +58,14 @@ export interface RunParams {
   busy: number;
 }
 
-export const DEFAULT_RUN_PARAMS: RunParams = { speed: 16, callers: 0.8, spread: 80, weak: 0.15, busy: 0.35 };
+export const DEFAULT_RUN_PARAMS: RunParams = { speed: 16, arrivals: 1.5, crowd: {}, tempo: 'short', spread: 80, weak: 0.15, busy: 0.35 };
+
+/** Share of short-exchange callers by tempo. */
+export const BRIEF_SHARE: Record<ExchangeTempo, number> = { short: 0.7, long: 0.15 };
+/** Listeners who found us this long ago or more have moved on: arrivals count at most this window. */
+export const ARRIVAL_WINDOW = 45;
+/** Who is already tuned to the frequency when our first CQ goes out (seconds' worth of arrivals). */
+const FIRST_WINDOW = 20;
 
 /** "In use": someone else keyed within ±BUSY_HZ of our frequency in the last BUSY_SECONDS. */
 export const BUSY_HZ = 250;
@@ -49,6 +73,8 @@ export const BUSY_SECONDS = 20;
 /** A QRL? counts for a CQ within this many Hz and seconds of it. */
 export const QRL_HZ = 100;
 export const QRL_VALID = 60;
+/** Seconds to listen after QRL? before the frequency counts as checked. */
+export const QRL_LISTEN = 3;
 /** Callers who still come to a CQ on top of someone else's QSO. */
 export const BUSY_ARRIVALS = 0.3;
 /** One-sided QSOs (we hear only one of the two) among those placed. */
@@ -115,8 +141,13 @@ export interface FrequencyUse {
   firstCqAt: number;
   /** We sent QRL? there before the first CQ. */
   qrlFirst: boolean;
+  /** Seconds we listened between that QRL? ending and the first CQ (null: no QRL?). */
+  qrlListen: number | null;
+  lastCqAt: number;
   /** CQs we sent there while it was in use. */
   busyCqs: number;
+  /** Times a station there asked us to QSY. */
+  qsyAsked: number;
 }
 
 /** Where residents go when the run starts. Omitted fields are drawn from `busy`. */
@@ -135,6 +166,7 @@ export interface RunResult {
   unlogged: string[];
   missed: MissedCaller[];
   frequencies: FrequencyUse[];
+  tempo: ExchangeTempo;
   stats: {
     seconds: number;
     contacts: number;
@@ -150,10 +182,16 @@ export interface RunResult {
     dupes: number;
     /** CQs sent on a frequency in use. */
     busyCqs: number;
+    /** First CQs sent before listening out a QRL?. */
+    qrlNoListen: number;
+    /** Callers who came to the frequency. */
+    callers: number;
+    /** Doublings between us and callers. */
+    doublings: number;
   };
 }
 
-/** Our CQ reaches this many new callers on average; a QRZ? or TU only half as many. */
+/** A bare QRZ? (no call of ours) is found by half as many. */
 const QRZ_ARRIVALS = 0.5;
 
 export class RunSession {
@@ -172,8 +210,11 @@ export class RunSession {
   private partialsTotal = 0;
   private seq = 0;
   private notes: AgentNote[] = [];
-  private qrls: { rf: number; at: number }[] = [];
+  private qrls: { rf: number; at: number; end: number }[] = [];
+  /** Start of the transmission that last let new listeners find us. */
+  private foundAt: number | null = null;
   private frequencyList: FrequencyUse[] = [];
+  private qrlNoListen = 0;
   private readonly personas: PersonaSource;
   private readonly ctx: AgentContext;
 
@@ -187,6 +228,7 @@ export class RunSession {
       peers: () => this.agents.filter((agent) => !agent.gone),
       notify: (note) => this.onNote(note),
       hearsKeying: (agent, party) => this.ether.hearsKeying(agent, party, radio.now()),
+      keyingSince: (agent, party) => this.ether.keyingSince(agent, party, radio.now()),
     };
   }
 
@@ -207,11 +249,48 @@ export class RunSession {
   /** When our latest transmission ends (−∞ if none on the air recently). */
   get keyedUntil() { return this.ether.keyedUntil('me'); }
 
-  /** Is `rf` in use by someone other than us and our callers, as heard on the air? */
+  /** Is `rf` in use by someone other than us and our callers, as heard on the air by `at`? */
   frequencyBusy(rf: number, at: number) {
     const ours = new Set<number>(this.agents.map((agent) => agent.id));
-    return this.ether.activeNear(rf, BUSY_HZ, at - BUSY_SECONDS, (party) => party === 'me' || ours.has(party));
+    return this.ether.activeNear(rf, BUSY_HZ, at - BUSY_SECONDS, (party) => party === 'me' || ours.has(party), at);
   }
+
+  /**
+   * When the last caller we can hear on `rf` stopped (or stops) keying, as of `now` — CQ
+   * repeat listens from here, so it doesn't step on someone calling. Other stations'
+   * QRM doesn't hold it.
+   */
+  callersQuietFrom(rf: number, now: number) {
+    const ours = new Set<number>(this.agents.map((agent) => agent.id));
+    return this.ether.lastNear(rf, BUSY_HZ, (party) => party !== 'me' && ours.has(party), now);
+  }
+
+  /** The QRL? on `rf` not yet followed by a CQ there, if it is recent enough to count. */
+  private pendingQrl(rf: number, at: number) {
+    const qrl = [...this.qrls].reverse().find((item) => Math.abs(item.rf - rf) <= QRL_HZ && item.at < at && at - item.end <= QRL_VALID);
+    if (!qrl) return null;
+    const use = this.frequencyList.find((item) => Math.abs(item.rf - rf) <= QRL_HZ);
+    return use && use.lastCqAt > qrl.at ? null : qrl;
+  }
+
+  /**
+   * Where the check of `rf` stands at `now`, read from the air: after a QRL? we listen
+   * QRL_LISTEN seconds, and anyone heard near the frequency meanwhile makes it busy.
+   * A UI may hold a CQ on this; it never decides it from its own queue.
+   */
+  frequencyCheck(rf: number, now: number): FrequencyCheck {
+    const qrl = this.pendingQrl(rf, now);
+    if (!qrl) return { state: 'none' };
+    if (this.frequencyBusy(rf, now)) return { state: 'busy' };
+    const until = qrl.end + QRL_LISTEN;
+    return now < until ? { state: 'listening', until } : { state: 'clear' };
+  }
+
+  /** Change how new callers behave from here on (tempo, crowd); those already here stay as they are. */
+  setParams(change: Partial<RunParams>) {
+    this.config = { ...this.config, params: { ...this.config.params, ...change } };
+  }
+  get params(): Readonly<RunParams> { return this.config.params; }
 
   /**
    * Put the band's residents around where we start at `rf`: maybe a QSO right on it
@@ -275,28 +354,39 @@ export class RunSession {
       this.partialsTotal += 1;
     }
     if (intent.cq && !intent.mentionsMe) issues.push('cq-without-call');
-    if (intent.qrl) this.qrls.push({ rf, at: start });
     let busy = false;
     if (intent.cq) {
       busy = this.frequencyBusy(rf, start);
-      const asked = this.qrls.some((qrl) => Math.abs(qrl.rf - rf) <= QRL_HZ && start - qrl.at <= QRL_VALID && qrl.at < start);
+      const qrl = this.pendingQrl(rf, start);
+      const asked = qrl !== null || this.qrls.some((item) => Math.abs(item.rf - rf) <= QRL_HZ && item.at < start && start - item.end <= QRL_VALID);
+      const listened = qrl ? Math.max(0, start - qrl.end) : null;
       let use = this.frequencyList.find((item) => Math.abs(item.rf - rf) <= QRL_HZ);
       if (!use) {
-        use = { rf, firstCqAt: start, qrlFirst: asked, busyCqs: 0 };
+        use = { rf, firstCqAt: start, qrlFirst: asked, qrlListen: listened, lastCqAt: start, busyCqs: 0, qsyAsked: 0 };
         this.frequencyList.push(use);
       }
+      use.lastCqAt = start;
       if (busy) {
         use.busyCqs += 1;
         issues.push(asked ? 'busy-frequency' : 'cq-without-qrl');
+      } else if (listened !== null && listened < QRL_LISTEN) {
+        issues.push('qrl-no-listen');
+        this.qrlNoListen += 1;
       }
     }
+    if (intent.qrl) this.qrls.push({ rf, at: start, end });
     const exchangeOnly = (intent.report || intent.fields.name) && !intent.calls.length;
     if (exchangeOnly && !partner && this.agents.filter((agent) => agent.state === 'waiting').length > 1) issues.push('no-call');
 
-    // Arrival rate only (patience and re-calls live on the callers): tuned separately in Stage 4.
-    const arrivals = (intent.cq && intent.mentionsMe ? params.callers
-      : (intent.qrz || (intent.closing && intent.mentionsMe)) ? params.callers * QRZ_ARRIVALS : 0) * (busy ? BUSY_ARRIVALS : 1);
-    this.spawn(poisson(random, arrivals), rf, end);
+    // Listeners tune in at a steady rate and call when they hear who we are; patience and
+    // re-calls live on the callers. Together they settle the crowd — nothing caps it.
+    const found = intent.mentionsMe && (intent.cq || intent.qrz || intent.closing);
+    if (found || intent.qrz) {
+      const window = Math.min(ARRIVAL_WINDOW, start - (this.foundAt ?? start - FIRST_WINDOW));
+      this.foundAt = start;
+      const mean = (params.arrivals / 60) * window * (found ? 1 : QRZ_ARRIVALS) * (busy ? BUSY_ARRIVALS : 1);
+      this.spawn(poisson(random, mean), rf, end);
+    }
 
     this.ether.emit({ from: 'me', text, intent, rf, start, end });
     return { intent, issues };
@@ -384,6 +474,7 @@ export class RunSession {
       unlogged,
       missed: this.missed(),
       frequencies: this.frequencyList.map((use) => ({ ...use })),
+      tempo: this.config.params.tempo,
       stats: {
         seconds,
         contacts: made.length,
@@ -396,6 +487,9 @@ export class RunSession {
         unlogged: unlogged.length,
         dupes: log.filter((entry) => entry.verdict === 'dupe').length,
         busyCqs: this.frequencyList.reduce((sum, use) => sum + use.busyCqs, 0),
+        qrlNoListen: this.qrlNoListen,
+        callers: this.agents.length,
+        doublings: this.agents.reduce((sum, agent) => sum + agent.doublings, 0),
       },
     };
   }
@@ -409,7 +503,8 @@ export class RunSession {
     const now = Math.max(at, this.radio.now());
     for (let index = 0; index < count; index += 1) {
       const active = [...this.agents, ...this.residents].filter((agent) => !agent.gone).map((agent) => agent.station.call);
-      const persona = this.personas.next({ random, speed: params.speed, weak: params.weak, spread: params.spread, active });
+      const crowd = { brief: BRIEF_SHARE[params.tempo], ...params.crowd };
+      const persona = this.personas.next({ random, speed: params.speed, weak: params.weak, spread: params.spread, active, crowd });
       this.agents.push(createCaller(persona, { random, listenRf: rf, now }));
     }
     // Put them on the band before they key anything, so the rig doesn't reshuffle their clocks.
@@ -430,6 +525,11 @@ export class RunSession {
 
   private onNote(note: AgentNote) {
     this.notes.push(note);
+    if (note.type === 'qsy-asked') {
+      const rf = note.agent.station.rf;
+      const use = [...this.frequencyList].reverse().find((item) => Math.abs(item.rf - rf) <= BUSY_HZ);
+      if (use) use.qsyAsked += 1;
+    }
     if (!(note.agent instanceof CallerAgent)) return;
     const agent = note.agent;
     const now = this.radio.now();

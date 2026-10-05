@@ -163,6 +163,31 @@ export interface QsoRunSummary {
   dupes: number;
   /** Callers who called and left unworked. */
   missed: number;
+  /** Exchange tempo: short (standard) or the long rubber stamp. */
+  tempo?: 'short' | 'long';
+  /** Callers who came to the frequency, and doublings with them. */
+  callers?: number;
+  doublings?: number;
+  /** CQs sent on a frequency in use. */
+  busyCqs?: number;
+  /** First CQs keyed before listening out a QRL?. */
+  qrlNoListen?: number;
+  /** Every frequency we called CQ on, in order, and how it was checked. */
+  frequencies?: QsoFrequencySummary[];
+}
+
+/** How we took a frequency: kept for analysing operating procedure later. */
+export interface QsoFrequencySummary {
+  /** Hz. */
+  rf: number;
+  /** Wall clock of the first CQ there. */
+  at: number;
+  qrlFirst: boolean;
+  /** Seconds listened between QRL? and the first CQ (null: no QRL?). */
+  qrlListen: number | null;
+  busyCqs: number;
+  /** Times a station there asked us to QSY. */
+  qsyAsked: number;
 }
 
 export interface QueueInputResult {

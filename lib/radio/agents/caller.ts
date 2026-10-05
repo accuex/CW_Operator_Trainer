@@ -12,7 +12,13 @@ import type { Agent, AgentContext, GoneReason } from './types';
  *   arriving ─(CQ/QRZ)→ waiting ─(our call / partial match)→ selected ─(our exchange)→ exchanged ─(TU/73)→ done
  *   waiting ─(someone else picked)→ holding ─(QRZ/TU/CQ)→ waiting
  *   waiting ─(a call 1–2 letters off)→ corrects, at most MAX_CORRECTIONS times, then plays along or leaves
- *   any ─(patience used up / LEAVE_AFTER of silence)→ gone
+ *   waiting/holding ─(patience calls unanswered / waitLimit unpicked)→ gone
+ *   any ─(LEAVE_AFTER of silence)→ gone
+ *
+ * A doubling — we started keying while it was still sending, so each side lost the
+ * other's head — is nobody's "no": the call it lost counts only half against patience,
+ * a seasoned caller listens a beat longer before calling again, and a station already
+ * in QSO with us asks again soon instead of waiting out the silence.
  */
 
 export type CallerState = 'arriving' | 'waiting' | 'holding' | 'selected' | 'exchanged' | 'done' | 'gone';
@@ -23,8 +29,14 @@ export const LEAVE_AFTER = 30;
 /** Spawned but never heard a CQ to answer. */
 export const ARRIVE_TIMEOUT = 10;
 export const QRS_STEP = 4;
-/** On QRZ?/AGN? some waiting callers sit one round out. */
-export const REST_RATE = 0.25;
+/** A call lost in a doubling counts this much against patience (it wasn't a "no", but it wears). */
+export const DOUBLED_WEIGHT = 0.5;
+/** A station in QSO with us asks again ("?") at most this many times after doublings. */
+/** How fast waiting wears on a caller while it hears the run going (us keying, or holding), against otherwise. */
+export const HEARD_WAIT = 0.5;
+export const MAX_NUDGES = 2;
+/** Our message starting within this long before a caller stops keying is lost on it (the ether's head rule). */
+const DOUBLE_HEAD = 0.5;
 
 const FIELD_ORDER: AskField[] = ['RST', 'NAME', 'QTH'];
 
@@ -34,6 +46,10 @@ export class CallerAgent implements Agent {
   readonly rxWidth: number;
   state: CallerState = 'arriving';
   callsMade = 0;
+  /** Calls that went unanswered (doubled ones count DOUBLED_WEIGHT) — what patience counts. */
+  attempts = 0;
+  /** Doublings with us while calling or in QSO. */
+  doublings = 0;
   corrections = 0;
   /** Played along with a wrong call. */
   busted = false;
@@ -47,6 +63,19 @@ export class CallerAgent implements Agent {
   private retryAt: number | null = null;
   private lastHeard: number;
   private nudged = false;
+  private nudges = 0;
+  private firstCallAt: number | null = null;
+  /** Seconds of waiting to be picked, as the caller feels them (see HEARD_WAIT). */
+  private waited = 0;
+  private lastTick: number | null = null;
+  /** The last call was lost in a doubling: the next one is a repeat, not another try. */
+  private doubled = false;
+  /** Start of the transmission of ours we last checked for a doubling. */
+  private checkedTx = Number.NEGATIVE_INFINITY;
+  /** In QSO and our message was lost: ask again from here. */
+  private askAt: number | null = null;
+  /** Extra listening before the next call after a doubling. */
+  private listenOut = 0;
 
   constructor(readonly persona: StationPersona, readonly station: Station, private listenAt: number, now: number) {
     this.id = station.id;
@@ -71,6 +100,16 @@ export class CallerAgent implements Agent {
 
   tick(now: number, ctx: AgentContext) {
     if (this.gone) return;
+    const dt = this.lastTick === null ? 0 : Math.min(1, Math.max(0, now - this.lastTick));
+    this.lastTick = now;
+    // Hearing us at work (or someone else being worked) makes the wait easier to bear than
+    // calling into silence or against other callers.
+    if (this.firstCallAt !== null) this.waited += dt * (this.state === 'holding' || ctx.hearsKeying(this, 'me') ? HEARD_WAIT : 1);
+    const ours = ctx.keyingSince(this, 'me');
+    if (ours !== null && ours !== this.checkedTx) {
+      this.checkedTx = ours;
+      if (this.station.busyUntil > ours + DOUBLE_HEAD) this.onDoubled(now, ctx);
+    }
     if (ctx.hearsKeying(this, 'me')) {
       // We are on the air: nobody calls over us, and the frequency is plainly alive.
       this.lastHeard = Math.max(this.lastHeard, now);
@@ -90,19 +129,34 @@ export class CallerAgent implements Agent {
       case 'waiting':
         if (quiet > LEAVE_AFTER) return this.leave('timeout', ctx);
         if (sending) return;
-        this.retryAt ??= Math.max(now, this.station.busyUntil) + uniform(ctx.random, this.persona.retry);
+        // A seasoned caller doesn't time a call over someone else on the air — it may be a
+        // QSO it missed the start of (a doubling). A novice calls regardless.
+        if (this.persona.style !== 'novice' && ctx.hearsKeying(this)) {
+          this.retryAt = null;
+          return;
+        }
+        if (this.retryAt === null) {
+          this.retryAt = Math.max(now, this.station.busyUntil) + uniform(ctx.random, this.persona.retry) + this.listenOut;
+          this.listenOut = 0;
+        }
         if (now < this.retryAt) return;
-        if (this.callsMade >= this.persona.patience) this.leave('patience', ctx);
-        else this.callAgain(ctx, 0.1);
+        this.callAgain(ctx, 0.1);
         return;
       case 'holding':
         if (quiet > LEAVE_AFTER) this.leave('timeout', ctx);
+        // Someone else is being worked; it gives up on the wait, though not mid-call or just after one.
+        else if (!sending && now - this.station.busyUntil > this.persona.retry[1] && this.waitedOut()) this.leave('waited', ctx);
         return;
       case 'selected':
       case 'exchanged': {
         if (sending) return;
         if (quiet > LEAVE_AFTER) this.leave('timeout', ctx);
-        else if (quiet > NUDGE_AFTER && !this.nudged) {
+        else if (this.askAt !== null && now >= this.askAt) {
+          // Our message went under its own: ask for it rather than sit in the silence.
+          this.askAt = null;
+          this.nudged = true;
+          this.say(ctx, nudgeText(this.persona, ctx.me.call), 0.1);
+        } else if (quiet > NUDGE_AFTER && !this.nudged) {
           this.nudged = true;
           this.say(ctx, nudgeText(this.persona, ctx.me.call), 0.1);
         }
@@ -112,8 +166,33 @@ export class CallerAgent implements Agent {
 
   rebase(shift: number) {
     if (this.retryAt !== null) this.retryAt += shift;
+    if (this.firstCallAt !== null) this.firstCallAt += shift;
+    if (this.lastTick !== null) this.lastTick += shift;
+    if (this.askAt !== null) this.askAt += shift;
+    this.checkedTx += shift;
     this.lastHeard += shift;
     this.arrivedAt += shift;
+  }
+
+  /** Waiting to be picked longer than it is willing to. */
+  private waitedOut() {
+    return this.waited > this.persona.waitLimit;
+  }
+
+  private onDoubled(now: number, ctx: AgentContext) {
+    this.doublings += 1;
+    if (this.state === 'waiting' || this.state === 'holding') {
+      this.doubled = true;
+      // A seasoned caller listens a beat longer before calling again; a novice comes straight back.
+      this.listenOut = this.persona.style === 'novice' ? 0 : uniform(ctx.random, [1, 2.5]);
+      return;
+    }
+    if ((this.state === 'selected' || this.state === 'exchanged') && this.nudges < MAX_NUDGES) {
+      this.nudges += 1;
+      this.nudged = false;
+      // Asks once our carrier is gone; a slower hand takes longer about it.
+      this.askAt = now + uniform(ctx.random, this.persona.retry) + (this.persona.style === 'novice' ? 2 : 0);
+    }
   }
 
   private hearWhileCalling(intent: OperatorIntent, ctx: AgentContext) {
@@ -162,19 +241,20 @@ export class CallerAgent implements Agent {
       return;
     }
     const cq = intent.cq && intent.mentionsMe;
-    if (this.state === 'holding') {
-      if (cq || intent.qrz || intent.closing) this.callAgain(ctx);
-      return;
-    }
     if (this.state === 'arriving') {
       if (cq || intent.qrz) this.callAgain(ctx);
       return;
     }
-    if (cq || intent.qrz || intent.agn || intent.qrs) {
-      if (intent.qrs) this.slowDown();
-      if ((intent.qrz || intent.agn) && ctx.random() < REST_RATE) return;
-      this.callAgain(ctx);
+    const cue = this.state === 'holding' ? cq || intent.qrz || intent.closing : cq || intent.qrz || intent.agn || intent.qrs;
+    if (!cue) return;
+    if (intent.qrs) this.slowDown();
+    if (ctx.random() >= this.persona.recall) {
+      // Sits this one out and listens for the next (or calls late if nothing comes).
+      this.state = 'waiting';
+      this.retryAt = ctx.now() + uniform(ctx.random, this.persona.retry) * 3;
+      return;
     }
+    this.callAgain(ctx);
   }
 
   private hearAsPartner(intent: OperatorIntent, ctx: AgentContext) {
@@ -242,7 +322,14 @@ export class CallerAgent implements Agent {
     }
   }
 
+  /** Call (again). The call before went unanswered (or half, if a doubling took it); patience counts those. */
   private callAgain(ctx: AgentContext, delay?: number) {
+    if (this.callsMade > 0) this.attempts += this.doubled ? DOUBLED_WEIGHT : 1;
+    this.doubled = false;
+    if (this.attempts >= this.persona.patience) return this.leave('patience', ctx);
+    // Waited long enough: it gives up when it would call again, never straight after a call it made.
+    if (this.waitedOut()) return this.leave('waited', ctx);
+    this.firstCallAt ??= ctx.now();
     this.say(ctx, callText(this.persona, ctx.me.call), delay);
     this.callsMade += 1;
     this.state = 'waiting';

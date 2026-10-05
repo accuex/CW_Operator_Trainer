@@ -10,9 +10,9 @@ export const cqRunMode: RunQsoMode = {
   alphabet: 'international',
   available: true,
   presets: ['basic-rst-name-qth'],
-  // Callers don't drift; the run's own axes (callers / spread / busy) arrive with Stage 4.
+  // Callers don't drift. Arrivals, crowd and busy are run params for now; they become axes with pileup-run.
   axes: ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak'],
-  createRun({ random, me, difficulty }, radio) {
-    return new RunSession({ random, me, params: { ...DEFAULT_RUN_PARAMS, speed: difficulty.speed, weak: difficulty.weak } }, radio);
+  createRun({ random, me, difficulty, tempo = 'short' }, radio) {
+    return new RunSession({ random, me, params: { ...DEFAULT_RUN_PARAMS, speed: difficulty.speed, weak: difficulty.weak, tempo } }, radio);
   },
 };

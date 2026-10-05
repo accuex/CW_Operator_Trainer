@@ -5,7 +5,7 @@ import type { ExchangePreset } from '../exchange';
 import type { TxResult } from '../qso';
 import type { AgentMe } from '../agents/types';
 import type { Random } from '../random';
-import type { RadioPort, RunSession } from './cqRun';
+import type { ExchangeTempo, RadioPort, RunSession } from './cqRun';
 
 /**
  * A QSO mode is an independent game (rag-chew, CQ run, contest, pile-up, wabun …),
@@ -65,6 +65,8 @@ export interface RunContext {
   random: Random;
   me: AgentMe;
   difficulty: DifficultyVector;
+  /** Exchange tempo the operator chose (short if omitted). */
+  tempo?: ExchangeTempo;
 }
 
 /**

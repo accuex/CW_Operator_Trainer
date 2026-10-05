@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { AirEvent } from '../air/ether';
 import { keyText } from '../keying';
-import { DEFAULT_RUN_PARAMS, RunSession, type Placement } from '../modes/cqRun';
+import { DEFAULT_RUN_PARAMS, QRL_LISTEN, RunSession, type Placement } from '../modes/cqRun';
 import { seeded } from '../random';
 import { HeadlessRadio } from '../sim/runSim';
 import { MAX_QSY_REQUESTS, type OccupantAgent } from './occupant';
@@ -94,8 +94,8 @@ describe('OccupantPair', () => {
     expect(sim.send('CQ DE JS2WDR K').issues).toContain('busy-frequency');
 
     const moved = VFO + 1000;
-    sim.send('QRL? DE JS2WDR', moved);
-    sim.until(sim.t + 6);
+    const check = sim.send('QRL? DE JS2WDR', moved);
+    sim.until(check.end + 4);
     const cq = sim.send('CQ DE JS2WDR K', moved);
     expect(cq.issues).toEqual([]);
     const result = sim.run.finish(sim.t);
@@ -129,5 +129,44 @@ describe('OccupantPair', () => {
     sim.until(30);
     expect(sim.run.frequencyBusy(VFO, sim.t)).toBe(false);
     expect(sim.run.frequencyBusy(sim.run.occupants[0].rf, sim.t)).toBe(true);
+  });
+
+  it('reads the check after a QRL? from the air: listening, then clear or busy', () => {
+    const empty = setup(5, { onFrequency: false, nearby: 0 });
+    empty.until(5);
+    expect(empty.run.frequencyCheck(VFO, empty.t)).toEqual({ state: 'none' });
+    const qrl = empty.send('QRL? DE JS2WDR');
+    empty.until(qrl.end + 1);
+    expect(empty.run.frequencyCheck(VFO, empty.t)).toEqual({ state: 'listening', until: qrl.end + QRL_LISTEN });
+    empty.until(qrl.end + QRL_LISTEN + 0.1);
+    expect(empty.run.frequencyCheck(VFO, empty.t)).toEqual({ state: 'clear' });
+    // Another frequency was never checked.
+    expect(empty.run.frequencyCheck(VFO + 1000, empty.t)).toEqual({ state: 'none' });
+    const cq = empty.send('CQ DE JS2WDR K');
+    expect(cq.issues).toEqual([]);
+    // The CQ used the check up.
+    expect(empty.run.frequencyCheck(VFO, empty.t)).toEqual({ state: 'none' });
+
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const sim = setup(seed);
+      sim.until(8);
+      const asked = sim.send('QRL? DE JS2WDR');
+      sim.until(asked.end + 8);
+      expect(sim.run.frequencyCheck(VFO, sim.t), `seed ${seed}`).toEqual({ state: 'busy' });
+    }
+  });
+
+  it('records how long we listened after QRL?, and flags a CQ sent straight after', () => {
+    const sim = setup(6, { onFrequency: false, nearby: 0 });
+    sim.until(5);
+    const qrl = sim.send('QRL? DE JS2WDR');
+    sim.until(qrl.end + 1);
+    const cq = sim.send('CQ DE JS2WDR K');
+    expect(cq.issues).toContain('qrl-no-listen');
+    const result = sim.run.finish(sim.t);
+    expect(result.stats.qrlNoListen).toBe(1);
+    expect(result.frequencies[0].qrlFirst).toBe(true);
+    expect(result.frequencies[0].qrlListen).toBeGreaterThan(0.9);
+    expect(result.frequencies[0].qrlListen).toBeLessThan(QRL_LISTEN);
   });
 });

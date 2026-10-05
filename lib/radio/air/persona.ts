@@ -23,8 +23,12 @@ export interface StationPersona {
   jitter: number;
   style: CallStyle;
   sendStyle: SendStyle;
-  /** How many times it calls before giving up. */
+  /** How many unanswered calls it makes before giving up (calls lost in a doubling don't count). */
   patience: number;
+  /** Seconds it waits to be picked, from its first call, before moving on. */
+  waitLimit: number;
+  /** Chance it calls again at each CQ / QRZ? / AGN? while waiting (else it sits that one out). */
+  recall: number;
   /** Seconds from hearing us to keying, [min, max]. */
   reaction: readonly [number, number];
   /** Seconds it listens after its own call before calling again, [min, max]. */
@@ -55,7 +59,25 @@ export interface PersonaRequest {
   spread: number;
   /** Calls already on the air, to make look-alikes from. */
   active: readonly string[];
+  /** How the crowd behaves; an ordinary evening if omitted. */
+  crowd?: Partial<CrowdTraits>;
 }
+
+/**
+ * The knobs that make a frequency quiet or crowded, read per caller. Together with
+ * the run's arrival rate they settle how many stations end up waiting — a pileup is
+ * the same callers with these turned up, never a cap on their number.
+ */
+export interface CrowdTraits {
+  /** Scales patience in calls and in seconds. */
+  patience: number;
+  /** Mean chance of calling again at each CQ / QRZ? / AGN?. */
+  recall: number;
+  /** Share of (non-novice) callers sending the short exchange. */
+  brief: number;
+}
+
+export const DEFAULT_CROWD: CrowdTraits = { patience: 1, recall: 0.8, brief: 0.4 };
 
 export interface PersonaSource {
   next(request: PersonaRequest): StationPersona;
@@ -88,7 +110,8 @@ export class RandomPersonaSource implements PersonaSource {
 
   constructor(private similarRate = 0.12) {}
 
-  next({ random, speed, weak, spread, active }: PersonaRequest): StationPersona {
+  next({ random, speed, weak, spread, active, crowd: crowdChange }: PersonaRequest): StationPersona {
+    const crowd = { ...DEFAULT_CROWD, ...crowdChange };
     const call = this.uniqueCall(random, active);
     const area = Number(/[0-9](?=[A-Z]+$)/.exec(call)?.[0] ?? 1);
     const novice = random() < NOVICE_RATE;
@@ -105,8 +128,10 @@ export class RandomPersonaSource implements PersonaSource {
       wpm,
       jitter: novice ? 0.2 : 0.03 + random() * 0.07,
       style,
-      sendStyle: novice || random() < 0.6 ? 'full' : 'brief',
-      patience: 2 + Math.floor(random() * 4),
+      sendStyle: !novice && random() < crowd.brief ? 'brief' : 'full',
+      patience: Math.max(1, Math.round((2 + Math.floor(random() * 4)) * crowd.patience)),
+      waitLimit: Math.round((60 + random() * 90) * crowd.patience),
+      recall: clamp(crowd.recall + (random() - 0.5) * 0.3, 0, 1),
       reaction: novice ? [0.5, 3] : [0.2, 1.5],
       retry: [2.5, 5],
       strength: clamp((0.85 - weak * 0.75) * (0.35 + random() * 0.8), 0.025, 1),

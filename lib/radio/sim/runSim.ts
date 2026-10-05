@@ -56,10 +56,17 @@ export interface BotOptions {
   qsyStep: number;
   /** Key the first CQ 5 s in, without listening to the frequency. */
   blindStart: boolean;
+  /** Answer callers at all (false: CQ after CQ and never pick anyone — CQ repeat left running). */
+  pick: boolean;
+  /**
+   * The desk's CQ repeat: with no partner, CQ again this many seconds after our last
+   * transmission and the last caller's (null: CQ only once the frequency has gone quiet).
+   */
+  cqRepeat: number | null;
 }
 
 export const PERFECT_BOT: BotOptions = {
-  callErrorRate: 0, partialRate: 0, ignoreCorrections: false, phantomRate: 0, wpm: 20, cqListen: 4, filter: 500, qrl: true, qrlListen: 4, qsyStep: 1000, blindStart: false,
+  callErrorRate: 0, partialRate: 0, ignoreCorrections: false, phantomRate: 0, wpm: 20, cqListen: 4, filter: 500, qrl: true, qrlListen: 4, qsyStep: 1000, blindStart: false, pick: true, cqRepeat: null,
 };
 
 export interface SimOptions {
@@ -89,6 +96,8 @@ export interface SimReport {
   qsys: number;
   /** Procedure issues the run flagged on our transmissions. */
   issues: string[];
+  /** Callers waiting or holding, sampled each second until QRT. */
+  waiting: { max: number; mean: number; samples: number[] };
 }
 
 // The developer's own call stands in for the operator.
@@ -144,9 +153,13 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
 
   const qrtAt = duration;
   const end = duration + drain;
+  const samples: number[] = [];
   let t = 0;
   for (; t <= end; t = Math.round((t + step) * 1000) / 1000) {
     radio.advance(t);
+    if (t < qrtAt && Math.abs(t - Math.round(t)) < step / 2) {
+      samples.push(run.agents.filter((agent) => agent.state === 'waiting' || agent.state === 'holding').length);
+    }
     const settled = run.agents.every((agent) => agent.gone) && !run.stations.length;
     if (t >= qrtAt && !partner && t >= busyUntil && settled) break;
     inbox.push(...run.tick(t).filter(heardByBot));
@@ -181,7 +194,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
           if (random() < bot.phantomRate) run.logEntry({ call: 'JQ9QQQ', rst: '599', name: 'X', qth: 'X' }, t);
           partner.closing = true;
           partner.since = t;
-          send(`R TNX ${agent.persona.name} 73 TU EE`);
+          send(`R TNX ${agent.persona.name} 73 TU DE ${me.call} QRZ?`);
           break;
         }
         if (/(NAME|QTH|RST)\?/.test(text)) {
@@ -199,6 +212,11 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
       if (!partner && text.includes(agent.call) && !heard.some((item) => item.stationId === agent.id)) heard.push({ stationId: agent.id, call: agent.call, at: t });
     }
     if (t < busyUntil) continue;
+    if (bot.cqRepeat !== null && !partner && !(bot.pick && heard.length) && check.state === 'clear' && t < qrtAt && cqs > 0 && t - Math.max(lastTxEnd, run.callersQuietFrom(vfo, t)) >= bot.cqRepeat) {
+      cqs += 1;
+      send(`CQ DE ${me.call} ${me.call} K`);
+      continue;
+    }
     if (bot.blindStart && txCount === 0 && t >= 5) {
       cqs += 1;
       send(`CQ DE ${me.call} ${me.call} K`);
@@ -228,7 +246,7 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
       }
     } else if (t < qrtAt) {
       heard = heard.filter((item) => !agentOf(item.stationId)?.gone);
-      const candidate = heard[0];
+      const candidate = bot.pick ? heard[0] : undefined;
       if (candidate) {
         heard = [];
         if (random() < bot.partialRate && !partialAsked.has(candidate.stationId)) {
@@ -251,5 +269,6 @@ export function runSim({ seed, params, me = ME, bot: botOptions, placement, dura
       }
     }
   }
-  return { result: run.finish(t), run, tx: txCount, cqs, qrtAt, qrls, qsys, issues };
+  const waiting = { max: Math.max(0, ...samples), mean: samples.length ? samples.reduce((sum, value) => sum + value, 0) / samples.length : 0, samples };
+  return { result: run.finish(t), run, tx: txCount, cqs, qrtAt, qrls, qsys, issues, waiting };
 }

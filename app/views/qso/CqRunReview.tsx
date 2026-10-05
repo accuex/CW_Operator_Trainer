@@ -1,7 +1,7 @@
 import { formatFrequency } from '@/lib/radio/band';
 import type { GoneReason } from '@/lib/radio/agents/types';
 import type { ExchangePreset } from '@/lib/radio/exchange';
-import type { ContactOutcome, FrequencyUse, MissedCaller, RunResult } from '@/lib/radio/modes/cqRun';
+import { QRL_LISTEN, type ContactOutcome, type FrequencyUse, type MissedCaller, type RunResult } from '@/lib/radio/modes/cqRun';
 import type { RunScore } from '@/lib/radio/runReview';
 import { FieldCells } from './FieldCells';
 
@@ -18,6 +18,7 @@ const OUTCOME_LABEL: Record<ContactOutcome, string> = {
 };
 const GONE_LABEL: Record<GoneReason, string> = {
   patience: '呼び疲れて去った',
+  waited: '待ちくたびれて去った',
   timeout: '応答がなく去った',
   dropped: '途中で去った',
   'ignored-correction': '訂正が通らず去った',
@@ -33,8 +34,10 @@ export function missedLine(caller: MissedCaller, filter: number) {
 }
 
 function frequencyLine(use: FrequencyUse) {
-  const check = use.qrlFirst ? 'QRL? で確かめてから CQ' : 'QRL? なしで CQ';
-  return use.busyCqs ? `${check}・使用中に ${use.busyCqs} 回 CQ` : `${check}・空いていました`;
+  const listened = use.qrlListen === null ? '' : use.qrlListen < QRL_LISTEN ? `（聴いたのは ${use.qrlListen.toFixed(1)} 秒）` : `（${Math.round(use.qrlListen)} 秒聴いて）`;
+  const check = use.qrlFirst ? `QRL? で確かめて${listened}から CQ` : 'QRL? なしで CQ';
+  const asked = use.qsyAsked ? `・QSY を ${use.qsyAsked} 回求められた` : '';
+  return use.busyCqs ? `${check}・使用中に ${use.busyCqs} 回 CQ${asked}` : `${check}・空いていました${asked}`;
 }
 
 const formatDuration = (seconds: number) => `${Math.floor(seconds / 60)} 分 ${Math.round(seconds % 60)} 秒`;
@@ -53,6 +56,7 @@ export function CqRunReview({ review, preset, onRestart }: { review: RunReviewDa
     ['ログ漏れ', stats.unlogged, 'cause-procedure'],
     ['重複ログ', stats.dupes, 'cause-procedure'],
     ['使用中の周波数で CQ', stats.busyCqs, 'cause-procedure'],
+    ['QRL? のあと聴かずに CQ', stats.qrlNoListen, 'cause-procedure'],
     ['拾えなかった局', result.missed.length, 'cause-timing'],
   ];
   const nil = result.log.filter((entry) => entry.verdict === 'nil');

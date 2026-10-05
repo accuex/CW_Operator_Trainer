@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createCaller, MAX_CORRECTIONS, type CallerAgent } from './caller';
+import { createCaller, DOUBLED_WEIGHT, HEARD_WAIT, MAX_CORRECTIONS, NUDGE_AFTER, type CallerAgent } from './caller';
 import { callText, exchangeText, finalText } from './templates';
 import type { Agent, AgentContext, AgentNote } from './types';
 import type { AirEvent } from '../air/ether';
@@ -12,12 +12,14 @@ const ME = { call: 'JA1ZZZ', name: 'MASA', qth: 'TOKYO' };
 
 const persona = (call: string, extra: Partial<StationPersona> = {}): StationPersona => ({
   call, name: 'KEN', qth: 'OSAKA', area: 3, wpm: 20, jitter: 0.05, style: 'twice', sendStyle: 'brief',
-  patience: 3, reaction: [0.2, 0.4], retry: [2.5, 3], strength: 0.5, offsetHz: 30, rxWidth: 400,
+  patience: 3, waitLimit: 120, recall: 1, reaction: [0.2, 0.4], retry: [2.5, 3], strength: 0.5, offsetHz: 30, rxWidth: 400,
   qrsFloor: 14, rst: '579', cutNumbers: false, closing: 'full', ...extra,
 });
 
 /** A frequency with a few callers and a context that records what they key. */
-function setup(...calls: string[]) {
+const setup = (...calls: string[]) => setupWith({}, ...calls);
+
+function setupWith(extra: Partial<StationPersona>, ...calls: string[]) {
   const random = seeded(1);
   let now = 0;
   const sent: { agent: Agent; text: string }[] = [];
@@ -31,8 +33,9 @@ function setup(...calls: string[]) {
     peers: () => agents.filter((agent) => !agent.gone),
     notify: (note) => notes.push(note),
     hearsKeying: () => false,
+    keyingSince: () => null,
   };
-  for (const call of calls) agents.push(createCaller(persona(call), { random, listenRf: RF, now }));
+  for (const call of calls) agents.push(createCaller(persona(call, extra), { random, listenRf: RF, now }));
   let seq = 0;
   const say = (text: string) => {
     const event: AirEvent = { id: (seq += 1), from: 'me', text, intent: parseIntent(text, ME.call), rf: RF, start: now, end: now + 1, epoch: 0 };
@@ -46,7 +49,17 @@ function setup(...calls: string[]) {
     }
   };
   const said = (agent: Agent) => sent.filter((item) => item.agent === agent).map((item) => item.text);
-  return { agents, sent, notes, say, tick, said, ctx };
+  /** We start keying while `agent` is still sending its call (the head of ours is lost on it), for `seconds`. */
+  const doubleWith = (agent: CallerAgent, seconds = 3) => {
+    const start = now;
+    agent.station.busyUntil = now + 1.5;
+    ctx.keyingSince = (_agent, party) => (party === 'me' ? start : null);
+    ctx.hearsKeying = (_agent, party) => party === 'me';
+    tick(seconds);
+    ctx.keyingSince = () => null;
+    ctx.hearsKeying = () => false;
+  };
+  return { agents, sent, notes, say, tick, said, ctx, doubleWith, get now() { return now; } };
 }
 
 describe('CallerAgent', () => {
@@ -151,4 +164,94 @@ describe('CallerAgent', () => {
     expect(said(a)).toHaveLength(1);
     expect(a.gone).toBe(false);
   });
+
+  it('counts a call lost in a doubling only half against patience', () => {
+    const plain = setup('JH3ABC');
+    plain.say('CQ DE JA1ZZZ K');
+    plain.say('CQ DE JA1ZZZ K');
+    expect(plain.agents[0].attempts).toBe(1);
+
+    const doubled = setup('JH3ABC');
+    const [a] = doubled.agents;
+    doubled.say('CQ DE JA1ZZZ K');
+    doubled.doubleWith(a);
+    expect(a.doublings).toBe(1);
+    doubled.say('CQ DE JA1ZZZ K');
+    expect(a.attempts).toBe(DOUBLED_WEIGHT);
+    expect(a.callsMade).toBe(2);
+  });
+
+  it('stays through a doubling it would have left on, then is worked', () => {
+    // Patience 2: two plain unanswered calls and it goes; a doubling in between keeps it.
+    const { agents: [a], say, doubleWith, said } = setupWith({ patience: 2 }, 'JH3ABC');
+    say('CQ DE JA1ZZZ K');
+    say('CQ DE JA1ZZZ K');
+    doubleWith(a);
+    say('CQ DE JA1ZZZ K');
+    expect(a.gone).toBe(false);
+    say('JH3ABC UR 599 NAME MASA QTH TOKYO BK');
+    expect(a.state).toBe('exchanged');
+    expect(said(a).at(-1)).toBe(exchangeText(a.persona, ME, true));
+  });
+
+  it('asks again soon when our message to it went under its own', () => {
+    const { agents: [a], say, doubleWith, tick, said } = setup('JH3ABC');
+    say('CQ DE JA1ZZZ K');
+    say('JH3ABC UR 599 NAME MASA QTH TOKYO BK');
+    expect(a.state).toBe('exchanged');
+    const before = said(a).length;
+    doubleWith(a);
+    tick(a.persona.retry[1] + 1);
+    expect(said(a).length).toBe(before + 1);
+    expect(said(a).at(-1)).toBe('JA1ZZZ?');
+    // Without a doubling it waits NUDGE_AFTER of silence first.
+    const calm = setup('JH3ABC');
+    calm.say('CQ DE JA1ZZZ K');
+    calm.say('JH3ABC UR 599 NAME MASA QTH TOKYO BK');
+    const quiet = calm.said(calm.agents[0]).length;
+    calm.tick(a.persona.retry[1] + 1);
+    expect(calm.said(calm.agents[0]).length).toBe(quiet);
+    calm.tick(NUDGE_AFTER);
+    expect(calm.said(calm.agents[0]).length).toBe(quiet + 1);
+  });
+
+  it('moves on after waiting too long to be picked, however lively the frequency', () => {
+    const { agents: [a, b], say, tick, ctx } = setupWith({ waitLimit: 40, patience: 9 }, 'JH3ABC', 'JA1XYZ');
+    say('CQ DE JA1ZZZ K');
+    say('JA1XYZ UR 599 NAME MASA QTH TOKYO BK');
+    expect(a.state).toBe('holding');
+    // Someone is always on the air: no silence timeout, only the wait — which wears slower
+    // while it watches another station being worked.
+    ctx.hearsKeying = (_agent, party) => party === undefined;
+    tick(40 / HEARD_WAIT - 10);
+    expect(a.gone).toBe(false);
+    tick(20);
+    expect(a.goneReason).toBe('waited');
+    expect(b.gone).toBe(false);
+  });
+
+  it('sits a CQ out now and then, as its recall says', () => {
+    const shy = setupWith({ recall: 0 }, 'JH3ABC');
+    shy.say('CQ DE JA1ZZZ K');
+    shy.say('CQ DE JA1ZZZ K');
+    expect(shy.said(shy.agents[0])).toHaveLength(1);
+    const eager = setupWith({ recall: 1 }, 'JH3ABC');
+    eager.say('CQ DE JA1ZZZ K');
+    eager.say('CQ DE JA1ZZZ K');
+    expect(eager.said(eager.agents[0])).toHaveLength(2);
+  });
+
+  it('gives up on the wait only when it would call again, never straight after calling', () => {
+    const { agents: [a], say, tick, ctx } = setupWith({ waitLimit: 10, patience: 9, recall: 1 }, 'JH3ABC');
+    say('CQ DE JA1ZZZ K');
+    // A long call of its own runs past the limit.
+    a.station.busyUntil = 15;
+    ctx.hearsKeying = (agent, party) => party === undefined && agent === a;
+    tick(14);
+    expect(a.gone).toBe(false);
+    ctx.hearsKeying = () => false;
+    say('CQ DE JA1ZZZ K');
+    expect(a.goneReason).toBe('waited');
+  });
 });
+
