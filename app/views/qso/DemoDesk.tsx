@@ -27,7 +27,7 @@ interface Snap {
 
 /** Guided karaoke desk: tune, send the lit line, hear the reply. */
 export function DemoDesk({ rig, myCall }: { rig: Rig; myCall: string }) {
-  const { engineRef, setDecode, transmit, txOn, powered, vfo, tune, newCapture } = rig;
+  const { engineRef, setDecode, setFilter, transmit, txOn, powered, vfo, tune, newCapture } = rig;
   const sessionRef = useRef<DemoSession | null>(null);
   const captureRef = useRef(newCapture());
   const [snap, setSnap] = useState<Snap | null>(null);
@@ -36,7 +36,9 @@ export function DemoDesk({ rig, myCall }: { rig: Rig; myCall: string }) {
 
   useEffect(() => {
     setDecode({ on: true, lang: 'roman' });
-  }, [setDecode]);
+    // Wide FIL so the jog pitch sweep (nyuuuiin) is audible; narrow later for QRM.
+    setFilter(2400);
+  }, [setDecode, setFilter]);
 
   useEffect(() => {
     let cancelled = false;
@@ -202,7 +204,7 @@ export function DemoDesk({ rig, myCall }: { rig: Rig; myCall: string }) {
                 const session = sessionRef.current;
                 if (!session) return;
                 setBusyHint(null);
-                tune(session.target.rf);
+                tune(session.target.rf, { jog: true });
               }}
             >
               CQに同調
@@ -220,7 +222,7 @@ export function DemoDesk({ rig, myCall }: { rig: Rig; myCall: string }) {
         <div className="qso-panel-head"><h2>操作のコツ</h2></div>
         <ul className="demo-desk-tips">
           <li>いちばん強いピークをクリック（または「CQに同調」）</li>
-          <li>FIL 2（500）だと隣の QRM が聞きやすい</li>
+          <li>同調のピッチ変化を聴いたら、FIL 2（500）に絞ると隣の QRM が聞きやすい</li>
           <li>ずれが大きいと相手は聞こえない（本物と同じ）</li>
           <li>DECODE は補助。耳で手順を追うのが本番</li>
         </ul>

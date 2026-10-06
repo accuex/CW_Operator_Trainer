@@ -39,7 +39,7 @@ export function RigPanel({ rig, onPower }: { rig: Rig; onPower?: (result: PowerR
     const rect = event.currentTarget.getBoundingClientRect();
     const hz = hzAtRatio((event.clientX - rect.left) / rect.width, engine.vfo, span);
     const near = nearestStation(engine.stations, hz, span * 0.1);
-    tune(near ? near.rf : hz);
+    tune(near ? near.rf : hz, { jog: true });
   };
   const onKey = (event: React.KeyboardEvent) => {
     if (event.target instanceof HTMLInputElement) return;

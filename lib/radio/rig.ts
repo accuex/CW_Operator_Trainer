@@ -311,7 +311,7 @@ export class RigEngine {
   }
 
   private retune() {
-    for (const station of this.stations) this.updateVoice(station, 0.03);
+    for (const station of this.stations) this.updateVoice(station, 0.02);
   }
 
   private updateVoice(station: Station, smoothing: number) {
@@ -321,8 +321,13 @@ export class RigEngine {
     const freq = this.audioFrequency(station);
     // Opposite sideband / far out of the passband: silent rather than mirrored.
     const audible = freq > AUDIBLE[0] && freq < AUDIBLE[1];
-    voice.osc.frequency.setTargetAtTime(Math.max(AUDIBLE[0], freq), ctx.currentTime, Math.min(smoothing, 0.05));
-    voice.amp.gain.setTargetAtTime(audible ? station.strength * 0.5 * station.fade : 0, ctx.currentTime, smoothing);
+    const next = Math.max(AUDIBLE[0], freq);
+    // Short glide so jog/VFO steps sing as a continuous pitch sweep.
+    const t = ctx.currentTime;
+    voice.osc.frequency.cancelScheduledValues(t);
+    voice.osc.frequency.setValueAtTime(voice.osc.frequency.value, t);
+    voice.osc.frequency.linearRampToValueAtTime(next, t + 0.045);
+    voice.amp.gain.setTargetAtTime(audible ? station.strength * 0.5 * station.fade : 0, t, smoothing);
   }
 
   private resetClock(station: Station) {

@@ -120,7 +120,8 @@ export class DemoSession {
   private place(vfo: number) {
     this.info = makeTarget(this.random, DEMO_WPM);
     this.info.wpm = DEMO_WPM;
-    const offset = (480 + this.random() * 420) * (this.random() < 0.5 ? -1 : 1);
+    // Far enough that 「CQに同調」slews through a clear pitch sweep (nyuuuiin), still inside ±2.5k SPAN.
+    const offset = (1400 + this.random() * 700) * (this.random() < 0.5 ? -1 : 1);
     this.target = makeStation(this.random, {
       role: 'target',
       call: this.info.call,

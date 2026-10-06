@@ -47,15 +47,15 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
           <p className="home-hint"><Link href="/#method">学習法（音感／合調）が未選択です。サイトトップで選んでから始めると、カードの合調表示が決まります。</Link></p>
         )}
         <p className="section-kicker"><Icon name="sparkle" size={14} />{isNew ? 'WELCOME' : 'WELCOME BACK'}</p>
-        <h1>{isNew ? <>耳で読む。<br /><em>モールスの世界へ。</em></> : <>今日も<em>1文字</em>、<br />耳を育てよう。</>}</h1>
+        <h1>{isNew ? <>耳で読む。<em>モールスの世界へ。</em></> : <>今日も<em>1文字</em>、耳を育てよう。</>}</h1>
         <p>{scopeSetLabel(profile.unlockedKinds)} を練習中。
           {goalDone ? ' 今日の目標は達成済み！さらに伸ばすならコンボに挑戦。' : ` 今日はあと ${Math.max(0, DAILY_GOAL - stats.todayAnswers)} 問で目標達成。`}</p>
         <div className="home-hero-actions">
-          <button type="button" className="btn btn-primary btn-lg" onClick={() => onNavigate('learn')}>
-            <Icon name="play" size={18} />{courseCards.length ? '続きから練習' : 'はじめる'}
+          <button type="button" className="btn btn-primary" onClick={() => onNavigate('learn')}>
+            <Icon name="play" size={16} />{courseCards.length ? '続きから練習' : 'はじめる'}
           </button>
-          <button type="button" className="btn btn-ghost btn-lg" onClick={() => onNavigate('train')}>
-            <Icon name="train" size={18} />聴きとりへ
+          <button type="button" className="btn btn-ghost" onClick={() => onNavigate('train')}>
+            <Icon name="train" size={16} />聴きとりへ
           </button>
         </div>
       </div>
@@ -63,7 +63,7 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
       <div className="home-player">
         <div className="player-card">
           <button type="button" className="player-level" onClick={() => onNavigate('levelup')} aria-label={`コッホ Lv.${stats.level}、レベル試験へ`}>
-            <Ring value={stats.levelProgress} size={96} stroke={8} tone="url(#lv)">
+            <Ring value={stats.levelProgress} size={78} stroke={7} tone="url(#lv)">
               <small>Lv.</small><b>{stats.level}</b>
             </Ring>
             <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}><defs><linearGradient id="lv" x1="0" x2="1"><stop offset="0" stopColor="#8c7bff" /><stop offset="1" stopColor="#d0c4ff" /></linearGradient></defs></svg>

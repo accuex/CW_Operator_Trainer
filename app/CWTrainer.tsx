@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import { applyAchievements, achievementById } from '@/lib/achievements';
 import { APP_VERSION } from '@/lib/appMeta';
 import { loadAuthSession } from '@/lib/api/authSession';
@@ -271,7 +270,18 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   return (
     <div className={`app-frame view-${view}`}>
       <aside className="sidebar" aria-label="メインナビゲーション">
-        <button type="button" className="brand" onClick={() => navigate('home')} aria-label="ホームへ">
+        <a
+          className="brand"
+          href="/"
+          aria-label="サイトトップへ"
+          onClick={(event) => {
+            event.preventDefault();
+            audioEngine.stop();
+            if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+            // Client router keeps /app SPA history; hard leave to the landing page.
+            window.location.assign('/');
+          }}
+        >
           <span className="brand-mark" aria-hidden="true"><i /><i className="dah" /><i /><i className="dah" /></span>
           <span className="brand-text">
             <b>CW Operator</b>
@@ -280,7 +290,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <span className="brand-ver">v{APP_VERSION}</span>
             </small>
           </span>
-        </button>
+        </a>
         <nav className="nav">
           {views.map((item) => (
             <button
@@ -327,7 +337,18 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <small><Icon name="flame" size={13} /> {stats.streakDays}日連続</small>
             </div>
           </div>
-          <Link className="sidebar-site" href="/">サイトトップ</Link>
+          <a
+            className="sidebar-site"
+            href="/"
+            onClick={(event) => {
+              event.preventDefault();
+              audioEngine.stop();
+              if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+              window.location.assign('/');
+            }}
+          >
+            サイトトップ
+          </a>
           <p className="app-credit">(C) 2026 Int Design LLC.</p>
         </div>
       </aside>

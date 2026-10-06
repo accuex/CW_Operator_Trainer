@@ -76,6 +76,7 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   const decodePerfRef = useRef<DecodePerf>({ ticks: 0, ms: 0, maxMs: 0, samples: 0, stationSamples: 0, flushes: 0 });
   const holdRef = useRef(hold);
   const spanRef = useRef<number>(span);
+  const jogRafRef = useRef(0);
   useEffect(() => {
     holdRef.current = hold;
     spanRef.current = span;
@@ -187,17 +188,54 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   const firstStop = useRef(stopEpoch);
   useEffect(() => {
     if (stopEpoch === firstStop.current) return;
+    if (jogRafRef.current) cancelAnimationFrame(jogRafRef.current);
+    jogRafRef.current = 0;
     void engineRef.current?.powerOff();
     setPowered(false);
     setTxOn(false);
   }, [stopEpoch]);
 
-  const tune = useCallback((hz: number) => {
+  const stopJog = useCallback(() => {
+    if (!jogRafRef.current) return;
+    cancelAnimationFrame(jogRafRef.current);
+    jogRafRef.current = 0;
+  }, []);
+
+  useEffect(() => () => stopJog(), [stopJog]);
+
+  /** Instant for the dial; `{ jog: true }` slews so the CW pitch sings through (nyuuuiin). */
+  const tune = useCallback((hz: number, opts?: { jog?: boolean }) => {
     const engine = engineRef.current;
     if (!engine) return;
-    engine.setVfo(hz);
-    setVfo(engine.vfo);
-  }, []);
+    stopJog();
+    const target = Math.round(hz);
+    const apply = (next: number) => {
+      engine.setVfo(next);
+      setVfo(engine.vfo);
+    };
+    if (!opts?.jog) {
+      apply(target);
+      return;
+    }
+    const from = engine.vfo;
+    const delta = target - from;
+    if (Math.abs(delta) <= 2) {
+      apply(target);
+      return;
+    }
+    // Long travel: early Hz is often outside FIL (quiet), ease-out lingers for the audible nyuuuiin.
+    const ms = Math.min(2400, Math.max(1400, Math.abs(delta) * 0.9));
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      if (engineRef.current !== engine) return;
+      const u = Math.min(1, (now - t0) / ms);
+      const eased = 1 - (1 - u) ** 3;
+      apply(u >= 1 ? target : Math.round(from + delta * eased));
+      if (u < 1) jogRafRef.current = requestAnimationFrame(tick);
+      else jogRafRef.current = 0;
+    };
+    jogRafRef.current = requestAnimationFrame(tick);
+  }, [stopJog]);
 
   // Wheel tuning needs a non-passive listener.
   useEffect(() => {
@@ -216,6 +254,7 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
     const engine = engineRef.current;
     if (!engine) return 'failed';
     if (engine.powered) {
+      stopJog();
       setPowered(false);
       setTxOn(false);
       await engine.powerOff();
