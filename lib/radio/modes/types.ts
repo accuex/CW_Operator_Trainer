@@ -38,6 +38,8 @@ export interface QsoSession {
   truth(): Record<string, string>;
   /** Our transmission went out; the agents answer. */
   onTransmit(text: string, ctx: { offsetHz: number }): TxResult;
+  /** We started keying (engine clock): a station between CQs on our frequency holds its next CQ. */
+  onKeying?(span: { start: number; end: number }, offsetHz: number): void;
   /** Ready-made transmissions for the current step. */
   macros(log: Record<string, string>): [string, string][];
 }
@@ -95,4 +97,12 @@ export interface ContestQsoMode extends QsoModeBase {
   kind: 'contest';
 }
 
-export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode | ContestQsoMode;
+/**
+ * A wabun QSO: Latin calls, ホレ, a kana body, ラタ, Latin again. It has its own desk
+ * (kana input, the switches) and starts WabunSession itself.
+ */
+export interface WabunQsoMode extends QsoModeBase {
+  kind: 'wabun';
+}
+
+export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode | ContestQsoMode | WabunQsoMode;

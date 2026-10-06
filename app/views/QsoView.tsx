@@ -17,7 +17,10 @@ import { TIER_LABEL, badgeById, recordQsoOutcome, recordRunOutcome, type EarnedB
 import { modeProgress, normalizeQsoProfile, recommendStage, updateSkills } from '@/lib/radio/skills';
 import { logbookEntries } from '@/lib/radio/logbook';
 import { traceRx, type QsoTrace } from '@/lib/radio/trace';
-import { addQsoTrace } from '@/lib/storage';
+import { addQsoTrace, addWabunRecord } from '@/lib/storage';
+import { updateWabunSkills } from '@/lib/radio/wabun/learning';
+import { adjustWabun, normalizeWabunAdapt, voteWabunAxes, wabunBand, type WabunAxis } from '@/lib/radio/wabun/adapt';
+import type { WabunQsoRecord } from '@/lib/radio/wabun/trace';
 import { nowId } from '@/app/trainer/shared';
 import { Icon } from '@/app/components/icons';
 import { FieldCells } from './qso/FieldCells';
@@ -25,6 +28,10 @@ import { CqRunDesk, type RunRecord, type RunSaved } from './qso/CqRunDesk';
 import { ContestDesk, CONTEST_RIG_LEVELS, type ContestSaveRecord } from './qso/ContestDesk';
 import { PileupDesk, PILEUP_RIG_LEVELS } from './qso/PileupDesk';
 import { RigPanel } from './qso/RigPanel';
+import { WabunDesk, WABUN_RIG_LEVELS } from './qso/WabunDesk';
+import { devWabunPreset } from '@/lib/radio/wabun/presets';
+import { assistedAnswers, compareDecode, decodeAssist, decodeNote, isAssisted, outcomeWithoutCopy, wabunWithoutCopy, withoutCopy } from '@/lib/radio/decode/assist';
+import type { QsoAssist } from '@/lib/types';
 import { useRig, type Capture, type PowerResult } from './qso/useRig';
 
 const PREFS_KEY = 'cwot.qso.prefs';
@@ -63,6 +70,7 @@ interface Review {
   earned: EarnedBadge[];
   /** Characters that just got their 実戦マーク. */
   marked: string[];
+  assist?: QsoAssist;
 }
 
 export interface QsoViewProps {
@@ -86,7 +94,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const advice = recommendStage(qso);
 
   // The pileup's band is its own (its levels don't use these axes yet).
-  const band = mode.kind === 'pileup' ? PILEUP_RIG_LEVELS : mode.kind === 'contest' ? CONTEST_RIG_LEVELS : difficulty;
+  // The wabun desk's band: おまかせ's rf axis when on (0.25 is Stage 4's quiet band), else that quiet band.
+  // A dev preset (?wabunPreset=) sets the band too, the same as its sim run.
+  const [wabunPreset] = useState(devWabunPreset);
+  const wabunAdapt = mode.kind === 'wabun' && progress.auto ? normalizeWabunAdapt(progress.wabun as Parameters<typeof normalizeWabunAdapt>[0]) : null;
+  const band = mode.kind === 'pileup' ? PILEUP_RIG_LEVELS : mode.kind === 'contest' ? CONTEST_RIG_LEVELS
+    : mode.kind === 'wabun' ? (wabunPreset ? wabunBand(wabunPreset.axes.rf ?? 0.25).rig : wabunAdapt ? wabunBand(wabunAdapt.axes.rf).rig : WABUN_RIG_LEVELS) : difficulty;
   const rig = useRig({ pitch: settings.pitch, stopEpoch, levels: { af: prefs.af, noise: band.noise, qrn: band.qrn, qsb: band.qsb } });
   const { engineRef, txOn, newCapture } = rig;
   const [step, setStep] = useState(0);
@@ -144,7 +157,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     const macro = macros.some(([, line]) => line.toUpperCase().replace(/\s+/g, ' ').trim() === text);
     setTxText('');
     setSent((list) => [...list, text]);
-    if (!(await rig.transmit(text, difficulty.speed)) || liveRef.current !== live) return;
+    // A station between CQs hears our carrier and holds its next CQ (session.onKeying).
+    const onKeyed = (span: { start: number; end: number }) => live.session.onKeying?.(span, engine.vfo - live.session.target.rf);
+    if (!(await rig.transmit(text, difficulty.speed, onKeyed)) || liveRef.current !== live) return;
     const { session } = live;
     const offsetHz = engine.vfo - session.target.rf;
     const reply = session.onTransmit(text, { offsetHz });
@@ -180,10 +195,13 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       onFrequency: live.tx.length - offFrequency,
       procedure: live.tx.filter((event) => isProcedureIssue(event.issue)).length,
     });
+    // DECODE printed: the copy may have come off the screen — kept, but not the ear's.
+    const assist = decodeAssist(capture.decode, Object.values(log));
+    const learned = isAssisted(assist) ? withoutCopy(evidence) : evidence;
     const correctFields = fields.filter((field) => field.correct).length;
     const current = modeProgress(qso, live.modeId, difficulty);
     const adjusted = current.auto
-      ? adjustDifficulty({ difficulty: current.difficulty as DifficultyVector, votes: current.votes }, evidence, current.pinned)
+      ? adjustDifficulty({ difficulty: current.difficulty as DifficultyVector, votes: current.votes }, learned, current.pinned)
       : { difficulty: current.difficulty as DifficultyVector, votes: current.votes, moved: {} };
     const endedAt = Date.now();
     // QRS slows the target down; credit the speed it actually sent at.
@@ -192,10 +210,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       fields, evidence, alphabet: session.preset.alphabet, wpm, tx: live.tx, at: endedAt,
       complete: session.step >= mode.steps.length - 1,
     };
-    const { earned, marked } = recordQsoOutcome(qso, outcome);
+    // Badges and 実戦マーク: the copy only when it was the ear's.
+    const counted = isAssisted(assist) ? outcomeWithoutCopy(outcome) : outcome;
+    const { earned, marked } = recordQsoOutcome(qso, counted);
     updateQso((old) => {
       const base = modeProgress(old, live.modeId, difficulty);
-      const next = recordQsoOutcome(updateSkills(old, { modeId: live.modeId, alphabet: session.preset.alphabet, wpm, evidence }), outcome).qso;
+      const next = recordQsoOutcome(updateSkills(old, { modeId: live.modeId, alphabet: session.preset.alphabet, wpm, evidence: learned }), counted).qso;
       return {
         ...next,
         modes: {
@@ -203,7 +223,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           [live.modeId]: {
             ...base,
             qsos: base.qsos + 1,
-            perfect: base.perfect + (correctFields === fields.length ? 1 : 0),
+            perfect: base.perfect + (!isAssisted(assist) && correctFields === fields.length ? 1 : 0),
             lastAt: endedAt,
             difficulty: adjusted.difficulty,
             votes: adjusted.votes,
@@ -215,7 +235,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     const answers = fieldAnswers(fields, {
       sessionId: live.id, timestamp: endedAt, wpm, modeId: live.modeId, presetId: session.preset.id, alphabet: session.preset.alphabet,
     });
-    recordMany(answers);
+    recordMany(assistedAnswers(answers, assist));
     const cleanAccuracy = evidence.clean.total ? evidence.clean.correct / evidence.clean.total : null;
     onSession({
       id: live.id,
@@ -237,6 +257,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         difficulty: { ...difficulty },
         adjusted: adjusted.moved,
         contacts: [{ call: session.truth().call ?? '', fields: fields.length, fieldsCorrect: correctFields, outcome: outcome.complete ? 'complete' : 'partial', at: endedAt }],
+        ...(assist ? { assist } : {}),
       },
     });
     const rx = traceRx(targetRx, capture.monitor, now, (record) => capture.rxWpm.get(record) ?? session.target.wpm);
@@ -254,11 +275,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       tx: live.tx,
       evidence,
       adjusted: adjusted.moved,
+      ...(assist ? { assist, decode: compareDecode(targetRx.map((record) => ({ tx: record.tx, station: record.station, epoch: record.epoch })), capture.decode.chars) } : {}),
     }).catch(() => undefined);
     // What actually went out, without the CQ loop repeating itself.
     const received = rx.filter((record) => !/^u*$/.test(record.conditions)).map((record) => record.text)
       .filter((text, index, list) => text !== list[index - 1]);
-    setReview({ fields, evidence, moved: adjusted.moved, auto: current.auto, received, earned, marked });
+    setReview({ fields, evidence, moved: adjusted.moved, auto: current.auto, received, earned, marked, assist });
   };
 
   /** Rag-chew only: a run keeps its background for the whole run (the next run gets the new count). */
@@ -292,7 +314,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
    * unpinned axes the run mode has (おまかせ) — the same evidence rules as a rag-chew.
    */
   const saveRun = (record: RunRecord): RunSaved => {
-    recordMany(record.answers);
+    const assist = decodeAssist(rig.captureRef.current?.decode, record.summary.contacts?.map((contact) => contact.call));
+    const evidence = isAssisted(assist) ? withoutCopy(record.evidence) : record.evidence;
+    recordMany(assistedAnswers(record.answers, assist));
     const modeId = record.summary.modeId;
     const current = modeProgress(qso, modeId, difficulty);
     const { pileup } = record;
@@ -303,9 +327,13 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       ? { difficulty: normalizeDifficulty(pileup.axes, current.difficulty as DifficultyVector), votes: current.level === pileup.level ? current.votes : {} }
       : { difficulty: current.difficulty as DifficultyVector, votes: current.votes };
     const adjusted = current.auto
-      ? adjustDifficulty(state, record.evidence, pinned, pileup ? pileup.votes : undefined)
+      ? adjustDifficulty(state, evidence, pinned, pileup && !isAssisted(assist) ? pileup.votes : undefined)
       : { ...state, moved: {} };
-    const runOutcome = { ...record.run, alphabet: record.alphabet, at: record.endedAt };
+    const runOutcome = {
+      ...record.run, alphabet: record.alphabet, at: record.endedAt,
+      // Badges and 実戦マーク: the contacts' copy only when it was the ear's (the run's own counters stay).
+      contacts: isAssisted(assist) ? record.run.contacts.map(outcomeWithoutCopy) : record.run.contacts,
+    };
     const { earned, marked } = recordRunOutcome(qso, runOutcome);
     onSession({
       id: record.id,
@@ -315,13 +343,14 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       alphabetType: record.alphabet,
       answers: record.answers.length,
       accuracy: record.answers.length ? record.answers.filter((answer) => answer.isCorrect).length / record.answers.length : 0,
-      qso: { ...record.summary, adjusted: adjusted.moved },
+      qso: { ...record.summary, adjusted: adjusted.moved, ...(assist ? { assist } : {}) },
     });
     const made = record.summary.contacts?.length ?? 0;
-    const perfect = record.summary.contacts?.filter((contact) => contact.fields > 0 && contact.fieldsCorrect === contact.fields).length ?? 0;
+    const perfect = isAssisted(assist) ? 0 : record.summary.contacts?.filter((contact) => contact.fields > 0 && contact.fieldsCorrect === contact.fields).length ?? 0;
     updateQso((old) => {
-      const skilled = updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence: record.evidence });
-      const next = recordRunOutcome(pileup ? updatePileupSkills(skilled, pileup.analysis) : skilled, runOutcome).qso;
+      const skilled = updateSkills(old, { modeId, alphabet: record.alphabet, wpm: record.wpm, evidence });
+      // Pileup skills are the partial / callsign copy: not the ear's when DECODE printed.
+      const next = recordRunOutcome(pileup && !isAssisted(assist) ? updatePileupSkills(skilled, pileup.analysis) : skilled, runOutcome).qso;
       const base = modeProgress(old, modeId, difficulty);
       return {
         ...next,
@@ -334,7 +363,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         },
       };
     });
-    return { moved: adjusted.moved, auto: current.auto, earned, marked };
+    return { moved: adjusted.moved, auto: current.auto, earned, marked, assist };
   };
 
   /**
@@ -343,17 +372,19 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
    * (contest/learning.ts) — never on procedure, logging, DUPE or dropped contacts.
    */
   const saveContest = (record: ContestSaveRecord): RunSaved => {
-    recordMany(record.answers);
+    const assist = decodeAssist(rig.captureRef.current?.decode, record.summary.contacts?.map((contact) => contact.call));
+    const evidence = isAssisted(assist) ? withoutCopy(record.analysis.evidence) : record.analysis.evidence;
+    recordMany(assistedAnswers(record.answers, assist));
     const modeId = record.summary.modeId;
     const current = modeProgress(qso, modeId, difficulty);
     const pinned = [...current.pinned, ...AXES.filter((axis) => !(CONTEST_ADAPT_AXES as readonly Axis[]).includes(axis))];
     // From the axes it ran at; votes carry over only within the same level.
     const state = { difficulty: normalizeDifficulty({ ...record.axes }, current.difficulty as DifficultyVector), votes: current.level === record.level ? current.votes : {} };
     const adjusted = current.auto
-      ? adjustDifficulty(state, record.analysis.evidence, pinned, voteContestAxes(record.analysis))
+      ? adjustDifficulty(state, evidence, pinned, isAssisted(assist) ? undefined : voteContestAxes(record.analysis))
       : { ...state, moved: {} };
     const runOutcome: RunOutcome = {
-      contacts: record.contacts, alphabet: 'international', at: record.endedAt, seconds: record.review.seconds,
+      contacts: isAssisted(assist) ? record.contacts.map(outcomeWithoutCopy) : record.contacts, alphabet: 'international', at: record.endedAt, seconds: record.review.seconds,
       frequencyChecks: 0, busyAvoided: 0, cleanContacts: 0, cleanRate: 0, contest: contestOutcome(record.review, record.analysis),
     };
     const { earned, marked } = recordRunOutcome(qso, runOutcome);
@@ -365,12 +396,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       alphabetType: 'international',
       answers: record.answers.length,
       accuracy: record.answers.length ? record.answers.filter((answer) => answer.isCorrect).length / record.answers.length : 0,
-      qso: { ...record.summary, adjusted: adjusted.moved },
+      qso: { ...record.summary, adjusted: adjusted.moved, ...(assist ? { assist } : {}) },
     });
     const logged = record.summary.contest?.logged ?? 0;
     updateQso((old) => {
-      const skilled = updateSkills(old, { modeId, alphabet: 'international', wpm: record.wpm, evidence: record.analysis.evidence });
-      const next = recordRunOutcome(updateContestSkills(skilled, record.analysis, modeId), runOutcome).qso;
+      const skilled = updateSkills(old, { modeId, alphabet: 'international', wpm: record.wpm, evidence });
+      const next = recordRunOutcome(isAssisted(assist) ? skilled : updateContestSkills(skilled, record.analysis, modeId), runOutcome).qso;
       const base = modeProgress(old, modeId, difficulty);
       return {
         ...next,
@@ -380,7 +411,42 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         },
       };
     });
-    return { moved: adjusted.moved, auto: current.auto, earned, marked };
+    return { moved: adjusted.moved, auto: current.auto, earned, marked, assist };
+  };
+
+  /**
+   * A wabun QSO reviewed: copy.wabun (memo only), follow.wabun and procedure into the
+   * skills, each from its own evidence, the QSO counted for the mode and the record kept
+   * on the device. No session record (nothing new synced) and no おまかせ yet.
+   */
+  const saveWabun = (record: WabunQsoRecord): Partial<Record<WabunAxis, [number, number]>> => {
+    // おまかせ: from the axes the QSO ran at; each axis by its own evidence (procedure moves none).
+    const current = modeProgress(qso, record.modeId, difficulty);
+    // DECODE printed: the memo and the facts may have come off the screen (tuning still counts).
+    const evidence = isAssisted(record.assist) ? wabunWithoutCopy(record.evidence) : record.evidence;
+    const stored = normalizeWabunAdapt(current.wabun as Parameters<typeof normalizeWabunAdapt>[0], record.axes?.speed);
+    const state = { ...stored, axes: record.axes ?? stored.axes };
+    const adjusted = record.auto && record.axes
+      ? adjustWabun(state, voteWabunAxes({ level: record.level, evidence, procedure: record.procedure, fistKind: record.fist?.kind ?? null }), record.level)
+      : null;
+    updateQso((old) => {
+      const next = updateWabunSkills(old, { modeId: record.modeId, evidence, procedure: record.procedure });
+      const base = modeProgress(old, record.modeId, difficulty);
+      return {
+        ...next,
+        modes: {
+          ...next.modes,
+          [record.modeId]: {
+            ...base, qsos: base.qsos + 1, perfect: base.perfect + (record.complete && record.follow.ok ? 1 : 0), lastAt: record.endedAt, level: `${record.level}`,
+            ...(adjusted ? { wabun: { axes: { ...adjusted.axes }, votes: adjusted.votes as Record<string, number>, level: record.level } } : {}),
+          },
+        },
+      };
+    });
+    // Off (or a dev preset): nothing was up for adjusting, kept as null rather than "no change".
+    const moved = adjusted ? adjusted.moved : null;
+    void addWabunRecord({ ...record, adjusted: moved }).catch(() => undefined);
+    return moved ?? {};
   };
 
   /** Where a contest level starts: as おまかせ left it when that is the level last run, else the level's own axes. */
@@ -442,7 +508,17 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     <div className="qso-grid">
       <RigPanel rig={rig} onPower={onPower} />
 
-      {mode.kind === 'pileup' ? (
+      {mode.kind === 'wabun' ? (
+        <WabunDesk
+          key={mode.id}
+          rig={rig}
+          myCall={myCall}
+          auto={progress.auto}
+          adapt={progress.wabun}
+          onAuto={(auto) => updateMode({ auto })}
+          onSave={saveWabun}
+        />
+      ) : mode.kind === 'pileup' ? (
         <PileupDesk
           key={mode.id}
           rig={rig}
@@ -559,7 +635,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
 
     <div className="qso-bottom">
       <div className="panel panel-pad qso-settings">
-        {mode.kind === 'pileup' ? (
+        {mode.kind === 'wabun' ? (
+          <>
+            <div className="qso-panel-head"><h2>設定</h2></div>
+            <p className="qso-note">和文 QSO はデスクのレベル（Lv1 打ち逃げ・Lv2 ラバースタンプ・Lv3 天気・設備・Lv4 近況ひとこと・Lv5 実用ラグチュー）と「速さ」で選びます（次の局から反映。QRS で相手を遅くできます）。おまかせはデスクで切り替えます（オンのとき相手の速さ・話の量・電波・周波数のずれ・Lv5 の手打ちのクセを結果に合わせて少しずつ調整。手順の結果では変えません）。オフのときのバンドは弱い QSB・QRN と少しの欧文の混信がある程度に固定です。交信の詳しい記録はこの端末だけに保存します（最大 50 件）。</p>
+          </>
+        ) : mode.kind === 'pileup' ? (
           <>
             <div className="qso-panel-head"><h2>設定</h2></div>
             <p className="qso-note">パイルアップの難しさは、デスクのレベル（入門〜DX級）で選びます。おまかせ調整は、ミスの原因に関係する軸（速さ・呼ぶ局数・似たコール・弱信号・集中度）だけを動かします。</p>
@@ -623,7 +704,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           </label>
           <label>AF 音量 <b>{Math.round(prefs.af * 100)}</b><input type="range" min={0} max={1} step={0.01} value={prefs.af} onChange={(event) => setPrefs({ ...prefs, af: Number(event.target.value) })} /></label>
         </div>
-        {mode.kind !== 'pileup' && mode.kind !== 'contest' && <p className="qso-note">速さ・弱信号・ドリフトは次の局から反映されます（QRS で相手を遅くできます）。ピッチは全体の設定に従います。</p>}
+        {mode.kind !== 'pileup' && mode.kind !== 'contest' && mode.kind !== 'wabun' && <p className="qso-note">速さ・弱信号・ドリフトは次の局から反映されます（QRS で相手を遅くできます）。ピッチは全体の設定に従います。</p>}
       </div>
 
       <div className="panel panel-pad qso-logbook">
@@ -691,7 +772,8 @@ function SkillPanel({ qso, modeId }: { qso: QsoProfile; modeId: string }) {
 
 /** Post-QSO review: which characters were missed, and why. */
 function QsoReview({ review }: { review: Review }) {
-  const { fields, evidence, moved, auto, received, earned, marked } = review;
+  const { fields, evidence, moved, auto, received, earned, marked, assist } = review;
+  const decodeLine = decodeNote(assist);
   const causes = (Object.keys(CAUSE_LABEL) as (keyof typeof CAUSE_LABEL)[]).filter((cause) => (evidence.causes[cause] ?? 0) > 0);
   const moves = (Object.entries(moved) as [Axis, number][]).map(([axis, delta]) => describeMove(axis, delta));
   const clean = evidence.clean.total ? Math.round((evidence.clean.correct / evidence.clean.total) * 100) : null;
@@ -728,6 +810,7 @@ function QsoReview({ review }: { review: Review }) {
             : '難易度はそのまま（もう少し様子を見ます）。'}
         {' '}悪条件で落とした文字は苦手分析に入りません（分析画面のスイッチで表示できます）。
       </p>
+      {decodeLine && <p className="qso-note decode-note">{decodeLine}</p>}
       <details className="qso-reveal">
         <summary>相手局が送った電文</summary>
         <ul>{received.map((line, index) => <li key={index}>{line}</li>)}</ul>

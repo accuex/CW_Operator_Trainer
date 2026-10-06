@@ -1,3 +1,4 @@
+import type { QsoAssist } from '../types';
 import type { QsoEvidence } from './difficulty';
 import type { AirLine } from './contest/analysis';
 import type { ContestReview, DeskSent, ReviewSource } from './contest/review';
@@ -50,6 +51,8 @@ export interface RunTrace<R extends RunBooks = RunResult, P = RunParams> {
   /** Axis moves applied after the run, and badges it lifted. */
   adjusted: Record<string, number>;
   earned: { id: string; tier: number }[];
+  /** DECODE's use during the run (absent: never on). */
+  assist?: QsoAssist;
   /** A pileup's own record: what the review redraws its timeline from. */
   pileup?: PileupTraceDetail;
   /** A contest's own record: the review as built at QRT and what the desk sent. */

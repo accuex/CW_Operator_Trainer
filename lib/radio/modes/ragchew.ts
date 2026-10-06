@@ -1,9 +1,11 @@
 import { makeQrm, makeStation } from '../band';
 import { BAND_AXES, targetDrift, targetStrength } from '../difficulty';
-import { cqText, makeTarget, MIN_TARGET_WPM, respond, type QsoPhase } from '../qso';
+import { cqText, makeTarget, MIN_TARGET_WPM, respond, TUNE_TOLERANCE_HZ, type QsoPhase } from '../qso';
 import type { QsoSession, SessionContext, SingleQsoMode } from './types';
 
 const STEP_OF: Record<QsoPhase, number> = { cq: 0, report: 1, done: 2 };
+/** Seconds a station that heard a carrier listens past it before calling CQ again (as the wabun desk's). */
+const CQ_LISTEN = 4;
 
 /** Answer someone's CQ and trade RST / name / QTH. */
 export const ragchew: SingleQsoMode = {
@@ -54,6 +56,13 @@ export const ragchew: SingleQsoMode = {
         if (result.reply && result.phase !== 'cq') target.loop = null;
         phase = result.phase;
         return result;
+      },
+      // The same rule as the wabun station: only a CQ not yet on the air is held, and only
+      // when we key on its frequency (one already keyed goes on; off frequency it never heard us).
+      onKeying({ start, end }, offsetHz) {
+        if (phase !== 'cq' || !target.loop || Math.abs(offsetHz) > TUNE_TOLERANCE_HZ) return;
+        if (target.busyUntil > start || target.queue.length || target.nextAt <= start) return;
+        target.nextAt = Math.max(target.nextAt, end + CQ_LISTEN);
       },
       macros(log) {
         const call = log.call?.toUpperCase();

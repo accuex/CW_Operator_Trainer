@@ -5,6 +5,7 @@ import { formatFrequency, nearestStation } from '@/lib/radio/band';
 import { FILTERS } from '@/lib/radio/rig';
 import { hzAtRatio } from '@/lib/radio/scope';
 import { Icon } from '@/app/components/icons';
+import { DecodeStrip } from './DecodeStrip';
 import type { PowerResult, Rig } from './useRig';
 
 /** The receiver front panel: power, frequency, S-meter, scope/waterfall and keys. */
@@ -88,6 +89,7 @@ export function RigPanel({ rig, onPower }: { rig: Rig; onPower?: (result: PowerR
         <button type="button" onClick={() => tune(vfo - 50)} aria-label="50 Hz 下げる">◀<small>−50</small></button>
         <button type="button" onClick={() => tune(vfo + 50)} aria-label="50 Hz 上げる">▶<small>+50</small></button>
       </div>
+      <DecodeStrip rig={rig} />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import type { MistakeNote, PileupMistake } from '@/lib/radio/pileup/analysis';
 import { Icon } from '@/app/components/icons';
 import { fitting, nextPractice, pickGroups, responderRole, reviewStats, type DeskStep, type GroupOutcome, type PickGroup, type ResponderRole } from '@/lib/radio/pileup/review';
 import type { PileupReviewData } from './PileupDesk';
+import { decodeNote } from '@/lib/radio/decode/assist';
 
 /**
  * After QRT: the answers. Each pick shows what we sent, who was really calling then,
@@ -89,6 +90,7 @@ export function PileupReview({ review, auto, onRestart, onClose }: { review: Pil
         {onClose && <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>一覧に戻る</button>}
       </div>
 
+      {saved?.assist && <p className="qso-note decode-note">{decodeNote(saved.assist)}</p>}
       {saved && saved.earned.length > 0 && (
         <div className="qso-review-earned" role="status">
           {saved.earned.map(({ id, tier }) => (

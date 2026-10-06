@@ -1,5 +1,5 @@
 import { cutStation, enqueue, fadeAt, schedulePending, type Station, type Transmission } from './band';
-import { keyText, type Mark } from './keying';
+import { keyText, type Keyed, type KeyingOptions, type Mark } from './keying';
 
 /**
  * Multi-voice receiver for the QSO simulator.
@@ -40,6 +40,8 @@ export class RigEngine {
   stations: Station[] = [];
   crashes: Crash[] = [];
   txUntil = 0;
+  /** Start of the current (or last) run of our keying; with txUntil, when the receiver is muted. */
+  txFrom = 0;
   random: () => number;
   /** Bumped whenever the clock source changes (power on/off); times from other epochs don't compare. */
   epoch = 0;
@@ -100,6 +102,7 @@ export class RigEngine {
     this.ctx = null;
     this.rx = null;
     this.txUntil = 0;
+    this.txFrom = 0;
     this.epoch += 1;
     for (const station of this.stations) this.resetClock(station);
     try { await ctx.close(); } catch { /* already closed */ }
@@ -172,13 +175,17 @@ export class RigEngine {
   /**
    * Key our own transmitter. Resolves when the last element ends. `onKeyed` gets the
    * on-air span (engine clock, current epoch) as soon as it is fixed — before the
-   * first element sounds — so stations can hear our carrier while we send.
+   * first element sounds — so stations can hear our carrier while we send. `keyer`
+   * replaces the Latin `keyText` (a wabun transmission keys its segments).
    */
-  transmit(text: string, wpm: number, effectiveWpm = wpm, onKeyed?: (span: { start: number; end: number; epoch: number }) => void): Promise<number> {
+  transmit(
+    text: string, wpm: number, effectiveWpm = wpm, onKeyed?: (span: { start: number; end: number; epoch: number }) => void,
+    keyer: (text: string, options: KeyingOptions) => Keyed = keyText,
+  ): Promise<number> {
     const ctx = this.ctx;
     const rx = this.rx;
     if (!ctx || !rx) return Promise.resolve(0);
-    const { marks, length } = keyText(text, { wpm, effectiveWpm });
+    const { marks, length } = keyer(text, { wpm, effectiveWpm });
     const t0 = Math.max(ctx.currentTime, this.txUntil) + 0.05;
     onKeyed?.({ start: t0, end: t0 + length, epoch: this.epoch });
     const osc = ctx.createOscillator();
@@ -192,6 +199,8 @@ export class RigEngine {
     // Receiver mutes while we key (no full break-in).
     rx.af.gain.setTargetAtTime(0, t0, 0.01);
     rx.af.gain.setTargetAtTime(this.levels.af, t0 + length, 0.05);
+    // Back-to-back overs are one muted stretch.
+    if (t0 > this.txUntil + 0.06) this.txFrom = t0;
     this.txUntil = t0 + length;
     return new Promise((resolve) => {
       setTimeout(() => resolve(length), (t0 + length - ctx.currentTime) * 1000);
@@ -213,6 +222,9 @@ export class RigEngine {
 
   /** Receiver on and not keying our own transmitter. */
   get listening() { return this.powered && !this.transmitting; }
+
+  /** The receiver was muted at t (we were keying). */
+  mutedAt(t: number) { return t >= this.txFrom && t < this.txUntil; }
 
   /** Strongest static crash active at t (0 = quiet). */
   crashAt(t: number) {

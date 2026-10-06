@@ -170,6 +170,22 @@ export interface QsoSessionSummary {
   pileup?: QsoPileupSummary;
   /** Contest numbers (contest only): the checked result in counts, never the log or the timeline. */
   contest?: QsoContestSummary;
+  /** How the rig's DECODE was used (absent: never on). */
+  assist?: QsoAssist;
+}
+
+/**
+ * The rig's DECODE in a session: on or not, whether it printed, and how many logged values
+ * it had also printed. Never a claim that a value was read from it.
+ */
+export interface QsoAssist {
+  /** on: on while listening, printed nothing · shown: it printed. */
+  decode: 'on' | 'shown';
+  decodeUsed: true;
+  decodeSeconds: number;
+  decodeShown: number;
+  /** Logged values DECODE had also printed. */
+  loggedShown: number;
 }
 
 /**
@@ -446,6 +462,8 @@ export interface QsoModeProgress {
   votes: Record<string, number>;
   /** Pileup: the level `difficulty` was set from (おまかせ moves it from there). */
   level?: string;
+  /** Wabun QSO: おまかせ's own axes and votes (lib/radio/wabun/adapt.ts). */
+  wabun?: { axes: Record<string, number>; votes: Record<string, number>; level?: number };
 }
 
 export interface QsoProfile {
@@ -469,6 +487,8 @@ export interface QsoProfile {
     pileup?: PileupSkill;
     /** Contest skills, kept apart from callsign (see ContestSkill). */
     contest?: ContestSkill;
+    /** Following a QSO's content (wabun QSO: see FollowSkill). Apart from copy and procedure. */
+    follow?: Partial<Record<AlphabetType, FollowSkill>>;
   };
   modes: Record<string, QsoModeProgress>;
   /** Raw evidence counters badges are computed from (see lib/radio/badges.ts). */
@@ -494,6 +514,20 @@ export interface CallsignSkill {
   log: CallSkillBuckets;
   /** The first call we sent back (run modes): copy on the first hearing. */
   first: CallSkillBuckets;
+}
+
+/**
+ * Did we follow what the QSO told (call, report, name, QTH, the theme, the news)? Of the
+ * facts that reached us, the share logged or picked in the check afterwards. A fact got
+ * only by asking again counts as followed; `first` keeps the share without asking again,
+ * `paths` every fact's path (repeat-recovered apart from logged / postcheck). Facts
+ * keyed while we transmitted (not-reached) are counted there and nowhere else.
+ */
+export interface FollowSkill extends SkillEstimate {
+  first?: SkillEstimate;
+  paths: Record<'logged' | 'postcheck' | 'repeat-recovered' | 'missed' | 'not-reached', number>;
+  /** Wabun QSOs measured. */
+  qsos: number;
 }
 
 /**

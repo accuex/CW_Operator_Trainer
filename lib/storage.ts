@@ -4,6 +4,7 @@ import { clampSpeedWpm } from './speed';
 import { COURSE_DEFAULT_UNLOCK } from './course';
 import { normalizeQsoProfile } from './radio/skills';
 import { QSO_TRACE_LIMIT, type QsoTrace } from './radio/trace';
+import type { WabunQsoRecord } from './radio/wabun/trace';
 import { RUN_TRACE_LIMIT, type AnyRunTrace } from './radio/runTrace';
 
 const DB_NAME = 'cw-operator-trainer';
@@ -96,6 +97,8 @@ async function putCapped(storeName: 'qsoTraces' | 'runTraces', item: { id: strin
 
 /** Store a QSO trace and drop all but the newest QSO_TRACE_LIMIT. */
 export const addQsoTrace = (trace: QsoTrace) => putCapped('qsoTraces', trace, QSO_TRACE_LIMIT);
+/** A wabun QSO record goes with the single-QSO traces (same cap, device-only). */
+export const addWabunRecord = (record: WabunQsoRecord) => putCapped('qsoTraces', record, QSO_TRACE_LIMIT);
 export const getQsoTrace = (id: string) => transaction<QsoTrace | undefined>('qsoTraces', 'readonly', (store) => store.get(id));
 
 /** Store a run trace and drop all but the newest RUN_TRACE_LIMIT. */

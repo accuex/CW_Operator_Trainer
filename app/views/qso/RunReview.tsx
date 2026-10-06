@@ -10,6 +10,7 @@ import type { RunScore } from '@/lib/radio/runReview';
 import { Icon } from '@/app/components/icons';
 import { FieldCells, SITUATION_LABEL } from './FieldCells';
 import type { RunSaved } from './RunDesk';
+import { decodeNote } from '@/lib/radio/decode/assist';
 
 export interface RunReviewData<R extends RunBooks = RunResult> {
   result: R;
@@ -138,6 +139,7 @@ export function RunReview<R extends RunBooks>({ review, flavor, preset, onRestar
         </div>
       )}
 
+      {saved?.assist && <p className="qso-note decode-note">{decodeNote(saved.assist)}</p>}
       {saved && (saved.earned.length > 0 || saved.marked.length > 0) && (
         <div className="qso-review-earned" role="status">
           {saved.earned.map(({ id, tier }) => (

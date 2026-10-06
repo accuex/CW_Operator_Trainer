@@ -352,7 +352,7 @@ export function ContestDesk({ rig, myCall, myName, myQth, axesFor, stored, auto,
         contacts: contestContacts(saved.trace.result, judged.scored, saved.analysis, (id) => wpmOf[id] ?? axes.speed),
       });
       // The detailed record (our log, the stations' logs, what we sent and received, the causes) stays on this device.
-      void addRunTrace({ ...saved.trace, adjusted: kept.moved, earned: kept.earned })
+      void addRunTrace({ ...saved.trace, adjusted: kept.moved, earned: kept.earned, ...(kept.assist ? { assist: kept.assist } : {}) })
         .then(() => setRecordsAt(Date.now())).catch(() => undefined);
       setResult({ review: saved.review, level: live.level, saved: kept, analysis: saved.analysis });
     } else {

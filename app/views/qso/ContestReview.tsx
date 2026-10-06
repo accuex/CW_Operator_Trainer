@@ -7,6 +7,7 @@ import { contestLevel, type ContestLevelId } from '@/lib/radio/contest/levels';
 import { describeMove, type Axis } from '@/lib/radio/difficulty';
 import { Icon } from '@/app/components/icons';
 import type { RunSaved } from './RunDesk';
+import { decodeNote } from '@/lib/radio/decode/assist';
 import { ourNr } from '@/lib/radio/contest/esm';
 import type { CheckVerdict } from '@/lib/radio/contest/log';
 import { rateOver, type ContestReview as ContestReviewData, type LeftLine, type ReviewLine, type StoredRules, type TheirOnlyLine } from '@/lib/radio/contest/review';
@@ -131,6 +132,7 @@ export function ContestReview({ review, level, stored, saved, analysis, auto, on
         BUST・NIL・相手ログのみはここで初めて分かります。
       </p>
 
+      {saved?.assist && <p className="qso-note decode-note">{decodeNote(saved.assist)}</p>}
       {saved && saved.earned.length > 0 && (
         <div className="qso-review-earned" role="status">
           {saved.earned.map(({ id, tier }) => (

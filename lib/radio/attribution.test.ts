@@ -272,7 +272,8 @@ describe('ragchew mode', () => {
     expect(session.canLog).toBe(true);
     session.onTransmit('R TU 599 73', { offsetHz: 0 });
     expect(session.step).toBe(2);
-    // Unbuilt modes fall back to ragchew instead of throwing.
-    expect(qsoMode('wabun-ragchew').id).toBe('ragchew');
+    // Unknown modes fall back to ragchew instead of throwing.
+    expect(qsoMode('no-such-mode').id).toBe('ragchew');
+    expect(qsoMode('wabun-ragchew').kind).toBe('wabun');
   });
 });

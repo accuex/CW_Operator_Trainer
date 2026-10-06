@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Station, Transmission } from '@/lib/radio/band';
 import { CopyMonitor, sampleBand, type RxRecord } from '@/lib/radio/conditions';
+import { followDecoder, newDecodeUsage, type DecodeUsage } from '@/lib/radio/decode/assist';
+import { CwDecoder, type DecodeLang, type DecodeSpeed } from '@/lib/radio/decode/decoder';
+import type { Keyed, KeyingOptions } from '@/lib/radio/keying';
 import { RigEngine, type FilterWidth, type RigLevels } from '@/lib/radio/rig';
 import { ScopeRenderer } from '@/lib/radio/scope';
 import { audioEngine } from '@/app/trainer/shared';
@@ -20,7 +23,14 @@ export interface Capture {
   rx: RxRecord[];
   /** WPM each record went out at (QRS changes it mid-session). */
   rxWpm: Map<RxRecord, number>;
+  /** How DECODE was used this session (assist, never copy). */
+  decode: DecodeUsage;
 }
+
+export interface DecodeSettings { on: boolean; lang: DecodeLang; speed: DecodeSpeed }
+
+/** DECODE's cost, for the dev desk (OFF: nothing runs, these stay put). */
+export interface DecodePerf { ticks: number; ms: number; maxMs: number; samples: number; stationSamples: number; /** Window re-renders. */ flushes: number }
 
 /** Stations whose copy gets judged. Background QRM is only ever interference. */
 export const isCopied = (station: Station) => station.role !== 'qrm';
@@ -51,6 +61,7 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   const [span, setSpan] = useState<Span>(2500);
   const [hold, setHold] = useState(false);
   const [txOn, setTxOn] = useState(false);
+  const [decode, setDecodeState] = useState<DecodeSettings>({ on: false, lang: 'auto', speed: 'auto' });
 
   const engineRef = useRef<RigEngine | null>(null);
   const captureRef = useRef<Capture | null>(null);
@@ -59,6 +70,10 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   const scopeRef = useRef<HTMLCanvasElement>(null);
   const fallRef = useRef<HTMLCanvasElement>(null);
   const meterRef = useRef<HTMLElement>(null);
+  /** The rig's decoder: runs on the engine tick only while DECODE is on. */
+  const decoderRef = useRef<CwDecoder | null>(null);
+  const decodeOnRef = useRef(false);
+  const decodePerfRef = useRef<DecodePerf>({ ticks: 0, ms: 0, maxMs: 0, samples: 0, stationSamples: 0, flushes: 0 });
   const holdRef = useRef(hold);
   const spanRef = useRef<number>(span);
   useEffect(() => {
@@ -67,8 +82,10 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   });
 
   const newCapture = useCallback((): Capture => {
-    const capture = { monitor: new CopyMonitor(), rx: [], rxWpm: new Map() };
+    const capture = { monitor: new CopyMonitor(), rx: [], rxWpm: new Map(), decode: newDecodeUsage() };
     captureRef.current = capture;
+    // A new session: DECODE starts from a clean window (what it shows belongs to this session).
+    decoderRef.current?.reset(true);
     return capture;
   }, []);
 
@@ -85,8 +102,29 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
       capture.rx.push(record);
       capture.rxWpm.set(record, station.wpm);
     };
+    const decoder = new CwDecoder({ seed: 1 });
+    decoderRef.current = decoder;
+    const muted = (t: number) => engine.mutedAt(t);
+    const crashAt = (t: number) => engine.crashAt(t);
     engine.onTick = (now) => {
       const capture = captureRef.current;
+      // DECODE: only while on and the receiver is powered (OFF costs nothing).
+      if (decodeOnRef.current && engine.powered) {
+        const before = performance.now();
+        const { samples, stationSamples } = decoder.stats;
+        decoder.process(now, { stations: engine.stations, vfo: engine.vfo, filter: engine.filter, noise: engine.levels.noise, epoch: engine.epoch, crashAt, muted });
+        const ms = performance.now() - before;
+        const perf = decodePerfRef.current;
+        perf.ticks += 1;
+        perf.ms += ms;
+        perf.maxMs = Math.max(perf.maxMs, ms);
+        perf.samples += decoder.stats.samples - samples;
+        perf.stationSamples += decoder.stats.stationSamples - stationSamples;
+        if (capture) {
+          if (engine.listening) capture.decode.onSeconds += 0.1;
+          followDecoder(capture.decode, decoder.chars);
+        }
+      }
       if (!capture) return;
       for (const station of engine.stations) {
         if (!isCopied(station)) continue;
@@ -194,19 +232,39 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
 
   /**
    * Key `text` on the air. True when it went out completely on the same, still powered rig.
-   * `onKeyed` hears the on-air span the moment it is fixed (before the audio starts).
+   * `onKeyed` hears the on-air span the moment it is fixed (before the audio starts);
+   * `keyer` replaces the Latin keying (wabun).
    */
-  const transmit = async (text: string, wpm: number, onKeyed?: (span: KeyedSpan) => void) => {
+  const transmit = async (text: string, wpm: number, onKeyed?: (span: KeyedSpan) => void, keyer?: (text: string, options: KeyingOptions) => Keyed) => {
     const engine = engineRef.current;
     if (!engine?.powered) return false;
     setTxOn(true);
-    await engine.transmit(text, wpm, wpm, onKeyed);
+    await engine.transmit(text, wpm, wpm, onKeyed, keyer);
     setTxOn(false);
     return engineRef.current === engine && engine.powered;
   };
 
+  const setDecode = useCallback((change: Partial<DecodeSettings>) => {
+    setDecodeState((current) => {
+      const next = { ...current, ...change };
+      const decoder = decoderRef.current;
+      if (decoder) {
+        if (next.on !== current.on) decoder.reset(true);
+        if (next.lang !== current.lang) decoder.setLang(next.lang);
+        // LOCK holds the speed it has now; AUTO estimates again from there.
+        if (next.speed !== current.speed) decoder.setSpeed(next.speed);
+      }
+      decodeOnRef.current = next.on;
+      return next;
+    });
+  }, []);
+
   return {
     engineRef,
+    decoderRef,
+    decodePerfRef,
+    decode,
+    setDecode,
     captureRef,
     tapRef,
     scopeRef,

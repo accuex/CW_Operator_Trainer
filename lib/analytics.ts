@@ -56,6 +56,8 @@ export function summary(logs: AnswerLog[]) {
 export const isCleanCopy = (log: AnswerLog) => !log.qso || (log.qso.condition === 'clean' && !log.qso.blame && !log.qso.env?.overlap);
 /** Weak-pair input: clean copy only, or every condition — never a miss that was a look-alike's, a lid's or a slip's (blame). */
 export const forWeakAnalysis = (logs: AnswerLog[], includeEnvironment = false) => logs.filter(includeEnvironment ? (log) => !log.qso?.blame : isCleanCopy);
+/** Characters the "include bad conditions" switch would add (a blamed miss never is). */
+export const hiddenByCondition = (logs: AnswerLog[]) => forWeakAnalysis(logs, true).length - forWeakAnalysis(logs).length;
 
 export interface ConditionRow { condition: string; answers: number; accuracy: number }
 
@@ -65,6 +67,9 @@ export const situationOfLog = (log: AnswerLog): CopySituation | null => {
   return log.qso.situation ?? (log.qso.condition === 'muted' ? 'doubled' : log.qso.condition);
 };
 
+/** A QSO character from a session where DECODE printed (the screen may have copied it). */
+const isDecodeAssisted = (log: AnswerLog) => log.qso?.blame === 'decode';
+
 /**
  * QSO copy accuracy per situation (clean vs QRM vs QSB vs doubled …), optionally for
  * one log field (`call` → how calls hold up under each).
@@ -73,7 +78,7 @@ export function qsoConditionBreakdown(logs: AnswerLog[], field?: string): Condit
   const buckets = new Map<string, { total: number; correct: number }>();
   for (const log of logs) {
     const situation = situationOfLog(log);
-    if (!situation || (field && log.qso?.field !== field)) continue;
+    if (!situation || (field && log.qso?.field !== field) || isDecodeAssisted(log)) continue;
     const bucket = buckets.get(situation) ?? { total: 0, correct: 0 };
     bucket.total += 1;
     if (log.isCorrect) bucket.correct += 1;
@@ -92,7 +97,7 @@ export function conditionContrast(logs: AnswerLog[], { minClean = 5, minHard = 3
   const bySymbol = new Map<string, Map<CopySituation, { total: number; correct: number }>>();
   for (const log of logs) {
     const situation = situationOfLog(log);
-    if (!situation || situation === 'unheard') continue;
+    if (!situation || situation === 'unheard' || isDecodeAssisted(log)) continue;
     const map = bySymbol.get(log.correctSymbol) ?? new Map();
     const bucket = map.get(situation) ?? { total: 0, correct: 0 };
     bucket.total += 1;
@@ -136,7 +141,8 @@ const FINDING_MIN = 6;
 
 /** Every stored pileup summary added up (cloud summaries are enough: counts only). */
 export function pileupBreakdown(sessions: Pick<SessionRecord, 'qso'>[]): PileupBreakdown | null {
-  const runs = sessions.flatMap((session) => (session.qso?.pileup ? [session.qso.pileup] : []));
+  // A run where DECODE printed: its call copy may have been the screen's.
+  const runs = sessions.flatMap((session) => (session.qso?.pileup && session.qso.assist?.decode !== 'shown' ? [session.qso.pileup] : []));
   if (!runs.length) return null;
   const firstCall = { '1': { total: 0, correct: 0 }, '2': { total: 0, correct: 0 }, '3+': { total: 0, correct: 0 } };
   const out: PileupBreakdown = { runs: runs.length, picks: 0, doubledPicks: 0, firstCall, similarMet: 0, similarRight: 0, narrowings: 0, narrowed: 0, causes: {}, findings: [] };

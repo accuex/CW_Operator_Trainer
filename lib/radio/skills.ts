@@ -31,6 +31,7 @@ export function modeProgress(profile: QsoProfile, modeId: string, seed?: Partial
     auto: stored?.auto ?? true,
     votes: stored?.votes ?? {},
     ...(stored?.level ? { level: stored.level } : {}),
+    ...(stored?.wabun ? { wabun: stored.wabun } : {}),
   };
 }
 

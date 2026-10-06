@@ -1,4 +1,4 @@
-import { keyText, type CharSpan, type Mark } from './keying';
+import { keyText, type CharSpan, type Keyed, type KeyingOptions, type Mark } from './keying';
 
 /**
  * Band model for the QSO simulator: who is on the air, where, and what they send.
@@ -35,6 +35,8 @@ export interface Station {
   marks: Mark[];
   nextAt: number;
   busyUntil: number;
+  /** How this station turns text into keying (absent: Latin `keyText`; a wabun station keys segments). */
+  keyer?: (text: string, options: KeyingOptions) => Keyed;
 }
 
 /** One message on the air. Times are absolute on the scheduler clock. */
@@ -115,7 +117,7 @@ export function schedulePending(station: Station, now: number, horizon: number, 
     const text = queued ?? station.loop?.();
     if (!text) { station.nextAt = Number.POSITIVE_INFINITY; break; }
     const start = Math.max(station.nextAt, now);
-    const keyed = keyText(text, { wpm: station.wpm, jitter: station.jitter, random });
+    const keyed = (station.keyer ?? keyText)(text, { wpm: station.wpm, jitter: station.jitter, random });
     const marks = keyed.marks.map(([a, b]) => [start + a, start + b] as const);
     const chars = keyed.chars.map((span) => ({ ...span, start: start + span.start, end: start + span.end }));
     station.marks.push(...marks);

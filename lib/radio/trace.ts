@@ -1,4 +1,5 @@
-import type { CopyCondition } from '../types';
+import type { CopyCondition, QsoAssist } from '../types';
+import type { DecodeOverTrace } from './decode/assist';
 import type { FieldResult } from './attribution';
 import type { CopySituation, QsoOverlapEnv } from '../types';
 import { judgeChar, situationOf, type ClockNow, type CopyMonitor, type RxRecord } from './conditions';
@@ -49,6 +50,10 @@ export interface QsoTrace {
   tx: { at: number; text: string; offsetHz: number; issue?: QsoIssue; macro?: boolean }[];
   evidence: QsoEvidence;
   adjusted: Record<string, number>;
+  /** DECODE's use (none: never on); then the copy evidence stayed out of the skills and おまかせ. */
+  assist?: QsoAssist;
+  /** Dev: each over against what DECODE printed (only when it was on). */
+  decode?: DecodeOverTrace[];
 }
 
 export function traceRx(records: RxRecord[], monitor: CopyMonitor, now: ClockNow, wpm: (record: RxRecord) => number): TracedRx[] {

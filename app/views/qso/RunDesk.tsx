@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import type { AnswerLog, QsoSessionSummary } from '@/lib/types';
+import type { AnswerLog, QsoAssist, QsoSessionSummary } from '@/lib/types';
 import { makeQrm, type Station } from '@/lib/radio/band';
 import { fieldAnswers } from '@/lib/radio/attribution';
 import type { AgentNote } from '@/lib/radio/agents/types';
@@ -147,6 +147,8 @@ export interface RunSaved {
   auto: boolean;
   earned: EarnedBadge[];
   marked: string[];
+  /** DECODE's use in this run (none: never on). */
+  assist?: QsoAssist;
 }
 
 export interface RunDeskProps {
@@ -459,7 +461,7 @@ export function RunDesk({ rig, mode, preset, difficulty, myCall, myName, myQth, 
       void addRunTrace({
         kind: 'run', version: RUN_TRACE_VERSION, id: live.id, startedAt: live.startedAt, endedAt, modeId: mode.id, presetId: preset.id,
         difficulty: { ...difficulty }, params: { ...live.run.params }, result, scored: score.contacts, evidence: score.evidence,
-        rx, tx: live.txLog, filter: engine.filter, wpmOf: wpms, adjusted: saved.moved, earned: saved.earned,
+        rx, tx: live.txLog, filter: engine.filter, wpmOf: wpms, adjusted: saved.moved, earned: saved.earned, ...(saved.assist ? { assist: saved.assist } : {}),
       }).then(() => setRecordsAt(Date.now())).catch(() => undefined);
     }
     // Callers leave with us; the background stays.

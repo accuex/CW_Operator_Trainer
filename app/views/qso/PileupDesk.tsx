@@ -393,7 +393,7 @@ export function PileupDesk({ rig, myCall, myName, myQth, axesFor, stored, auto, 
       void addRunTrace({
         kind: 'run', version: RUN_TRACE_VERSION, id: live.id, startedAt: live.startedAt, endedAt, modeId: MODE_ID, presetId: PILEUP_RST.id,
         difficulty, params: { ...live.run.params }, result, scored: score.contacts, evidence: analysis.evidence,
-        rx, tx: [], filter: engine.filter, wpmOf: wpms, adjusted: saved.moved, earned: saved.earned,
+        rx, tx: [], filter: engine.filter, wpmOf: wpms, adjusted: saved.moved, earned: saved.earned, ...(saved.assist ? { assist: saved.assist } : {}),
         pileup: pileupTraceDetail(live.level, wpm, steps, analysis),
       } satisfies PileupTrace).then(() => setRecordsAt(Date.now())).catch(() => undefined);
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useState, type CSSProperties } from 'react';
-import { conditionContrast, confusionMatrix, forWeakAnalysis, pileupBreakdown, qsoConditionBreakdown, summary, weakPairs, type ConditionContrast, type ConditionRow, type PileupBreakdown, type PileupFinding } from '@/lib/analytics';
+import { conditionContrast, confusionMatrix, forWeakAnalysis, hiddenByCondition, pileupBreakdown, qsoConditionBreakdown, summary, weakPairs, type ConditionContrast, type ConditionRow, type PileupBreakdown, type PileupFinding } from '@/lib/analytics';
 import { CAUSE_LABEL, CROWD_LABEL } from './qso/PileupReview';
 import type { AlphabetType, AnswerLog, SessionRecord } from '@/lib/types';
 import { type View, pct, fmtLatency } from '@/app/trainer/shared';
@@ -18,7 +18,7 @@ export function AnalysisView({ answers, sessions, onNavigate }: { answers: Answe
   const qsoRows = qsoConditionBreakdown(scoped);
   const callRows = qsoConditionBreakdown(scoped, 'call');
   const contrast = conditionContrast(scoped.filter((answer) => answer.qso));
-  const hiddenQso = scoped.length - forWeakAnalysis(scoped).length;
+  const hiddenQso = hiddenByCondition(scoped);
   const stats = summary(filtered);
   const matrix = confusionMatrix(filtered);
   const pairs = weakPairs(filtered);
