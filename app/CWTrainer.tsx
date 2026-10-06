@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { courseMeta } from '@/lib/course';
+import Link from 'next/link';
 import { applyAchievements, achievementById } from '@/lib/achievements';
 import { APP_VERSION } from '@/lib/appMeta';
 import { loadAuthSession } from '@/lib/api/authSession';
@@ -16,9 +16,9 @@ import {
   type CloudSnapshot,
 } from '@/lib/api/cloudSync';
 import { logout } from '@/lib/api/client';
-import { DEFAULT_PROFILE, DEFAULT_SETTINGS, addAnswer, addSession, getAnswers, getProfile, getSessions, loadSettings, normalizeProfile, saveDataMeta, saveProfile, saveSettings } from '@/lib/storage';
+import { DEFAULT_PROFILE, DEFAULT_SETTINGS, addAnswer, addSession, getAnswers, getProfile, getSessions, loadSettings, markTrainerStarted, normalizeProfile, saveDataMeta, saveProfile, saveSettings } from '@/lib/storage';
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from '@/lib/types';
-import { type View, views, viewMeta, audioEngine, goalLabel, scopeLabel, pathToView } from '@/app/trainer/shared';
+import { type View, views, viewMeta, audioEngine, goalLabel, scopeLabel, pathToView, viewToPath } from '@/app/trainer/shared';
 import { playerStats, DAILY_GOAL } from '@/app/trainer/progress';
 import { kochChars, kochProgressOf } from '@/lib/koch';
 import { Ring, SpeedPairControls } from '@/app/components/ui';
@@ -34,7 +34,6 @@ import { QsoView } from '@/app/views/QsoView';
 import { CollectionView } from '@/app/views/CollectionView';
 import { SettingsView } from '@/app/views/SettingsView';
 import { AccountView } from '@/app/views/AccountView';
-import { Onboarding } from '@/app/views/Onboarding';
 import { trackPageView } from '@/app/components/GoogleAnalytics';
 import { markSfxBackground, unlockSfx, wakeSfx } from '@/app/trainer/sfx';
 
@@ -64,7 +63,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   /** 一総通ナビを同じ画面でもう一度押したら科目選択へ戻す */
   const [examDeskResetEpoch, setExamDeskResetEpoch] = useState(0);
   const [speedOpen, setSpeedOpen] = useState(false);
-  const [signedIn, setSignedIn] = useState(() => Boolean(loadAuthSession()));
+  const [signedIn, setSignedIn] = useState(false);
   const speedWrapRef = useRef<HTMLDivElement>(null);
   const applyingCloudRef = useRef(false);
 
@@ -79,6 +78,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     setSettings(snap.settings);
     setAnswers(snap.answers);
     setSessions(snap.sessions);
+    if (snap.profile.goal) markTrainerStarted();
     window.setTimeout(() => { applyingCloudRef.current = false; }, 0);
   }, []);
 
@@ -97,8 +97,11 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   }, [announce, applyCloudSnapshot]);
 
   useEffect(() => {
+    setSignedIn(Boolean(loadAuthSession()));
     Promise.all([getProfile(), getAnswers(), getSessions()]).then(async ([savedProfile, savedAnswers, savedSessions]) => {
-      setProfile(normalizeProfile(savedProfile)); setAnswers(savedAnswers); setSessions(savedSessions); setSettings(loadSettings()); setReady(true);
+      const next = normalizeProfile(savedProfile);
+      setProfile(next); setAnswers(savedAnswers); setSessions(savedSessions); setSettings(loadSettings()); setReady(true);
+      if (next.goal) markTrainerStarted();
       void saveDataMeta();
       if (loadAuthSession()) await pullCloudPreferred();
     }).catch(() => { setSettings(loadSettings()); setReady(true); });
@@ -196,7 +199,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
     setStopEpoch((value) => value + 1);
     setAudioStatus('READY'); setView(next); setSpeedOpen(false);
-    const path = next === 'home' ? '/' : `/${next}`;
+    const path = viewToPath(next);
     history.pushState(null, '', path);
     trackPageView(path);
     setProfile((old) => ({ ...old, lastMode: next }));
@@ -220,9 +223,11 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     if (!ready) return;
     const { profile: next, unlocked } = applyAchievements(profile, answers, sessions);
     if (unlocked.length === 0) return;
-    setProfile(next);
-    const first = achievementById(unlocked[0])?.title ?? unlocked[0];
-    announce(unlocked.length === 1 ? `実績GET: ${first}` : `実績GET: ${first} ほか${unlocked.length - 1}`);
+    queueMicrotask(() => {
+      setProfile(next);
+      const first = achievementById(unlocked[0])?.title ?? unlocked[0];
+      announce(unlocked.length === 1 ? `実績GET: ${first}` : `実績GET: ${first} ほか${unlocked.length - 1}`);
+    });
     // 進捗系だけ再評価（ナビの lastMode では回さない）
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, answers, sessions, profile.cards, profile.koch, profile.achievements]);
@@ -322,6 +327,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <small><Icon name="flame" size={13} /> {stats.streakDays}日連続</small>
             </div>
           </div>
+          <Link className="sidebar-site" href="/">サイトトップ</Link>
           <p className="app-credit">(C) 2026 Int Design LLC.</p>
         </div>
       </aside>
@@ -364,13 +370,12 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             </button>
             <button type="button" className="profile-button" onClick={() => navigate('account')} title={`マイページ / 目的: ${goalLabel(profile.goal)} / 範囲: ${scopeLabel(profile)}`} aria-label="マイページ">
               <span className="profile-avatar" aria-hidden="true"><Icon name="account" size={18} /></span>
-              <span className="profile-text"><b>{courseMeta(profile.learnCourse)?.label ?? 'コース未選択'}</b><small>{goalLabel(profile.goal)}</small></span>
+              <span className="profile-text"><b>{scopeLabel(profile)}</b><small>{goalLabel(profile.goal)}</small></span>
             </button>
           </div>
         </header>
         <div className="view-stage" key={view}>{content}</div>
       </main>
-      {ready && profile.goal === null && <Onboarding onSelect={(goal) => setProfile((old) => ({ ...old, goal }))} />}
       <div className="toast" role="status" aria-live="polite">{toast}</div>
     </div>
   );

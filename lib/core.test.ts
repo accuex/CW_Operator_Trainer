@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { confusionMatrix, weakPairs } from './analytics';
 import { CARDS, INTERNATIONAL_MORSE, WABUN_MORSE, expandWabunVoicing, resolveMnemonicSegments, tokenizeMorseInput } from './morse';
-import { cardsForCourse, selectCourseDefaults } from './course';
+import { cardsForPractice } from './course';
 import { CARD_ARTWORK, artworkFor, artworkUrlForRarity } from './cardArtwork';
 import { QueueEvaluator } from './queue';
 import { DEFAULT_SETTINGS } from './storage';
@@ -58,32 +58,36 @@ describe('Morse data', () => {
   });
 });
 
-describe('course filters', () => {
-  it('starts amateur-latin with A–Z only', () => {
-    const defaults = selectCourseDefaults('amateur-latin');
-    const cards = cardsForCourse(CARDS, defaults.learnCourse, defaults.unlockedKinds);
+describe('practice set filters', () => {
+  it('starts with A–Z only', () => {
+    const cards = cardsForPractice(CARDS, ['latinLetter']);
     expect(cards.every((card) => card.kind === 'latinLetter')).toBe(true);
     expect(cards).toHaveLength(26);
   });
-  it('keeps amateur-wabun to kana cards', () => {
-    const defaults = selectCourseDefaults('amateur-wabun');
-    const cards = cardsForCourse(CARDS, defaults.learnCourse, defaults.unlockedKinds);
+  it('keeps wabun to kana cards', () => {
+    const cards = cardsForPractice(CARDS, ['wabun']);
     expect(cards.every((card) => card.kind === 'wabun')).toBe(true);
     expect(cards.length).toBeGreaterThan(40);
   });
-  it('can unlock JARL punctuation into amateur-latin without wiping letters', () => {
-    const cards = cardsForCourse(CARDS, 'amateur-latin', ['latinLetter', 'punctuation', 'prosign']);
+  it('adds latin punctuation without wiping letters', () => {
+    const cards = cardsForPractice(CARDS, ['latinLetter', 'punctuation', 'prosign']);
     expect(cards.some((card) => card.symbol === '/')).toBe(true);
     expect(cards.some((card) => card.symbol === '[AS]')).toBe(true);
     expect(cards.some((card) => card.symbol === 'A')).toBe(true);
     expect(cards.every((card) => card.alphabet === 'international')).toBe(true);
   });
-  it('keeps unlocked amateur-wabun symbols on the wabun alphabet', () => {
-    const cards = cardsForCourse(CARDS, 'amateur-wabun', ['wabun', 'digit', 'punctuation', 'prosign']);
+  it('keeps wabun symbols on the wabun alphabet', () => {
+    const cards = cardsForPractice(CARDS, ['wabun', 'digit', 'punctuation', 'prosign']);
     expect(cards.some((card) => card.symbol === 'ー')).toBe(true);
     expect(cards.some((card) => card.symbol === '[0]')).toBe(true);
     expect(cards.some((card) => card.symbol === '/')).toBe(false);
     expect(cards.every((card) => card.alphabet === 'wabun')).toBe(true);
+  });
+  it('unions latin and wabun when both scripts are on', () => {
+    const cards = cardsForPractice(CARDS, ['latinLetter', 'wabun']);
+    expect(cards.some((card) => card.symbol === 'A')).toBe(true);
+    expect(cards.some((card) => card.symbol === 'ア')).toBe(true);
+    expect(cards.every((card) => card.kind === 'latinLetter' || card.kind === 'wabun')).toBe(true);
   });
 });
 

@@ -19,7 +19,18 @@ export const FILTERS = [250, 500, 2400] as const;
 export type FilterWidth = (typeof FILTERS)[number];
 
 interface Voice { osc: OscillatorNode; key: GainNode; amp: GainNode; chirp: GainNode | null; chirpSource: ConstantSourceNode | null }
-interface Rx { bus: GainNode; f1: BiquadFilterNode; f2: BiquadFilterNode; agc: DynamicsCompressorNode; af: GainNode; meter: AnalyserNode; noise: GainNode; noiseBuffer: AudioBuffer; meterData: Float32Array<ArrayBuffer> }
+interface Rx {
+  bus: GainNode;
+  f1: BiquadFilterNode;
+  f2: BiquadFilterNode;
+  agc: DynamicsCompressorNode;
+  af: GainNode;
+  meter: AnalyserNode;
+  noise: GainNode;
+  noiseSource: AudioBufferSourceNode;
+  noiseBuffer: AudioBuffer;
+  meterData: Float32Array<ArrayBuffer>;
+}
 
 const LOOKAHEAD = 1.5;
 const TICK_MS = 100;
@@ -54,6 +65,8 @@ export class RigEngine {
   private rx: Rx | null = null;
   private voices = new Map<number, Voice>();
   private timer: ReturnType<typeof setInterval> | null = null;
+  /** Cancels an in-flight powerOn so OFF never leaves a live context. */
+  private powerGen = 0;
 
   constructor(vfo = 7_012_000, random: () => number = Math.random) {
     this.vfo = vfo;
@@ -71,19 +84,25 @@ export class RigEngine {
     this.tick();
   }
 
-  /** Must run inside a user gesture (iOS). */
+  /** Must run inside a user gesture (iOS). Audio starts only after resume succeeds. */
   async powerOn() {
     if (this.ctx) return;
     const Ctor = audioContextCtor();
     if (!Ctor) throw new Error('Web Audio unavailable');
+    const gen = ++this.powerGen;
     const ctx = new Ctor({ latencyHint: 'interactive' });
-    this.ctx = ctx;
-    this.epoch += 1;
     // iOS: play one silent frame in the gesture so the context unlocks.
     const silent = ctx.createBufferSource();
     silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
     silent.connect(ctx.destination);
     silent.start();
+    try { await ctx.resume(); } catch { /* resumes on next gesture */ }
+    if (gen !== this.powerGen) {
+      try { await ctx.close(); } catch { /* abandoned */ }
+      return;
+    }
+    this.ctx = ctx;
+    this.epoch += 1;
     this.rx = this.buildReceiver(ctx);
     this.applyFilter();
     this.applyLevels();
@@ -91,21 +110,32 @@ export class RigEngine {
       this.resetClock(station);
       this.attach(station);
     }
-    try { await ctx.resume(); } catch { /* resumes on next gesture */ }
     this.tick();
   }
 
   async powerOff() {
+    this.powerGen += 1;
     const ctx = this.ctx;
-    if (!ctx) return;
-    for (const station of this.stations) this.detach(station);
+    const rx = this.rx;
     this.ctx = null;
     this.rx = null;
     this.txUntil = 0;
     this.txFrom = 0;
+    if (!ctx) return;
     this.epoch += 1;
+    this.silence(ctx, rx);
+    for (const station of this.stations) this.detach(station);
     for (const station of this.stations) this.resetClock(station);
     try { await ctx.close(); } catch { /* already closed */ }
+  }
+
+  private silence(ctx: AudioContext, rx: Rx | null) {
+    if (rx) {
+      try { rx.noiseSource.stop(); } catch { /* already stopped */ }
+      try { rx.af.gain.value = 0; } catch { /* closed */ }
+      try { rx.af.disconnect(); } catch { /* closed */ }
+    }
+    try { void ctx.suspend(); } catch { /* closed */ }
   }
 
   /** Suspend audio while the tab is hidden; the scheduler restarts cleanly on resume. */
@@ -368,7 +398,7 @@ export class RigEngine {
     const noise = ctx.createGain();
     source.connect(noise).connect(bus);
     source.start();
-    return { bus, f1, f2, agc, af, meter, noise, noiseBuffer, meterData: new Float32Array(meter.fftSize) };
+    return { bus, f1, f2, agc, af, meter, noise, noiseSource: source, noiseBuffer, meterData: new Float32Array(meter.fftSize) };
   }
 
   private applyFilter() {

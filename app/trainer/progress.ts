@@ -2,9 +2,15 @@ import { KOCH_PASS_ACCURACY, isKochComplete, kochBest, kochChars, kochMaxLesson,
 import { readProgressMeter } from '@/lib/progressMeter';
 import type { AlphabetType, AnswerLog, TrainerProfile } from '@/lib/types';
 
-/** 表示の主になるコッホ。和文コースだけ和文、ほかは欧文。 */
-export const primaryKochAlphabet = (profile: Pick<TrainerProfile, 'learnCourse'>): AlphabetType =>
-  profile.learnCourse === 'amateur-wabun' ? 'wabun' : 'international';
+/** 表示の主になるコッホ。和文セットだけで欧文がオフなら和文、ほかは欧文。 */
+export const primaryKochAlphabet = (profile: Pick<TrainerProfile, 'unlockedKinds' | 'learnCourse'>): AlphabetType => {
+  const kinds = profile.unlockedKinds ?? [];
+  const latin = kinds.includes('latinLetter');
+  const wabun = kinds.includes('wabun');
+  if (wabun && !latin) return 'wabun';
+  if (!kinds.length && profile.learnCourse === 'amateur-wabun') return 'wabun';
+  return 'international';
+};
 
 /**
  * Level = Koch レベル試験の進捗（欧文 profile.koch / 和文 profile.kochWabun）。

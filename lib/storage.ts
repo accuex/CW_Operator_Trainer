@@ -1,7 +1,7 @@
 import { APP_VERSION, SCHEMA_VERSION, currentDataMeta, currentExportMeta, type DataMeta } from './appMeta';
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from './types';
 import { clampSpeedWpm } from './speed';
-import { COURSE_DEFAULT_UNLOCK } from './course';
+import { COURSE_DEFAULT_UNLOCK, DEFAULT_UNLOCK } from './course';
 import { normalizeQsoProfile } from './radio/skills';
 import { QSO_TRACE_LIMIT, type QsoTrace } from './radio/trace';
 import type { WabunQsoRecord } from './radio/wabun/trace';
@@ -10,6 +10,7 @@ import { RUN_TRACE_LIMIT, type AnyRunTrace } from './radio/runTrace';
 const DB_NAME = 'cw-operator-trainer';
 const DB_VERSION = 3;
 const SETTINGS_KEY = 'cwot:settings';
+const STARTED_KEY = 'cwot:started';
 const META_KEY = 'meta';
 
 const WAVEFORMS: OscillatorType[] = ['sine', 'triangle', 'square', 'sawtooth'];
@@ -38,10 +39,67 @@ export function normalizeProfile(profile: TrainerProfile | null | undefined): Tr
     revealAll: Boolean(profile?.revealAll),
   };
   if (profile?.qso) merged.qso = normalizeQsoProfile(profile.qso);
-  if (merged.learnCourse && (!merged.unlockedKinds || merged.unlockedKinds.length === 0)) {
-    merged.unlockedKinds = [...COURSE_DEFAULT_UNLOCK[merged.learnCourse]];
+  if (!merged.unlockedKinds || merged.unlockedKinds.length === 0) {
+    merged.unlockedKinds = merged.learnCourse
+      ? [...COURSE_DEFAULT_UNLOCK[merged.learnCourse]]
+      : [...DEFAULT_UNLOCK];
   }
   return merged;
+}
+
+/** Audio prefs already written to this device. */
+export function hasStoredSettings(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    return localStorage.getItem(SETTINGS_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/** Profile already has a course or any practice history. Default audio prefs do not count. */
+export function isReturningProfile(profile: TrainerProfile | null | undefined): boolean {
+  if (!profile) return false;
+  return Boolean(profile.goal)
+    || Object.keys(profile.cards ?? {}).length > 0
+    || (profile.totalTrainingMs ?? 0) > 0;
+}
+
+/** Existing user: they already chose a course, or have practice history on this device. */
+export async function isReturningUser(profile?: TrainerProfile | null): Promise<boolean> {
+  return isReturningProfile(profile === undefined ? await getProfile() : profile);
+}
+
+export function hasTrainerStarted(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    return localStorage.getItem(STARTED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function markTrainerStarted(): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(STARTED_KEY, '1');
+  } catch {
+    /* private / blocked storage */
+  }
+}
+
+/**
+ * Landing CTA only. IndexedDB survives typical “clear site data / localStorage”
+ * attempts, so we do not treat a leftover profile as returning unless this
+ * device also still has the start flag (or audio prefs + a chosen course).
+ */
+export function isLandingReturning(profile: TrainerProfile | null | undefined): boolean {
+  if (hasTrainerStarted()) return true;
+  if (profile?.goal && hasStoredSettings()) {
+    markTrainerStarted();
+    return true;
+  }
+  return false;
 }
 
 function openDatabase(): Promise<IDBDatabase> {

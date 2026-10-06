@@ -38,7 +38,7 @@ export function RigPanel({ rig, onPower }: { rig: Rig; onPower?: (result: PowerR
     if (!drag || drag.moved || !engine) return;
     const rect = event.currentTarget.getBoundingClientRect();
     const hz = hzAtRatio((event.clientX - rect.left) / rect.width, engine.vfo, span);
-    const near = nearestStation(engine.stations, hz, span * 0.04);
+    const near = nearestStation(engine.stations, hz, span * 0.1);
     tune(near ? near.rf : hz);
   };
   const onKey = (event: React.KeyboardEvent) => {
@@ -66,9 +66,21 @@ export function RigPanel({ rig, onPower }: { rig: Rig; onPower?: (result: PowerR
         <div className="rig-freq" aria-live="off"><span>{freq.main}</span>.<small>{freq.sub}</small></div>
       </div>
       <div className="rig-meter">
-        <span>S</span>
-        <div className="rig-smeter"><i ref={meterRef} /></div>
-        <span className="rig-scale">1 · 3 · 5 · 7 · 9 · +20 · +40</span>
+        <span className="rig-meter-s">S</span>
+        <div className="rig-meter-col">
+          <div className="rig-scale" aria-hidden="true">
+            {(['1', '3', '5', '7', '9', '+20', '+40'] as const).map((mark, index, marks) => (
+              <span
+                key={mark}
+                className={index >= 5 ? 'over' : undefined}
+                style={{ left: `${(index / (marks.length - 1)) * 100}%` }}
+              >
+                {mark}
+              </span>
+            ))}
+          </div>
+          <div className="rig-smeter"><i ref={meterRef} /></div>
+        </div>
       </div>
       <div className="rig-scope-head"><span>−{span / 1000}k</span><span>SCOPE · CENTER</span><span>+{span / 1000}k</span></div>
       <canvas ref={scopeRef} className="rig-scope" {...canvasEvents} />

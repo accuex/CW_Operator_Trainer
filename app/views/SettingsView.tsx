@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import { COURSES, courseMeta, selectCourseDefaults, type LearnCourse } from '@/lib/course';
+import { PRACTICE_SETS, normalizeKinds, practiceSetOn, scopeSetLabel, togglePracticeSet } from '@/lib/course';
 import { loadAuthSession } from '@/lib/api/authSession';
 import { AUTH_SYNC_EVENT } from '@/lib/api/cloudSync';
 import { exportAllData, importAllData } from '@/lib/storage';
@@ -10,6 +10,7 @@ import type { AudioSettings, TrainerProfile } from '@/lib/types';
 import { audioEngine, type View } from '@/app/trainer/shared';
 import { AudioControls } from '@/app/components/ui';
 import { Icon } from '@/app/components/icons';
+import { GOAL_CHOICES, isSoundOnlyGoal } from '@/app/views/Onboarding';
 
 export function SettingsView({ settings, setSettings, profile, setProfile, onImported, announce, onNavigate }: { settings: AudioSettings; setSettings: (settings: AudioSettings) => void; profile: TrainerProfile; setProfile: Dispatch<SetStateAction<TrainerProfile>>; onImported: () => void; announce: (message: string) => void; onNavigate?: (view: View) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -42,24 +43,24 @@ export function SettingsView({ settings, setSettings, profile, setProfile, onImp
       announce(error instanceof Error ? error.message : '読み込みに失敗しました');
     }
   };
-  const changeCourse = (course: LearnCourse) => {
-    const defaults = selectCourseDefaults(course);
-    setProfile((old) => ({ ...old, ...defaults }));
-    announce(`${courseMeta(course)?.label ?? course} に切り替えました（学習履歴は保持）`);
+  const toggleSet = (setId: (typeof PRACTICE_SETS)[number]['id']) => {
+    const next = togglePracticeSet(profile.unlockedKinds, setId);
+    if (!next) {
+      announce('少なくとも1つの範囲はONにしてください');
+      return;
+    }
+    setProfile((old) => ({ ...old, unlockedKinds: next }));
+    const set = PRACTICE_SETS.find((item) => item.id === setId);
+    const nowOn = set ? practiceSetOn(next, set) : false;
+    announce(`${set?.label ?? setId} を${nowOn ? 'ON' : 'OFF'}にしました（学習履歴は保持）`);
   };
-  const goals: [NonNullable<TrainerProfile['goal']>, string, string][] = [
-    ['fun', 'まずCWを楽しく覚えたい', '合調法カードから'],
-    ['sound', '最初から音で覚えたい', '音感法コース'],
-    ['experienced', '符号はすでに知っている', '高速訓練へ'],
-    ['exam', '第一級総合無線通信士を目指す', '音感 → Queue → 試験'],
-  ];
   return (
     <section className="page-pad settings-page">
       <div className="page-title">
         <div>
           <p className="section-kicker">SETTINGS</p>
           <h1>練習の環境を整える</h1>
-          <p>音・目的・コース・データ。いつでも変えられます。学習の記録は消えません。</p>
+          <p>音・目的・セット・データ。いつでも変えられます。学習の記録は消えません。</p>
         </div>
       </div>
       <div className="settings-grid">
@@ -106,36 +107,55 @@ export function SettingsView({ settings, setSettings, profile, setProfile, onImp
             <div>
               <p className="section-kicker">GOAL</p>
               <h2>学習の目的</h2>
-              <p>最初に選んだルートです。いつでも変更できます。学習履歴は消えません。</p>
+              <p>最初に選んだルートです。いつでも変更できます。符号既知と一総通は音感法のみです。学習履歴は消えません。</p>
             </div>
           </div>
           <div className="choice-list">
-            {goals.map(([id, title, description]) => (
-              <button key={id} type="button" className={profile.goal === id ? 'choice-card active' : 'choice-card'} aria-pressed={profile.goal === id} onClick={() => { setProfile((old) => ({ ...old, goal: id })); announce('学習の目的を更新しました'); }}>
-                <span className="choice-copy"><strong>{title}</strong><small>{description}</small></span>
-                <span className="choice-check" aria-hidden="true">{profile.goal === id && <Icon name="check" size={18} />}</span>
-              </button>
-            ))}
+            {GOAL_CHOICES.map(([id, , title, description]) => {
+              const blocked = (id === 'fun' && isSoundOnlyGoal(profile.goal)) || ((id === 'experienced' || id === 'exam') && profile.goal === 'fun');
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={profile.goal === id || (id === 'sound' && isSoundOnlyGoal(profile.goal)) ? 'choice-card active' : 'choice-card'}
+                  aria-pressed={profile.goal === id || (id === 'sound' && isSoundOnlyGoal(profile.goal))}
+                  disabled={blocked}
+                  title={blocked ? (id === 'fun' ? '符号既知・一総通では合調法は使えません' : '合調法では選べません。先に音感法を選んでください') : undefined}
+                  onClick={() => {
+                    const next = id === 'sound' && isSoundOnlyGoal(profile.goal) ? 'sound' : id;
+                    setProfile((old) => ({ ...old, goal: next }));
+                    announce('学習の目的を更新しました');
+                  }}
+                >
+                  <span className="choice-copy"><strong>{title}</strong><small>{blocked && id === 'fun' ? '音感法のみ（合調は使えません）' : description}</small></span>
+                  <span className="choice-check" aria-hidden="true">{(profile.goal === id || (id === 'sound' && isSoundOnlyGoal(profile.goal))) && <Icon name="check" size={18} />}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
         <div className="panel panel-pad settings-panel">
           <div className="settings-card-head">
             <span className="settings-icon" aria-hidden="true"><Icon name="learn" size={22} /></span>
             <div>
-              <p className="section-kicker">LEARN COURSE</p>
-              <h2>学ぶ範囲</h2>
-              <p>符号を覚える範囲のフィルターです。変更しても習熟度やカード取得は消えません。</p>
+              <p className="section-kicker">PRACTICE SET</p>
+              <h2>覚えるセット</h2>
+              <p>欧文・数字・記号・和文。アマチュアも一総通も同じセットです。変更しても習熟度やカード取得は消えません。</p>
             </div>
           </div>
           <div className="choice-list">
-            {COURSES.map((item) => (
-              <button key={item.id} type="button" className={profile.learnCourse === item.id ? 'choice-card active' : 'choice-card'} aria-pressed={profile.learnCourse === item.id} onClick={() => changeCourse(item.id)}>
-                <span className="choice-copy"><strong>{item.label}</strong><small>{item.description}</small></span>
-                <span className="choice-check" aria-hidden="true">{profile.learnCourse === item.id && <Icon name="check" size={18} />}</span>
-              </button>
-            ))}
+            {PRACTICE_SETS.map((item) => {
+              const kinds = normalizeKinds(profile.unlockedKinds);
+              const on = practiceSetOn(kinds, item);
+              return (
+                <button key={item.id} type="button" className={on ? 'choice-card active' : 'choice-card'} aria-pressed={on} onClick={() => toggleSet(item.id)}>
+                  <span className="choice-copy"><strong>{item.label}</strong></span>
+                  <span className="choice-check" aria-hidden="true">{on && <Icon name="check" size={18} />}</span>
+                </button>
+              );
+            })}
           </div>
-          <p className="exposure-note">いまのコース: {courseMeta(profile.learnCourse)?.label ?? '未選択'}</p>
+          <p className="exposure-note">いまのセット: {scopeSetLabel(profile.unlockedKinds)}</p>
         </div>
         <div className="panel panel-pad settings-panel">
           <div className="settings-card-head">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { DecodedChar, DecodeLang } from '@/lib/radio/decode/decoder';
 import type { Rig } from './useRig';
 
@@ -32,6 +32,7 @@ function runsOf(chars: readonly DecodedChar[]) {
 export function DecodeStrip({ rig }: { rig: Rig }) {
   const { decode, setDecode, decoderRef, decodePerfRef, powered } = rig;
   const [view, setView] = useState<View>({ version: -1, chars: [], wpm: 0 });
+  const windowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!decode.on) return;
@@ -46,6 +47,11 @@ export function DecodeStrip({ rig }: { rig: Rig }) {
     }, FLUSH_MS);
     return () => clearInterval(timer);
   }, [decode.on, decoderRef, decodePerfRef]);
+
+  useLayoutEffect(() => {
+    const pane = windowRef.current;
+    if (pane) pane.scrollTop = pane.scrollHeight;
+  }, [view.version]);
 
   const nextLang = LANGS[(LANGS.indexOf(decode.lang) + 1) % LANGS.length];
   const chars = decode.on ? view.chars : [];
@@ -67,7 +73,7 @@ export function DecodeStrip({ rig }: { rig: Rig }) {
         )}
       </div>
       {decode.on && (
-        <div className="rig-decode-window" role="log" aria-live="off" aria-label="DECODE の表示（受信の補助。正しいとは限りません）">
+        <div ref={windowRef} className="rig-decode-window" role="log" aria-live="off" aria-label="DECODE の表示（受信の補助。正しいとは限りません）">
           {!powered ? <span className="hint">電源を入れると表示します</span>
             : !chars.length ? <span className="hint">受信待ち…（補助表示です。正しいとは限りません）</span>
               : <p>{runsOf(chars).map((run, index) => <span key={index} className={run.mark}>{run.text}</span>)}</p>}

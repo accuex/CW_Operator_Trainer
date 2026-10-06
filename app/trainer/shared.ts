@@ -1,11 +1,13 @@
 import type { IconName } from '@/app/components/icons';
 import { MorseAudioEngine } from '@/lib/audio';
 import type { MorseCard } from '@/lib/morse';
-import { COURSE_CATALOG, COURSE_DEFAULT_UNLOCK, KIND_LABEL, type CharacterKind } from '@/lib/course';
+import { normalizeKinds, scopeSetLabel, type CharacterKind } from '@/lib/course';
 import { readProgressMeter } from '@/lib/progressMeter';
 import type { CardProgress, TrainerProfile } from '@/lib/types';
+import type { AppView } from '@/lib/appPaths';
 
-export type View = 'home' | 'learn' | 'train' | 'levelup' | 'queue' | 'analysis' | 'exam' | 'qso' | 'collection' | 'settings' | 'account';
+export type View = AppView;
+export { pathToView, viewToPath, APP_BASE } from '@/lib/appPaths';
 export type QueueSource = 'international' | 'wabun' | 'visual' | 'phonetic' | 'digits' | 'kana';
 export interface ViewMeta {
   id: View;
@@ -76,17 +78,8 @@ export const GOAL_LABEL: Record<NonNullable<TrainerProfile['goal']>, string> = {
   exam: '一総通',
 };
 export const goalLabel = (goal: TrainerProfile['goal']) => (goal ? GOAL_LABEL[goal] : '未選択');
-export const activeScopeKinds = (profile: TrainerProfile): CharacterKind[] => {
-  const course = profile.learnCourse;
-  if (!course) return [];
-  const unlocked = profile.unlockedKinds?.length ? profile.unlockedKinds : COURSE_DEFAULT_UNLOCK[course];
-  return COURSE_CATALOG[course].filter((kind) => unlocked.includes(kind));
-};
-export const scopeLabel = (profile: TrainerProfile) => {
-  const kinds = activeScopeKinds(profile);
-  if (!kinds.length) return '未選択';
-  return kinds.map((kind) => KIND_LABEL[kind]).join(' · ');
-};
+export const activeScopeKinds = (profile: TrainerProfile): CharacterKind[] => normalizeKinds(profile.unlockedKinds);
+export const scopeLabel = (profile: TrainerProfile) => scopeSetLabel(profile.unlockedKinds) || '欧文';
 export const maybeMaster = (progress: CardProgress): CardProgress => {
   if (progress.mastered) return progress;
   const ratio = progress.attempts ? progress.correct / progress.attempts : 0;
@@ -97,7 +90,3 @@ export const maybeMaster = (progress: CardProgress): CardProgress => {
   return progress;
 };
 
-export function pathToView(path: string): View {
-  const value = path.split('/').filter(Boolean)[0] as View | undefined;
-  return views.some((view) => view.id === value) ? value! : 'home';
-}

@@ -1,8 +1,9 @@
-import CWTrainer from '../CWTrainer';
+import { notFound, redirect } from 'next/navigation';
+import { APP_VIEWS, viewToPath, type AppView } from '@/lib/appPaths';
 
-const valid = ['learn','train','levelup','queue','analysis','exam','qso','collection','settings','account'] as const;
-export default async function SectionPage({ params }: { params: Promise<{ section: string }> }) {
+/** Old root paths (`/learn`, `/qso`, …) send people into `/app/*`. */
+export default async function LegacyTrainerPath({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;
-  const initialView = valid.includes(section as typeof valid[number]) ? section as typeof valid[number] : 'home';
-  return <CWTrainer initialView={initialView} />;
+  if (section === 'home' || !(APP_VIEWS as readonly string[]).includes(section)) notFound();
+  redirect(viewToPath(section as AppView));
 }

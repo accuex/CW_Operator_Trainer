@@ -1,5 +1,5 @@
-import CWTrainer from './CWTrainer';
+import { LandingPage } from '@/app/landing/LandingPage';
 
 export default function Home() {
-  return <CWTrainer initialView="home" />;
+  return <LandingPage />;
 }

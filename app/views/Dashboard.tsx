@@ -2,13 +2,14 @@
 
 import { summary, weakPairs, forWeakAnalysis } from '@/lib/analytics';
 import { CARDS } from '@/lib/morse';
-import { cardsForCourse, courseMeta } from '@/lib/course';
+import { cardsForPractice, scopeSetLabel } from '@/lib/course';
 import type { AnswerLog, SessionRecord, TrainerProfile } from '@/lib/types';
 import { type View, cardKey, fmtLatency, isLearned, pct } from '@/app/trainer/shared';
 import { DAILY_GOAL, type PlayerStats } from '@/app/trainer/progress';
 import { Metric, ProgressBar, Ring } from '@/app/components/ui';
 import { Icon, type IconName } from '@/app/components/icons';
 import { TradingCard } from '@/app/components/TradingCard';
+import Link from 'next/link';
 
 interface Tile { view: View; icon: IconName; title: string; body: string; meta: string; tone: string }
 
@@ -17,8 +18,7 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
   const totals = summary(copied);
   const pairs = weakPairs(copied);
   const lastQueue = [...sessions].reverse().find((session) => session.queue)?.queue;
-  const course = profile.learnCourse ?? null;
-  const courseCards = cardsForCourse(CARDS, course, profile.unlockedKinds ?? []);
+  const courseCards = cardsForPractice(CARDS, profile.unlockedKinds);
   const collectionPool = courseCards.length ? courseCards : CARDS;
   const masteredInPool = collectionPool.filter((card) => profile.cards[cardKey(card)]?.mastered);
   const nextCard = courseCards.find((card) => !profile.cards[cardKey(card)]?.mastered && isLearned(profile.cards[cardKey(card)]))
@@ -43,13 +43,16 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
   return <section className="dashboard page-pad">
     <div className="home-hero panel">
       <div className="home-hero-copy">
+        {profile.goal === null && (
+          <p className="home-hint"><Link href="/#method">学習法（音感／合調）が未選択です。サイトトップで選んでから始めると、カードの合調表示が決まります。</Link></p>
+        )}
         <p className="section-kicker"><Icon name="sparkle" size={14} />{isNew ? 'WELCOME' : 'WELCOME BACK'}</p>
         <h1>{isNew ? <>耳で読む。<br /><em>モールスの世界へ。</em></> : <>今日も<em>1文字</em>、<br />耳を育てよう。</>}</h1>
-        <p>{course ? `${courseMeta(course)?.label} コースで学習中。` : 'まずはコースを選んで、最初のカードを手に入れよう。'}
+        <p>{scopeSetLabel(profile.unlockedKinds)} を練習中。
           {goalDone ? ' 今日の目標は達成済み！さらに伸ばすならコンボに挑戦。' : ` 今日はあと ${Math.max(0, DAILY_GOAL - stats.todayAnswers)} 問で目標達成。`}</p>
         <div className="home-hero-actions">
           <button type="button" className="btn btn-primary btn-lg" onClick={() => onNavigate('learn')}>
-            <Icon name="play" size={18} />{course ? '続きから練習' : 'はじめる'}
+            <Icon name="play" size={18} />{courseCards.length ? '続きから練習' : 'はじめる'}
           </button>
           <button type="button" className="btn btn-ghost btn-lg" onClick={() => onNavigate('train')}>
             <Icon name="train" size={18} />聴きとりへ
@@ -95,7 +98,7 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
           </button>
         ) : (
           <button type="button" className="next-card empty" onClick={() => onNavigate('learn')}>
-            <div className="next-card-copy"><span>コース未選択</span><b>?</b><small>コースを選ぶ</small></div>
+            <div className="next-card-copy"><span>セットを確認</span><b>?</b><small>おぼえるへ</small></div>
           </button>
         )}
       </div>

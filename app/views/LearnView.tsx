@@ -4,7 +4,7 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import type { PlaybackHandle } from '@/lib/audio';
 import { CARDS, resolveMnemonicSegments, type MorseCard } from '@/lib/morse';
-import { COURSES, COURSE_CATALOG, COURSE_DEFAULT_UNLOCK, KIND_LABEL, cardsForCourse, courseMeta, selectCourseDefaults, type CharacterKind, type LearnCourse } from '@/lib/course';
+import { PRACTICE_SETS, cardsForPractice, normalizeKinds, practiceSetOn, scopeSetLabel, togglePracticeSet } from '@/lib/course';
 import { buildTargetCountRound, isTargetCountSymbol, resolveConfirmDistractors, type TargetCountRound } from '@/lib/targetCount';
 import { applyMeterDelta, CONFIRM_METER, RECALL_METER } from '@/lib/progressMeter';
 import type { AnswerLog, AudioSettings, CardProgress, TrainerProfile } from '@/lib/types';
@@ -22,9 +22,8 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
   const [fxKey, setFxKey] = useState(0);
   const [combo, setCombo] = useState(0);
   const [recallPick, setRecallPick] = useState<string | null>(null);
-  const course = profile.learnCourse ?? null;
-  const unlockedKinds = profile.unlockedKinds ?? [];
-  const cards = cardsForCourse(CARDS, course, unlockedKinds);
+  const unlockedKinds = normalizeKinds(profile.unlockedKinds);
+  const cards = cardsForPractice(CARDS, unlockedKinds);
   const [index, setIndex] = useState(0);
   const [listenStep, setListenStep] = useState(0);
   const [activeElement, setActiveElement] = useState(-1);
@@ -55,8 +54,6 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
     })
     : [];
   const canConfirm = Boolean(card && isTargetCountSymbol(card.symbol) && confirmDistractors.length > 0);
-  const catalogKinds = course ? COURSE_CATALOG[course] : [];
-  const activeCourse = courseMeta(course);
 
   const resetConfirm = () => {
     setConfirmRound(null);
@@ -77,29 +74,17 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
     playbackRef.current = null;
   }, [clearPlaybackMonitor]);
 
-  const chooseCourse = (next: LearnCourse) => {
-    const defaults = selectCourseDefaults(next);
-    setProfile((old) => ({ ...old, ...defaults }));
-    setIndex(0);
-    setPhase('discover');
-    resetConfirm();
-    setRecallTarget(null);
-    setRecallChoices([]);
-    setRecallRevealed(false);
-    announce(`${courseMeta(next)?.label ?? next} を選択しました`);
-  };
-
-  const toggleKind = (kind: CharacterKind) => {
-    const current = unlockedKinds.length ? unlockedKinds : (course ? COURSE_DEFAULT_UNLOCK[course] : []);
-    const enabled = current.includes(kind);
-    if (enabled && current.length <= 1) {
+  const toggleSet = (setId: (typeof PRACTICE_SETS)[number]['id']) => {
+    const next = togglePracticeSet(unlockedKinds, setId);
+    if (!next) {
       announce('少なくとも1つの範囲はONにしてください');
       return;
     }
-    const next = enabled ? current.filter((item) => item !== kind) : [...current, kind];
     setProfile((old) => ({ ...old, unlockedKinds: next }));
     setIndex(0);
-    announce(`${KIND_LABEL[kind]} を${enabled ? 'OFF' : 'ON'}にしました`);
+    const set = PRACTICE_SETS.find((item) => item.id === setId);
+    const nowOn = set ? practiceSetOn(next, set) : false;
+    announce(`${set?.label ?? setId} を${nowOn ? 'ON' : 'OFF'}にしました`);
   };
 
   const monitorPlayback = (handle: PlaybackHandle, repeatLimit: number, onComplete: () => void) => {
@@ -390,29 +375,6 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  if (!course) {
-    return <section className="page-pad learn-page">
-      <div className="page-title">
-        <div>
-          <p className="section-kicker"><Icon name="sparkle" size={14} />COURSE SELECT</p>
-          <h1>どの文字から覚える？</h1>
-          <p>コースは出題範囲のフィルターです。あとから変えても、学習記録やGETしたカードは消えません。</p>
-        </div>
-      </div>
-      <div className="course-pick-grid">
-        {COURSES.map((item, itemIndex) => (
-          <button key={item.id} type="button" className={`course-pick-card course-${item.id}`} onClick={() => chooseCourse(item.id)}>
-            <span className="course-pick-glyph" aria-hidden="true">{COURSE_GLYPH[item.id]}</span>
-            <span className="course-pick-step">COURSE {itemIndex + 1}</span>
-            <strong>{item.label}</strong>
-            <small>{item.description}</small>
-            <b>このコースで始める<Icon name="chevron-right" size={16} /></b>
-          </button>
-        ))}
-      </div>
-    </section>;
-  }
-
   const phaseIndex = phase === 'discover' ? 0 : phase === 'confirm' ? 1 : 2;
   const meter = masteryFor(progress);
   const listenRatio = (value: number, total: number) => (total ? value / total : 0);
@@ -628,9 +590,9 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
   return <section className="page-pad learn-page">
     <div className="learn-top">
       <div className="learn-course">
-        <p className="section-kicker">{activeCourse?.short}</p>
-        <h1>{activeCourse?.label}</h1>
-        <small>{cards.length} 文字 · {learnedCards.length} 文字 練習中</small>
+        <p className="section-kicker">PRACTICE SET</p>
+        <h1>おぼえる</h1>
+        <small>{scopeSetLabel(unlockedKinds)} · {cards.length} 文字 · {learnedCards.length} 文字 練習中</small>
       </div>
       <ol className="phase-stepper" aria-label="学習ステップ">
         {steps.map((step, stepIndex) => (
@@ -642,29 +604,22 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
           </li>
         ))}
       </ol>
-      <button type="button" className="btn btn-sm btn-ghost course-switch" onClick={() => {
-        audioEngine.stop(); clearPlaybackMonitor(); setPlaying(false); setAudioStatus('READY');
-        setProfile((old) => ({ ...old, learnCourse: null, unlockedKinds: [] }));
-        setPhase('discover'); resetConfirm(); setRecallTarget(null); setRecallChoices([]); setRecallRevealed(false); setIndex(0);
-      }}>コース変更</button>
     </div>
 
-    {catalogKinds.length > 0 && (
-      <div className="scope-strip" role="group" aria-label="学習範囲のON/OFF">
-        <span>出題範囲</span>
-        {catalogKinds.map((kind) => {
-          const on = unlockedKinds.includes(kind) || (!unlockedKinds.length && course !== null && COURSE_DEFAULT_UNLOCK[course].includes(kind));
-          return (
-            <button key={kind} type="button" className={`scope-toggle ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggleKind(kind)}>
-              <i>{on ? <Icon name="check" size={12} /> : null}</i>{KIND_LABEL[kind]}
-            </button>
-          );
-        })}
-      </div>
-    )}
+    <div className="scope-strip" role="group" aria-label="覚えるセット">
+      <span>セット</span>
+      {PRACTICE_SETS.map((set) => {
+        const on = practiceSetOn(unlockedKinds, set);
+        return (
+          <button key={set.id} type="button" className={`scope-toggle ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggleSet(set.id)}>
+            <i>{on ? <Icon name="check" size={12} /> : null}</i>{set.label}
+          </button>
+        );
+      })}
+    </div>
 
     {!card ? (
-      <EmptyState title="表示できるカードがありません" body="コース設定を確認してください。" action="コースを選ぶ" onClick={() => setProfile((old) => ({ ...old, learnCourse: null, unlockedKinds: [] }))} />
+      <EmptyState title="表示できるカードがありません" body="欧文・数字・記号・和文のどれかをONにしてください。" action="欧文をON" onClick={() => setProfile((old) => ({ ...old, unlockedKinds: ['latinLetter'] }))} />
     ) : (
       <>
         <div className="lesson-grid">
@@ -732,8 +687,3 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
   </section>;
 }
 
-const COURSE_GLYPH: Record<LearnCourse, string> = {
-  'amateur-latin': 'A',
-  'amateur-wabun': 'イ',
-  general: '総',
-};

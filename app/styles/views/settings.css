@@ -62,8 +62,11 @@
   transition: border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
 }
 
-.choice-card:hover {
+.choice-card:hover:not(:disabled) {
   border-color: var(--line-3);
+}
+.choice-card:disabled {
+  opacity: .45;
 }
 
 .choice-card.active {

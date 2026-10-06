@@ -2,7 +2,7 @@
   "name": "CW Operator Trainer",
   "short_name": "CW Trainer",
   "description": "Hear, hold, and copy International and Wabun Morse code.",
-  "start_url": "/",
+  "start_url": "/app",
   "display": "standalone",
   "background_color": "#0c1024",
   "theme_color": "#f6c453",

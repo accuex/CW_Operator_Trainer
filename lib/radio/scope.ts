@@ -56,14 +56,17 @@ export class ScopeRenderer {
 
   resize() {
     this.dpr = Math.min(2, window.devicePixelRatio || 1);
+    let changed = false;
     for (const canvas of [this.scope, this.fall]) {
       const width = Math.max(1, Math.round(canvas.clientWidth * this.dpr));
       const height = Math.max(1, Math.round(canvas.clientHeight * this.dpr));
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
+        changed = true;
       }
     }
+    if (!changed) return;
     this.fc.fillStyle = '#02030a';
     this.fc.fillRect(0, 0, this.fall.width, this.fall.height);
   }
@@ -102,9 +105,12 @@ export class ScopeRenderer {
     for (let x = 0; x < W; x += 1) this.smooth[x] = this.smooth[x] * 0.55 + col[x] * 0.45;
 
     this.drawSpectrum(frame, W, H, hzPerPx);
-    if (!frame.hold && t - this.lastRow > 0.04) {
-      this.lastRow = t;
-      this.drawRow(col, W);
+    if (!frame.hold) {
+      const wall = performance.now() / 1000;
+      if (wall - this.lastRow > 0.04) {
+        this.lastRow = wall;
+        this.drawRow(col, W);
+      }
     }
   }
 

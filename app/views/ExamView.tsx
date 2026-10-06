@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ExamGakuForm, countPlaySymbols, highlightPlayText } from '@/app/components/ExamGakuForm';
-import { loadExamPrefs, saveExamPrefs } from '@/lib/examPrefs';
+import { DEFAULT_EXAM_PREFS, loadExamPrefs, saveExamPrefs } from '@/lib/examPrefs';
 import { EXAM_SHEET_GAP_SEC, EXAM_SUBJECTS, buildExamSession, examSheetGapSec, type ExamSession, type ExamSubjectId } from '@/lib/training';
 import { EXAM_PENALTY, scoreExamCopy, stripExamProcedureMarks, type ExamScore } from '@/lib/examScore';
 import type { AnswerLog, AudioSettings } from '@/lib/types';
@@ -41,15 +41,16 @@ export function ExamView({
   announce: (message: string) => void;
 }) {
   const presets = SUBJECT_IDS.map((id) => EXAM_SUBJECTS[id]);
-  const boot = initialExamUi();
-  const [selected, setSelected] = useState(boot.selected);
-  const [telegram, setTelegram] = useState(boot.prefs.telegram);
+  const defaultSelected = Math.max(0, SUBJECT_IDS.indexOf(DEFAULT_EXAM_PREFS.subjectId));
+  const [selected, setSelected] = useState(defaultSelected);
+  const [telegram, setTelegram] = useState(DEFAULT_EXAM_PREFS.telegram);
   /** 和文本文に井戸のヰ・カギのあるヱを含める */
-  const [includeWiWe, setIncludeWiWe] = useState(boot.prefs.includeWiWe);
+  const [includeWiWe, setIncludeWiWe] = useState(DEFAULT_EXAM_PREFS.includeWiWe);
   /** 視聴モード: 正解を見ながら追従再生（採点なし） */
-  const [listenMode, setListenMode] = useState(boot.prefs.listenMode);
+  const [listenMode, setListenMode] = useState(DEFAULT_EXAM_PREFS.listenMode);
   /** 視聴: セット終了後に次問題を自動再生（ひたすら聞く） */
-  const [autoContinueListen, setAutoContinueListen] = useState(boot.prefs.autoContinueListen);
+  const [autoContinueListen, setAutoContinueListen] = useState(DEFAULT_EXAM_PREFS.autoContinueListen);
+  const [prefsReady, setPrefsReady] = useState(false);
   /** 開始時に固定（途中でトグルしても表示が壊れない） */
   const [sessionListenMode, setSessionListenMode] = useState(false);
   /** setup | ready | playing | paused | review — ready は出題済み・再生待ち、review は答え合わせ */
@@ -70,13 +71,26 @@ export function ExamView({
   const [timeUp, setTimeUp] = useState(false);
   /** 他アプリに奪われて再生が止まった（スタートで再開） */
   const [audioInterrupted, setAudioInterrupted] = useState(false);
-  const listenModeRef = useRef(boot.prefs.listenMode);
-  const autoContinueListenRef = useRef(boot.prefs.autoContinueListen);
+  const listenModeRef = useRef(DEFAULT_EXAM_PREFS.listenMode);
+  const autoContinueListenRef = useRef(DEFAULT_EXAM_PREFS.autoContinueListen);
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
 
-  // 科目・視聴・電報トグルは画面を離れても維持
   useEffect(() => {
+    const boot = initialExamUi();
+    setSelected(boot.selected);
+    setTelegram(boot.prefs.telegram);
+    setIncludeWiWe(boot.prefs.includeWiWe);
+    setListenMode(boot.prefs.listenMode);
+    setAutoContinueListen(boot.prefs.autoContinueListen);
+    listenModeRef.current = boot.prefs.listenMode;
+    autoContinueListenRef.current = boot.prefs.autoContinueListen;
+    setPrefsReady(true);
+  }, []);
+
+  // 科目・視聴・電報トグルは画面を離れても維持（初回は SSR と揃えてから書く）
+  useEffect(() => {
+    if (!prefsReady) return;
     saveExamPrefs({
       subjectId: SUBJECT_IDS[selected] ?? 'plain',
       telegram,
@@ -84,7 +98,7 @@ export function ExamView({
       listenMode,
       autoContinueListen,
     });
-  }, [selected, telegram, includeWiWe, listenMode, autoContinueListen]);
+  }, [prefsReady, selected, telegram, includeWiWe, listenMode, autoContinueListen]);
   const timer = useRef<number | null>(null);
   const activeRef = useRef(false);
   const pausedRef = useRef(false);

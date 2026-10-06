@@ -152,9 +152,15 @@ export const fadeAt = (station: Station, t: number, depth: number) =>
 
 export function nearestStation(stations: Station[], hz: number, within: number) {
   let best: Station | null = null;
+  let bestScore = Infinity;
   for (const station of stations) {
-    if (Math.abs(station.rf - hz) > within) continue;
-    if (!best || Math.abs(station.rf - hz) < Math.abs(best.rf - hz)) best = station;
+    const dist = Math.abs(station.rf - hz);
+    if (dist > within) continue;
+    const score = dist - station.strength * within * 0.4;
+    if (!best || score < bestScore) {
+      best = station;
+      bestScore = score;
+    }
   }
   return best;
 }

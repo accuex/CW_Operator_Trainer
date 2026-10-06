@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ACHIEVEMENTS, type AchievementDef } from '@/lib/achievements';
 import { effectiveDisplayRarity } from '@/lib/collectionReveal';
 import { CARDS, type MorseCard } from '@/lib/morse';
-import { COURSE_CATALOG, KIND_LABEL, cardsForCourse, courseMeta, type CharacterKind } from '@/lib/course';
+import { ALL_KINDS, KIND_LABEL, cardsForPractice, scopeSetLabel, type CharacterKind } from '@/lib/course';
 import { readProgressMeter } from '@/lib/progressMeter';
 import { BADGES, MARK_COUNT, MARK_WPM, TIER_LABEL, badgeTier, charMarkKey, hasCharMark, nextTier } from '@/lib/radio/badges';
 import type { AudioSettings, CardProgress, CardRarityOwned, TrainerProfile } from '@/lib/types';
@@ -21,12 +21,9 @@ const CATEGORY_LABEL: Record<string, string> = { Recommended: 'おすすめ', Cl
 type ArchiveTab = 'chars' | 'achievements' | 'qso';
 
 export function CollectionView({ settings, profile, setProfile, setAudioStatus }: { settings: AudioSettings; profile: TrainerProfile; setProfile: React.Dispatch<React.SetStateAction<TrainerProfile>>; setAudioStatus: (status: string) => void }) {
-  const course = profile.learnCourse ?? null;
   const revealAll = Boolean(profile.revealAll);
-  const unlockedKinds = revealAll && course
-    ? COURSE_CATALOG[course]
-    : (profile.unlockedKinds ?? []);
-  const courseCards = cardsForCourse(CARDS, course, unlockedKinds);
+  const unlockedKinds = revealAll ? ALL_KINDS : (profile.unlockedKinds ?? []);
+  const courseCards = cardsForPractice(CARDS, unlockedKinds);
   const [archiveTab, setArchiveTab] = useState<ArchiveTab>('chars');
   const [kindFilter, setKindFilter] = useState<CharacterKind | 'all'>('all');
   const [previewRarity, setPreviewRarity] = useState<CardRarityOwned>('SSR');
@@ -112,7 +109,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
   return <section className="page-pad collection-page">
     <div className="collection-hero panel">
       <div className="collection-hero-copy">
-        <p className="section-kicker"><Icon name="collection" size={14} />CARD ARCHIVE{course ? ` · ${courseMeta(course)?.short}` : ''}</p>
+        <p className="section-kicker"><Icon name="collection" size={14} />CARD ARCHIVE · {scopeSetLabel(unlockedKinds)}</p>
         <h1>カード図鑑</h1>
         <p>{revealAll
           ? '全解放表示中（プレビュー）。下のレア切替で R / SR / SSR を見られます。GET数は本物の進捗のまま。'
@@ -120,9 +117,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
             ? '条件を満たすと実績カードが解禁。未取得は中身シークレット（???）。'
             : archiveTab === 'qso'
               ? 'QSO シミュレーターでの実戦の証。カードのレア度とは別に、銅・銀・金の 3 段階で育ちます。'
-            : course
-              ? 'コース内の文字は最初から見えます。カード絵は「当てる」やコッホ昇級でGETして集めよう。'
-              : '「おぼえる」でコースを選ぶと、その範囲のカードがここに並びます。学習記録は消えません。'}</p>
+            : 'いまONのセットの文字が並びます。カード絵は「当てる」やコッホ昇級でGETして集めよう。'}</p>
         <div className="collection-tally">
           {archiveTab === 'achievements' ? (
             <>
@@ -159,7 +154,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
         options={[['chars', '文字カード'], ['achievements', '実績'], ['qso', 'QSO バッジ']]}
         onChange={(value) => switchTab(value as ArchiveTab)}
       />
-      {archiveTab === 'chars' && course && (
+      {archiveTab === 'chars' && (
         <Segmented
           label="文字種"
           value={kindFilter}
@@ -167,7 +162,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
           onChange={(value) => { setKindFilter(value as CharacterKind | 'all'); setSelected(null); }}
         />
       )}
-      {revealAll && archiveTab === 'chars' && course && (
+      {revealAll && archiveTab === 'chars' && (
         <Segmented
           label="プレビューレア"
           value={previewRarity}
@@ -177,13 +172,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
       )}
     </div>
 
-    {archiveTab === 'chars' && !course && (
-      <div className="collection-empty panel">
-        <p>コース未選択です。「おぼえる」でコースを選ぶと文字カードが並びます。実績タブはコースなしでも開けます。</p>
-      </div>
-    )}
-
-    {archiveTab === 'chars' && course && (
+    {archiveTab === 'chars' && (
       <div className="card-grid">{cards.map((card, cardIndex) => {
         const progress = profile.cards[cardKey(card)];
         const acquired = revealCard(progress);

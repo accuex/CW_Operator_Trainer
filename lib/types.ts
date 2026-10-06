@@ -412,9 +412,9 @@ export interface KochProgress {
 export interface TrainerProfile {
   version: 1;
   goal: 'fun' | 'sound' | 'experienced' | 'exam' | null;
-  /** Learn / Collection feature-set filter. Null until the user picks a course. */
+  /** Learn / Collection filter via unlockedKinds. Kept for old backups. */
   learnCourse?: LearnCourse | null;
-  /** Unlocked character kinds within the selected course catalog. */
+  /** Practice sets: 欧文 / 数字 / 記号 / 和文. */
   unlockedKinds?: CharacterKind[];
   cards: Record<string, CardProgress>;
   /** Achievement archive unlocks keyed by AchievementId. */

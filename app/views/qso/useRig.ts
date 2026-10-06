@@ -160,7 +160,7 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
         hold: holdRef.current,
         transmitting: engine.transmitting,
       });
-      if (meterRef.current) meterRef.current.style.transform = `scaleX(${engine.meter()})`;
+      if (meterRef.current) meterRef.current.style.transform = `scaleX(${1 - engine.meter()})`;
     };
     raf = requestAnimationFrame(frame);
     const onVisibility = () => void engine.setBackground(document.visibilityState === 'hidden');
@@ -203,9 +203,10 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
   useEffect(() => {
     const canvases = [scopeRef.current, fallRef.current].filter(Boolean) as HTMLCanvasElement[];
     const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
       const engine = engineRef.current;
-      if (engine) tune(engine.vfo + Math.sign(event.deltaY) * (event.shiftKey ? 2 : 10));
+      if (!engine?.powered) return;
+      event.preventDefault();
+      tune(engine.vfo + Math.sign(event.deltaY) * (event.shiftKey ? 2 : 10));
     };
     for (const canvas of canvases) canvas.addEventListener('wheel', onWheel, { passive: false });
     return () => { for (const canvas of canvases) canvas.removeEventListener('wheel', onWheel); };
@@ -215,14 +216,16 @@ export function useRig({ pitch, stopEpoch, levels }: UseRigOptions) {
     const engine = engineRef.current;
     if (!engine) return 'failed';
     if (engine.powered) {
-      await engine.powerOff();
       setPowered(false);
+      setTxOn(false);
+      await engine.powerOff();
       return 'off';
     }
     // The trainer's own player and the rig must not talk over each other.
     audioEngine.stop();
     try {
       await engine.powerOn();
+      if (!engine.powered) return 'failed';
       setPowered(true);
       return 'on';
     } catch {

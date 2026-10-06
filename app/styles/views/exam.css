@@ -566,8 +566,12 @@
   --wg-side: 58px;
   --wg-grid: calc(6 * var(--wg-cell) + 14px);
   --wg-grid-h: calc(10 * var(--wg-cell) + 20px);
+  --wg-head-w: calc(var(--wg-grid) / 2 + 4 * var(--wg-addr) + var(--wg-side));
   justify-self: start;
   width: max-content;
+  min-width: max-content;
+  max-width: none;
+  flex-shrink: 0;
   margin-inline: auto;
   padding: 26px 72px 30px 26px;
   background: var(--wg-paper);
@@ -653,7 +657,8 @@
 /* 上段: 採点欄 + 前文欄 */
 .gaku-sheet.wabun .wg-top {
   display: grid;
-  grid-template-columns: calc(var(--wg-info) + var(--wg-notes) + var(--wg-grid) / 2) calc(var(--wg-grid) / 2 + 4 * var(--wg-addr) + var(--wg-side));
+  grid-template-columns: calc(var(--wg-info) + var(--wg-notes) + var(--wg-grid) / 2) var(--wg-head-w);
+  width: max-content;
   align-items: start;
 }
 .wg-score {
@@ -669,23 +674,30 @@
 .wg-score td { width: 85px; }
 .gaku-sheet.wabun .wg-head {
   display: grid;
-  grid-template-columns: 85fr 85fr 113fr 85fr 85fr;
+  grid-template-columns: minmax(80px, 1fr) minmax(80px, 1fr) minmax(104px, 1.3fr) minmax(80px, 1fr) minmax(80px, 1fr);
+  grid-template-rows: 216px;
+  grid-auto-flow: column;
+  width: var(--wg-head-w);
+  min-width: var(--wg-head-w);
   height: 216px;
+  overflow: hidden;
   border: 1.5px solid var(--wg-red);
   border-bottom: 0;
 }
-/* DOM は再生順。PC 帳票は左から 受付→番号→発信局→字数→種類 */
-.gaku-sheet.wabun .wg-field-time { grid-column: 1; }
-.gaku-sheet.wabun .wg-field-number { grid-column: 2; }
-.gaku-sheet.wabun .wg-field-office { grid-column: 3; }
-.gaku-sheet.wabun .wg-field-count { grid-column: 4; }
-.gaku-sheet.wabun .wg-field-kind { grid-column: 5; }
+/* DOM は再生順。PC 帳票は左から 受付→番号→発信局→字数→種類。row を固定しないと sparse auto-placement が次行へ送る */
+.gaku-sheet.wabun .wg-field-time { grid-column: 1; grid-row: 1; }
+.gaku-sheet.wabun .wg-field-number { grid-column: 2; grid-row: 1; }
+.gaku-sheet.wabun .wg-field-office { grid-column: 3; grid-row: 1; }
+.gaku-sheet.wabun .wg-field-count { grid-column: 4; grid-row: 1; }
+.gaku-sheet.wabun .wg-field-kind { grid-column: 5; grid-row: 1; }
 .gaku-sheet.wabun .wg-field {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  min-width: 0;
+  min-width: 80px;
+  height: 100%;
+  min-height: 0;
   padding-top: 6px;
   border-left: 1.5px solid var(--wg-red);
 }
@@ -713,6 +725,7 @@
 .gaku-sheet.wabun .wg-main {
   display: grid;
   grid-template-columns: var(--wg-info) var(--wg-notes) var(--wg-grid) calc(4 * var(--wg-addr)) var(--wg-side);
+  width: max-content;
   align-items: stretch;
 }
 /* DOM 順と見た目の列を分離（モバイルは source order のまま縦積み） */
@@ -1133,6 +1146,7 @@
   .gaku-sheet.wabun {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     justify-self: stretch;
     margin-inline: 0;
     padding: 10px 10px 12px;
@@ -1172,23 +1186,32 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-width: 0;
     margin-bottom: 8px;
   }
   .gaku-sheet.wabun .wg-head {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    height: auto;
+    grid-template-rows: none;
+    grid-auto-flow: row;
     width: 100%;
+    min-width: 0;
+    height: auto;
+    overflow: visible;
   }
   /* モバイルは再生順のまま: 字数|発信局 / 番号|受付 */
   .gaku-sheet.wabun .wg-field-count,
   .gaku-sheet.wabun .wg-field-office,
   .gaku-sheet.wabun .wg-field-number,
-  .gaku-sheet.wabun .wg-field-time {
+  .gaku-sheet.wabun .wg-field-time,
+  .gaku-sheet.wabun .wg-field-kind {
     grid-column: auto;
+    grid-row: auto;
   }
   .gaku-sheet.wabun .wg-field {
+    min-width: 0;
     min-height: 0;
+    height: auto;
     padding: 6px 8px;
     border-left: 0;
     border-top: 1.5px solid var(--wg-red);
@@ -1239,6 +1262,7 @@
     align-items: stretch;
     gap: 8px;
     width: 100%;
+    min-width: 0;
     height: auto;
     grid-template-columns: none;
     grid-template-rows: none;

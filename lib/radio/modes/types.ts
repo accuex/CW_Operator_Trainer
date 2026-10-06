@@ -105,4 +105,9 @@ export interface WabunQsoMode extends QsoModeBase {
   kind: 'wabun';
 }
 
-export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode | ContestQsoMode | WabunQsoMode;
+/** Spectator: two skilled stations work a rag-chew. No transmit, no scoring. */
+export interface DemoQsoMode extends QsoModeBase {
+  kind: 'demo';
+}
+
+export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode | ContestQsoMode | WabunQsoMode | DemoQsoMode;

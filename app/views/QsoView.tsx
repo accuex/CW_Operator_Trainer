@@ -28,6 +28,7 @@ import { CqRunDesk, type RunRecord, type RunSaved } from './qso/CqRunDesk';
 import { ContestDesk, CONTEST_RIG_LEVELS, type ContestSaveRecord } from './qso/ContestDesk';
 import { PileupDesk, PILEUP_RIG_LEVELS } from './qso/PileupDesk';
 import { RigPanel } from './qso/RigPanel';
+import { DemoDesk, DEMO_RIG_LEVELS } from './qso/DemoDesk';
 import { WabunDesk, WABUN_RIG_LEVELS } from './qso/WabunDesk';
 import { devWabunPreset } from '@/lib/radio/wabun/presets';
 import { assistedAnswers, compareDecode, decodeAssist, decodeNote, isAssisted, outcomeWithoutCopy, wabunWithoutCopy, withoutCopy } from '@/lib/radio/decode/assist';
@@ -99,6 +100,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const [wabunPreset] = useState(devWabunPreset);
   const wabunAdapt = mode.kind === 'wabun' && progress.auto ? normalizeWabunAdapt(progress.wabun as Parameters<typeof normalizeWabunAdapt>[0]) : null;
   const band = mode.kind === 'pileup' ? PILEUP_RIG_LEVELS : mode.kind === 'contest' ? CONTEST_RIG_LEVELS
+    : mode.kind === 'demo' ? DEMO_RIG_LEVELS
     : mode.kind === 'wabun' ? (wabunPreset ? wabunBand(wabunPreset.axes.rf ?? 0.25).rig : wabunAdapt ? wabunBand(wabunAdapt.axes.rf).rig : WABUN_RIG_LEVELS) : difficulty;
   const rig = useRig({ pitch: settings.pitch, stopEpoch, levels: { af: prefs.af, noise: band.noise, qrn: band.qrn, qsb: band.qsb } });
   const { engineRef, txOn, newCapture } = rig;
@@ -475,7 +477,9 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
       <div>
         <p className="section-kicker">QSO SIMULATOR</p>
         <h1>QSO シミュレーター</h1>
-        <p>バンドを聴いて CQ を出している局を探し、呼んで、レポートを書き取り、73 で締める。混信・ノイズ・フェージングの中で 1 交信を完成させましょう。</p>
+        <p>{mode.kind === 'demo'
+          ? 'チュートリアル。CQ に同調し、案内どおり送信して、呼ぶ→レポート→73 の手順を手で覚えます。'
+          : 'バンドを聴いて CQ を出している局を探し、呼んで、レポートを書き取り、73 で締める。混信・ノイズ・フェージングの中で 1 交信を完成させましょう。'}</p>
       </div>
     </div>
 
@@ -559,6 +563,8 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           onProfile={(change) => updateQso((old) => ({ ...old, ...change }))}
           onSave={saveRun}
         />
+      ) : mode.kind === 'demo' ? (
+        <DemoDesk key={mode.id} rig={rig} myCall={myCall} />
       ) : (
       <div className="qso-side">
         <div className="panel panel-pad qso-status">
@@ -650,6 +656,11 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
             <div className="qso-panel-head"><h2>設定</h2></div>
             <p className="qso-note">コンテストの難しさは、デスクのレベル（入門〜エキスパート）で選びます。おまかせ調整は、ミスの原因に関係する軸（速さ・呼ぶ局の多さ・似たコール・弱信号・番号の難しさ）だけを動かします。各レベルの値は暫定です。</p>
           </>
+        ) : mode.kind === 'demo' ? (
+          <>
+            <div className="qso-panel-head"><h2>チュートリアル</h2></div>
+            <p className="qso-note">採点はありません。滝で CQ を探し、±150 Hz 以内に同調してから、案内の送信ボタンを押します。ずれていると相手は応答しません。</p>
+          </>
         ) : <>
         <div className="qso-panel-head">
           <h2>難易度</h2>
@@ -722,7 +733,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         ) : <p className="qso-note">まだ交信がありません。最初の 1 局を探しましょう。</p>}
       </div>
 
-      <SkillPanel qso={qso} modeId={mode.id} />
+      {mode.kind !== 'demo' && <SkillPanel qso={qso} modeId={mode.id} />}
     </div>
 
     <p className="qso-help">

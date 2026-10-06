@@ -11,6 +11,7 @@
 /* Rig face: generic transceiver panel, not modelled on any maker. */
 .qso-rig {
   position: relative;
+  min-width: 0;
   overflow: hidden;
   border: 1.5px solid #1c2442;
   border-radius: var(--r-lg);
@@ -64,23 +65,47 @@
 
 .rig-meter {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
-  padding: 0 14px 8px;
+  padding: 6px 14px 8px;
   background: #050814;
   color: #8a93b8;
   font: 600 10.5px/1 var(--font-mono);
 }
-.rig-smeter { flex: 0 0 min(220px, 40%); height: 8px; overflow: hidden; border-radius: 2px; background: #111833; }
+.rig-meter-s { padding-bottom: 1px; }
+.rig-meter-col { flex: 0 0 min(220px, 40%); width: min(220px, 40%); }
+.rig-scale {
+  position: relative;
+  height: 13px;
+  margin-bottom: 3px;
+}
+.rig-scale span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  color: #9aa3c7;
+  font: 600 9px/1 var(--font-mono);
+}
+.rig-scale span:first-child { transform: none; }
+.rig-scale span:last-child { transform: translateX(-100%); }
+.rig-scale span.over { color: #f87171; }
+.rig-smeter {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #22d3ee 0%, #38bdf8 52%, #4ade80 62%, #facc15 66.6%, #f87171 72%, #ef4444 100%);
+}
 .rig-smeter i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #38bdf8 0 60%, #f87171 60%);
-  transform: scaleX(0);
-  transform-origin: left;
+  width: 100%;
+  background: #111833;
+  transform: scaleX(1);
+  transform-origin: right center;
   transition: transform 80ms linear;
 }
-.rig-scale { white-space: nowrap; overflow: hidden; text-overflow: clip; }
 
 .rig-scope-head {
   display: flex;
@@ -140,7 +165,7 @@
 .rig-keys button.on small { color: #bcd3ff; }
 
 /* DECODE: a key row and a few lines of decoded text (a receive aid) */
-.rig-decode { padding: 0 8px 8px; background: #050814; }
+.rig-decode { min-width: 0; padding: 0 8px 8px; background: #050814; }
 .rig-decode-keys { display: flex; gap: 6px; }
 .rig-decode-keys button {
   display: grid;
@@ -163,14 +188,23 @@
   height: calc(3 * 1.45em + 12px);
   margin-top: 6px;
   padding: 6px 8px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-width: 0;
   border: 1px solid #1d2647;
   border-radius: 6px;
   background: #02040c;
   color: #9ef0c4;
   font: 500 13px/1.45 var(--font-mono);
 }
-.rig-decode-window p { margin: 0; overflow-wrap: anywhere; word-break: keep-all; white-space: pre-wrap; }
+.rig-decode-window p {
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
 .rig-decode-window .unsure { opacity: .55; }
 .rig-decode-window .unknown { color: #f5b25b; }
 .rig-decode-window .hint { color: #5d6790; font-size: 11.5px; }
@@ -323,8 +357,6 @@
 @media (max-width: 560px) {
   .rig-top { flex-wrap: wrap; }
   .rig-freq { flex-basis: 100%; text-align: right; }
-  .rig-scale { display: none; }
-  .rig-smeter { flex: 1; }
   .rig-keys { grid-template-columns: repeat(4, 1fr); }
 }
 
@@ -653,6 +685,35 @@
 .wabun-paths .chip { margin-left: auto; }
 .wabun-auto { display: flex; align-items: flex-start; gap: 8px; margin: 8px 0 4px; font-size: 13px; line-height: 1.5; cursor: pointer; }
 .wabun-auto input { margin-top: 3px; flex: none; }
+
+.demo-desk-title { margin: 4px 0 8px; font: 800 20px/1.2 var(--font-display); }
+.demo-guide-steps { margin-bottom: 10px; }
+.demo-desk-calls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+.demo-desk-calls div {
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: var(--surface-sunken);
+}
+.demo-desk-calls dt { color: var(--muted); font: 800 11px/1 var(--font-mono); letter-spacing: .06em; }
+.demo-desk-calls dd { margin: 6px 0 0; font: 800 16px/1.2 var(--font-mono); letter-spacing: .04em; }
+.demo-desk-calls dd.ok { color: var(--mint); }
+.demo-script {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--gold) 14%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+  font: 700 14px/1.45 var(--font-mono);
+  letter-spacing: .03em;
+  word-break: break-all;
+}
+.demo-send { width: 100%; min-height: 48px; font-size: 16px; }
+.demo-desk-tips { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; font-size: 13px; line-height: 1.5; color: var(--text-2); }
 .wabun-responses { display: grid; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; font-size: 13px; line-height: 1.6; }
 .wabun-responses li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--surface-sunken); min-width: 0; }
 .wabun-responses b { font: 800 11px/1 var(--font-mono); color: var(--muted); }
