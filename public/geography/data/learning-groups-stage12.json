@@ -1,0 +1,2723 @@
+{
+  "schema_version": 1,
+  "policy": "Singleton learning groups preserve canonical distinctions. No site/name merging without question evidence. Training attempts remain keyed by canonical ID; not migrated.",
+  "groups": [
+    {
+      "id": "learn-jp-shiogama-same",
+      "canonical_entity_ids": [
+        "jp-shiogama-same"
+      ],
+      "region_id": "japan",
+      "display_name": "塩釜（鮫）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-shiogama-utatsu",
+      "canonical_entity_ids": [
+        "jp-shiogama-utatsu"
+      ],
+      "region_id": "japan",
+      "display_name": "塩釜（歌津）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-shiogama-atsumi",
+      "canonical_entity_ids": [
+        "jp-shiogama-atsumi"
+      ],
+      "region_id": "japan",
+      "display_name": "塩釜（温海）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-yokohama-suzaki",
+      "canonical_entity_ids": [
+        "jp-yokohama-suzaki"
+      ],
+      "region_id": "japan",
+      "display_name": "横浜（須崎）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-yokohama-shirahama",
+      "canonical_entity_ids": [
+        "jp-yokohama-shirahama"
+      ],
+      "region_id": "japan",
+      "display_name": "横浜（白浜）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-yokohama-tsukuba",
+      "canonical_entity_ids": [
+        "jp-yokohama-tsukuba"
+      ],
+      "region_id": "japan",
+      "display_name": "横浜（筑波）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-otaru-sasayama",
+      "canonical_entity_ids": [
+        "jp-otaru-sasayama"
+      ],
+      "region_id": "japan",
+      "display_name": "小樽（笹山）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-otaru-shoya",
+      "canonical_entity_ids": [
+        "jp-otaru-shoya"
+      ],
+      "region_id": "japan",
+      "display_name": "小樽（庶野）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-otaru-utashima",
+      "canonical_entity_ids": [
+        "jp-otaru-utashima"
+      ],
+      "region_id": "japan",
+      "display_name": "小樽（歌島）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-nanao",
+      "canonical_entity_ids": [
+        "jp-port-nanao"
+      ],
+      "region_id": "japan",
+      "display_name": "七尾",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-sakata",
+      "canonical_entity_ids": [
+        "jp-port-sakata"
+      ],
+      "region_id": "japan",
+      "display_name": "酒田",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-fushiki",
+      "canonical_entity_ids": [
+        "jp-port-fushiki"
+      ],
+      "region_id": "japan",
+      "display_name": "伏木富山",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-kanazawa",
+      "canonical_entity_ids": [
+        "jp-port-kanazawa"
+      ],
+      "region_id": "japan",
+      "display_name": "金沢",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-tsuruga",
+      "canonical_entity_ids": [
+        "jp-port-tsuruga"
+      ],
+      "region_id": "japan",
+      "display_name": "敦賀",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-imabari",
+      "canonical_entity_ids": [
+        "jp-port-imabari"
+      ],
+      "region_id": "japan",
+      "display_name": "今治",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-akashi",
+      "canonical_entity_ids": [
+        "jp-strait-akashi"
+      ],
+      "region_id": "japan",
+      "display_name": "明石海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-kii",
+      "canonical_entity_ids": [
+        "jp-strait-kii"
+      ],
+      "region_id": "japan",
+      "display_name": "紀伊水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-bungo",
+      "canonical_entity_ids": [
+        "jp-strait-bungo"
+      ],
+      "region_id": "japan",
+      "display_name": "豊後水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-naruto",
+      "canonical_entity_ids": [
+        "jp-strait-naruto"
+      ],
+      "region_id": "japan",
+      "display_name": "鳴門海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-irago",
+      "canonical_entity_ids": [
+        "jp-strait-irago"
+      ],
+      "region_id": "japan",
+      "display_name": "伊良湖水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-kanmon",
+      "canonical_entity_ids": [
+        "jp-strait-kanmon"
+      ],
+      "region_id": "japan",
+      "display_name": "関門海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-land-oshika",
+      "canonical_entity_ids": [
+        "jp-land-oshika"
+      ],
+      "region_id": "japan",
+      "display_name": "牡鹿半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-land-tsugaru",
+      "canonical_entity_ids": [
+        "jp-land-tsugaru"
+      ],
+      "region_id": "japan",
+      "display_name": "津軽半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-land-oga",
+      "canonical_entity_ids": [
+        "jp-land-oga"
+      ],
+      "region_id": "japan",
+      "display_name": "男鹿半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-land-shimokita",
+      "canonical_entity_ids": [
+        "jp-land-shimokita"
+      ],
+      "region_id": "japan",
+      "display_name": "下北半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-land-kunisaki",
+      "canonical_entity_ids": [
+        "jp-land-kunisaki"
+      ],
+      "region_id": "japan",
+      "display_name": "国東半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-rogaland",
+      "canonical_entity_ids": [
+        "eu-station-rogaland"
+      ],
+      "region_id": "europe",
+      "display_name": "ローガラン",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-oostende",
+      "canonical_entity_ids": [
+        "eu-station-oostende"
+      ],
+      "region_id": "europe",
+      "display_name": "オーステンデ",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-lyngby",
+      "canonical_entity_ids": [
+        "eu-station-lyngby"
+      ],
+      "region_id": "europe",
+      "display_name": "リングビュー",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-stockholm",
+      "canonical_entity_ids": [
+        "eu-station-stockholm"
+      ],
+      "region_id": "europe",
+      "display_name": "ストックホルム",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-hamburg",
+      "canonical_entity_ids": [
+        "eu-station-hamburg"
+      ],
+      "region_id": "europe",
+      "display_name": "ハンブルク",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-tallinn",
+      "canonical_entity_ids": [
+        "eu-port-tallinn"
+      ],
+      "region_id": "europe",
+      "display_name": "タリン",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-copenhagen",
+      "canonical_entity_ids": [
+        "eu-port-copenhagen"
+      ],
+      "region_id": "europe",
+      "display_name": "コペンハーゲン",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-amsterdam",
+      "canonical_entity_ids": [
+        "eu-port-amsterdam"
+      ],
+      "region_id": "europe",
+      "display_name": "アムステルダム",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-southampton",
+      "canonical_entity_ids": [
+        "eu-port-southampton"
+      ],
+      "region_id": "europe",
+      "display_name": "サウサンプトン",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-rotterdam",
+      "canonical_entity_ids": [
+        "eu-port-rotterdam"
+      ],
+      "region_id": "europe",
+      "display_name": "ロッテルダム",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-stockholm",
+      "canonical_entity_ids": [
+        "eu-port-stockholm"
+      ],
+      "region_id": "europe",
+      "display_name": "ストックホルム",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-helsinki",
+      "canonical_entity_ids": [
+        "eu-port-helsinki"
+      ],
+      "region_id": "europe",
+      "display_name": "ヘルシンキ",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-oslo",
+      "canonical_entity_ids": [
+        "eu-port-oslo"
+      ],
+      "region_id": "europe",
+      "display_name": "オスロ",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-antwerpen",
+      "canonical_entity_ids": [
+        "eu-port-antwerpen"
+      ],
+      "region_id": "europe",
+      "display_name": "アントウェルペン",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-dover",
+      "canonical_entity_ids": [
+        "eu-strait-dover"
+      ],
+      "region_id": "europe",
+      "display_name": "ドーバー海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-skagerrak",
+      "canonical_entity_ids": [
+        "eu-strait-skagerrak"
+      ],
+      "region_id": "europe",
+      "display_name": "スカゲラク海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-northchannel",
+      "canonical_entity_ids": [
+        "eu-strait-northchannel"
+      ],
+      "region_id": "europe",
+      "display_name": "ノース海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-stgeorge",
+      "canonical_entity_ids": [
+        "eu-strait-stgeorge"
+      ],
+      "region_id": "europe",
+      "display_name": "セントジョージ海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-baltic",
+      "canonical_entity_ids": [
+        "eu-sea-baltic"
+      ],
+      "region_id": "europe",
+      "display_name": "バルト海",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-north",
+      "canonical_entity_ids": [
+        "eu-sea-north"
+      ],
+      "region_id": "europe",
+      "display_name": "北海",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-norwegian",
+      "canonical_entity_ids": [
+        "eu-sea-norwegian"
+      ],
+      "region_id": "europe",
+      "display_name": "ノルウェー海",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-land-cotentin",
+      "canonical_entity_ids": [
+        "eu-land-cotentin"
+      ],
+      "region_id": "europe",
+      "display_name": "コタンタン半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-land-bretagne",
+      "canonical_entity_ids": [
+        "eu-land-bretagne"
+      ],
+      "region_id": "europe",
+      "display_name": "ブルターニュ半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-land-jutland",
+      "canonical_entity_ids": [
+        "eu-land-jutland"
+      ],
+      "region_id": "europe",
+      "display_name": "ユトランド半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-poland",
+      "canonical_entity_ids": [
+        "eu-country-poland"
+      ],
+      "region_id": "europe",
+      "display_name": "ポーランド",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-netherlands",
+      "canonical_entity_ids": [
+        "eu-country-netherlands"
+      ],
+      "region_id": "europe",
+      "display_name": "オランダ",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-estonia",
+      "canonical_entity_ids": [
+        "eu-country-estonia"
+      ],
+      "region_id": "europe",
+      "display_name": "エストニア",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-denmark",
+      "canonical_entity_ids": [
+        "eu-country-denmark"
+      ],
+      "region_id": "europe",
+      "display_name": "デンマーク",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-belgium",
+      "canonical_entity_ids": [
+        "eu-country-belgium"
+      ],
+      "region_id": "europe",
+      "display_name": "ベルギー",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-yokohama-shimoda",
+      "canonical_entity_ids": [
+        "jp-yokohama-shimoda"
+      ],
+      "region_id": "japan",
+      "display_name": "横浜（下田）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-kagoshima-aburatsu",
+      "canonical_entity_ids": [
+        "jp-kagoshima-aburatsu"
+      ],
+      "region_id": "japan",
+      "display_name": "鹿児島（油津）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-otaru-ono",
+      "canonical_entity_ids": [
+        "jp-otaru-ono"
+      ],
+      "region_id": "japan",
+      "display_name": "小樽（大野）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-tallinn",
+      "canonical_entity_ids": [
+        "eu-station-tallinn"
+      ],
+      "region_id": "europe",
+      "display_name": "タリン（海岸局）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-hamburg",
+      "canonical_entity_ids": [
+        "eu-port-hamburg"
+      ],
+      "region_id": "europe",
+      "display_name": "ハンブルク（港）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-station-mrcc-oostende",
+      "canonical_entity_ids": [
+        "eu-station-mrcc-oostende"
+      ],
+      "region_id": "europe",
+      "display_name": "MRCC-Oostende Radio",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-tsushima",
+      "canonical_entity_ids": [
+        "jp-strait-tsushima"
+      ],
+      "region_id": "japan",
+      "display_name": "対馬海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-osumi",
+      "canonical_entity_ids": [
+        "jp-strait-osumi"
+      ],
+      "region_id": "japan",
+      "display_name": "大隅海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-soya",
+      "canonical_entity_ids": [
+        "jp-strait-soya"
+      ],
+      "region_id": "japan",
+      "display_name": "宗谷海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-navtex-naha-kyan",
+      "canonical_entity_ids": [
+        "jp-navtex-naha-kyan"
+      ],
+      "region_id": "japan",
+      "display_name": "那覇（喜屋武）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-liverpool-uk",
+      "canonical_entity_ids": [
+        "eu-port-liverpool-uk"
+      ],
+      "region_id": "europe",
+      "display_name": "Liverpool",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-satsuma",
+      "canonical_entity_ids": [
+        "jp-landform-satsuma"
+      ],
+      "region_id": "japan",
+      "display_name": "薩摩半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-atsumi",
+      "canonical_entity_ids": [
+        "jp-landform-atsumi"
+      ],
+      "region_id": "japan",
+      "display_name": "渥美半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-tango",
+      "canonical_entity_ids": [
+        "jp-landform-tango"
+      ],
+      "region_id": "japan",
+      "display_name": "丹後半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-maizuru",
+      "canonical_entity_ids": [
+        "jp-port-maizuru"
+      ],
+      "region_id": "japan",
+      "display_name": "舞鶴",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-shimizu",
+      "canonical_entity_ids": [
+        "jp-port-shimizu"
+      ],
+      "region_id": "japan",
+      "display_name": "清水",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-niigata",
+      "canonical_entity_ids": [
+        "jp-port-niigata"
+      ],
+      "region_id": "japan",
+      "display_name": "新潟",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-yokkaichi",
+      "canonical_entity_ids": [
+        "jp-port-yokkaichi"
+      ],
+      "region_id": "japan",
+      "display_name": "四日市",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-ireland",
+      "canonical_entity_ids": [
+        "eu-landform-ireland"
+      ],
+      "region_id": "europe",
+      "display_name": "Ireland",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-karatsu",
+      "canonical_entity_ids": [
+        "jp-port-karatsu"
+      ],
+      "region_id": "japan",
+      "display_name": "唐津",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-kochi",
+      "canonical_entity_ids": [
+        "jp-port-kochi"
+      ],
+      "region_id": "japan",
+      "display_name": "高知",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-hachinohe",
+      "canonical_entity_ids": [
+        "jp-port-hachinohe"
+      ],
+      "region_id": "japan",
+      "display_name": "八戸",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-nagasaki",
+      "canonical_entity_ids": [
+        "jp-port-nagasaki"
+      ],
+      "region_id": "japan",
+      "display_name": "長崎",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-oita",
+      "canonical_entity_ids": [
+        "jp-port-oita"
+      ],
+      "region_id": "japan",
+      "display_name": "大分",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-cb5c00e477cf",
+      "canonical_entity_ids": [
+        "jp-port-s10-cb5c00e477cf"
+      ],
+      "region_id": "japan",
+      "display_name": "田子の浦",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-be19905fb9c7",
+      "canonical_entity_ids": [
+        "jp-port-s10-be19905fb9c7"
+      ],
+      "region_id": "japan",
+      "display_name": "御前崎",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-bbd5e0e410af",
+      "canonical_entity_ids": [
+        "jp-port-s10-bbd5e0e410af"
+      ],
+      "region_id": "japan",
+      "display_name": "鹿島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-7a5a06691214",
+      "canonical_entity_ids": [
+        "jp-port-s10-7a5a06691214"
+      ],
+      "region_id": "japan",
+      "display_name": "石巻",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-b0a18a633eb3",
+      "canonical_entity_ids": [
+        "jp-port-s10-b0a18a633eb3"
+      ],
+      "region_id": "japan",
+      "display_name": "小名浜",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-f6d4ea08afe4",
+      "canonical_entity_ids": [
+        "jp-port-s10-f6d4ea08afe4"
+      ],
+      "region_id": "japan",
+      "display_name": "釜石",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-7aaed178aa08",
+      "canonical_entity_ids": [
+        "jp-strait-s10-7aaed178aa08"
+      ],
+      "region_id": "japan",
+      "display_name": "来島海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-cdf4da234e24",
+      "canonical_entity_ids": [
+        "jp-strait-s10-cdf4da234e24"
+      ],
+      "region_id": "japan",
+      "display_name": "友ヶ島水道（紀淡海峡）",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-5b6c2d466835",
+      "canonical_entity_ids": [
+        "jp-landform-s10-5b6c2d466835"
+      ],
+      "region_id": "japan",
+      "display_name": "松前半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-46e2dc31b37d",
+      "canonical_entity_ids": [
+        "jp-port-s10-46e2dc31b37d"
+      ],
+      "region_id": "japan",
+      "display_name": "直江津",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-270189889f7b",
+      "canonical_entity_ids": [
+        "jp-port-s10-270189889f7b"
+      ],
+      "region_id": "japan",
+      "display_name": "宮津",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-66acd31bc13e",
+      "canonical_entity_ids": [
+        "jp-landform-s10-66acd31bc13e"
+      ],
+      "region_id": "japan",
+      "display_name": "志摩半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-ce355e1d724b",
+      "canonical_entity_ids": [
+        "jp-landform-s10-ce355e1d724b"
+      ],
+      "region_id": "japan",
+      "display_name": "大隅半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-60c4cdea0e9a",
+      "canonical_entity_ids": [
+        "jp-landform-s10-60c4cdea0e9a"
+      ],
+      "region_id": "japan",
+      "display_name": "知多半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-e5b84eccf9b9",
+      "canonical_entity_ids": [
+        "jp-landform-s10-e5b84eccf9b9"
+      ],
+      "region_id": "japan",
+      "display_name": "種子島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-3e0dc1562f5d",
+      "canonical_entity_ids": [
+        "jp-landform-s10-3e0dc1562f5d"
+      ],
+      "region_id": "japan",
+      "display_name": "奄美大島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-31d8cb1b4b1d",
+      "canonical_entity_ids": [
+        "jp-landform-s10-31d8cb1b4b1d"
+      ],
+      "region_id": "japan",
+      "display_name": "徳之島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-7141bd115a6f",
+      "canonical_entity_ids": [
+        "jp-landform-s10-7141bd115a6f"
+      ],
+      "region_id": "japan",
+      "display_name": "沖永良部島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-f8cc56adb948",
+      "canonical_entity_ids": [
+        "jp-landform-s10-f8cc56adb948"
+      ],
+      "region_id": "japan",
+      "display_name": "屋久島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-820d302fe863",
+      "canonical_entity_ids": [
+        "jp-port-s10-820d302fe863"
+      ],
+      "region_id": "japan",
+      "display_name": "紋別",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-b9dc1732beef",
+      "canonical_entity_ids": [
+        "jp-port-s10-b9dc1732beef"
+      ],
+      "region_id": "japan",
+      "display_name": "花咲",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-abec7d48e4bd",
+      "canonical_entity_ids": [
+        "jp-port-s10-abec7d48e4bd"
+      ],
+      "region_id": "japan",
+      "display_name": "網走",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-9c30b99ccfb5",
+      "canonical_entity_ids": [
+        "jp-port-s10-9c30b99ccfb5"
+      ],
+      "region_id": "japan",
+      "display_name": "留萌",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-e56e2acc2374",
+      "canonical_entity_ids": [
+        "jp-port-s10-e56e2acc2374"
+      ],
+      "region_id": "japan",
+      "display_name": "苫小牧",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-dd1b72ecb6e1",
+      "canonical_entity_ids": [
+        "jp-port-s10-dd1b72ecb6e1"
+      ],
+      "region_id": "japan",
+      "display_name": "衣浦",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-ddae00e9445c",
+      "canonical_entity_ids": [
+        "jp-landform-s10-ddae00e9445c"
+      ],
+      "region_id": "japan",
+      "display_name": "宮古島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-66726f05a572",
+      "canonical_entity_ids": [
+        "jp-landform-s10-66726f05a572"
+      ],
+      "region_id": "japan",
+      "display_name": "西表島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-343cebe62107",
+      "canonical_entity_ids": [
+        "jp-landform-s10-343cebe62107"
+      ],
+      "region_id": "japan",
+      "display_name": "与那国島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-bb075170e40b",
+      "canonical_entity_ids": [
+        "jp-landform-s10-bb075170e40b"
+      ],
+      "region_id": "japan",
+      "display_name": "石垣島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-c26db81b5a15",
+      "canonical_entity_ids": [
+        "jp-landform-s10-c26db81b5a15"
+      ],
+      "region_id": "japan",
+      "display_name": "能登半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-9b76e12322e6",
+      "canonical_entity_ids": [
+        "jp-landform-s10-9b76e12322e6"
+      ],
+      "region_id": "japan",
+      "display_name": "島原半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-e5750abc7b1c",
+      "canonical_entity_ids": [
+        "jp-landform-s10-e5750abc7b1c"
+      ],
+      "region_id": "japan",
+      "display_name": "西彼杵半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-c02e094cd748",
+      "canonical_entity_ids": [
+        "jp-port-s10-c02e094cd748"
+      ],
+      "region_id": "japan",
+      "display_name": "佐世保",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-3db4f65f8e0b",
+      "canonical_entity_ids": [
+        "jp-port-s10-3db4f65f8e0b"
+      ],
+      "region_id": "japan",
+      "display_name": "細島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-d2cca28e3683",
+      "canonical_entity_ids": [
+        "jp-port-s10-d2cca28e3683"
+      ],
+      "region_id": "japan",
+      "display_name": "三角",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-10bdd0358523",
+      "canonical_entity_ids": [
+        "jp-port-s10-10bdd0358523"
+      ],
+      "region_id": "japan",
+      "display_name": "釧路",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-910917a88fe3",
+      "canonical_entity_ids": [
+        "jp-port-s10-910917a88fe3"
+      ],
+      "region_id": "japan",
+      "display_name": "室蘭",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-9f763809a654",
+      "canonical_entity_ids": [
+        "jp-port-s10-9f763809a654"
+      ],
+      "region_id": "japan",
+      "display_name": "柏崎",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-82bf204431de",
+      "canonical_entity_ids": [
+        "jp-port-s10-82bf204431de"
+      ],
+      "region_id": "japan",
+      "display_name": "能代",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-a133eebbc0c7",
+      "canonical_entity_ids": [
+        "jp-port-s10-a133eebbc0c7"
+      ],
+      "region_id": "japan",
+      "display_name": "境",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-faeadc6cf334",
+      "canonical_entity_ids": [
+        "jp-port-s10-faeadc6cf334"
+      ],
+      "region_id": "japan",
+      "display_name": "宇部",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-6363aaba5532",
+      "canonical_entity_ids": [
+        "jp-port-s10-6363aaba5532"
+      ],
+      "region_id": "japan",
+      "display_name": "浜田",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-e7cefb4afeb0",
+      "canonical_entity_ids": [
+        "jp-port-s10-e7cefb4afeb0"
+      ],
+      "region_id": "japan",
+      "display_name": "徳山下松",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-67cca5bacf8d",
+      "canonical_entity_ids": [
+        "jp-port-s10-67cca5bacf8d"
+      ],
+      "region_id": "japan",
+      "display_name": "萩",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-a04638b0a1c9",
+      "canonical_entity_ids": [
+        "jp-landform-s10-a04638b0a1c9"
+      ],
+      "region_id": "japan",
+      "display_name": "甑島列島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-8cc1ac429152",
+      "canonical_entity_ids": [
+        "jp-landform-s10-8cc1ac429152"
+      ],
+      "region_id": "japan",
+      "display_name": "天草諸島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-be9d6aa90e0b",
+      "canonical_entity_ids": [
+        "jp-landform-s10-be9d6aa90e0b"
+      ],
+      "region_id": "japan",
+      "display_name": "五島列島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-d1ededee79d3",
+      "canonical_entity_ids": [
+        "jp-landform-s10-d1ededee79d3"
+      ],
+      "region_id": "japan",
+      "display_name": "大隅諸島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-506052e483ae",
+      "canonical_entity_ids": [
+        "jp-landform-s10-506052e483ae"
+      ],
+      "region_id": "japan",
+      "display_name": "慶良間列島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-35daafa146d7",
+      "canonical_entity_ids": [
+        "jp-port-s10-35daafa146d7"
+      ],
+      "region_id": "japan",
+      "display_name": "相馬",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-11d1790e42b2",
+      "canonical_entity_ids": [
+        "jp-port-s10-11d1790e42b2"
+      ],
+      "region_id": "japan",
+      "display_name": "日立",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-620cb115ccf2",
+      "canonical_entity_ids": [
+        "jp-port-s10-620cb115ccf2"
+      ],
+      "region_id": "japan",
+      "display_name": "新居浜",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-6987e362e513",
+      "canonical_entity_ids": [
+        "jp-port-s10-6987e362e513"
+      ],
+      "region_id": "japan",
+      "display_name": "宇和島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-a8902df73d3a",
+      "canonical_entity_ids": [
+        "jp-port-s10-a8902df73d3a"
+      ],
+      "region_id": "japan",
+      "display_name": "松山",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-edef5c941618",
+      "canonical_entity_ids": [
+        "jp-port-s10-edef5c941618"
+      ],
+      "region_id": "japan",
+      "display_name": "坂出",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-4e7621c9a94b",
+      "canonical_entity_ids": [
+        "jp-port-s10-4e7621c9a94b"
+      ],
+      "region_id": "japan",
+      "display_name": "高松",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-775a9b69d694",
+      "canonical_entity_ids": [
+        "jp-landform-s10-775a9b69d694"
+      ],
+      "region_id": "japan",
+      "display_name": "伊豆半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-585c1a4107ce",
+      "canonical_entity_ids": [
+        "jp-port-s10-585c1a4107ce"
+      ],
+      "region_id": "japan",
+      "display_name": "須崎",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-d612724046f7",
+      "canonical_entity_ids": [
+        "jp-landform-s10-d612724046f7"
+      ],
+      "region_id": "japan",
+      "display_name": "奥尻島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-0ba1bab2b99a",
+      "canonical_entity_ids": [
+        "jp-landform-s10-0ba1bab2b99a"
+      ],
+      "region_id": "japan",
+      "display_name": "焼尻島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-c21e33d6a7de",
+      "canonical_entity_ids": [
+        "jp-landform-s10-c21e33d6a7de"
+      ],
+      "region_id": "japan",
+      "display_name": "天売島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-50ff817cd542",
+      "canonical_entity_ids": [
+        "jp-landform-s10-50ff817cd542"
+      ],
+      "region_id": "japan",
+      "display_name": "利尻島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-a7721e3b4537",
+      "canonical_entity_ids": [
+        "jp-landform-s10-a7721e3b4537"
+      ],
+      "region_id": "japan",
+      "display_name": "礼文島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-1c89531c9971",
+      "canonical_entity_ids": [
+        "jp-port-s10-1c89531c9971"
+      ],
+      "region_id": "japan",
+      "display_name": "博多",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-6290460f0c4d",
+      "canonical_entity_ids": [
+        "jp-landform-s10-6290460f0c4d"
+      ],
+      "region_id": "japan",
+      "display_name": "根室半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-d5a9d5c731fd",
+      "canonical_entity_ids": [
+        "jp-landform-s10-d5a9d5c731fd"
+      ],
+      "region_id": "japan",
+      "display_name": "積丹半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-0a3212609c3a",
+      "canonical_entity_ids": [
+        "jp-landform-s10-0a3212609c3a"
+      ],
+      "region_id": "japan",
+      "display_name": "知床半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-7ecde2b95aad",
+      "canonical_entity_ids": [
+        "jp-landform-s10-7ecde2b95aad"
+      ],
+      "region_id": "japan",
+      "display_name": "亀田半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-d44e35b225e4",
+      "canonical_entity_ids": [
+        "jp-strait-s10-d44e35b225e4"
+      ],
+      "region_id": "japan",
+      "display_name": "浦賀水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-b3f640646610",
+      "canonical_entity_ids": [
+        "jp-port-s10-b3f640646610"
+      ],
+      "region_id": "japan",
+      "display_name": "小樽",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-479b630e5724",
+      "canonical_entity_ids": [
+        "jp-port-s10-479b630e5724"
+      ],
+      "region_id": "japan",
+      "display_name": "志布志",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-eae0513ea38c",
+      "canonical_entity_ids": [
+        "jp-landform-s10-eae0513ea38c"
+      ],
+      "region_id": "japan",
+      "display_name": "宇土半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-5cd44c1b82bc",
+      "canonical_entity_ids": [
+        "jp-port-s10-5cd44c1b82bc"
+      ],
+      "region_id": "japan",
+      "display_name": "稚内",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-d1208d7023d9",
+      "canonical_entity_ids": [
+        "jp-landform-s10-d1208d7023d9"
+      ],
+      "region_id": "japan",
+      "display_name": "福江島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-6a199feb6c93",
+      "canonical_entity_ids": [
+        "jp-port-s10-6a199feb6c93"
+      ],
+      "region_id": "japan",
+      "display_name": "三池",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-d24e49891f06",
+      "canonical_entity_ids": [
+        "jp-port-s10-d24e49891f06"
+      ],
+      "region_id": "japan",
+      "display_name": "伊万里",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-25a4e5652018",
+      "canonical_entity_ids": [
+        "jp-strait-s10-25a4e5652018"
+      ],
+      "region_id": "japan",
+      "display_name": "諏訪之瀬水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-e0098a226c54",
+      "canonical_entity_ids": [
+        "jp-strait-s10-e0098a226c54"
+      ],
+      "region_id": "japan",
+      "display_name": "壱岐水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-77517faf769d",
+      "canonical_entity_ids": [
+        "jp-strait-s10-77517faf769d"
+      ],
+      "region_id": "japan",
+      "display_name": "中之島水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-0a6335cc3190",
+      "canonical_entity_ids": [
+        "jp-port-s10-0a6335cc3190"
+      ],
+      "region_id": "japan",
+      "display_name": "徳島小松島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-41550ae98813",
+      "canonical_entity_ids": [
+        "jp-port-s10-41550ae98813"
+      ],
+      "region_id": "japan",
+      "display_name": "三島川之江",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-cfb1c610d66a",
+      "canonical_entity_ids": [
+        "jp-port-s10-cfb1c610d66a"
+      ],
+      "region_id": "japan",
+      "display_name": "三田尻中関",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-2ea37098a284",
+      "canonical_entity_ids": [
+        "jp-landform-s10-2ea37098a284"
+      ],
+      "region_id": "japan",
+      "display_name": "島根半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-e4e96963758f",
+      "canonical_entity_ids": [
+        "jp-landform-s10-e4e96963758f"
+      ],
+      "region_id": "japan",
+      "display_name": "企救半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-f4e6efe9695f",
+      "canonical_entity_ids": [
+        "jp-strait-s10-f4e6efe9695f"
+      ],
+      "region_id": "japan",
+      "display_name": "吐噶喇海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-bed1c0d460b2",
+      "canonical_entity_ids": [
+        "jp-port-s10-bed1c0d460b2"
+      ],
+      "region_id": "japan",
+      "display_name": "厳原",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-e5763ac22e0b",
+      "canonical_entity_ids": [
+        "jp-port-s10-e5763ac22e0b"
+      ],
+      "region_id": "japan",
+      "display_name": "喜入",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-10ff52250645",
+      "canonical_entity_ids": [
+        "jp-port-s10-10ff52250645"
+      ],
+      "region_id": "japan",
+      "display_name": "那覇",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-3fd3c2f8ae35",
+      "canonical_entity_ids": [
+        "jp-port-s10-3fd3c2f8ae35"
+      ],
+      "region_id": "japan",
+      "display_name": "平良",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-ce2d30cc2d34",
+      "canonical_entity_ids": [
+        "jp-strait-s10-ce2d30cc2d34"
+      ],
+      "region_id": "japan",
+      "display_name": "口之島水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-695e56f9687c",
+      "canonical_entity_ids": [
+        "jp-port-s10-695e56f9687c"
+      ],
+      "region_id": "japan",
+      "display_name": "福井",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-ad8cb1a4d131",
+      "canonical_entity_ids": [
+        "jp-port-s10-ad8cb1a4d131"
+      ],
+      "region_id": "japan",
+      "display_name": "八代",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-bb3930e6356d",
+      "canonical_entity_ids": [
+        "jp-landform-s10-bb3930e6356d"
+      ],
+      "region_id": "japan",
+      "display_name": "佐田岬半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-4a34b179e100",
+      "canonical_entity_ids": [
+        "jp-landform-s10-4a34b179e100"
+      ],
+      "region_id": "japan",
+      "display_name": "佐賀関半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-0b6a4b3d4f68",
+      "canonical_entity_ids": [
+        "jp-strait-s10-0b6a4b3d4f68"
+      ],
+      "region_id": "japan",
+      "display_name": "根室海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-3649525463e1",
+      "canonical_entity_ids": [
+        "jp-strait-s10-3649525463e1"
+      ],
+      "region_id": "japan",
+      "display_name": "利尻水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-3b9cb8949f8c",
+      "canonical_entity_ids": [
+        "jp-strait-s10-3b9cb8949f8c"
+      ],
+      "region_id": "japan",
+      "display_name": "国後水道",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-3f3e03b52f7b",
+      "canonical_entity_ids": [
+        "jp-port-s10-3f3e03b52f7b"
+      ],
+      "region_id": "japan",
+      "display_name": "三河",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-38dc0570863b",
+      "canonical_entity_ids": [
+        "jp-landform-s10-38dc0570863b"
+      ],
+      "region_id": "japan",
+      "display_name": "重茂半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-27c5f4c32dd2",
+      "canonical_entity_ids": [
+        "jp-landform-s10-27c5f4c32dd2"
+      ],
+      "region_id": "japan",
+      "display_name": "渡島半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-d97bb3d520eb",
+      "canonical_entity_ids": [
+        "jp-port-s10-d97bb3d520eb"
+      ],
+      "region_id": "japan",
+      "display_name": "水島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-ef10deed5ece",
+      "canonical_entity_ids": [
+        "jp-port-s10-ef10deed5ece"
+      ],
+      "region_id": "japan",
+      "display_name": "苅田",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-cc13c4884f69",
+      "canonical_entity_ids": [
+        "jp-strait-s10-cc13c4884f69"
+      ],
+      "region_id": "japan",
+      "display_name": "種子島海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-eb33fe095854",
+      "canonical_entity_ids": [
+        "jp-port-s10-eb33fe095854"
+      ],
+      "region_id": "japan",
+      "display_name": "秋田船川",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-2cd2ad2b1f45",
+      "canonical_entity_ids": [
+        "jp-port-s10-2cd2ad2b1f45"
+      ],
+      "region_id": "japan",
+      "display_name": "青森",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-8c60996eb007",
+      "canonical_entity_ids": [
+        "jp-port-s10-8c60996eb007"
+      ],
+      "region_id": "japan",
+      "display_name": "名古屋",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-landform-s10-afee7c7cb683",
+      "canonical_entity_ids": [
+        "jp-landform-s10-afee7c7cb683"
+      ],
+      "region_id": "japan",
+      "display_name": "高縄半島",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-94bc51d8eca8",
+      "canonical_entity_ids": [
+        "jp-port-s10-94bc51d8eca8"
+      ],
+      "region_id": "japan",
+      "display_name": "宮古",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-2e9c5bca8481",
+      "canonical_entity_ids": [
+        "jp-port-s10-2e9c5bca8481"
+      ],
+      "region_id": "japan",
+      "display_name": "油津",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-strait-s10-bb121bfd7bee",
+      "canonical_entity_ids": [
+        "jp-strait-s10-bb121bfd7bee"
+      ],
+      "region_id": "japan",
+      "display_name": "津軽海峡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-port-s10-6d9141723e99",
+      "canonical_entity_ids": [
+        "jp-port-s10-6d9141723e99"
+      ],
+      "region_id": "japan",
+      "display_name": "大船渡",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-93061a619e5f",
+      "canonical_entity_ids": [
+        "eu-port-s10-93061a619e5f"
+      ],
+      "region_id": "europe",
+      "display_name": "Glasgow",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-4176e5015cc1",
+      "canonical_entity_ids": [
+        "eu-port-s10-4176e5015cc1"
+      ],
+      "region_id": "europe",
+      "display_name": "Aberdeen",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-a1967e3cd489",
+      "canonical_entity_ids": [
+        "eu-port-s10-a1967e3cd489"
+      ],
+      "region_id": "europe",
+      "display_name": "Stavanger",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-34453bf304d1",
+      "canonical_entity_ids": [
+        "eu-port-s10-34453bf304d1"
+      ],
+      "region_id": "europe",
+      "display_name": "Le Havre",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-426487b30131",
+      "canonical_entity_ids": [
+        "eu-port-s10-426487b30131"
+      ],
+      "region_id": "europe",
+      "display_name": "Brest",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-78b0515d5e33",
+      "canonical_entity_ids": [
+        "eu-port-s10-78b0515d5e33"
+      ],
+      "region_id": "europe",
+      "display_name": "Marseille",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-655a80abfec2",
+      "canonical_entity_ids": [
+        "eu-port-s10-655a80abfec2"
+      ],
+      "region_id": "europe",
+      "display_name": "Bordeaux",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-8d052e7f3ed8",
+      "canonical_entity_ids": [
+        "eu-port-s10-8d052e7f3ed8"
+      ],
+      "region_id": "europe",
+      "display_name": "Venezia",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-2fb7250fb812",
+      "canonical_entity_ids": [
+        "eu-port-s10-2fb7250fb812"
+      ],
+      "region_id": "europe",
+      "display_name": "Trieste",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-67f531365bc9",
+      "canonical_entity_ids": [
+        "eu-country-s10-67f531365bc9"
+      ],
+      "region_id": "europe",
+      "display_name": "Romania",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-4379784425f1",
+      "canonical_entity_ids": [
+        "eu-country-s10-4379784425f1"
+      ],
+      "region_id": "europe",
+      "display_name": "Federal Republic of Germany",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-ac93c19ff4c4",
+      "canonical_entity_ids": [
+        "eu-country-s10-ac93c19ff4c4"
+      ],
+      "region_id": "europe",
+      "display_name": "Republic of Latvia",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-f86d1d397de8",
+      "canonical_entity_ids": [
+        "eu-country-s10-f86d1d397de8"
+      ],
+      "region_id": "europe",
+      "display_name": "Republic of Lithuania",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-6287b4df29ee",
+      "canonical_entity_ids": [
+        "eu-country-s10-6287b4df29ee"
+      ],
+      "region_id": "europe",
+      "display_name": "Principality of Liechtenstein",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-85dab771e766",
+      "canonical_entity_ids": [
+        "eu-country-s10-85dab771e766"
+      ],
+      "region_id": "europe",
+      "display_name": "Grand Duchy of Luxembourg",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-acb4372f6b94",
+      "canonical_entity_ids": [
+        "eu-sea-s10-acb4372f6b94"
+      ],
+      "region_id": "europe",
+      "display_name": "Adriatic Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-fd034ac00318",
+      "canonical_entity_ids": [
+        "eu-sea-s10-fd034ac00318"
+      ],
+      "region_id": "europe",
+      "display_name": "Barents Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-s10-6e2132435212",
+      "canonical_entity_ids": [
+        "eu-strait-s10-6e2132435212"
+      ],
+      "region_id": "europe",
+      "display_name": "English Channel",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-234fde2092c4",
+      "canonical_entity_ids": [
+        "eu-port-s10-234fde2092c4"
+      ],
+      "region_id": "europe",
+      "display_name": "London",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-81c60819506a",
+      "canonical_entity_ids": [
+        "eu-port-s10-81c60819506a"
+      ],
+      "region_id": "europe",
+      "display_name": "Portsmouth",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-cd2d22a9a310",
+      "canonical_entity_ids": [
+        "eu-port-s10-cd2d22a9a310"
+      ],
+      "region_id": "europe",
+      "display_name": "Riga",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-0d6c850d7402",
+      "canonical_entity_ids": [
+        "eu-port-s10-0d6c850d7402"
+      ],
+      "region_id": "europe",
+      "display_name": "Bremerhaven",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-a92644a400ca",
+      "canonical_entity_ids": [
+        "eu-country-s10-a92644a400ca"
+      ],
+      "region_id": "europe",
+      "display_name": "Republic of Belarus",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-9b83e01c025a",
+      "canonical_entity_ids": [
+        "eu-sea-s10-9b83e01c025a"
+      ],
+      "region_id": "europe",
+      "display_name": "Gulf of Bothnia",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-a587718e840f",
+      "canonical_entity_ids": [
+        "eu-port-s10-a587718e840f"
+      ],
+      "region_id": "europe",
+      "display_name": "Barcelona",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-d3c090327556",
+      "canonical_entity_ids": [
+        "eu-country-s10-d3c090327556"
+      ],
+      "region_id": "europe",
+      "display_name": "Kingdom of Norway",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-bb16c47b74a4",
+      "canonical_entity_ids": [
+        "eu-country-s10-bb16c47b74a4"
+      ],
+      "region_id": "europe",
+      "display_name": "Kingdom of Sweden",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-629fc169d1d5",
+      "canonical_entity_ids": [
+        "eu-country-s10-629fc169d1d5"
+      ],
+      "region_id": "europe",
+      "display_name": "Republic of Finland",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-56f7ab9c7599",
+      "canonical_entity_ids": [
+        "eu-sea-s10-56f7ab9c7599"
+      ],
+      "region_id": "europe",
+      "display_name": "Ionian Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-9fee383bb86c",
+      "canonical_entity_ids": [
+        "eu-port-s10-9fee383bb86c"
+      ],
+      "region_id": "europe",
+      "display_name": "Sankt Peterburg",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-09a75d333d39",
+      "canonical_entity_ids": [
+        "eu-sea-s10-09a75d333d39"
+      ],
+      "region_id": "europe",
+      "display_name": "Bay of Biscay",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-s10-418604ddbe35",
+      "canonical_entity_ids": [
+        "eu-strait-s10-418604ddbe35"
+      ],
+      "region_id": "europe",
+      "display_name": "Strait of Gibraltar",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-98375c96685e",
+      "canonical_entity_ids": [
+        "eu-sea-s10-98375c96685e"
+      ],
+      "region_id": "europe",
+      "display_name": "Aegean Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-da3ebd3452d1",
+      "canonical_entity_ids": [
+        "eu-port-s10-da3ebd3452d1"
+      ],
+      "region_id": "europe",
+      "display_name": "Dublin",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-80555b273f3f",
+      "canonical_entity_ids": [
+        "eu-port-s10-80555b273f3f"
+      ],
+      "region_id": "europe",
+      "display_name": "Great Yarmouth",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-af957b2262b3",
+      "canonical_entity_ids": [
+        "eu-country-s10-af957b2262b3"
+      ],
+      "region_id": "europe",
+      "display_name": "Republic of Austria",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-country-s10-88efb9ca2b02",
+      "canonical_entity_ids": [
+        "eu-country-s10-88efb9ca2b02"
+      ],
+      "region_id": "europe",
+      "display_name": "French Republic",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-d2a9e2fde70c",
+      "canonical_entity_ids": [
+        "eu-port-s10-d2a9e2fde70c"
+      ],
+      "region_id": "europe",
+      "display_name": "Reykjavik",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-ec0bcf506acc",
+      "canonical_entity_ids": [
+        "eu-landform-s10-ec0bcf506acc"
+      ],
+      "region_id": "europe",
+      "display_name": "Iceland",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-cdc51dde5d55",
+      "canonical_entity_ids": [
+        "eu-landform-s10-cdc51dde5d55"
+      ],
+      "region_id": "europe",
+      "display_name": "Gotland",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-s10-b70efca07229",
+      "canonical_entity_ids": [
+        "eu-strait-s10-b70efca07229"
+      ],
+      "region_id": "europe",
+      "display_name": "Bristol Channel",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-s10-967aa188d0bb",
+      "canonical_entity_ids": [
+        "eu-strait-s10-967aa188d0bb"
+      ],
+      "region_id": "europe",
+      "display_name": "Bosporus",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-strait-s10-1f701ffa0f10",
+      "canonical_entity_ids": [
+        "eu-strait-s10-1f701ffa0f10"
+      ],
+      "region_id": "europe",
+      "display_name": "Dardanelles",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-67d4f306fad6",
+      "canonical_entity_ids": [
+        "eu-landform-s10-67d4f306fad6"
+      ],
+      "region_id": "europe",
+      "display_name": "Greenland",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-707c40c5de44",
+      "canonical_entity_ids": [
+        "eu-sea-s10-707c40c5de44"
+      ],
+      "region_id": "europe",
+      "display_name": "Irish Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-7859692ae7a6",
+      "canonical_entity_ids": [
+        "eu-sea-s10-7859692ae7a6"
+      ],
+      "region_id": "europe",
+      "display_name": "Black Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-sea-s10-c8b129c38fdd",
+      "canonical_entity_ids": [
+        "eu-sea-s10-c8b129c38fdd"
+      ],
+      "region_id": "europe",
+      "display_name": "Caspian Sea",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-port-s10-7c092f6f1713",
+      "canonical_entity_ids": [
+        "eu-port-s10-7c092f6f1713"
+      ],
+      "region_id": "europe",
+      "display_name": "Klaipeda",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-a59e5d953f12",
+      "canonical_entity_ids": [
+        "eu-landform-s10-a59e5d953f12"
+      ],
+      "region_id": "europe",
+      "display_name": "Great Britain",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-37d3e3e54172",
+      "canonical_entity_ids": [
+        "eu-landform-s10-37d3e3e54172"
+      ],
+      "region_id": "europe",
+      "display_name": "Malta",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-1574319e36a7",
+      "canonical_entity_ids": [
+        "eu-landform-s10-1574319e36a7"
+      ],
+      "region_id": "europe",
+      "display_name": "Isle of Man",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-3c061007f2c8",
+      "canonical_entity_ids": [
+        "eu-landform-s10-3c061007f2c8"
+      ],
+      "region_id": "europe",
+      "display_name": "Shetland Islands",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-eu-landform-s10-4155b05f3111",
+      "canonical_entity_ids": [
+        "eu-landform-s10-4155b05f3111"
+      ],
+      "region_id": "europe",
+      "display_name": "Orkney Islands",
+      "grouping_status": "singleton",
+      "reason": "試験で区別不要という根拠が未確認なので統合しない",
+      "merge_evidence": null
+    },
+    {
+      "id": "learn-jp-dgps-toimisaki-s12",
+      "canonical_entity_ids": [
+        "jp-dgps-toimisaki-s12"
+      ],
+      "region_id": "japan",
+      "display_name": "都井岬（DGPS局）",
+      "grouping_status": "singleton",
+      "merge_evidence": null,
+      "reason": "Service-specific identity; distinct from geographic feature/port/beacon"
+    },
+    {
+      "id": "learn-jp-dgps-kinkasan-s12",
+      "canonical_entity_ids": [
+        "jp-dgps-kinkasan-s12"
+      ],
+      "region_id": "japan",
+      "display_name": "金華山（DGPS局）",
+      "grouping_status": "singleton",
+      "merge_evidence": null,
+      "reason": "Service-specific identity; distinct from geographic feature/port/beacon"
+    },
+    {
+      "id": "learn-jp-dgps-murotomisaki-s12",
+      "canonical_entity_ids": [
+        "jp-dgps-murotomisaki-s12"
+      ],
+      "region_id": "japan",
+      "display_name": "室戸岬（DGPS局）",
+      "grouping_status": "singleton",
+      "merge_evidence": null,
+      "reason": "Service-specific identity; distinct from geographic feature/port/beacon"
+    },
+    {
+      "id": "learn-jp-dgps-tango-s12",
+      "canonical_entity_ids": [
+        "jp-dgps-tango-s12"
+      ],
+      "region_id": "japan",
+      "display_name": "丹後（DGPS局）",
+      "grouping_status": "singleton",
+      "merge_evidence": null,
+      "reason": "Service-specific identity; distinct from geographic feature/port/beacon"
+    }
+  ]
+}

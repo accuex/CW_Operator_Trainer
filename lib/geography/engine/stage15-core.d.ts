@@ -1,0 +1,10 @@
+import type {Store,Entity,Progress,ProgressEntry,Grade,Scope,Session,Outcome,Master,Checkpoint} from '../types';
+export const KEY:string,VERSION:number;
+export function empty():Progress;
+export function validate(p:unknown):Progress;
+export function openStore(storage:Pick<Storage,'getItem'|'setItem'>):Store;
+export function status(e?:ProgressEntry):'未練習'|'練習中'|'最近正解';
+export function choose(pool:Entity[],p:Progress,size?:string,weak?:boolean):Entity[];
+export function record(p:Progress,id:string,grade:Grade,meta:{area:string;scope:Scope;mode:string},sessionID:string,at?:string):void;
+export function result(s:Session):Outcome;
+export function validActive(a:Checkpoint|null,master:Master):boolean;

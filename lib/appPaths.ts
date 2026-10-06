@@ -10,6 +10,7 @@ export const APP_VIEWS = [
   'queue',
   'analysis',
   'exam',
+  'geography',
   'qso',
   'collection',
   'settings',

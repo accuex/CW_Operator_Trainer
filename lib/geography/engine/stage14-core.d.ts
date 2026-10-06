@@ -1,0 +1,15 @@
+import type {Master,Entity,Area,Scope,Point,Projection,Session,Grade} from '../types';
+export const SCOPES:Record<Scope,string>;
+export function selectedEntities(master:Master,rows:Entity[],area:string,scope:Scope):Entity[];
+export function sortEntities(rows:Entity[],sort:string):Entity[];
+export function drillPool(rows:Entity[]):Entity[];
+export function viewBounds(area:Area,entities:Entity[]):[number,number,number,number];
+export function projector(bounds:number[],W:number,H:number):Projection;
+export function nameMatches(e:Entity,text:string):boolean;
+export function toleranceFor(e:Entity,db:unknown,model:unknown,areas:Area[]):{bounds:number[];correct:number;sufficient:number;near:number};
+export function judge(e:Entity,p:Point,t:ReturnType<typeof toleranceFor>):{grade:Grade;accepted:boolean};
+export function sessionSummary(s:Session):{mastered:number;total:number;answers:number;correct:number;incorrect:number;retryIds:string[];remaining:number};
+export function createSession(ids:string[]):Session;
+export function nextSession(s:Session):string|null;
+export function recordSession(s:Session,id:string,grade:Grade):void;
+export function labels(points:{id:string;name:string;x:number;y:number;selected:boolean}[],W:number,H:number):{id:string;name:string;x:number;y:number;selected:boolean}[];

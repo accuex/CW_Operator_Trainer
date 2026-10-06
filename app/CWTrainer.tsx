@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { applyAchievements, achievementById } from '@/lib/achievements';
 import { APP_VERSION } from '@/lib/appMeta';
 import { loadAuthSession } from '@/lib/api/authSession';
@@ -35,6 +35,14 @@ import { SettingsView } from '@/app/views/SettingsView';
 import { AccountView } from '@/app/views/AccountView';
 import { trackPageView } from '@/app/components/GoogleAnalytics';
 import { markSfxBackground, unlockSfx, wakeSfx } from '@/app/trainer/sfx';
+
+const GeographyView = lazy(() => import('@/app/views/GeographyView'));
+
+// The geography view has an in-memory fallback. A blocked browser store must
+// not prevent its shared shell from mounting before that fallback can run.
+const readShellSettings = () => {
+  try { return loadSettings(); } catch { return DEFAULT_SETTINGS; }
+};
 
 const AUDIO_STATUS_LABEL: Record<string, string> = {
   READY: '待機中',
@@ -99,11 +107,11 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     setSignedIn(Boolean(loadAuthSession()));
     Promise.all([getProfile(), getAnswers(), getSessions()]).then(async ([savedProfile, savedAnswers, savedSessions]) => {
       const next = normalizeProfile(savedProfile);
-      setProfile(next); setAnswers(savedAnswers); setSessions(savedSessions); setSettings(loadSettings()); setReady(true);
+      setProfile(next); setAnswers(savedAnswers); setSessions(savedSessions); setSettings(readShellSettings()); setReady(true);
       if (next.goal) markTrainerStarted();
       void saveDataMeta();
       if (loadAuthSession()) await pullCloudPreferred();
-    }).catch(() => { setSettings(loadSettings()); setReady(true); });
+    }).catch(() => { setSettings(readShellSettings()); setReady(true); });
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => undefined);
     return () => audioEngine.stop();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,7 +172,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
 
   useEffect(() => {
     if (!ready || applyingCloudRef.current) return;
-    saveSettings(settings);
+    try { saveSettings(settings); } catch { /* Keep the shell usable when browser storage is blocked. */ }
     saveProfile(profile).catch(() => undefined);
     schedulePushState(profile, settings);
   }, [settings, profile, ready]);
@@ -259,7 +267,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     levelup: <LevelUpView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} record={record} setAudioStatus={setAudioStatus} onSession={onSession} />,
     queue: <QueueView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} onSession={onSession} />,
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
-    exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} />,
+    exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onGeography={() => navigate('geography')} />,
+    geography: ready ? <Suspense fallback={<p className="page-pad" role="status">地理教材を読み込んでいます…</p>}><GeographyView onBack={() => navigate('exam')} /></Suspense> : null,
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
@@ -296,12 +305,12 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             <button
               key={item.id}
               type="button"
-              className={`nav-item ${view === item.id ? 'active' : ''} ${item.primary ? 'primary' : 'secondary'}`}
+              className={`nav-item ${(view === item.id || view === 'geography' && item.id === 'exam') ? 'active' : ''} ${item.primary ? 'primary' : 'secondary'}`}
               onClick={() => {
                 if (item.id === 'exam' && view === 'exam') setExamDeskResetEpoch((value) => value + 1);
                 navigate(item.id);
               }}
-              aria-current={view === item.id ? 'page' : undefined}
+              aria-current={(view === item.id || view === 'geography' && item.id === 'exam') ? 'page' : undefined}
               title={item.id === 'exam' && view === 'exam' ? '科目選択に戻る' : item.title}
             >
               <Icon name={item.icon} size={22} />
