@@ -63,7 +63,8 @@ export interface RunCoreConfig<P extends CallerParams> {
   behaviour?: CallerBehaviour;
 }
 
-export interface LogFields { call: string; rst: string; name: string; qth: string }
+/** `nr`: a contest serial — present only where the mode has one, so other modes' books read as before. */
+export interface LogFields { call: string; rst: string; name: string; qth: string; nr?: string }
 
 export interface RunContact {
   id: string;
@@ -397,11 +398,10 @@ export class RunCore<P extends CallerParams = CallerParams> {
         this.partner = agent;
         this.closingSent = false;
         if (this.contactOf(agent)) return;
-        const { persona } = agent;
         this.contactList.push({
           id: `qso-${(this.seq += 1)}`,
           stationId: agent.id,
-          truth: { call: persona.call, rst: persona.rst, name: persona.name, qth: persona.qth },
+          truth: this.truthOf(agent),
           sentCalls: [],
           sentAt: [],
           doublings: 0,
@@ -456,6 +456,12 @@ export class RunCore<P extends CallerParams = CallerParams> {
     }
   }
 
+  /** What a station actually is and sends, for its contact (a contest adds its serial). */
+  protected truthOf(agent: CallerAgent): LogFields {
+    const { persona } = agent;
+    return { call: persona.call, rst: persona.rst, name: persona.name, qth: persona.qth };
+  }
+
   private contactOf(agent: Agent) {
     return this.contactList.find((contact) => contact.stationId === agent.id) ?? null;
   }
@@ -488,7 +494,9 @@ export class RunCore<P extends CallerParams = CallerParams> {
 }
 
 function cleanFields(fields: LogFields): LogFields {
-  return { call: normalizeCall(fields.call), rst: normalizeRst(fields.rst), name: normalizeWord(fields.name), qth: normalizeWord(fields.qth) };
+  const clean: LogFields = { call: normalizeCall(fields.call), rst: normalizeRst(fields.rst), name: normalizeWord(fields.name), qth: normalizeWord(fields.qth) };
+  if (fields.nr !== undefined) clean.nr = normalizeWord(fields.nr);
+  return clean;
 }
 
 function outcomeOf(contact: RunContact): ContactOutcome {

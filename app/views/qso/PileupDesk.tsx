@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import type { Station } from '@/lib/radio/band';
 import type { EarnedBadge } from '@/lib/radio/badges';
-import { AXIS_SPECS, describeMove, type Axis } from '@/lib/radio/difficulty';
+import { AXIS_SPECS, type Axis } from '@/lib/radio/difficulty';
 import { PILEUP_RST } from '@/lib/radio/exchange';
 import { pileupLevel, pileupParamsOf, PILEUP_LEVELS, type PileupAxes, type PileupLevelId } from '@/lib/radio/modes/pileupLevels';
 import { PileupSession, type PileupResult } from '@/lib/radio/modes/pileupRun';
@@ -686,9 +686,10 @@ export function PileupDesk({ rig, myCall, myName, myQth, axesFor, stored, auto, 
 
 /** One axis as おまかせ has moved it from the level. */
 function describeLevelMove(axis: Axis, now: number, from: number) {
+  // The level's value and where おまかせ has it now, as the numbers stand (a step's word would hide how far it went).
   const spec = AXIS_SPECS[axis];
-  if (axis === 'speed' || axis === 'pile') return `${spec.label} ${now}${spec.unit ?? ''}`;
-  return describeMove(axis, Math.round((now - from) * 100) / 100);
+  const value = (x: number) => String(Math.round(x * 100) / 100);
+  return `${spec.label} ${value(from)}→${value(now)}${spec.unit ? ` ${spec.unit}` : ''}`;
 }
 
 /** The status line when the coach has nothing to say: what Enter does now, from our own state. */

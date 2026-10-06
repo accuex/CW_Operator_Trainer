@@ -7,11 +7,13 @@ import { markCut } from '@/lib/radio/conditions';
 import { collectEvidence, fieldAnswers, scoreFields, type FieldResult } from '@/lib/radio/attribution';
 import { AXES, AXIS_SPECS, adjustDifficulty, describeMove, normalizeDifficulty, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
 import { PILEUP_ADAPT_AXES, updatePileupSkills } from '@/lib/radio/pileup/learning';
+import { CONTEST_ADAPT_AXES, contestOutcome, updateContestSkills, voteContestAxes } from '@/lib/radio/contest/learning';
+import { contestAxesOf, contestLevel, isContestLevel, type ContestLevelId } from '@/lib/radio/contest/levels';
 import { isPileupLevel, pileupAxesOf, pileupLevel, type PileupLevelId } from '@/lib/radio/modes/pileupLevels';
 import { PRESETS } from '@/lib/radio/exchange';
 import { QSO_MODES, qsoMode, type QsoSession } from '@/lib/radio/modes';
 import { isProcedureIssue, MIN_TARGET_WPM } from '@/lib/radio/qso';
-import { TIER_LABEL, badgeById, recordQsoOutcome, recordRunOutcome, type EarnedBadge } from '@/lib/radio/badges';
+import { TIER_LABEL, badgeById, recordQsoOutcome, recordRunOutcome, type EarnedBadge, type RunOutcome } from '@/lib/radio/badges';
 import { modeProgress, normalizeQsoProfile, recommendStage, updateSkills } from '@/lib/radio/skills';
 import { logbookEntries } from '@/lib/radio/logbook';
 import { traceRx, type QsoTrace } from '@/lib/radio/trace';
@@ -20,6 +22,7 @@ import { nowId } from '@/app/trainer/shared';
 import { Icon } from '@/app/components/icons';
 import { FieldCells } from './qso/FieldCells';
 import { CqRunDesk, type RunRecord, type RunSaved } from './qso/CqRunDesk';
+import { ContestDesk, CONTEST_RIG_LEVELS, type ContestSaveRecord } from './qso/ContestDesk';
 import { PileupDesk, PILEUP_RIG_LEVELS } from './qso/PileupDesk';
 import { RigPanel } from './qso/RigPanel';
 import { useRig, type Capture, type PowerResult } from './qso/useRig';
@@ -83,7 +86,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
   const advice = recommendStage(qso);
 
   // The pileup's band is its own (its levels don't use these axes yet).
-  const band = mode.kind === 'pileup' ? PILEUP_RIG_LEVELS : difficulty;
+  const band = mode.kind === 'pileup' ? PILEUP_RIG_LEVELS : mode.kind === 'contest' ? CONTEST_RIG_LEVELS : difficulty;
   const rig = useRig({ pitch: settings.pitch, stopEpoch, levels: { af: prefs.af, noise: band.noise, qrn: band.qrn, qsb: band.qsb } });
   const { engineRef, txOn, newCapture } = rig;
   const [step, setStep] = useState(0);
@@ -334,6 +337,58 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     return { moved: adjusted.moved, auto: current.auto, earned, marked };
   };
 
+  /**
+   * Contest QRT: the answers and the session record (its summary is what syncs), the
+   * shared and contest skills, badges, and おまかせ on the axes its causes speak for
+   * (contest/learning.ts) — never on procedure, logging, DUPE or dropped contacts.
+   */
+  const saveContest = (record: ContestSaveRecord): RunSaved => {
+    recordMany(record.answers);
+    const modeId = record.summary.modeId;
+    const current = modeProgress(qso, modeId, difficulty);
+    const pinned = [...current.pinned, ...AXES.filter((axis) => !(CONTEST_ADAPT_AXES as readonly Axis[]).includes(axis))];
+    // From the axes it ran at; votes carry over only within the same level.
+    const state = { difficulty: normalizeDifficulty({ ...record.axes }, current.difficulty as DifficultyVector), votes: current.level === record.level ? current.votes : {} };
+    const adjusted = current.auto
+      ? adjustDifficulty(state, record.analysis.evidence, pinned, voteContestAxes(record.analysis))
+      : { ...state, moved: {} };
+    const runOutcome: RunOutcome = {
+      contacts: record.contacts, alphabet: 'international', at: record.endedAt, seconds: record.review.seconds,
+      frequencyChecks: 0, busyAvoided: 0, cleanContacts: 0, cleanRate: 0, contest: contestOutcome(record.review, record.analysis),
+    };
+    const { earned, marked } = recordRunOutcome(qso, runOutcome);
+    onSession({
+      id: record.id,
+      startedAt: record.startedAt,
+      endedAt: record.endedAt,
+      mode: 'qso',
+      alphabetType: 'international',
+      answers: record.answers.length,
+      accuracy: record.answers.length ? record.answers.filter((answer) => answer.isCorrect).length / record.answers.length : 0,
+      qso: { ...record.summary, adjusted: adjusted.moved },
+    });
+    const logged = record.summary.contest?.logged ?? 0;
+    updateQso((old) => {
+      const skilled = updateSkills(old, { modeId, alphabet: 'international', wpm: record.wpm, evidence: record.analysis.evidence });
+      const next = recordRunOutcome(updateContestSkills(skilled, record.analysis, modeId), runOutcome).qso;
+      const base = modeProgress(old, modeId, difficulty);
+      return {
+        ...next,
+        modes: {
+          ...next.modes,
+          [modeId]: { ...base, qsos: base.qsos + logged, lastAt: record.endedAt, level: record.level, difficulty: adjusted.difficulty, votes: adjusted.votes },
+        },
+      };
+    });
+    return { moved: adjusted.moved, auto: current.auto, earned, marked };
+  };
+
+  /** Where a contest level starts: as おまかせ left it when that is the level last run, else the level's own axes. */
+  const contestAxesFor = (level: ContestLevelId) => {
+    const axes = contestLevel(level).axes;
+    return progress.level === level ? contestAxesOf(progress.difficulty, axes) : axes;
+  };
+
   /** Where a pileup level starts: as おまかせ left it when that is the level last run, else the level's own axes. */
   const pileupAxesFor = (level: PileupLevelId) => {
     const axes = pileupLevel(level).axes;
@@ -400,6 +455,20 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           onAuto={(auto) => updateMode({ auto })}
           onResetLevel={(level) => updateMode({ level, difficulty: { ...progress.difficulty, ...pileupLevel(level).axes }, votes: {} })}
           onSave={saveRun}
+        />
+      ) : mode.kind === 'contest' ? (
+        <ContestDesk
+          key={mode.id}
+          rig={rig}
+          myCall={myCall}
+          myName={qso.myName ?? ''}
+          myQth={qso.myQth ?? ''}
+          axesFor={contestAxesFor}
+          stored={isContestLevel(progress.level) ? progress.level : null}
+          auto={progress.auto}
+          onAuto={(auto) => updateMode({ auto })}
+          onResetLevel={(level) => updateMode({ level, difficulty: { ...progress.difficulty, ...contestLevel(level).axes }, votes: {} })}
+          onSave={saveContest}
         />
       ) : mode.kind === 'run' ? (
         <CqRunDesk
@@ -493,7 +562,12 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         {mode.kind === 'pileup' ? (
           <>
             <div className="qso-panel-head"><h2>設定</h2></div>
-            <p className="qso-note">パイルアップの難しさは、デスクのレベル（入門〜DX級）で選びます。おまかせ調整はまだありません。</p>
+            <p className="qso-note">パイルアップの難しさは、デスクのレベル（入門〜DX級）で選びます。おまかせ調整は、ミスの原因に関係する軸（速さ・呼ぶ局数・似たコール・弱信号・集中度）だけを動かします。</p>
+          </>
+        ) : mode.kind === 'contest' ? (
+          <>
+            <div className="qso-panel-head"><h2>設定</h2></div>
+            <p className="qso-note">コンテストの難しさは、デスクのレベル（入門〜エキスパート）で選びます。おまかせ調整は、ミスの原因に関係する軸（速さ・呼ぶ局の多さ・似たコール・弱信号・番号の難しさ）だけを動かします。各レベルの値は暫定です。</p>
           </>
         ) : <>
         <div className="qso-panel-head">
@@ -549,7 +623,7 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
           </label>
           <label>AF 音量 <b>{Math.round(prefs.af * 100)}</b><input type="range" min={0} max={1} step={0.01} value={prefs.af} onChange={(event) => setPrefs({ ...prefs, af: Number(event.target.value) })} /></label>
         </div>
-        {mode.kind !== 'pileup' && <p className="qso-note">速さ・弱信号・ドリフトは次の局から反映されます（QRS で相手を遅くできます）。ピッチは全体の設定に従います。</p>}
+        {mode.kind !== 'pileup' && mode.kind !== 'contest' && <p className="qso-note">速さ・弱信号・ドリフトは次の局から反映されます（QRS で相手を遅くできます）。ピッチは全体の設定に従います。</p>}
       </div>
 
       <div className="panel panel-pad qso-logbook">

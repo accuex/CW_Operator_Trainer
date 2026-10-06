@@ -1,4 +1,8 @@
 import type { QsoEvidence } from './difficulty';
+import type { AirLine } from './contest/analysis';
+import type { ContestReview, DeskSent, ReviewSource } from './contest/review';
+import type { ContestScoredContact } from './contest/score';
+import type { ContestParams } from './contest/levels';
 import type { RunIssue, RunParams, RunResult } from './modes/cqRun';
 import type { PileupParams } from './modes/pileupLevels';
 import type { PileupResult } from './modes/pileupRun';
@@ -48,6 +52,8 @@ export interface RunTrace<R extends RunBooks = RunResult, P = RunParams> {
   earned: { id: string; tier: number }[];
   /** A pileup's own record: what the review redraws its timeline from. */
   pileup?: PileupTraceDetail;
+  /** A contest's own record: the review as built at QRT and what the desk sent. */
+  contest?: ContestTraceDetail;
 }
 
 /** Any stored run, whatever its mode (narrow by modeId). */
@@ -64,6 +70,30 @@ export interface PileupTraceDetail {
 }
 
 export type PileupTrace = RunTrace<PileupResult, PileupParams> & { pileup: PileupTraceDetail };
+/** A contest's result as stored: its rules by id (the rules hold functions, which IndexedDB can't keep). */
+export type StoredContestResult = ReviewSource;
+
+export interface ContestTraceDetail {
+  level: string;
+  /** Our keying speed at QRT. */
+  wpm: number;
+  /** Planned length, minutes (0 = open-ended). */
+  minutes: number;
+  /** What the desk sent, seconds from the start. */
+  sent: DeskSent[];
+  /** The review as built at QRT: what the stored record shows again. */
+  review: ContestReview;
+  /** Each contact judged character by character (Stage 4; absent on older records). */
+  scored?: ContestScoredContact[];
+  /** The callers' messages as we received them, seconds from the start (device only). */
+  air?: AirLine[];
+  /** The analysis version the run was judged with (the causes are derived again from the above). */
+  analysisVersion?: number;
+}
+
+export type ContestTrace = RunTrace<StoredContestResult, ContestParams> & { contest: ContestTraceDetail };
+export const isContestTrace = (trace: AnyRunTrace): trace is ContestTrace => Boolean((trace as { contest?: unknown }).contest);
+
 export const isPileupTrace = (trace: AnyRunTrace): trace is PileupTrace => Boolean(trace.pileup);
 
 /** A short line for the list of stored runs. */

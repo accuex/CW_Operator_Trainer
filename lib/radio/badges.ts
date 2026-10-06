@@ -1,9 +1,10 @@
-import type { AlphabetType, PileupStats, QsoBadgeRecord, QsoCharMark, QsoEnvCondition, QsoProfile, QsoStats } from '../types';
+import type { AlphabetType, ContestStats, PileupStats, QsoBadgeRecord, QsoCharMark, QsoEnvCondition, QsoProfile, QsoStats } from '../types';
 import { isEnvCondition } from './conditions';
 import type { FieldResult } from './attribution';
 import type { QsoEvidence } from './difficulty';
 import type { QsoIssue } from './qso';
 import { QRL_LISTEN } from './modes/cqRun';
+import type { ContestOutcome } from './contest/learning';
 import type { PileupOutcome } from './pileup/learning';
 
 /**
@@ -35,6 +36,10 @@ export const PILEUP_RUN_PICKS = 5;
 /** …and as calm with at most this many calls sent over the station (doubled). */
 export const PILEUP_CALM_DOUBLED = 1;
 
+/** A contest run counts toward its rate and clean-run badges from this long, with at least this many lines. */
+export const CONTEST_RUN_SECONDS = 600;
+export const CONTEST_RUN_LINES = 10;
+
 /** A character gets its mark after this many clean, correct copies at MARK_WPM or faster. */
 export const MARK_WPM = 18;
 export const MARK_COUNT = 5;
@@ -49,6 +54,7 @@ const env = (condition: QsoEnvCondition) => (stats: QsoStats) => stats.envCorrec
 const counter = (key: 'zeroIn' | 'freehand' | 'callsign' | 'frequencyChecks') => (stats: QsoStats) => stats[key] ?? 0;
 const bestRate = (stats: QsoStats) => stats.bestRate ?? 0;
 const pileup = (key: keyof PileupStats) => (stats: QsoStats) => stats.pileup?.[key] ?? 0;
+const contest = (key: keyof ContestStats) => (stats: QsoStats) => stats.contest?.[key] ?? 0;
 const counted = (value: BadgeTierDef['value'], goals: [number, number, number], unit: string): BadgeDef['tiers'] =>
   goals.map((goal) => ({ goal, label: `${goal} ${unit}`, value })) as BadgeDef['tiers'];
 
@@ -114,18 +120,47 @@ export const BADGES: BadgeDef[] = [
       { goal: 75, label: '75 局/h', value: pileup('bestRate') },
     ],
   },
+  // Contest goals are provisional until Stage 5 measures what runs at each level give.
+  { id: 'contest', title: 'コンテスト', description: 'コンテストで、ログチェックを通った（BUST・NIL・DUPE でない）交信の数（1 局目から数えます）', unit: '局', tiers: counted(contest('qsos'), [1, 100, 500], '局') },
+  {
+    id: 'contest-streak',
+    title: 'ミスなく続ける',
+    description: '1 回のコンテストで、BUST も NIL もなくログチェックを通った交信が続いた最長の数（DUPE は数えず、途切れもしません）',
+    unit: '局',
+    tiers: counted(contest('bestStreak'), [10, 25, 50], '局'),
+  },
+  {
+    id: 'contest-rate',
+    title: 'コンテストのレート',
+    description: `${CONTEST_RUN_SECONDS / 60} 分以上のコンテストで、ログチェックを通った交信の 1 時間あたりの数（ラン全体・最高記録）`,
+    unit: '/h',
+    tiers: [
+      { goal: 30, label: '30 局/h', value: contest('bestRate') },
+      { goal: 60, label: '60 局/h', value: contest('bestRate') },
+      { goal: 90, label: '90 局/h', value: contest('bestRate') },
+    ],
+  },
+  {
+    id: 'contest-clean',
+    title: 'クリーンログ',
+    description: `${CONTEST_RUN_SECONDS / 60} 分以上・${CONTEST_RUN_LINES} 交信以上のコンテストで、BUST・NIL・交換後の破棄が 1 つもなかったラン`,
+    unit: 'ラン',
+    tiers: counted(contest('cleanRuns'), [1, 5, 20], 'ラン'),
+  },
 ];
 
 export const badgeById = (id: string) => BADGES.find((badge) => badge.id === id);
 
 export const emptyPileupStats = (): PileupStats => ({ contacts: 0, narrowed: 0, similar: 0, calmRuns: 0, bestRate: 0 });
 
+export const emptyContestStats = (): ContestStats => ({ qsos: 0, bestStreak: 0, bestRate: 0, cleanRuns: 0 });
+
 export const emptyStats = (): QsoStats => ({ fastClean: {}, envCorrect: {}, zeroIn: 0, freehand: 0, callsign: 0 });
 
 export function normalizeStats(raw: Partial<QsoStats> | undefined): QsoStats {
   const base = emptyStats();
   if (!raw || typeof raw !== 'object') return base;
-  return { ...base, ...raw, fastClean: { ...raw.fastClean }, envCorrect: { ...raw.envCorrect }, ...(raw.pileup ? { pileup: { ...emptyPileupStats(), ...raw.pileup } } : {}) };
+  return { ...base, ...raw, fastClean: { ...raw.fastClean }, envCorrect: { ...raw.envCorrect }, ...(raw.pileup ? { pileup: { ...emptyPileupStats(), ...raw.pileup } } : {}), ...(raw.contest ? { contest: { ...emptyContestStats(), ...raw.contest } } : {}) };
 }
 
 /** Tier the counters currently support (0 = none). Tiers must be met in order. */
@@ -232,6 +267,8 @@ export interface RunOutcome {
   cleanRate: number;
   /** A pileup: its own counters, and no CQ-run rate or frequency checks. */
   pileup?: PileupOutcome;
+  /** A contest: its own counters, and no CQ-run rate or frequency checks. */
+  contest?: ContestOutcome;
 }
 
 /** Fold a whole run in: each contact like a QSO, then the run's own procedure and rate. */
@@ -245,6 +282,7 @@ export function recordRunOutcome(qso: QsoProfile, run: RunOutcome): { qso: QsoPr
   }
   const stats = normalizeStats(next.stats);
   if (run.pileup) foldPileup(stats, run.pileup);
+  else if (run.contest) foldContest(stats, run.contest);
   else {
     stats.frequencyChecks = (stats.frequencyChecks ?? 0) + run.frequencyChecks + run.busyAvoided;
     if (run.seconds >= RATE_MIN_SECONDS && run.cleanContacts >= RATE_MIN_CONTACTS) stats.bestRate = Math.max(stats.bestRate ?? 0, Math.round(run.cleanRate));
@@ -267,4 +305,14 @@ function foldPileup(stats: QsoStats, run: PileupOutcome) {
   if (counts && run.doubledPicks <= PILEUP_CALM_DOUBLED) pile.calmRuns += 1;
   if (counts && run.contacts >= RATE_MIN_CONTACTS) pile.bestRate = Math.max(pile.bestRate, Math.round(run.cleanRate));
   stats.pileup = pile;
+}
+
+function foldContest(stats: QsoStats, run: ContestOutcome) {
+  const contest = { ...emptyContestStats(), ...stats.contest };
+  contest.qsos += run.qsos;
+  contest.bestStreak = Math.max(contest.bestStreak, run.streak);
+  const counts = run.seconds >= CONTEST_RUN_SECONDS && run.lines >= CONTEST_RUN_LINES;
+  if (counts) contest.bestRate = Math.max(contest.bestRate, run.rate);
+  if (counts && run.faults === 0) contest.cleanRuns += 1;
+  stats.contest = contest;
 }

@@ -15,7 +15,7 @@ import type { ActionKind } from '../pileup/nextAction';
 import { callerSnaps, StepRecorder, type DeskStep } from '../pileup/review';
 import type { RunScore } from '../runReview';
 import { seeded } from '../random';
-import { HeadlessRadio, type SimBand } from './runSim';
+import { HeadlessRadio, type SimAirEvent, type SimBand } from './runSim';
 
 /**
  * Headless pileup: PileupSession and its callers, the band sampled every 100 ms as the
@@ -37,6 +37,8 @@ export interface PileupSimOptions {
   drain?: number;
   /** Every input the bot got and what it did, in order (replay tests). */
   record?: boolean;
+  /** Every transmission on the air, ours ('me') and every station's, as it is keyed (golden tests). */
+  onAir?: (event: SimAirEvent) => void;
 }
 
 /** One thing the bot was given, or did. */
@@ -104,7 +106,7 @@ export const PILEUP_BAND: SimBand = { noise: 0.2, qsb: 0, qrn: 0, qrm: 0 };
 /** Total stations keyed on a character (the copied one plus `n` others) as the analysis buckets them. */
 const bucketOf = (n: number) => (n + 1 >= 4 ? '4+' : n + 1 >= 2 ? '2-3' : '1');
 
-export function runPileupSim({ seed, level = 'intermediate', axes, params, bot: botId = 'average', band = PILEUP_BAND, duration = 300, drain = 1500, record = false }: PileupSimOptions): PileupSimReport {
+export function runPileupSim({ seed, level = 'intermediate', axes, params, bot: botId = 'average', band = PILEUP_BAND, duration = 300, drain = 1500, record = false, onAir }: PileupSimOptions): PileupSimReport {
   const random = seeded(seed);
   const radio = new HeadlessRadio(random);
   const sessionParams = { ...pileupParamsOf({ ...pileupLevel(level).axes, ...axes }), ...params };
@@ -134,6 +136,7 @@ export function runPileupSim({ seed, level = 'intermediate', axes, params, bot: 
   const recorder = new StepRecorder();
   const records: RxRecord[] = [];
   radio.onTransmission = (station, tx) => {
+    onAir?.({ from: station.id, text: tx.text, rf: station.rf, start: tx.start, end: tx.start + tx.length, wpm: station.wpm });
     run.onStationTransmission(station, tx);
     const agent = run.agents.find((item) => item.id === station.id);
     if (agent) recorder.heard(agent, tx);
@@ -187,6 +190,7 @@ export function runPileupSim({ seed, level = 'intermediate', axes, params, bot: 
     if (action.move === 'call') {
       picks.push({ moves: cycle.moves, seconds: Math.max(0, start - cycle.from), via: lastPartial && cycle.moves > 1 ? 'partial' : 'direct' });
     }
+    onAir?.({ from: 'me', text: action.text, rf: VFO, start, end });
     run.transmit(action.text, { start, end, rf: VFO });
     recorder.sent({ at: start, end, text: action.text, kind: KIND[action.move], subject: action.piece ?? action.call, working, callers: callerSnaps(run.agents, VFO) });
     bot.keyed(end);
@@ -330,7 +334,7 @@ function departedBefore(agent: CallerAgent, at: number) {
   return agent.goneAt !== null && agent.goneAt <= at;
 }
 
-function tallyOverlap(record: RxRecord, heard: Heard, judged: CharJudgement[], overlap: PileupSimReport['overlap']) {
+export function tallyOverlap(record: RxRecord, heard: Heard, judged: CharJudgement[], overlap: PileupSimReport['overlap']) {
   const copied = heard.words.join('');
   const spans = record.tx.chars;
   if (copied.length !== spans.reduce((sum, span) => sum + span.char.length, 0)) return;
@@ -358,7 +362,7 @@ function tallyOverlap(record: RxRecord, heard: Heard, judged: CharJudgement[], o
  * (A novice-style caller doesn't hold for traffic: a pick that fit nobody it knows of
  * leaves it calling.)
  */
-function checkNotes(notes: AgentNote[], delivered: AirEvent[], run: PileupSession, t: number, pickHeardBy: Set<number>, standingBy: Map<number, string | null>, breach: (t: number, kind: string, detail: string) => void) {
+export function checkNotes(notes: AgentNote[], delivered: AirEvent[], run: { agents: readonly CallerAgent[] }, t: number, pickHeardBy: Set<number>, standingBy: Map<number, string | null>, breach: (t: number, kind: string, detail: string) => void) {
   const ours = delivered.filter((event) => event.from === 'me' && event.intent);
   const cue = ours.some((event) => event.intent!.cq || event.intent!.qrz || event.intent!.agn || event.intent!.qrs || event.intent!.partial);
   for (const note of notes) {
@@ -380,7 +384,7 @@ function checkNotes(notes: AgentNote[], delivered: AirEvent[], run: PileupSessio
 }
 
 /** Reactions only from callers whose manners allow them, and each the kind it claims to be. */
-function checkReactions(agent: CallerAgent, breach: (t: number, kind: string, detail: string) => void) {
+export function checkReactions(agent: CallerAgent, breach: (t: number, kind: string, detail: string) => void) {
   const m = agent.manners;
   for (const reaction of agent.reactions) {
     const { kind, partial } = reaction;

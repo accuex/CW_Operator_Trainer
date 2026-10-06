@@ -77,12 +77,34 @@ export function dxExchangeText(p: StationPersona, me: { call: string }, sends: r
   }
 }
 
+/**
+ * A contest exchange: the report and its serial (`nr`, already as it keys it — cut
+ * numbers and all), short as contesters send it: "5NN 023", "5NN 023 023",
+ * "R TU 5NN 023", a novice's "R 599 023 023 K".
+ */
+export function contestExchangeText(p: StationPersona, me: { call: string }, nr: string) {
+  const rst = rstOf(p);
+  switch (p.style) {
+    case 'once': return `${rst} ${nr}`;
+    case 'twice': return `${rst} ${twice(nr)}`;
+    case 'formal': return `R TU ${rst} ${nr}`;
+    // A novice spells it out but keeps it short: its call and ours are long at its speed.
+    case 'novice': return `R ${rst} ${twice(nr)} K`;
+  }
+}
+
+/** A contest's answer to NR? / CALL? / RST?: just the values, twice ("023 023", "JA1ABC JA1ABC"). */
+export function contestFieldsText(p: StationPersona, fields: AskField[], nr: string) {
+  const value: Partial<Record<AskField, string>> = { RST: rstOf(p), NR: nr, CALL: p.call };
+  return fields.map((field) => value[field]).filter(Boolean).map((text) => twice(text!)).join(' ');
+}
+
 export const askText = (p: StationPersona, fields: AskField[]) =>
   `${p.style === 'formal' || p.style === 'novice' ? 'PSE ' : ''}${fields.map((field) => `${field}?`).join(' ')}`;
 
 /** Only the fields we asked for again. */
 export function fieldsText(p: StationPersona, fields: AskField[]) {
-  const value: Record<AskField, string> = { RST: rstOf(p), NAME: p.name, QTH: p.qth };
+  const value: Record<AskField, string> = { RST: rstOf(p), NAME: p.name, QTH: p.qth, NR: '', CALL: p.call };
   return fields.map((field) => `${field} ${twice(value[field])}`).join(' ');
 }
 

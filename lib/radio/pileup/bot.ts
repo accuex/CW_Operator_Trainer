@@ -93,23 +93,23 @@ const REPLY_SLACK = 0.3;
  * `charTime`: seconds a character took in the call it sent — how slow a hand it is, and so
  * how long its answer may take (measured per character: a short call says nothing of a long answer).
  */
-interface Partner { call: string; pitch: number; level: number; charTime: number; agn: number; recalls: number; corrections: number }
+export interface Partner { call: string; pitch: number; level: number; charTime: number; agn: number; recalls: number; corrections: number }
 
 export class PileupBot {
   readonly logs: BotLog[] = [];
-  private inbox: Heard[] = [];
-  private partner: Partner | null = null;
-  private listenFrom = 0;
-  private lastCarrier = Number.NEGATIVE_INFINITY;
+  protected inbox: Heard[] = [];
+  protected partner: Partner | null = null;
+  protected listenFrom = 0;
+  protected lastCarrier = Number.NEGATIVE_INFINITY;
   /** Last time a tone was keyed near the pitch of the station it is working. */
   private lastPartnerTone = Number.NEGATIVE_INFINITY;
   private started = false;
   /** Consecutive transmissions in the pick without progress. */
-  private blind = 0;
-  private partialsInRow = 0;
-  private worked = new Set<string>();
+  protected blind = 0;
+  protected partialsInRow = 0;
+  protected worked = new Set<string>();
 
-  constructor(readonly profile: BotProfile, private me: string, private random: Random) {}
+  constructor(readonly profile: BotProfile, protected me: string, protected random: Random) {}
 
   /** A transmission it copied (as copied). */
   hear(heard: Heard) { this.inbox.push(heard); }
@@ -129,7 +129,7 @@ export class PileupBot {
     if (!this.started) {
       if (sense.qrt) return null;
       this.started = true;
-      return { text: `CQ DE ${this.me} ${this.me} K`, move: 'cq' };
+      return { text: this.cqText(), move: 'cq' };
     }
     const { minListen, quietGap, maxListen } = this.profile;
     const since = sense.t - this.listenFrom;
@@ -152,7 +152,7 @@ export class PileupBot {
     return this.partner ? this.work(this.partner, sense) : this.pick(sense);
   }
 
-  private pick(sense: BotSense): BotAction | null {
+  protected pick(sense: BotSense): BotAction | null {
     if (sense.qrt) return null;
     const heard = this.inbox;
     const calls = this.callsIn(heard);
@@ -161,7 +161,7 @@ export class PileupBot {
       this.partner = { call: best.call, pitch: best.pitch, level: best.level, charTime: best.charTime, agn: 0, recalls: 0, corrections: 0 };
       this.blind = 0;
       this.partialsInRow = 0;
-      return { text: `${best.call} 5NN`, move: 'call', call: best.call };
+      return { text: this.callText(best.call), move: 'call', call: best.call };
     }
     const pieces = this.piecesIn(heard);
     if (pieces.length && this.profile.partials && this.partialsInRow < 3) {
@@ -179,7 +179,7 @@ export class PileupBot {
     return { text: 'QRZ?', move: 'qrz' };
   }
 
-  private work(partner: Partner, sense: BotSense): BotAction | null {
+  protected work(partner: Partner, sense: BotSense): BotAction | null {
     const heard = this.inbox;
     const tolerance = this.profile.pitchTolerance;
     const fromPartner = heard.filter((item) => this.fromPartner(item, partner));
@@ -190,14 +190,14 @@ export class PileupBot {
     if (corrected && partner.corrections < 2) {
       partner.corrections += 1;
       partner.call = corrected.call;
-      return { text: `${partner.call} 5NN`, move: 'correct', call: partner.call };
+      return { text: this.callText(partner.call), move: 'correct', call: partner.call };
     }
     const reportElsewhere = elsewhere.find((item) => item.words.some((word) => RST.test(word)));
     if (!report && reportElsewhere) {
       if (partner.recalls < 1 && this.random() < this.profile.hijackCheck) {
         // A report back from another pitch than the one we called: someone took the call. Call ours again.
         partner.recalls += 1;
-        return { text: `${partner.call} 5NN`, move: 'recall', call: partner.call };
+        return { text: this.callText(partner.call), move: 'recall', call: partner.call };
       }
     }
     const taken = report ?? (reportElsewhere && this.profile.hijackCheck < 1 ? reportElsewhere.words.find((word) => RST.test(word)) : undefined);
@@ -211,7 +211,7 @@ export class PileupBot {
     const stillCalling = this.callsIn(fromPartner).some((item) => item.call === partner.call);
     if (stillCalling && partner.recalls < 2) {
       partner.recalls += 1;
-      return { text: `${partner.call} 5NN`, move: 'recall', call: partner.call };
+      return { text: this.callText(partner.call), move: 'recall', call: partner.call };
     }
     if (partner.agn < 2) {
       partner.agn += 1;
@@ -219,19 +219,25 @@ export class PileupBot {
     }
     if (partner.recalls < 1) {
       partner.recalls += 1;
-      return { text: `${partner.call} 5NN`, move: 'recall', call: partner.call };
+      return { text: this.callText(partner.call), move: 'recall', call: partner.call };
     }
     this.partner = null;
     if (sense.qrt) return null;
     return { text: 'QRZ?', move: 'qrz' };
   }
 
+  /** Our CQ. */
+  protected cqText() { return `CQ DE ${this.me} ${this.me} K`; }
+
+  /** Calling a station (and sending it our exchange). */
+  protected callText(call: string) { return `${call} 5NN`; }
+
   /** Near enough the pitch of the station we called to be it — and not plainly someone else calling. */
-  private fromPartner(item: Heard, partner: Partner) {
+  protected fromPartner(item: Heard, partner: Partner) {
     // An answer starts after we stopped; whatever began before is someone still calling.
     if (item.start < this.listenFrom - REPLY_SLACK || Math.abs(item.pitch - partner.pitch) > this.profile.pitchTolerance) return false;
     // A whole call that isn't ours, the partner's or near it: another station on that pitch.
-    return !mergeRepeats(item.words).some((word) => !word.includes(LOST) && isCallsign(word) && !this.isMine(word) && word !== partner.call && !isNearCall(partner.call, word));
+    return !mergeRepeats(item.words).some((word) => !word.includes(LOST) && this.isCall(word) && !this.isMine(word) && word !== partner.call && !isNearCall(partner.call, word));
   }
 
   /** A whole call has just ended: answer before its sender calls again. */
@@ -240,11 +246,11 @@ export class PileupBot {
   }
 
   /** Whole calls copied (none of ours, none worked already), best first. */
-  private callsIn(heard: readonly Heard[]) {
+  protected callsIn(heard: readonly Heard[]) {
     const found = new Map<string, { call: string; copies: number; pitch: number; level: number; charTime: number }>();
     for (const item of heard) {
       for (const word of mergeRepeats(item.words)) {
-        if (word.includes(LOST) || !isCallsign(word) || this.isMine(word) || this.worked.has(word)) continue;
+        if (word.includes(LOST) || !this.isCall(word) || this.isMine(word) || this.worked.has(word)) continue;
         const entry = found.get(word);
         if (entry) {
           entry.copies += 1;
@@ -256,7 +262,7 @@ export class PileupBot {
   }
 
   /** Copied pieces of calls (MIN_PIECE+ letters in a row), longest first (loud-first: from the loudest). */
-  private piecesIn(heard: readonly Heard[]) {
+  protected piecesIn(heard: readonly Heard[]) {
     const pieces: { piece: string; level: number; score: number }[] = [];
     for (const item of heard) {
       for (const word of mergeRepeats(item.words)) {
@@ -271,8 +277,11 @@ export class PileupBot {
     return pieces.sort((a, b) => (this.profile.loudFirst ? b.level - a.level || b.score - a.score : b.score - a.score || b.level - a.level));
   }
 
+  /** A word that is a call (a mode may read some call-shaped words as something else). */
+  protected isCall(word: string) { return isCallsign(word); }
+
   /** Our own call, or near enough that it is ours miscopied (callers send it). */
-  private isMine(word: string) {
+  protected isMine(word: string) {
     if (word === this.me) return true;
     if (word.length >= 4 && Math.abs(word.length - this.me.length) <= 1 && callDistance(word.replaceAll(LOST, '?'), this.me) <= 2) return true;
     return word.length >= 3 && this.me.includes(word);

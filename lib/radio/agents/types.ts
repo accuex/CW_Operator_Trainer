@@ -11,8 +11,11 @@ import type { Random } from '../random';
 
 export interface AgentMe { call: string; name: string; qth: string }
 
-/** Why an agent left the frequency. 'patience': called too often unanswered; 'waited': waited too long unpicked. */
-export type GoneReason = 'patience' | 'waited' | 'timeout' | 'dropped' | 'ignored-correction' | 'never-called';
+/**
+ * Why an agent left the frequency. 'patience': called too often unanswered; 'waited': waited too long unpicked;
+ * 'b4': told "QSO B4" (a contest: we had worked it already).
+ */
+export type GoneReason = 'patience' | 'waited' | 'timeout' | 'dropped' | 'ignored-correction' | 'never-called' | 'b4';
 
 /** What an agent tells the mode that is keeping the books. */
 export type AgentNote =

@@ -58,6 +58,7 @@ const GONE_LABEL: Record<GoneReason, string> = {
   dropped: '途中で去った',
   'ignored-correction': '訂正が通らず去った',
   'never-called': '呼ぶ前に去った',
+  b4: '交信済み（QSO B4）',
 };
 
 const strengthLabel = (strength: number) => (strength < 0.18 ? '弱信号' : strength < 0.45 ? '中くらいの信号' : '強い信号');

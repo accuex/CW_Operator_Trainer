@@ -5,7 +5,7 @@ import type { StationPersona } from '../air/persona';
 import { uniform, type Random } from '../random';
 import { BASIC_EXCHANGE, needsFrom, type ExchangeSpec } from './exchangeSpec';
 import { CQ_PROCEDURE, MAX_CORRECTIONS, mannersOf, type CallerManners, type CallerProcedure } from './manners';
-import { askText, callText, confirmText, correctionText, dxExchangeText, exchangeText, fieldsText, finalText, nudgeText, partialReply, pileupCallText } from './templates';
+import { askText, callText, confirmText, contestExchangeText, contestFieldsText, correctionText, dxExchangeText, exchangeText, fieldsText, finalText, nudgeText, partialReply, pileupCallText } from './templates';
 import type { Agent, AgentContext, GoneReason } from './types';
 
 /**
@@ -83,7 +83,11 @@ export class CallerAgent implements Agent {
   /** When it left the frequency or finished with us (null: still here). */
   goneAt: number | null = null;
   arrivedAt: number;
-  private got: Record<AskField, boolean> = { RST: false, NAME: false, QTH: false };
+  private got: Record<AskField, boolean> = { RST: false, NAME: false, QTH: false, NR: false, CALL: false };
+  /** A contest: the serial it gives us (fixed while it is on frequency) and how it keys it; null elsewhere. */
+  readonly contest: CallerContest | null;
+  /** A contest: our serial as it copied it (what goes in its log). */
+  heardNr: number | null = null;
   private heardName = false;
   private lastTx: string | null = null;
   private retryAt: number | null = null;
@@ -123,6 +127,7 @@ export class CallerAgent implements Agent {
     this.exchange = behaviour.exchange ?? BASIC_EXCHANGE;
     this.procedure = behaviour.procedure ?? CQ_PROCEDURE;
     this.calling = behaviour.calling ?? 'run';
+    this.contest = behaviour.contest ?? null;
     this.id = station.id;
     this.key = station.id;
     this.rxWidth = persona.rxWidth;
@@ -139,6 +144,11 @@ export class CallerAgent implements Agent {
     // It never copied this one: as far as it knows, nothing was said.
     if (this.missed(event.start, ctx)) return;
     const intent = event.intent;
+    if (intent.b4 && this.contest && this.toldB4(intent)) {
+      // We had it in the log already: it leaves without a word.
+      this.lastHeard = Math.max(this.lastHeard, event.end);
+      return this.leave('b4', ctx);
+    }
     this.lastHeard = Math.max(this.lastHeard, event.end);
     this.hearingFrom = event.start;
     if (this.retryAt !== null) this.retryAt = Math.max(this.retryAt, event.end + uniform(ctx.random, this.persona.retry));
@@ -423,14 +433,18 @@ export class CallerAgent implements Agent {
     }
 
     // exchanged: our exchange is out, waiting for TU / 73.
-    if (intent.ask.length) return this.say(ctx, fieldsText(this.persona, this.exchange.sends.filter((field) => intent.ask.includes(field))));
+    if (this.contest && forUs && intent.serial !== undefined) this.heardNr = intent.serial;
+    if (intent.ask.length) {
+      const fields = this.exchange.sends.filter((field) => intent.ask.includes(field));
+      return this.say(ctx, this.contest ? contestFieldsText(this.persona, fields, this.contest.nr) : fieldsText(this.persona, fields));
+    }
     if (intent.agn || intent.qrs) {
       if (intent.qrs) this.slowDown();
       return this.say(ctx, this.exchangeTextFor(ctx));
     }
     if (intent.closing) {
-      // DX style: our TU ends it, and the frequency is left to the next caller.
-      if (this.exchange.style !== 'dx') this.say(ctx, finalText(this.persona, ctx.me));
+      // DX and contest style: our TU ends it, and the frequency is left to the next caller.
+      if (this.exchange.style !== 'dx' && this.exchange.style !== 'contest') this.say(ctx, finalText(this.persona, ctx.me));
       this.state = 'done';
       this.goneAt = ctx.now();
       ctx.notify({ type: 'closed', agent: this });
@@ -446,13 +460,14 @@ export class CallerAgent implements Agent {
   }
 
   private exchangeTextFor(ctx: AgentContext) {
+    if (this.contest) return contestExchangeText(this.persona, ctx.me, this.contest.nr);
     return this.exchange.style === 'dx' ? dxExchangeText(this.persona, ctx.me, this.exchange.sends) : exchangeText(this.persona, ctx.me, this.heardName);
   }
 
   /** Its QSO undone (it took someone else's call, or we moved on before it began): back to standing by. */
   private release(ctx: AgentContext) {
     this.hijacked = false;
-    this.got = { RST: false, NAME: false, QTH: false };
+    this.got = { RST: false, NAME: false, QTH: false, NR: false, CALL: false };
     this.heardName = false;
     this.askAt = null;
     this.state = 'holding';
@@ -473,8 +488,9 @@ export class CallerAgent implements Agent {
     const { me } = ctx;
     const named = intent.fields.name !== undefined || (me.name !== '' && intent.tokens.includes(me.name));
     const placed = intent.fields.qth !== undefined || (me.qth !== '' && intent.tokens.includes(me.qth));
-    const fresh = Boolean(intent.report) || named || placed;
-    const heard: Record<AskField, boolean> = { RST: Boolean(intent.report), NAME: named, QTH: placed };
+    const fresh = Boolean(intent.report) || named || placed || intent.serial !== undefined;
+    const heard: Record<AskField, boolean> = { RST: Boolean(intent.report), NAME: named, QTH: placed, NR: intent.serial !== undefined, CALL: false };
+    if (this.contest && intent.serial !== undefined) this.heardNr = intent.serial;
     for (const field of ASK_FIELDS) this.got[field] ||= heard[field] || !needsFrom(this.exchange, field, me);
     this.heardName ||= named;
     const missing = this.exchange.wants.filter((field) => !this.got[field]);
@@ -485,6 +501,9 @@ export class CallerAgent implements Agent {
     } else if (fresh || this.exchange.wants.some((field) => this.got[field])) {
       this.say(ctx, askText(this.persona, missing));
       ctx.notify({ type: 'asked', agent: this, fields: missing });
+    } else if (this.contest) {
+      // Called with nothing else: its call once, and it waits for the exchange.
+      this.say(ctx, this.persona.call);
     } else {
       this.say(ctx, confirmText(this.persona));
     }
@@ -536,6 +555,12 @@ export class CallerAgent implements Agent {
     });
   }
 
+  /** "QSO B4" meant for it: with its call (or near it), or with none while it is the one we are working. */
+  private toldB4(intent: OperatorIntent) {
+    if (intent.calls.includes(this.call) || intent.calls.some((sent) => isNearCall(sent, this.call))) return true;
+    return !intent.calls.length && (this.state === 'selected' || this.state === 'exchanged');
+  }
+
   /** Someone else on frequency has exactly this call. */
   private peerHas(sent: string, ctx: AgentContext) {
     return ctx.peers().some((peer) => peer !== this && peer instanceof CallerAgent && !peer.gone && peer.call === sent);
@@ -547,7 +572,10 @@ export class CallerAgent implements Agent {
   }
 }
 
-const ASK_FIELDS: AskField[] = ['RST', 'NAME', 'QTH'];
+const ASK_FIELDS: AskField[] = ['RST', 'NAME', 'QTH', 'NR', 'CALL'];
+
+/** A contest caller's serial: the number, and the text it keys for it ("023", "T23", "23"). */
+export interface CallerContest { serial: number; nr: string }
 
 /** What a mode gives its callers beyond their persona; omitted parts take the CQ run's defaults. */
 export interface CallerBehaviour {
@@ -556,6 +584,8 @@ export interface CallerBehaviour {
   procedure?: CallerProcedure;
   /** How it sends its call: as on a CQ run (default), or the pileup's short form (pileupCallText). */
   calling?: 'run' | 'pileup';
+  /** A contest: its serial for us (with CONTEST_EXCHANGE). */
+  contest?: CallerContest;
 }
 
 /** A caller tuned to our CQ at `listenRf`, keying `offsetHz` off it. */

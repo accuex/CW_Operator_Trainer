@@ -87,4 +87,12 @@ export interface PileupQsoMode extends QsoModeBase {
   kind: 'pileup';
 }
 
-export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode;
+/**
+ * A contest: a fictional contest's exchange (report and serial) at a contest's pace. It
+ * has its own desk (levels, ESM, the logger's numbers) and starts ContestRunSession itself.
+ */
+export interface ContestQsoMode extends QsoModeBase {
+  kind: 'contest';
+}
+
+export type QsoMode = SingleQsoMode | RunQsoMode | PileupQsoMode | ContestQsoMode;

@@ -82,3 +82,9 @@ export interface CallerProcedure {
 
 export const CQ_PROCEDURE: CallerProcedure = { agnWakesStandby: false, closingWakes: true, qrsToFloor: false, partnerChecksPeers: false, requeueOnCue: false };
 export const PILEUP_PROCEDURE: CallerProcedure = { agnWakesStandby: true, closingWakes: false, qrsToFloor: true, partnerChecksPeers: true, requeueOnCue: true };
+/**
+ * A contest run: like a pileup's callers they stand by while we work someone and take
+ * AGN? / QRZ? as theirs, but our "TU JS2WDR" is the cue everyone waits for (closingWakes),
+ * and QRS is a step down, not to the floor.
+ */
+export const CONTEST_PROCEDURE: CallerProcedure = { agnWakesStandby: true, closingWakes: true, qrsToFloor: false, partnerChecksPeers: true, requeueOnCue: true };

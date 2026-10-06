@@ -168,6 +168,65 @@ export interface QsoSessionSummary {
   run?: QsoRunSummary;
   /** Pileup numbers (pileup-run only): counts, never the trace. */
   pileup?: QsoPileupSummary;
+  /** Contest numbers (contest only): the checked result in counts, never the log or the timeline. */
+  contest?: QsoContestSummary;
+}
+
+/**
+ * The synced side of a contest run: score and log-check counts only. The log lines, the
+ * stations' logs, the rate series and what went on the air stay on the device (RunTrace).
+ */
+export interface QsoContestSummary {
+  level: string;
+  rulesId: string;
+  seconds: number;
+  /** Lines in our log. */
+  logged: number;
+  /** Logged contacts an hour over the run, and the best ten minutes. */
+  rate: number;
+  bestRate: number;
+  claimed: { qsos: number; mults: number; total: number };
+  checked: { qsos: number; points: number; mults: number; total: number };
+  /** Our lines by verdict. */
+  ok: number;
+  bustCall: number;
+  bustNr: number;
+  nil: number;
+  dupe: number;
+  /** Contacts only the other station logged, and of them the ones we dropped after the exchange. */
+  theirOnly: number;
+  dropped: number;
+  /** Callers that left unworked, contacts started and never exchanged. */
+  missed: number;
+  abandoned: number;
+  doublings: number;
+  /** Callers who had worked us already, and the ones told QSO B4. */
+  dupeCallers: number;
+  b4: number;
+  /**
+   * What the run says about the operator (Stage 4; absent on older records): failures by
+   * primary cause and by kind, and the copy tallies おまかせ read. Counts only.
+   */
+  analysis?: QsoContestAnalysisSummary;
+}
+
+/** Why a contest line went wrong (see lib/radio/contest/analysis.ts). */
+export type ContestCause = 'reception' | 'weak' | 'environment' | 'overlap' | 'doubling' | 'similar' | 'interference' | 'procedure' | 'logging' | 'dupe' | 'dropped';
+/** What went wrong: the log check's verdicts and what the books show besides. */
+export type ContestFailure = 'bust-call' | 'bust-nr' | 'first-call' | 'nil' | 'dupe' | 'dropped' | 'unmatched' | 'doubled' | 'abandoned';
+
+export interface QsoContestAnalysisSummary {
+  version: number;
+  causes: Partial<Record<ContestCause, number>>;
+  failures: Partial<Record<ContestFailure, number>>;
+  /** right / total. */
+  copy: [number, number];
+  serial: [number, number];
+  crowded: [number, number];
+  similar: [number, number];
+  eager: number;
+  lid: number;
+  streak: number;
 }
 
 /** Why a pileup went wrong where it did (see lib/radio/pileup/analysis.ts). */
@@ -408,6 +467,8 @@ export interface QsoProfile {
     callsign?: CallsignSkill;
     /** Pileup skills, kept apart from callsign (see PileupSkill). */
     pileup?: PileupSkill;
+    /** Contest skills, kept apart from callsign (see ContestSkill). */
+    contest?: ContestSkill;
   };
   modes: Record<string, QsoModeProgress>;
   /** Raw evidence counters badges are computed from (see lib/radio/badges.ts). */
@@ -454,6 +515,40 @@ export interface PileupSkill {
   logging?: SkillEstimate;
 }
 
+/**
+ * Contest skills, each from its own evidence (see lib/radio/contest/analysis.ts): a
+ * look-alike, a lid, our own doubling, a procedure or logging slip never counts against
+ * call or serial copy.
+ */
+export interface ContestSkill {
+  /** First call right, in the clear. */
+  call?: SkillEstimate;
+  /** Serial logged right, in the clear (cut numbers read as the digits they stand for). */
+  serial?: SkillEstimate;
+  /** First call right with two or more callers keying just before. */
+  overlap?: SkillEstimate;
+  /** Contacts with a look-alike on the frequency logged right. */
+  similar?: SkillEstimate;
+  /** Calls sent with the station clear (not keying over it). */
+  timing?: SkillEstimate;
+  /** Contacts carried through without a procedure slip (dropped, abandoned, unmatched, no serial). */
+  procedure?: SkillEstimate;
+  /** Log lines without a logging slip. */
+  logging?: SkillEstimate;
+}
+
+/** Contest counters for its badges. */
+export interface ContestStats {
+  /** Lines checked ok, over all runs. */
+  qsos: number;
+  /** Longest in-run streak of lines checked ok (no BUST / NIL between; DUPEs skipped). */
+  bestStreak: number;
+  /** Best checked rate (ok lines an hour over the whole run) in a run long enough to count. */
+  bestRate: number;
+  /** Runs long enough to count with no BUST, NIL or dropped contact. */
+  cleanRuns: number;
+}
+
 /** Pileup counters for its badges. */
 export interface PileupStats {
   /** Complete contacts logged right. */
@@ -487,6 +582,7 @@ export interface QsoStats {
   /** Best clean rate (complete, all-correct contacts per hour) in a run long enough to count. */
   bestRate?: number;
   pileup?: PileupStats;
+  contest?: ContestStats;
 }
 
 export interface QsoBadgeRecord { tier: 1 | 2 | 3; at: number; criteriaVersion: number }

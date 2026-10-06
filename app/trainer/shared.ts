@@ -44,7 +44,7 @@ export const CARD_STATUS_LABEL: Record<ReturnType<typeof cardStatus>, string> = 
   DISCOVERED: '聴いた',
   UNFOUND: '未発見',
 };
-export const nowId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+export { nowId } from '@/lib/ids';
 export const pct = (value: number) => `${Math.round(value * 100)}%`;
 export const fmtLatency = (seconds: number) => seconds ? `${Math.round(seconds * 1000)} ms` : '—';
 export const cardKey = (card: MorseCard) => `${card.alphabet}:${card.symbol}`;

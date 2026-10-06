@@ -6,7 +6,7 @@ import type { CopySituation, QsoCauseCounts, QsoEnvCondition } from '../types';
  * drift — never "the QSO failed, so slow everything down".
  */
 
-export const AXES = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak', 'drift', 'pile', 'stack', 'even', 'manners', 'timing', 'similar'] as const;
+export const AXES = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak', 'drift', 'pile', 'stack', 'even', 'manners', 'timing', 'similar', 'density', 'serial'] as const;
 /** The axes every mode had before pileup-run; rag-chew uses all of these. */
 export const BAND_AXES = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak', 'drift'] as const satisfies readonly Axis[];
 export type Axis = (typeof AXES)[number];
@@ -28,10 +28,12 @@ export const AXIS_SPECS: Record<Axis, AxisSpec> = {
   manners: { label: '荒れ', min: 0, max: 1, step: 0.05, hint: '0 は親切（近い断片にも返す・2 回呼ぶ）、1 は荒れ（割り込み・テールエンド・聞こえていない局）' },
   timing: { label: '一斉度', min: 0, max: 1, step: 0.05, hint: '呼び始めの揃い方（大きいほど一斉に呼ぶ）' },
   similar: { label: '似たコール', min: 0, max: 0.4, step: 0.02, hint: '呼んでくる局のうち、すでに呼んでいる局と似たコールの局の割合' },
+  density: { label: '呼ぶ局の多さ', min: 0.5, max: 12, step: 0.5, unit: '局/分', hint: 'コンテストで 1 分あたりに見つけて呼んでくる局の数' },
+  serial: { label: '番号の難しさ', min: 0, max: 1, step: 0.05, hint: 'コンテストのシリアル番号の取りにくさ（カット数字・大きな番号・先頭の 0 なし）' },
 };
 
 export const DEFAULT_DIFFICULTY: DifficultyVector = {
-  speed: 14, crowd: 3, qsb: 0.25, qrn: 0.2, noise: 0.3, weak: 0.15, drift: 0, pile: 3, stack: 100, even: 6, manners: 0.25, timing: 0.25, similar: 0.12,
+  speed: 14, crowd: 3, qsb: 0.25, qrn: 0.2, noise: 0.3, weak: 0.15, drift: 0, pile: 3, stack: 100, even: 6, manners: 0.25, timing: 0.25, similar: 0.12, density: 4, serial: 0.5,
 };
 
 export const clampAxis = (axis: Axis, value: number) => {
@@ -84,7 +86,7 @@ const VOTES_TO_MOVE = 2;
 /** Never retune more than this many axes after one QSO. */
 const MAX_MOVES = 2;
 const STEP_SIZE: Record<Axis, number> = {
-  speed: 1, crowd: 1, qsb: 0.1, qrn: 0.1, noise: 0.1, weak: 0.1, drift: 0.1, pile: 1, stack: 10, even: 0.5, manners: 0.05, timing: 0.05, similar: 0.04,
+  speed: 1, crowd: 1, qsb: 0.1, qrn: 0.1, noise: 0.1, weak: 0.1, drift: 0.1, pile: 1, stack: 10, even: 0.5, manners: 0.05, timing: 0.05, similar: 0.04, density: 0.5, serial: 0.1,
 };
 /** Axes that get harder as the number falls (a tighter stack, a smaller strength spread). */
 const HARDER_DOWN: ReadonlySet<Axis> = new Set(['stack', 'even']);
@@ -159,5 +161,7 @@ export function describeMove(axis: Axis, delta: number) {
   if (axis === 'speed' || axis === 'crowd' || axis === 'pile') return `${spec.label} ${delta > 0 ? '+' : ''}${delta} ${spec.unit}`;
   if (axis === 'stack') return `${spec.label}を${delta < 0 ? '少し高く（呼ぶ局が近くに集まる）' : '少し低く（呼ぶ局が散らばる）'}`;
   if (axis === 'similar') return `${spec.label}を${delta > 0 ? '少し多く' : '少し少なく'}`;
+  if (axis === 'density') return `${spec.label} ${delta > 0 ? '+' : ''}${delta} ${spec.unit}`;
+  if (axis === 'serial') return `${spec.label}を${delta > 0 ? '少し上げる（カット数字・大きな番号が増える）' : '少し下げる'}`;
   return `${spec.label}を${delta > 0 ? '少し強く' : '少し弱く'}`;
 }

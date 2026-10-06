@@ -37,15 +37,15 @@ export const GOLDEN_SCENARIOS: GoldenScenario[] = [
 ];
 
 /** Ids relative to the run's first station; numbers kept exact. */
-function relativeIds(base: number) {
+export function relativeIds(base: number) {
   const ID_KEYS = new Set(['from', 'stationId', 'station', 'id', 'agent']);
   return (key: string, value: unknown) => (ID_KEYS.has(key) && typeof value === 'number' ? value - base : value);
 }
 
-const digest = (text: string) => createHash('sha256').update(text).digest('hex');
+export const digest = (text: string) => createHash('sha256').update(text).digest('hex');
 
 /** A probe station marks where this run's ids start (it never goes on the air). */
-const idBase = () => makeStation(() => 0.5, { rf: 0 }).id;
+export const idBase = () => makeStation(() => 0.5, { rf: 0 }).id;
 
 export interface GoldenEntry {
   name: string;

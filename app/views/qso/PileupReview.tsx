@@ -39,6 +39,7 @@ const GONE: Record<GoneReason, string> = {
   dropped: '交信が途切れた',
   'ignored-correction': '訂正が届かず離脱',
   'never-called': '呼ぶ前に離脱',
+  b4: '交信済み（QSO B4）',
 };
 
 export const CAUSE_LABEL: Record<PileupCause, string> = {

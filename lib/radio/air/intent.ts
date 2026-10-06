@@ -11,7 +11,8 @@ export const normalizeCall = (call: string) => call.toUpperCase().replace(/[^A-Z
 /** Plausible amateur call: prefix with a digit, then 1–4 letters. */
 export const isCallsign = (call: string) => /^[A-Z0-9]{1,3}[0-9][A-Z]{1,4}$/.test(normalizeCall(call));
 
-export type AskField = 'NAME' | 'QTH' | 'RST';
+/** NR (serial) and CALL are asked only in a contest (contestIntent reads them). */
+export type AskField = 'NAME' | 'QTH' | 'RST' | 'NR' | 'CALL';
 
 export interface OperatorIntent {
   text: string;
@@ -35,6 +36,10 @@ export interface OperatorIntent {
   agnFor?: string;
   /** QRX: stand by. */
   qrx?: true;
+  /** Serial number sent (a contest exchange, cut numbers read): only contestIntent sets it. */
+  serial?: number;
+  /** "QSO B4": we worked it already (contestIntent). */
+  b4?: true;
   /** Callsign-shaped words other than the sender's own, in order. */
   calls: string[];
   /** The sender's own call appears anywhere. */

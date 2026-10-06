@@ -1,0 +1,287 @@
+[
+ {
+  "name": "intro-average",
+  "seed": 1,
+  "digest": "ae4b01cfea1e0d14ae002e96590c3dc264492c58fe281d0f5ef0d27aa5ba3cee",
+  "summary": {
+   "air": 47,
+   "callers": 8,
+   "contacts": 7,
+   "log": "JR8KGD:ok,JA6ZZH:ok,JI6DHO:ok,JA6ZHH:ok,JA6ZRH:ok,JK8KUQ:ok,JF0SSB:ok",
+   "rate": 54.61638491547465,
+   "busts": 0,
+   "nil": 0,
+   "partials": 1,
+   "doublings": 6,
+   "hijacks": 0,
+   "mistakes": "first-call:overlap",
+   "settled": true
+  }
+ },
+ {
+  "name": "intro-average",
+  "seed": 2,
+  "digest": "6c6b841ef3f382f13fce072d98d436fa5550ff35b066204999d34b7acde605d7",
+  "summary": {
+   "air": 46,
+   "callers": 8,
+   "contacts": 6,
+   "log": "JS1ZN:ok,JF8NWQ:ok,JJ5UW:ok,JN7SDD:ok,JH7SDD:ok,JK3BFV:ok",
+   "rate": 44.09963250306247,
+   "busts": 0,
+   "nil": 0,
+   "partials": 1,
+   "doublings": 5,
+   "hijacks": 0,
+   "mistakes": "",
+   "settled": true
+  }
+ },
+ {
+  "name": "beginner-novice",
+  "seed": 11,
+  "digest": "b17b1e8bcfc56ef5c00bf0311863c02ef90bba9a475d3111b3f901e783882a21",
+  "summary": {
+   "air": 73,
+   "callers": 6,
+   "contacts": 1,
+   "log": "JJ5PWN:ok",
+   "rate": 8.541938545497686,
+   "busts": 0,
+   "nil": 0,
+   "partials": 4,
+   "doublings": 27,
+   "hijacks": 0,
+   "mistakes": "",
+   "settled": true
+  }
+ },
+ {
+  "name": "beginner-novice",
+  "seed": 12,
+  "digest": "20047ffe2f8db232965a33fd313a64be06f706771b535b6319ad05635876fdb9",
+  "summary": {
+   "air": 61,
+   "callers": 6,
+   "contacts": 5,
+   "log": "JH3YDA:ok,JF8FWD:ok,JK8ZQZ:ok,JO5NHX:ok",
+   "rate": 35.281146637265714,
+   "busts": 0,
+   "nil": 0,
+   "partials": 3,
+   "doublings": 18,
+   "hijacks": 0,
+   "mistakes": "no-closing:procedure,unlogged:logging",
+   "settled": true
+  }
+ },
+ {
+  "name": "intermediate-average",
+  "seed": 21,
+  "digest": "02a0bd5d722b3b5a0ce44e6ca4334a7ee58a32b5d13c5d02d45521120bc5811f",
+  "summary": {
+   "air": 113,
+   "callers": 11,
+   "contacts": 2,
+   "log": "JG3HR:ok,JN6WXU:ok",
+   "rate": 16.959133199858673,
+   "busts": 0,
+   "nil": 0,
+   "partials": 5,
+   "doublings": 54,
+   "hijacks": 0,
+   "mistakes": "dropped:interference",
+   "settled": true
+  }
+ },
+ {
+  "name": "intermediate-average",
+  "seed": 22,
+  "digest": "b13e377ffae17721fb4d4207faba88ad6510ebcde72c69b39d9be41d3aa58e39",
+  "summary": {
+   "air": 107,
+   "callers": 12,
+   "contacts": 5,
+   "log": "JH4PO:ok,JJ6XFT:ok,JJ2HB:ok,JE3GK:ok",
+   "rate": 27.499283872815806,
+   "busts": 0,
+   "nil": 0,
+   "partials": 3,
+   "doublings": 26,
+   "hijacks": 0,
+   "mistakes": "no-closing:procedure,unlogged:logging,first-call:overlap,first-call:overlap",
+   "settled": true
+  }
+ },
+ {
+  "name": "intermediate-loud-first",
+  "seed": 31,
+  "digest": "cafd0ffda9dffb7e84fd44662f4554e7818c9e57f4f80ec36b5efb51b3dede15",
+  "summary": {
+   "air": 96,
+   "callers": 11,
+   "contacts": 5,
+   "log": "JL7VVW:ok,JO7BOI:ok,JO4YE:ok,JN4XDZ:ok,JE6LBP:ok",
+   "rate": 45.94180704441041,
+   "busts": 0,
+   "nil": 0,
+   "partials": 7,
+   "doublings": 32,
+   "hijacks": 1,
+   "mistakes": "first-call:similar",
+   "settled": true
+  }
+ },
+ {
+  "name": "advanced-skilled",
+  "seed": 41,
+  "digest": "b92084dad65f7c43b175e9c13469daa5f192bc09e0410fdc3d9c7f851d30ba3f",
+  "summary": {
+   "air": 152,
+   "callers": 17,
+   "contacts": 4,
+   "log": "JO9VA:ok,JL4BP:ok,JE9BKU:ok",
+   "rate": 25.03477051460362,
+   "busts": 0,
+   "nil": 0,
+   "partials": 9,
+   "doublings": 44,
+   "hijacks": 0,
+   "mistakes": "no-closing:procedure,unlogged:logging,doubled:doubling",
+   "settled": true
+  }
+ },
+ {
+  "name": "advanced-skilled",
+  "seed": 42,
+  "digest": "de689a391ad0d28b1cfa700c4d15b24012ea5e0fa4d56a2c702dd2341e101383",
+  "summary": {
+   "air": 133,
+   "callers": 19,
+   "contacts": 5,
+   "log": "JK0LPI:ok,JI6QEN:ok,JE8OZM:ok,JI1LH:ok",
+   "rate": 41.43884892086331,
+   "busts": 0,
+   "nil": 0,
+   "partials": 9,
+   "doublings": 22,
+   "hijacks": 1,
+   "mistakes": "report:logging,first-call:similar,first-call:overlap,no-closing:procedure,unlogged:logging,doubled:doubling",
+   "settled": true
+  }
+ },
+ {
+  "name": "advanced-timing-poor",
+  "seed": 51,
+  "digest": "0751843616be770317e49db0af1db0e811ce9d6c8d983710896a1f1748ccddff",
+  "summary": {
+   "air": 249,
+   "callers": 20,
+   "contacts": 1,
+   "log": "JL5LVQ:ok",
+   "rate": 7.0004861448711715,
+   "busts": 0,
+   "nil": 0,
+   "partials": 6,
+   "doublings": 221,
+   "hijacks": 0,
+   "mistakes": "",
+   "settled": true
+  }
+ },
+ {
+  "name": "dx-skilled",
+  "seed": 61,
+  "digest": "ed76fa9da4421380f2d885e0c953f04db1fdcb494cc0a760b702d445c9522174",
+  "summary": {
+   "air": 305,
+   "callers": 39,
+   "contacts": 1,
+   "log": "JG3QRU:ok",
+   "rate": 6.231068801384682,
+   "busts": 0,
+   "nil": 0,
+   "partials": 2,
+   "doublings": 75,
+   "hijacks": 0,
+   "mistakes": "report:logging,doubled:doubling,doubled:doubling,doubled:doubling",
+   "settled": true
+  }
+ },
+ {
+  "name": "dx-skilled",
+  "seed": 62,
+  "digest": "90fc1b8b97e97c5d6b5a11e556c12e3bdee26d319cd66a36217551a217421d13",
+  "summary": {
+   "air": 324,
+   "callers": 51,
+   "contacts": 1,
+   "log": "JH6EHN:ok",
+   "rate": 8.557166627050155,
+   "busts": 0,
+   "nil": 0,
+   "partials": 4,
+   "doublings": 72,
+   "hijacks": 0,
+   "mistakes": "dropped:interference",
+   "settled": true
+  }
+ },
+ {
+  "name": "dx-partial-averse",
+  "seed": 71,
+  "digest": "b7a5dc664cd553ce8a64b28edff2dae4451e16bdb5586dc249ed93cad0506538",
+  "summary": {
+   "air": 443,
+   "callers": 55,
+   "contacts": 0,
+   "log": "",
+   "rate": 0,
+   "busts": 0,
+   "nil": 0,
+   "partials": 0,
+   "doublings": 97,
+   "hijacks": 0,
+   "mistakes": "",
+   "settled": true
+  }
+ },
+ {
+  "name": "intermediate-poor-rf",
+  "seed": 81,
+  "digest": "1e5233b239b65a520ee1eb90fe3e4abe47571bb548696f9317dcbf125f9fa52c",
+  "summary": {
+   "air": 90,
+   "callers": 11,
+   "contacts": 4,
+   "log": "JE0RD:ok,JK6AR:ok,JS7SVN:ok,JM1HFD:ok",
+   "rate": 33.149171270718234,
+   "busts": 0,
+   "nil": 0,
+   "partials": 3,
+   "doublings": 19,
+   "hijacks": 0,
+   "mistakes": "first-call:overlap,first-call:overlap,first-call:overlap",
+   "settled": true
+  }
+ },
+ {
+  "name": "advanced-similar-lids",
+  "seed": 91,
+  "digest": "49bff41d8f8453da39354b2058e477493211bfc58933ce24d1fe00eab673d387",
+  "summary": {
+   "air": 159,
+   "callers": 18,
+   "contacts": 4,
+   "log": "JA4ZFQ:ok,JH9XPW:ok,JJ3SUJ:ok",
+   "rate": 18.830093278702815,
+   "busts": 0,
+   "nil": 0,
+   "partials": 5,
+   "doublings": 48,
+   "hijacks": 0,
+   "mistakes": "no-closing:procedure,unlogged:logging,doubled:doubling,first-call:overlap",
+   "settled": true
+  }
+ }
+]
