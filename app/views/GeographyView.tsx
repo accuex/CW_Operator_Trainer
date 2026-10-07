@@ -7,6 +7,7 @@ import { SCOPES, selectedEntities, sortEntities, drillPool, nameMatches, toleran
 import { openStore, status, choose, record, result, validActive, validate } from '@/lib/geography/engine/stage15-core.js';
 import type { Config, Dataset, Entity, Grade, Outcome, Point, Session, Store, Progress } from '@/lib/geography/types';
 import GeographyMap from './geography/GeographyMap';
+import GeographyExplorer from './geography/GeographyExplorer';
 const initial: Config = { area: 'japan', scope: 'A', direction: 'name', size: '10', period: 'all', from: '2015-01', to: '2025-12' };
 interface Running {
     sessionID: string;
@@ -22,6 +23,7 @@ const frequency = (e: Entity) => e.choiceCount === null ? `OCR参考 ${e.provisi
 export default function GeographyView({ onBack }: {
     onBack: () => void;
 }) {
+    const [mode, setMode] = useState<'learn' | 'map'>('learn');
     const [data, setData] = useState<Dataset | null>(null), [error, setError] = useState(''), [config, setConfig] = useState<Config>(initial), [selected, setSelected] = useState<string | null>(null), [sort, setSort] = useState('priority'), [labels, setLabels] = useState('on'), [running, setRunning] = useState<Running | null>(null), [answer, setAnswer] = useState(''), [revision, setRevision] = useState(0), [notice, setNotice] = useState(''), [confirm, setConfirm] = useState<'area' | 'all' | 'import' | null>(null);
     const store = useRef<Store | null>(null), pendingImport = useRef<Progress | null>(null), dialog = useRef<HTMLDialogElement>(null), cancel = useRef<HTMLButtonElement>(null), input = useRef<HTMLInputElement>(null), next = useRef<HTMLButtonElement>(null), summary = useRef<HTMLElement>(null), list = useRef<HTMLDivElement>(null), periodCache = useRef(new Map<string, Entity[]>());
     useEffect(() => { let alive = true; loadGeography().then(d => { if (!alive)
@@ -100,8 +102,11 @@ export default function GeographyView({ onBack }: {
     if (!data || !store.current)
         return <section className="page-pad geography-page"><p role="status">地理教材を読み込んでいます…</p></section>;
     const progress = store.current.data, area = data.master.areas.find(a => a.areaId === config.area) ?? data.master.areas[0], e = rows.find(e => e.learningEntityId === selected), current = running?.pool.find(e => e.learningEntityId === running.currentID) ?? null, done = running && !running.currentID, stats: Outcome | null = done ? result(running.session) : null, practiced = rows.filter(e => progress.entities[e.learningEntityId]?.attempts).length, recent = progress.recent.filter(r => r.area === config.area && rows.some(e => e.learningEntityId === r.learningEntityId)).slice(-10), weak = choose(pool, progress, 'all', true), invalid = Boolean(config.period === 'custom' && config.from && config.to && config.from > config.to), last = validConfig(progress.last, data.master) ? progress.last : null, s = running ? sessionSummary(running.session) : null;
+    const modeTabs = <nav className="geo-mode-tabs" aria-label="地理の表示モード"><button id="geo-mode-learn" className="btn" aria-pressed={mode === 'learn'} onClick={() => setMode('learn')}>学習</button><button id="geo-mode-map" className="btn" aria-pressed={mode === 'map'} onClick={() => setMode('map')}>マップ</button></nav>;
+    if (mode === 'map') return <section className="page-pad geography-page geo-explorer-page"><div className="page-title"><div><p className="section-kicker">Geography · Map Explorer</p><h1>一総通 地理 · マップ</h1><p>全体を眺める · 位置関係を理解する · 頻度を見る</p></div><button id="geo-back" className="btn btn-ghost" onClick={onBack}>一総通へ戻る</button></div>{modeTabs}<GeographyExplorer data={data} periodRows={periodRows} config={config} onPeriodChange={(key, value) => change(key, value)} /></section>;
     return <section className={'page-pad geography-page' + (running ? ' geo-drilling' : '')} data-revision={revision}>
  <div className="page-title"><div><p className="section-kicker">Geography</p><h1>一総通 地理 · 地図で覚える</h1><p>エリアを選ぶ → 範囲を選ぶ → 地図で覚える → 練習する</p></div><button id="geo-back" className="btn btn-ghost" onClick={onBack}>一総通へ戻る</button></div>
+ {modeTabs}
  {notice && <p id="geo-notice" role="status">{notice}</p>}
  {!running && <><section className="panel geo-controls" aria-label="学習条件"><label>今日はどのエリア？<select id="geo-area" value={config.area} onChange={ev => change('area', ev.target.value)}>{data.master.areas.map(a => <option key={a.areaId} value={a.areaId}>{a.areaName}</option>)}</select></label><fieldset><legend>覚える範囲</legend><div className="geo-scopes">{(Object.keys(SCOPES) as Config['scope'][]).map(scope => <button key={scope} className="btn" data-scope={scope} aria-pressed={config.scope === scope} onClick={() => change('scope', scope)}>{SCOPES[scope]}<small>{area.cumulative[scope]}地点</small></button>)}</div></fieldset><details className="geo-period"><summary>登場回数の集計期間</summary><label>集計期間<select id="geo-period" value={config.period} onChange={ev => change('period', ev.target.value as Config['period'])}><option value="all">全期間</option><option value="10">最近10回</option><option value="5">最近5回</option><option value="custom">任意期間</option></select></label>{config.period === 'custom' && <div><label>開始<input id="geo-from" type="month" value={config.from} onChange={ev => change('from', ev.target.value)}/></label><label>終了<input id="geo-to" type="month" value={config.to} onChange={ev => change('to', ev.target.value)}/></label></div>}<p>覚える範囲は維持し、回数と強調・順番を更新します。</p></details></section>
  {invalid && <p role="alert">開始年月は終了年月以前にしてください。</p>}

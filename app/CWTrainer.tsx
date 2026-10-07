@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { applyAchievements, achievementById } from '@/lib/achievements';
+import { readExamMaterial, rememberExamMaterial, type ExamMaterial } from '@/lib/examMaterial';
 import { APP_VERSION } from '@/lib/appMeta';
 import { loadAuthSession } from '@/lib/api/authSession';
 import {
@@ -59,6 +60,13 @@ const AUDIO_STATUS_LABEL: Record<string, string> = {
 
 export default function CWTrainer({ initialView = 'home' }: { initialView?: View }) {
   const [view, setView] = useState<View>(initialView);
+  const lastExamMaterial = useRef<ExamMaterial>('exam');
+  useEffect(() => {
+    if (view === 'exam' || view === 'geography') {
+      lastExamMaterial.current = view;
+      rememberExamMaterial(view);
+    }
+  }, [view]);
   const [settings, setSettings] = useState<AudioSettings>(DEFAULT_SETTINGS);
   const [profile, setProfile] = useState<TrainerProfile>(DEFAULT_PROFILE);
   const [answers, setAnswers] = useState<AnswerLog[]>([]);
@@ -201,7 +209,9 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     };
   }, [speedOpen]);
 
-  const navigate = (next: View) => {
+  const navigate = (requested: View, resumeMaterial = true) => {
+    const next = requested === 'exam' && resumeMaterial ? readExamMaterial(lastExamMaterial.current) : requested;
+    if (next === 'geography' && next === view) return;
     audioEngine.stop();
     if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
     setStopEpoch((value) => value + 1);
@@ -268,7 +278,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     queue: <QueueView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} onSession={onSession} />,
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
     exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onGeography={() => navigate('geography')} />,
-    geography: ready ? <Suspense fallback={<p className="page-pad" role="status">地理教材を読み込んでいます…</p>}><GeographyView onBack={() => navigate('exam')} /></Suspense> : null,
+    geography: ready ? <Suspense fallback={<p className="page-pad" role="status">地理教材を読み込んでいます…</p>}><GeographyView onBack={() => navigate('exam', false)} /></Suspense> : null,
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,

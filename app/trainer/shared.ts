@@ -23,7 +23,7 @@ export const views: ViewMeta[] = [
   { id: 'train', label: 'TRAIN', title: '聴きとる', icon: 'train', primary: true },
   { id: 'levelup', label: 'LEVEL UP', title: 'レベル試験', icon: 'trophy', primary: true },
   { id: 'queue', label: 'QUEUE', title: '遅れ受信', icon: 'queue', primary: false },
-  { id: 'exam', label: 'EXAM', title: '一総通 試験', icon: 'exam', primary: true },
+  { id: 'exam', label: 'EXAM', title: '一総通', icon: 'exam', primary: true },
   { id: 'qso', label: 'QSO', title: 'QSO 交信', icon: 'radio', primary: false },
   { id: 'collection', label: 'COLLECTION', title: 'カード図鑑', icon: 'collection', primary: true },
   { id: 'analysis', label: 'ANALYSIS', title: '苦手分析', icon: 'analysis', primary: false },
