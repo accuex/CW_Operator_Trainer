@@ -35,7 +35,7 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
     { view: 'learn', icon: 'learn', title: 'おぼえる', body: '語呂とリズムで1文字ずつ。聴く→数える→当てるの3ステップ。', meta: `${stats.mastered} 枚 GET`, tone: 'gold' },
     { view: 'train', icon: 'train', title: '聴きとる', body: '符号を見ずに音だけで即答。コンボを伸ばそう。', meta: totals.answers ? `正答率 ${pct(totals.accuracy)}` : 'まずは10問', tone: 'sky' },
     { view: 'queue', icon: 'queue', title: '遅れ受信', body: '聴きながら覚えて、古い順に書く。実戦の頭を作る。', meta: lastQueue ? `安定深度 ${lastQueue.stableDepth.toFixed(1)}` : '目標 Queue 3', tone: 'violet' },
-    { view: 'exam', icon: 'exam', title: '一総通', body: '電気通信術の本番形式と、地図で覚える地理教材。', meta: '5分 · 額表つき', tone: 'coral' },
+    { view: 'exam', icon: 'exam', title: '一総通', body: '電気通信術・地理・専門英語。取り組みたい教材を選ぶ。', meta: '3つの教材', tone: 'coral' },
     { view: 'analysis', icon: 'analysis', title: '苦手分析', body: pairs[0] ? `${pairs[0].a} と ${pairs[0].b} を取り違えがち。` : '取り違えの「方向」を見つけます。', meta: pairs.length ? `${pairs.length} ペア検出` : 'データ待ち', tone: 'mint' },
     { view: 'collection', icon: 'collection', title: 'カード図鑑', body: '習得した文字がカードになって集まる。', meta: `${masteredInPool.length} / ${collectionPool.length}`, tone: 'gold' },
   ];

@@ -32,7 +32,7 @@ export function ExamView({
   setAudioStatus,
   stopEpoch,
   announce,
-  onGeography,
+  onBack,
 }: {
   settings: AudioSettings;
   setSettings: (settings: AudioSettings) => void;
@@ -40,7 +40,7 @@ export function ExamView({
   setAudioStatus: (status: string) => void;
   stopEpoch: number;
   announce: (message: string) => void;
-  onGeography?: () => void;
+  onBack?: () => void;
 }) {
   const presets = SUBJECT_IDS.map((id) => EXAM_SUBJECTS[id]);
   const defaultSelected = Math.max(0, SUBJECT_IDS.indexOf(DEFAULT_EXAM_PREFS.subjectId));
@@ -709,7 +709,7 @@ export function ExamView({
     : `第${sheetIndex + 1}/${session?.sheets.length ?? '—'}枚`;
   const passing = Boolean(examScore && examScore.accuracy >= 0.9);
   return <section className="exam-page page-pad">
-    {!inSession && onGeography && <div className="panel" style={{padding: 18, marginBottom: 20}}><p className="section-kicker">一総通 地理</p><p>過去問に登場した地点を地図で覚え、10問ずつ白地図で確かめます。</p><button id="exam-geography" className="btn btn-primary" onClick={onGeography}>地理 · 地図で覚える</button></div>}
+    {onBack && <button id="communication-back" className="btn btn-secondary exam-menu-return" onClick={onBack}>一総通の教材メニューへ</button>}
     {!inSession ? (
       <div className="exam-setup">
         <div className="page-title">

@@ -30,7 +30,7 @@ export const views: ViewMeta[] = [
   { id: 'settings', label: 'SETTINGS', title: '設定', icon: 'settings', primary: false },
   { id: 'account', label: 'ACCOUNT', title: 'マイページ', icon: 'account', primary: false },
 ];
-export const viewMeta = (id: View) => id === 'geography' ? {id, label: 'GEOGRAPHY', title: '一総通 地理', icon: 'exam' as const, primary: false} : views.find((item) => item.id === id) ?? views[0];
+export const viewMeta = (id: View) => id === 'communication' ? {id, label: 'RECEIVING', title: '一総通 電気通信術', icon: 'exam' as const, primary: false} : id === 'geography' ? {id, label: 'GEOGRAPHY', title: '一総通 地理', icon: 'exam' as const, primary: false} : id === 'english' ? {id, label: 'ENGLISH', title: '一総通 専門英語', icon: 'exam' as const, primary: false} : views.find((item) => item.id === id) ?? views[0];
 export const audioEngine = new MorseAudioEngine();
 /** Dots and dashes rendered with full-width glyphs for readability. */
 export const formatCode = (code: string) => code.replaceAll('.', '・').replaceAll('-', '－');

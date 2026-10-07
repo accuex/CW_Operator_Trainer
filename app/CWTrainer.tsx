@@ -37,6 +37,8 @@ import { AccountView } from '@/app/views/AccountView';
 import { trackPageView } from '@/app/components/GoogleAnalytics';
 import { markSfxBackground, unlockSfx, wakeSfx } from '@/app/trainer/sfx';
 
+const ExamMenuView = lazy(() => import('@/app/views/ExamMenuView'));
+const EnglishView = lazy(() => import('@/app/views/EnglishView'));
 const GeographyView = lazy(() => import('@/app/views/GeographyView'));
 
 // The geography view has an in-memory fallback. A blocked browser store must
@@ -60,10 +62,11 @@ const AUDIO_STATUS_LABEL: Record<string, string> = {
 
 export default function CWTrainer({ initialView = 'home' }: { initialView?: View }) {
   const [view, setView] = useState<View>(initialView);
-  const lastExamMaterial = useRef<ExamMaterial>('exam');
+  const [lastExamMaterial, setLastExamMaterial] = useState<ExamMaterial>('exam');
+  useEffect(() => { setLastExamMaterial(readExamMaterial()); }, []);
   useEffect(() => {
-    if (view === 'exam' || view === 'geography') {
-      lastExamMaterial.current = view;
+    if (view === 'communication' || view === 'geography' || view === 'english') {
+      setLastExamMaterial(view === 'communication' ? 'exam' : view);
       rememberExamMaterial(view);
     }
   }, [view]);
@@ -76,7 +79,6 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   const [toast, setToast] = useState('');
   const [stopEpoch, setStopEpoch] = useState(0);
   /** 一総通ナビを同じ画面でもう一度押したら科目選択へ戻す */
-  const [examDeskResetEpoch, setExamDeskResetEpoch] = useState(0);
   const [speedOpen, setSpeedOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const speedWrapRef = useRef<HTMLDivElement>(null);
@@ -209,9 +211,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     };
   }, [speedOpen]);
 
-  const navigate = (requested: View, resumeMaterial = true) => {
-    const next = requested === 'exam' && resumeMaterial ? readExamMaterial(lastExamMaterial.current) : requested;
-    if (next === 'geography' && next === view) return;
+  const navigate = (next: View) => {
+    if ((next === 'geography' || next === 'english') && next === view) return;
     audioEngine.stop();
     if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
     setStopEpoch((value) => value + 1);
@@ -277,8 +278,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     levelup: <LevelUpView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} record={record} setAudioStatus={setAudioStatus} onSession={onSession} />,
     queue: <QueueView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} onSession={onSession} />,
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
-    exam: <ExamView key={`exam-${examDeskResetEpoch}`} settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onGeography={() => navigate('geography')} />,
-    geography: ready ? <Suspense fallback={<p className="page-pad" role="status">地理教材を読み込んでいます…</p>}><GeographyView onBack={() => navigate('exam', false)} /></Suspense> : null,
+    exam: <Suspense fallback={<p className="page-pad" role="status">教材メニューを読み込んでいます…</p>}><ExamMenuView lastMaterial={lastExamMaterial} onNavigate={navigate} /></Suspense>,
+    communication: <ExamView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onBack={() => navigate('exam')} />,
+    english: ready ? <Suspense fallback={<p className="page-pad" role="status">専門英語教材を読み込んでいます…</p>}><EnglishView onBack={() => navigate('exam')} /></Suspense> : null,
+    geography: ready ? <Suspense fallback={<p className="page-pad" role="status">地理教材を読み込んでいます…</p>}><GeographyView onBack={() => navigate('exam')} /></Suspense> : null,
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
@@ -315,13 +318,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             <button
               key={item.id}
               type="button"
-              className={`nav-item ${(view === item.id || view === 'geography' && item.id === 'exam') ? 'active' : ''} ${item.primary ? 'primary' : 'secondary'}`}
-              onClick={() => {
-                if (item.id === 'exam' && view === 'exam') setExamDeskResetEpoch((value) => value + 1);
-                navigate(item.id);
-              }}
-              aria-current={(view === item.id || view === 'geography' && item.id === 'exam') ? 'page' : undefined}
-              title={item.id === 'exam' && view === 'exam' ? '科目選択に戻る' : item.title}
+              className={`nav-item ${(view === item.id || (view === 'communication' || view === 'geography' || view === 'english') && item.id === 'exam') ? 'active' : ''} ${item.primary ? 'primary' : 'secondary'}`}
+              onClick={() => navigate(item.id)}
+              aria-current={(view === item.id || (view === 'communication' || view === 'geography' || view === 'english') && item.id === 'exam') ? 'page' : undefined}
+              title={item.title}
             >
               <Icon name={item.icon} size={22} />
               <span className="nav-label">{item.title}</span>
