@@ -1,0 +1,15 @@
+
+> sites-project@1.1.0 test
+> vitest run --config vitest.config.ts lib/english
+
+
+ RUN  v3.2.4 /Users/macha/Project/CW_Operator_Trainer
+
+ ✓ lib/english/english.test.ts (5 tests) 8ms
+ ✓ lib/english/editorial.test.ts (4 tests) 13ms
+
+ Test Files  2 passed (2)
+      Tests  9 passed (9)
+   Start at  13:12:20
+   Duration  155ms (transform 33ms, setup 0ms, collect 46ms, tests 20ms, environment 0ms, prepare 46ms)
+

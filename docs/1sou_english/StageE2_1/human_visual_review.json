@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-07",
+  "reviewer": "project owner (user)",
+  "decision": "approved",
+  "evidence": "Stage E2.1 の生成イラストを人間レビューしました。現時点の採用画像はすべて OK と判断します。",
+  "assets": [
+    {
+      "assetId": "shore-ship-radio",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/shore-ship-radio-480.webp",
+          "sha256": "26cf67697559217259e65d1a8032443e33482812b996e91a1e9ce509e6ed69c3"
+        },
+        {
+          "src": "/english/illustrations/shore-ship-radio-960.webp",
+          "sha256": "c1bd10f8c5c9988daede1665baf0c1da5d568ab2bcc82aef47d07fe875b89d26"
+        }
+      ]
+    },
+    {
+      "assetId": "air-ground-radio",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/air-ground-radio-480.webp",
+          "sha256": "375b3f8aabf4afa9910a9c4e60a99177ff103187044dcffa22a57d79c4a7e1c8"
+        },
+        {
+          "src": "/english/illustrations/air-ground-radio-960.webp",
+          "sha256": "a055146062c033b2aac505116ac0a2fe58bdb6dafc4ba4ba3d822669df55cbfb"
+        }
+      ]
+    },
+    {
+      "assetId": "person-overboard",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/person-overboard-480.webp",
+          "sha256": "19f80ac78b7c9b937904a00b146d08518813a4ad5c0be5e8648cc974031e5483"
+        },
+        {
+          "src": "/english/illustrations/person-overboard-960.webp",
+          "sha256": "1f54d897c5c4cca9d8d8dc2883e33f5103fd04b1b221827b434c06d7ff0d83f2"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-aground",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-aground-480.webp",
+          "sha256": "869395677f466262762c228920335286183cf845a655cdd6e4984b43c8601d91"
+        },
+        {
+          "src": "/english/illustrations/ship-aground-960.webp",
+          "sha256": "51305c9ce153878cecbb75486a50d1450a619f0ab78e13f85e8732725827e3ba"
+        }
+      ]
+    },
+    {
+      "assetId": "boat-capsized",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/boat-capsized-480.webp",
+          "sha256": "af9e3496e7c66d22fd6bee71c3cfaf855fa542f68442c89289d6a083ab6f6d65"
+        },
+        {
+          "src": "/english/illustrations/boat-capsized-960.webp",
+          "sha256": "7bb7c40263a6993c783af37fae736ed082fc8797db4d05930f140bb0c785015b"
+        }
+      ]
+    },
+    {
+      "assetId": "flooded-engine-room",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/flooded-engine-room-480.webp",
+          "sha256": "d3ad3ce93dcedfff28710948ea05afe382feb62e37ad30f4afc2f0e232c82fea"
+        },
+        {
+          "src": "/english/illustrations/flooded-engine-room-960.webp",
+          "sha256": "245c41871cfc9251d13f7481e55ed90d889a5f99ec2eb7ce4a90d00e096f724a"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-at-berth",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-at-berth-480.webp",
+          "sha256": "02aac82f113f870d4be8ae30e38010e790bf33e1e0ea62cf93aa83263ad59a17"
+        },
+        {
+          "src": "/english/illustrations/ship-at-berth-960.webp",
+          "sha256": "b90d520338de825d695ebb7eae13e3e6088e402f9c395b66afb17bdec74da8bd"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-at-anchorage",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-at-anchorage-480.webp",
+          "sha256": "cfe927325349cae2119b0c9caf88154243e84f5d407c24e705b807b07744c22a"
+        },
+        {
+          "src": "/english/illustrations/ship-at-anchorage-960.webp",
+          "sha256": "233324bc42b905e131bdbcc5999d844883c68a8556c75a9d09119e095341cf5b"
+        }
+      ]
+    },
+    {
+      "assetId": "under-keel-gap",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/under-keel-gap-480.webp",
+          "sha256": "d3ea66a07ffa31aa6ff1377b959bb98cdf1886a390a9bae6782daa1c1b709cb2"
+        },
+        {
+          "src": "/english/illustrations/under-keel-gap-960.webp",
+          "sha256": "12d8526487da66638ce5624d751619475a8c21d624957afaca5caa6d64201876"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-height-below-bridge",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-height-below-bridge-480.webp",
+          "sha256": "353688b1c94aafb0fb9c28998894c6dd123ddc25baf52750ff9ca871a69e380a"
+        },
+        {
+          "src": "/english/illustrations/ship-height-below-bridge-960.webp",
+          "sha256": "cd1b966db05c7d71c3b84c7106f281d2a9ccbaf03297881fb96e86805b3e62bd"
+        }
+      ]
+    },
+    {
+      "assetId": "fog-at-harbour",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/fog-at-harbour-480.webp",
+          "sha256": "483afa2da598f315c84b818f4b46beaa778d173c757d13ff4816b0b99acdf93c"
+        },
+        {
+          "src": "/english/illustrations/fog-at-harbour-960.webp",
+          "sha256": "c396c075c7e508772e7662407a6bb95e0480683a0aef467cb15e7a3adaf251bc"
+        }
+      ]
+    },
+    {
+      "assetId": "rope-fouled-propeller",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/rope-fouled-propeller-480.webp",
+          "sha256": "964fdcd338780098073e9400105ad002ba460a09a8de26cfb445566c75a7eca3"
+        },
+        {
+          "src": "/english/illustrations/rope-fouled-propeller-960.webp",
+          "sha256": "9b81ca603f941eb4b1b59fdc9c612bf1a70125e5585b094cdd08eab96add57a8"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-rolling",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-rolling-480.webp",
+          "sha256": "116d5fa33e27fee90d5a52b7ce3c0a89f22f6ece37356a62ae088d6c384effaf"
+        },
+        {
+          "src": "/english/illustrations/ship-rolling-960.webp",
+          "sha256": "ffbf72445063e27d9ff7400a72bb9b1fd9b8bde3e985dcaadef83245f27e5111"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-pitching",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-pitching-480.webp",
+          "sha256": "90d015ba597136295d29f71d7f2deab1daef55bb766e61358e278ac457ed8303"
+        },
+        {
+          "src": "/english/illustrations/ship-pitching-960.webp",
+          "sha256": "a8729aa85c594d6f5a29ca2d309731f5cf85323d58515354c2d2127080d426a1"
+        }
+      ]
+    },
+    {
+      "assetId": "ship-bridge",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-bridge-v2-480.webp",
+          "sha256": "55c7e0439413903c48dc694eeab8a3c4de3574995544f2986af42c9312a8ce16"
+        },
+        {
+          "src": "/english/illustrations/ship-bridge-v2-960.webp",
+          "sha256": "2f60286b238e5ecd86fae2533f6de98bc1fe6dee5634471b38acb922fe851346"
+        }
+      ]
+    },
+    {
+      "assetId": "bulbous-bow",
+      "decision": "approved",
+      "variants": [
+        {
+          "src": "/english/illustrations/bulbous-bow-480.webp",
+          "sha256": "465a967ff7d0214a0d3f5bf17f5fe963bd0d8cb324d81f26544fdd14c5576dc1"
+        },
+        {
+          "src": "/english/illustrations/bulbous-bow-960.webp",
+          "sha256": "93bfc4765101725cd904522a56e00a5aa725e5b0c9961caeadd7c4661e56d312"
+        }
+      ]
+    }
+  ]
+}

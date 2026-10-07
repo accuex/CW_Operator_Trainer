@@ -1,0 +1,3146 @@
+[
+  {
+    "learningEntityId": "term-coast-station",
+    "term": "coast station",
+    "decision": "A",
+    "reason": "陸上側の局と船上の局の位置・通信相手を一目で区別できる。",
+    "learningPoint": "海岸側の無線局と船側の無線局が通信する関係。",
+    "risk": "衛星地球局や港管理者の建物へ置換しない。アンテナの特定型式を必須としない。",
+    "sharedIllustration": "shore-ship-radio",
+    "candidateAssetId": "shore-ship-radio",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "海岸局",
+      "misleading_meanings": "ship stationは船側の局、masterは船長です。coast stationは人の役職ではありません。",
+      "japanese_explanation": "陸上側から船と通信する局です。船舶局からの呼出しを受け、通報を扱います。",
+      "why_it_matters": "海岸側の局と船側の局を区別して、通信の相手を追えます。",
+      "example": {
+        "english": "The coast station asked the ship to repeat its position.",
+        "japanese": "海岸局は船に位置をもう一度伝えるよう求めた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors"
+      ],
+      "related_terms": [
+        "term-ship-station",
+        "term-coast-earth-station"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-ship-station",
+    "term": "ship station",
+    "decision": "A",
+    "reason": "海岸局との同じ関係を船側から読めるため、同一画像が両局の設置場所の区別に有効。",
+    "learningPoint": "船にある無線局が海岸側と通信する関係。",
+    "risk": "船長という人物と局を混同しない。船自体を局の唯一の外観と教えない。",
+    "sharedIllustration": "shore-ship-radio",
+    "candidateAssetId": "shore-ship-radio",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船舶局",
+      "misleading_meanings": "",
+      "japanese_explanation": "船に設けられた無線局です。位置や船の状態を海岸側へ伝える場面で登場します。",
+      "why_it_matters": "位置を送った主体が船の無線局だと分かります。",
+      "example": {
+        "english": "The ship station reported engine trouble to the coast station.",
+        "japanese": "船舶局は機関の不具合を海岸局に報告した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors"
+      ],
+      "related_terms": [
+        "term-coast-station",
+        "term-master"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-aircraft-station",
+    "term": "aircraft station",
+    "decision": "A",
+    "reason": "空中の航空機側と地上側の局の位置が区別できる。",
+    "learningPoint": "航空機上の局と地上の航空局が通信する関係。",
+    "risk": "地上局を管制塔だけに固定せず、衛星経由と誤認する要素を加えない。",
+    "sharedIllustration": "air-ground-radio",
+    "candidateAssetId": "air-ground-radio",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "航空機局",
+      "misleading_meanings": "航空機側がaircraft station、地上側がaeronautical stationです。",
+      "japanese_explanation": "航空機上の無線局を指します。地上の航空局と周波数を合わせて通信します。",
+      "why_it_matters": "送受信している局が航空機側にあると判断できます。",
+      "example": {
+        "english": "The aircraft station reported a receiver problem before landing.",
+        "japanese": "航空機局は着陸前に受信機の問題を報告した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-aeronautical-station",
+        "term-receiver-failure"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-aeronautical-station",
+    "term": "aeronautical station",
+    "decision": "A",
+    "reason": "航空機局と同じ関係を地上側から読めるため、共通画像が通信主体の区別に有効。",
+    "learningPoint": "航空機と通信する地上側の無線局。",
+    "risk": "局と航空交通業務を同一の建物・役職に固定しない。",
+    "sharedIllustration": "air-ground-radio",
+    "candidateAssetId": "air-ground-radio",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "航空局",
+      "misleading_meanings": "航空機上のaircraft stationとは設置場所が異なります。",
+      "japanese_explanation": "地上側の航空無線局です。航空機局との通信で、どちらが呼び出し、応答するかを読みます。",
+      "why_it_matters": "航空機からの通信に応答する地上側の主体を特定できます。",
+      "example": {
+        "english": "The aeronautical station asked the aircraft to repeat the message.",
+        "japanese": "航空局は航空機に通報を繰り返すよう求めた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-aircraft-station",
+        "term-air-traffic-services"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-coast-earth-station",
+    "term": "coast earth station",
+    "decision": "B",
+    "reason": "衛星を含む中継経路は描けるが、無線局画像に皿アンテナを足すだけでは語義が確定せず図解化しやすい。",
+    "learningPoint": "衛星通信の地上側という役割。",
+    "risk": "一般の海岸局との外観だけの分類は誤り。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "海岸地球局",
+      "misleading_meanings": "",
+      "japanese_explanation": "衛星通信の地上側を受け持つ海岸地球局です。船の通報が衛星を経て届く経路を意識します。",
+      "why_it_matters": "earth stationが入ると、衛星を経由する通信経路だと分かります。",
+      "example": {
+        "english": "The ship's distress alert reached the coast earth station via satellite.",
+        "japanese": "船の遭難警報は衛星を経由して海岸地球局に届いた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors"
+      ],
+      "related_terms": [
+        "term-coast-station",
+        "term-relay"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-master",
+    "term": "master",
+    "decision": "B",
+    "reason": "船長の肖像や制服では通信士・水先人との役割の区別が増えない。",
+    "learningPoint": "船長という報告・権限の主体。",
+    "risk": "服装で船長を判定する誤学習。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "主人／熟達者",
+      "specialized_meaning": "船長（harbour masterは港の管理者）",
+      "misleading_meanings": "船のmasterは船長ですが、harbour masterは港の管理者です。",
+      "japanese_explanation": "船内の指示や通報について書かれるmasterは船長です。誰に知らせるか、誰の権限で行うかに注目します。",
+      "why_it_matters": "船長が報告の宛先か判断する主体かを読み取れます。",
+      "example": {
+        "english": "The operator informed the master that a nearby vessel needed help.",
+        "japanese": "通信士は付近の船が援助を必要としていることを船長に知らせた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors"
+      ],
+      "related_terms": [
+        "term-ship-station",
+        "term-bridge",
+        "term-on-the-authority-of"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-administration",
+    "term": "Administration",
+    "decision": "C",
+    "reason": "主管庁という行政上の主体は庁舎外観で表せない。",
+    "learningPoint": "承認を行う行政上の主体。",
+    "risk": "特定国の庁舎へ意味を狭める。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "管理・運営",
+      "specialized_meaning": "主管庁",
+      "misleading_meanings": "一般的な管理業務ではなく、規定を所管する行政機関を指します。",
+      "japanese_explanation": "規定に出てくるAdministrationは主管庁です。設備の承認などを行う主体として読みます。",
+      "why_it_matters": "承認や許可を出すのが通信士ではなく主管庁だと分かります。",
+      "example": {
+        "english": "The Administration approved the ship's new radio equipment.",
+        "japanese": "主管庁は船の新しい無線設備を承認した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors"
+      ],
+      "related_terms": [
+        "term-subject-to",
+        "term-in-accordance-with"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-rescue-coordination-center",
+    "term": "rescue coordination center",
+    "decision": "B",
+    "reason": "建物やモニターの絵では調整機関と現場の救助隊を区別できない。",
+    "learningPoint": "救助活動を連絡・調整する役割。",
+    "risk": "救助艇そのものの意味へ置換。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "救助調整機関",
+      "misleading_meanings": "",
+      "japanese_explanation": "救助活動の連絡・調整を担う機関です。現場の救助船と、活動を調整する連絡先を分けて読みます。",
+      "why_it_matters": "救助の依頼や情報がどこへ送られるのかを追えます。",
+      "example": {
+        "english": "The coast station passed the vessel's position to the rescue coordination center.",
+        "japanese": "海岸局は船の位置を救助調整機関に伝えた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "actors"
+      ],
+      "related_terms": [
+        "term-on-scene",
+        "term-relay"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-distress",
+    "term": "distress",
+    "decision": "B",
+    "reason": "一つの海難場面では重大な危険の程度やurgencyとの区分を判断させにくい。",
+    "learningPoint": "直ちに援助が必要な遭難状況。",
+    "risk": "描いた事故をすべてdistressと教える。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "遭難",
+      "misleading_meanings": "urgencyと同じ通信区分ではありません。重大で差し迫った危険を示すdistressを分けて読みます。",
+      "japanese_explanation": "船や人が重大な危険にあり、直ちに援助を必要とする遭難の場面です。",
+      "why_it_matters": "単なる遅延や不便ではなく、直ちに援助が必要な状況だとつかめます。",
+      "example": {
+        "english": "The vessel is in distress and needs immediate assistance.",
+        "japanese": "船は遭難し、直ちに援助を必要としている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-urgency",
+        "term-distress-alert",
+        "term-mayday"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-urgency",
+    "term": "urgency",
+    "decision": "C",
+    "reason": "通信の区分は事故の見た目だけで確定できない。",
+    "learningPoint": "安全に関する緊急通報の区分。",
+    "risk": "負傷や故障を必ず特定区分にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "緊急通信",
+      "misleading_meanings": "",
+      "japanese_explanation": "船や人の安全に関する緊急の通報です。遭難通信とは区別して、何を急いで伝えるのかを読みます。",
+      "why_it_matters": "緊急通報を遭難通報と取り違えずに状況を整理できます。",
+      "example": {
+        "english": "The urgency message concerned an injured crew member.",
+        "japanese": "その緊急通報は負傷した乗組員に関するものだった。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-distress",
+        "term-pan-pan",
+        "term-medical-advice"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-distress-alert",
+    "term": "distress alert",
+    "decision": "B",
+    "reason": "警報装置の絵では最初の警報と後続の遭難通信を分けられない。",
+    "learningPoint": "遭難の発生を知らせる段階。",
+    "risk": "特定機器のランプや画面へ限定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "遭難警報",
+      "misleading_meanings": "alertは警報、distress trafficは遭難に関する通信のやり取りです。",
+      "japanese_explanation": "遭難を知らせる警報です。警報を受けた後の受信確認や中継と、最初の通知を区別します。",
+      "why_it_matters": "遭難の発生を知らせる段階と、その後の通信を分けられます。",
+      "example": {
+        "english": "After receiving the distress alert, the coast station called the vessel.",
+        "japanese": "遭難警報を受信した後、海岸局はその船を呼び出した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-distress-traffic",
+        "term-acknowledge",
+        "term-epirb"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-distress-traffic",
+    "term": "distress traffic",
+    "decision": "C",
+    "reason": "通信内容の区分は船の往来の絵では示せない。",
+    "learningPoint": "遭難に関する通信のやり取り。",
+    "risk": "船舶交通のtrafficへ引っ張る。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "遭難通信",
+      "misleading_meanings": "遭難の最初の警報だけを指すdistress alertとは範囲が異なります。",
+      "japanese_explanation": "遭難に関する通信のやり取りを指します。ここでのtrafficは道路や船の混雑ではありません。",
+      "why_it_matters": "妨害してはいけない対象が遭難通信だと分かります。",
+      "example": {
+        "english": "Stop transmissions that interfere with distress traffic.",
+        "japanese": "遭難通信を妨げる送信を止める。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress",
+        "operations"
+      ],
+      "related_terms": [
+        "term-traffic",
+        "term-distress-alert",
+        "term-seelonce-feenee"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-radiotelephony",
+    "term": "radiotelephony",
+    "decision": "B",
+    "reason": "マイクを持つ人だけでは無線電話と有線電話の方式差を教えられない。",
+    "learningPoint": "音声を使う無線通信方式。",
+    "risk": "汎用の通話画像だけになる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "無線電話",
+      "misleading_meanings": "通常の有線電話や文字通信と同じ意味ではありません。",
+      "japanese_explanation": "無線を使って音声で通話する通信方式です。文字を送る方式と対比して読みます。",
+      "why_it_matters": "位置報告などを音声で行うのか、文字で行うのかを区別できます。",
+      "example": {
+        "english": "The rescue vessels used radiotelephony to exchange their positions.",
+        "japanese": "救助船は無線電話で互いの位置を伝えた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress",
+        "operations"
+      ],
+      "related_terms": [
+        "term-narrow-band-direct-printing",
+        "term-digital-selective-calling"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-acknowledge",
+    "term": "acknowledge",
+    "decision": "C",
+    "reason": "受信確認という通信上の行為はうなずく人物では正確に示せない。",
+    "learningPoint": "受け取ったことを知らせる。",
+    "risk": "作業完了や承認と混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "通報・警報の受信を確認する",
+      "misleading_meanings": "",
+      "japanese_explanation": "通報を受け取ったことを相手に知らせます。内容を転送するrelayとは別の行為です。",
+      "why_it_matters": "受信確認を、中継や救助実施と取り違えずに通信の順序を追えます。",
+      "example": {
+        "english": "Please acknowledge receipt of our position report.",
+        "japanese": "こちらの位置報告を受信したことを知らせてください。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress",
+        "operations"
+      ],
+      "related_terms": [
+        "term-relay",
+        "term-distress-alert"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-relay",
+    "term": "relay",
+    "decision": "C",
+    "reason": "通信経路の中継には複数段階の図解が必要で、今回の単一場面画像の効果が薄い。",
+    "learningPoint": "通報を別の相手へ中継する。",
+    "risk": "単なる直接送信と誤認。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "通信を中継する",
+      "misleading_meanings": "",
+      "japanese_explanation": "受け取った通報を別の局へ中継します。送信元・中継局・宛先を順に追うと経路が分かります。",
+      "why_it_matters": "直接届かない通報を誰がどこへ取り次ぐのか読めます。",
+      "example": {
+        "english": "Please relay our position report to the coast station.",
+        "japanese": "こちらの位置報告を海岸局へ中継してください。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress",
+        "operations",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-acknowledge",
+        "term-coast-earth-station"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-medical-advice",
+    "term": "medical advice",
+    "decision": "B",
+    "reason": "医師やけが人の絵は描けるが、助言と治療・搬送の役割差を示しにくい。",
+    "learningPoint": "船外へ医療上の助言を求める。",
+    "risk": "実際の医療処置を教える画像になる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "医療上の助言",
+      "misleading_meanings": "",
+      "japanese_explanation": "病気やけがについて医療上の助言を受ける場面です。船長などが船外の専門家へ相談します。",
+      "why_it_matters": "船の機器故障ではなく、人の健康について相談しているとつかめます。",
+      "example": {
+        "english": "The master requested medical advice for a sick crew member.",
+        "japanese": "船長は病気の乗組員について医療上の助言を求めた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-urgency",
+        "term-pan-pan"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-maritime-safety-information",
+    "term": "maritime safety information",
+    "decision": "C",
+    "reason": "安全情報の範囲は特定の気象・浮標一つの絵へ限定できない。",
+    "learningPoint": "海上の安全に関わる情報。",
+    "risk": "個別の海難通報と混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "海上安全情報",
+      "misleading_meanings": "",
+      "japanese_explanation": "航行警報や気象情報など、海上の安全に関わる情報です。個別の遭難通報とは分けて読みます。",
+      "why_it_matters": "船に向けた放送が安全情報の提供だと判断できます。",
+      "example": {
+        "english": "The ship received maritime safety information about a damaged buoy.",
+        "japanese": "船は損傷した浮標についての海上安全情報を受信した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-navtex",
+        "term-distress-traffic"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-mayday",
+    "term": "mayday",
+    "decision": "C",
+    "reason": "信号の識別には文字・音が必要で、海難の絵だけではPAN PANと区別できない。",
+    "learningPoint": "遭難を示す呼出し信号。",
+    "risk": "事故の見た目を信号選択の規則とする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "遭難通信の信号",
+      "misleading_meanings": "緊急のPAN PANと区別します。日付のMay Dayという一般表現ではありません。",
+      "japanese_explanation": "遭難を示す信号です。呼出しの冒頭に現れると、直ちに援助を必要とする通信だと分かります。",
+      "why_it_matters": "MAYDAYを手がかりに、続く船名や状態を遭難の情報として読めます。",
+      "example": {
+        "english": "The call began with MAYDAY: the vessel was sinking.",
+        "japanese": "呼出しはMAYDAYで始まった。その船は沈みかけていた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-distress",
+        "term-pan-pan"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-pan-pan",
+    "term": "pan pan",
+    "decision": "C",
+    "reason": "緊急信号そのものを無文字の絵で識別できない。",
+    "learningPoint": "安全に関する緊急通信の信号。",
+    "risk": "医療相談すべてを同一信号とする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "緊急通信の信号",
+      "misleading_meanings": "遭難を示すMAYDAYと同じ信号ではありません。",
+      "japanese_explanation": "緊急通信を示す信号です。船や人の安全について、急いで知らせる通信の入口になります。",
+      "why_it_matters": "PAN PANから、後続の内容が安全に関する緊急通報だと分かります。",
+      "example": {
+        "english": "The call began with PAN PAN, followed by a request for medical advice.",
+        "japanese": "呼出しはPAN PANで始まり、続いて医療上の助言が求められた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-urgency",
+        "term-mayday"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-survival-craft",
+    "term": "survival craft",
+    "decision": "B",
+    "reason": "救命艇やいかだの一例は描けるが、単一外観へ意味を狭めるおそれがある。",
+    "learningPoint": "退避に使う救命用船艇の総称。",
+    "risk": "救助に来る艇と救命用船艇の混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "救命艇等の救命用船艇",
+      "misleading_meanings": "",
+      "japanese_explanation": "遭難時に人が退避する救命用の船艇です。lifeboatやlife raftなどが含まれます。",
+      "why_it_matters": "乗り移る先が通常の船ではなく、救命用の船艇だと分かります。",
+      "example": {
+        "english": "The crew left the sinking vessel in a survival craft.",
+        "japanese": "乗組員は救命用船艇で沈みかけた船から退避した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-overboard",
+        "term-on-scene"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-on-scene",
+    "term": "on scene",
+    "decision": "B",
+    "reason": "救助船の絵では到着前と到着済みを明確に分けられず、既存の日本語説明の効果を超えにくい。",
+    "learningPoint": "現場にいる状態。",
+    "risk": "航行中の船を現場到着と断定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "現場にいる／現場で",
+      "misleading_meanings": "",
+      "japanese_explanation": "救助などの現場に到着していることを表します。on-scene communicationsなら、現場で行う通信です。",
+      "why_it_matters": "船が現場にいるのか、現場へ向かっている途中なのかを区別できます。",
+      "example": {
+        "english": "The rescue vessel is now on scene.",
+        "japanese": "救助船は今、現場にいる。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-rescue-coordination-center",
+        "term-survival-craft"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-gmdss",
+    "term": "gmdss",
+    "decision": "C",
+    "reason": "制度の名称であり単一装置の外観に置き換えられない。",
+    "learningPoint": "遭難・安全通信の世界的制度。",
+    "risk": "一個の装置をGMDSSそのものとして描く。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "海上における遭難及び安全に関する世界的な制度（GMDSS）",
+      "misleading_meanings": "",
+      "japanese_explanation": "遭難警報や安全情報を扱う世界的な制度の名称です。単独の機器名ではなく、関連する通信・設備の枠組みを表します。",
+      "why_it_matters": "装置名が並ぶ文章で、GMDSSを全体の制度として位置付けられます。",
+      "example": {
+        "english": "The operator checked the GMDSS equipment before departure.",
+        "japanese": "通信士は出港前にGMDSSの設備を点検した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-epirb",
+        "term-navtex",
+        "term-digital-selective-calling"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-navtex",
+    "term": "navtex",
+    "decision": "B",
+    "reason": "受信機の外観は安全情報受信という機能を文字なしで示しにくい。",
+    "learningPoint": "海上安全情報を受信する方式。",
+    "risk": "特定の機種・表示画面を固定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "海上安全情報の受信方式",
+      "misleading_meanings": "",
+      "japanese_explanation": "航行警報や気象情報などの海上安全情報を受信する方式です。船が情報を受け取る場面で読みます。",
+      "why_it_matters": "安全情報を受信する話を、個別の遭難呼出しと混同せずに読めます。",
+      "example": {
+        "english": "The NAVTEX receiver printed a warning about a damaged buoy.",
+        "japanese": "NAVTEX受信機は損傷した浮標に関する警報を印刷した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-maritime-safety-information",
+        "term-narrow-band-direct-printing"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-epirb",
+    "term": "epirb",
+    "decision": "B",
+    "reason": "装置は描けるが多様な外観を一型式へ固定する危険があり、局所資料から外観を確定しない。",
+    "learningPoint": "遭難警報と位置情報を伝える標識。",
+    "risk": "浮標・通常の無線機との誤認。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "非常用位置指示無線標識（EPIRB）",
+      "misleading_meanings": "",
+      "japanese_explanation": "遭難時に警報と位置に関する情報を伝える無線標識です。船の通常の通話装置とは役割が異なります。",
+      "why_it_matters": "遭難位置を知らせる機器だと分かり、船の状態と装置の働きを結び付けられます。",
+      "example": {
+        "english": "The rescue team received an alert from the vessel's EPIRB.",
+        "japanese": "救助班はその船のEPIRBからの警報を受信した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-distress-alert",
+        "term-gmdss"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-digital-selective-calling",
+    "term": "digital selective calling",
+    "decision": "C",
+    "reason": "デジタル呼出しの方式は機器や船の絵だけでは識別できない。",
+    "learningPoint": "呼出しと音声通信の段階の違い。",
+    "risk": "特定画面やボタンの操作教材へ逸脱。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "デジタル選択呼出",
+      "misleading_meanings": "",
+      "japanese_explanation": "デジタル信号を使って局を呼び出す方式です。音声の通話そのものとは区別します。",
+      "why_it_matters": "呼出しと、その後に行う音声通信の段階を分けて読めます。",
+      "example": {
+        "english": "The operator made contact by digital selective calling before speaking by radio.",
+        "japanese": "通信士は無線で話す前にデジタル選択呼出で連絡を取った。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-radiotelephony",
+        "term-distress-alert"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-narrow-band-direct-printing",
+    "term": "narrow band direct printing",
+    "decision": "B",
+    "reason": "紙や受信機の絵は文字通信という方式の意味を十分に増やさない。",
+    "learningPoint": "文字通報を受ける通信方式。",
+    "risk": "一般のプリンタの絵になる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "狭帯域直接印刷通信",
+      "misleading_meanings": "",
+      "japanese_explanation": "受け取った文字通報を直接印刷・表示する狭帯域の通信方式です。音声通話との違いに注目します。",
+      "why_it_matters": "通信方式の指定が文字か音声かを取り違えずに読めます。",
+      "example": {
+        "english": "The station uses narrow band direct printing for text messages.",
+        "japanese": "局は文字通報に狭帯域直接印刷通信を用いる。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-radiotelephony",
+        "term-navtex"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-overboard",
+    "term": "overboard",
+    "decision": "A",
+    "reason": "船上と海中の人の位置の違いを直接読める。",
+    "learningPoint": "乗組員が船外の海中に転落した状況。",
+    "risk": "船の転覆と混同させない。非写実・非流血で、救助手順や装備選択を教えない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "person-overboard",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船外・海中へ",
+      "misleading_meanings": "",
+      "japanese_explanation": "船から外へ、とくに海中へ落ちたことを表します。人が主語なら転落の状況を読みます。",
+      "why_it_matters": "船自体の事故と、乗組員の海中転落を区別できます。",
+      "example": {
+        "english": "A crew member has fallen overboard.",
+        "japanese": "乗組員が海中に転落した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-survival-craft",
+        "term-capsize"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-aground",
+    "term": "aground",
+    "decision": "A",
+    "reason": "船底が海底に接している関係を文章より速く把握できる。",
+    "learningPoint": "船が浅瀬の底に接して座礁している状態。",
+    "risk": "投錨待機と混同せず、岩が甲板を貫くような不自然な構造を避ける。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-aground",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "座礁して",
+      "misleading_meanings": "錨を下ろして待つanchorageの場面とは異なります。",
+      "japanese_explanation": "船底が海底などに接して座礁した状態です。船が進めない理由として現れます。",
+      "why_it_matters": "停船しているだけなのか、座礁して動けないのかを判別できます。",
+      "example": {
+        "english": "The vessel is aground near the entrance.",
+        "japanese": "船は入口付近で座礁している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress",
+        "condition"
+      ],
+      "related_terms": [
+        "term-anchorage",
+        "term-under-keel-clearance"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-capsize",
+    "term": "capsize",
+    "decision": "A",
+    "reason": "船が横倒しに転覆した状態は通常の揺れと視覚的に区別できる。",
+    "learningPoint": "小型船が転覆した事故状態。",
+    "risk": "単なる横揺れとして描かず、転覆原因や全船型の法則を教えない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "boat-capsized",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "転覆する",
+      "misleading_meanings": "rollingは横揺れであり、それだけで転覆したことを意味しません。",
+      "japanese_explanation": "船が横倒しになるなどして転覆することです。波の話では、何が起きるおそれがあるのかを読みます。",
+      "why_it_matters": "単なる船の揺れと、転覆という事故を区別できます。",
+      "example": {
+        "english": "The small boat may capsize in these waves.",
+        "japanese": "この波では小型船が転覆するおそれがある。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-rolling",
+        "term-flooded"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-flooded",
+    "term": "flooded",
+    "decision": "A",
+    "reason": "船内の機関室に水が入った状態が、海面の波と区別できる。",
+    "learningPoint": "船の機関室が浸水している状態。",
+    "risk": "外の海面だけの画像にせず、浸水すべてが必ず沈没するという因果を加えない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "flooded-engine-room",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船体・機関室が浸水した",
+      "misleading_meanings": "",
+      "japanese_explanation": "船内などに水が入り、浸水した状態です。engine roomなら機関室で起きている問題を示します。",
+      "why_it_matters": "どの区画が浸水し、船にどんな危険があるかをつかめます。",
+      "example": {
+        "english": "The engine room is flooded and the ship is sinking.",
+        "japanese": "機関室が浸水し、船が沈みかけている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-bulkhead",
+        "term-capsize"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-seelonce-feenee",
+    "term": "seelonce feenee",
+    "decision": "C",
+    "reason": "沈黙の終了通知という通信上の意味は静かな海の絵では伝わらない。",
+    "learningPoint": "遭難通信の沈黙終了。",
+    "risk": "無通信の海を示すだけになる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "遭難通信に伴う沈黙終了の通知",
+      "misleading_meanings": "",
+      "japanese_explanation": "遭難通信に伴う沈黙が終了したことを知らせる表現です。終了の通知として読みます。",
+      "why_it_matters": "沈黙を続ける指示と、沈黙が終了した通知を区別できます。",
+      "example": {
+        "english": "The message SEELONCE FEENEE announced the end of distress silence.",
+        "japanese": "SEELONCE FEENEEという通報は遭難通信に伴う沈黙の終了を知らせた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "distress"
+      ],
+      "related_terms": [
+        "term-distress-traffic",
+        "term-clear"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-watch",
+    "term": "watch",
+    "decision": "B",
+    "reason": "受信機の前に座る人だけでは聴守・通常通話・時計の語義を区別しにくい。",
+    "learningPoint": "通信を受信できるよう聴守を続ける。",
+    "risk": "機器を見る行為だけを聴守と教える。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "見る／時計",
+      "specialized_meaning": "無線聴守／当直",
+      "misleading_meanings": "時計のwatchや、単に目で見る行為とは区別します。",
+      "japanese_explanation": "radio watchやkeep watchは、通信を受信できるよう聴守を続けることです。当直の意味も周囲の語で読み分けます。",
+      "why_it_matters": "watchを時計と読まず、通信を聞き続ける役割として理解できます。",
+      "example": {
+        "english": "Maintain a radio watch on the assigned frequency.",
+        "japanese": "指定周波数で無線聴守を続ける。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-guard",
+        "term-frequency"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-guard",
+    "term": "guard",
+    "decision": "B",
+    "reason": "聴守する機器の絵はwatchとほぼ同じで、一般義との対比を増やしにくい。",
+    "learningPoint": "周波数を目的語に取る聴守の動詞。",
+    "risk": "警備員・Coast Guardの画像へ引っ張る。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "守る／警備員",
+      "specialized_meaning": "周波数を聴守する",
+      "misleading_meanings": "Coast GuardのGuardは海上保安機関の名称で、動詞の聴守とは別です。",
+      "japanese_explanation": "動詞として周波数を目的語に取ると、その周波数を聴守する意味です。",
+      "why_it_matters": "周波数を守るという直訳から、通信を聞き続ける行為へ読み替えられます。",
+      "example": {
+        "english": "The operator guards two frequencies.",
+        "japanese": "通信士は二つの周波数を聴守している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-watch",
+        "term-frequency"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-traffic",
+    "term": "traffic",
+    "decision": "C",
+    "reason": "無線通信と船舶交通の両義を単一無文字画像で正確に区別しにくい。",
+    "learningPoint": "通信内容と船舶の往来の読み分け。",
+    "risk": "船の渋滞だけをtrafficの意味として固定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "交通",
+      "specialized_meaning": "無線通信のやり取り／船舶交通",
+      "misleading_meanings": "無線通信、船舶交通、道路交通を同じ意味に固定しません。",
+      "japanese_explanation": "radio trafficやdistress trafficは無線通信のやり取りです。vessel trafficなら船舶の往来を表します。",
+      "why_it_matters": "通信内容と船の混雑を、trafficの前後の語から区別できます。",
+      "example": {
+        "english": "Distress traffic has priority over routine messages.",
+        "japanese": "遭難通信は通常の通報より優先される。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-distress-traffic",
+        "term-congested"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-frequency",
+    "term": "frequency",
+    "decision": "C",
+    "reason": "周波数という量は無文字の通信場面から識別できない。",
+    "learningPoint": "無線周波数。",
+    "risk": "一般の出現頻度をヒートマップ化する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "頻度",
+      "specialized_meaning": "無線周波数",
+      "misleading_meanings": "一般英語の「出現頻度」とは違い、ここでは電波の周波数です。",
+      "japanese_explanation": "呼出しや聴守の対象となる無線周波数です。数値と単位が出る場合は、その指定先を読みます。",
+      "why_it_matters": "通信する周波数の指定を、物事の起きる頻度と取り違えずに読めます。",
+      "example": {
+        "english": "Indicate the frequency used for the call.",
+        "japanese": "呼出しに使った周波数を示す。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations"
+      ],
+      "related_terms": [
+        "term-watch",
+        "term-interference"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-interference",
+    "term": "interference",
+    "decision": "B",
+    "reason": "通信機に雑音記号を置くだけでは干渉と受信機故障の違いを示せない。",
+    "learningPoint": "他の送信等による通信の妨害。",
+    "risk": "受信機破損を描き別の原因に置換。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "干渉",
+      "specialized_meaning": "無線通信への干渉・妨害",
+      "misleading_meanings": "受信機そのものが故障するreceiver failureとは原因が異なります。",
+      "japanese_explanation": "他の送信などによって通信が妨げられることです。何が干渉を起こし、どの通信に影響するかを追います。",
+      "why_it_matters": "送信の停止が必要な理由を、通信への妨害として理解できます。",
+      "example": {
+        "english": "Another transmission caused interference with the position report.",
+        "japanese": "別の送信が位置報告への干渉を起こした。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations"
+      ],
+      "related_terms": [
+        "term-clear",
+        "term-receiver-failure"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-clear",
+    "term": "clear",
+    "decision": "C",
+    "reason": "周波数・係留場所という多義の空き状態を一つの絵で示すと適用対象を狭める。",
+    "learningPoint": "対象が空いている状態。",
+    "risk": "晴天や透明さの一般義へ引っ張る。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "明瞭な／取り除く",
+      "specialized_meaning": "周波数を空けておく／場所が空いている",
+      "misleading_meanings": "keep clear ofは対象から離れている意味です。「明瞭な」という訳だけに固定しません。",
+      "japanese_explanation": "周波数なら他の通信のために空けておくこと、係留場所なら空いていることを表します。何がclearなのかを見ます。",
+      "why_it_matters": "対象が周波数か水域かを見て、空いている状態の意味を読めます。",
+      "example": {
+        "english": "Keep this frequency clear for distress traffic.",
+        "japanese": "遭難通信のためこの周波数を空けておく。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations"
+      ],
+      "related_terms": [
+        "term-keep-clear",
+        "term-fairway"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-sensitivity",
+    "term": "sensitivity",
+    "decision": "C",
+    "reason": "弱い信号の検出能力という性能量を装置の絵だけでは表現できない。",
+    "learningPoint": "受信感度。",
+    "risk": "感情の敏感さや音量と混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "感受性・敏感さ",
+      "specialized_meaning": "受信機が弱い信号を受け取る能力を示す受信感度",
+      "misleading_meanings": "一般的な感情の敏感さではなく、receiverの受信感度です。",
+      "japanese_explanation": "受信機がどの程度弱い信号まで検出できるかに関わる感度です。設備の性能の話として読みます。",
+      "why_it_matters": "人の感受性ではなく、受信機の性能を比較していると分かります。",
+      "example": {
+        "english": "The receiver's sensitivity determines how weak a signal it can detect.",
+        "japanese": "受信感度はどれほど弱い信号を検出できるかに関わる。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "operations"
+      ],
+      "related_terms": [
+        "term-receiver-failure",
+        "term-interference"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-port",
+    "term": "port",
+    "decision": "B",
+    "reason": "港の絵は左舷の意味を隠し、左舷だけの絵も二義の区別を置き換えてしまうため本文による対比を優先。",
+    "learningPoint": "港と左舷を文脈で分ける。",
+    "risk": "見る人の向きだけで左舷を判断する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "港",
+      "specialized_meaning": "港と左舷を文脈で区別",
+      "misleading_meanings": "左舷のportの反対はstarboardです。港の意味か左舷の意味かを周囲の語で判断します。",
+      "japanese_explanation": "portに入る・出るなら港、port sideなら左舷です。同じ文章に両方の意味が出ることもあります。",
+      "why_it_matters": "既知の「港」だけで読まず、左舷側という位置関係も追えます。",
+      "example": {
+        "english": "The boat is on our port side near the entrance to the port.",
+        "japanese": "小型船は港の入口付近、こちらの左舷側にいる。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-starboard",
+        "term-next-port-of-call"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-starboard",
+    "term": "starboard",
+    "decision": "B",
+    "reason": "右舷は描けるが視点の条件が必要で、単独の無文字画像では左右を誤読させやすい。",
+    "learningPoint": "船首に向かうときの右舷。",
+    "risk": "観察者の右側と固定的な船側の混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "右舷",
+      "misleading_meanings": "左舷はportです。見る人の向きに合わせて左右を入れ替える語ではありません。",
+      "japanese_explanation": "船首に向かって右側の舷を指します。船に対してどちら側にあるかを表す語です。",
+      "why_it_matters": "他船の接近方向を、自分から見た右という曖昧な読み方から区別できます。",
+      "example": {
+        "english": "A small boat is approaching from starboard.",
+        "japanese": "小型船が右舷側から近づいている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-port"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-pilot",
+    "term": "pilot",
+    "decision": "B",
+    "reason": "服装や船への乗船だけでは船長と水先人、航空の操縦士を識別できない。",
+    "learningPoint": "海事の水先人と航空の操縦士の区別。",
+    "risk": "制服で職務を固定する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "航空機の操縦者",
+      "specialized_meaning": "水先人（海事）／操縦士（航空）",
+      "misleading_meanings": "航空機の操縦士のpilotと、海事の水先人を区別します。",
+      "japanese_explanation": "港への出入りなどを助ける水先人です。boardやportがある海事の場面では、この役割を読みます。",
+      "why_it_matters": "pilotを操縦士だけと考えず、船に乗る水先人として理解できます。",
+      "example": {
+        "english": "The pilot will board the ship before it enters the port.",
+        "japanese": "入港前に水先人が乗船する。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-port",
+        "term-bridge"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-berth",
+    "term": "berth",
+    "decision": "A",
+    "reason": "岸壁に船を着ける指定位置が港全体・錨地と視覚的に分かれる。",
+    "learningPoint": "船が岸壁の係留位置に着いている場面。",
+    "risk": "索の本数や配置を係留の正解として教えない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-at-berth",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "係留場所・岸壁の指定位置",
+      "misleading_meanings": "港全体のport、錨を下ろすanchorageとは場所の種類が異なります。",
+      "japanese_explanation": "岸壁などで船が係留される指定位置です。到着する港全体よりも狭い、船を着ける場所を表します。",
+      "why_it_matters": "港への到着と、具体的な係留位置への移動を分けて読めます。",
+      "example": {
+        "english": "The harbour master told us to wait until our berth was clear.",
+        "japanese": "港の管理者は、こちらの係留場所が空くまで待つよう伝えた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-anchorage",
+        "term-make-fast"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-anchorage",
+    "term": "anchorage",
+    "decision": "A",
+    "reason": "港外の水域で投錨待機する船は、岸壁のberthと位置関係が明確に違う。",
+    "learningPoint": "錨を下ろして待つ水域。",
+    "risk": "錨の構造を詳述せず、船が岸壁に係留されている絵にしない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-at-anchorage",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "錨地",
+      "misleading_meanings": "岸壁等の係留位置を指すberthとは区別します。",
+      "japanese_explanation": "錨を下ろして停泊する水域です。入港前にそこで待つ、といった位置指定として読みます。",
+      "why_it_matters": "待機場所が岸壁ではなく錨地だと分かります。",
+      "example": {
+        "english": "Wait at the anchorage outside the port.",
+        "japanese": "港外の錨地で待つ。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-berth",
+        "term-dragging"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-fairway",
+    "term": "fairway",
+    "decision": "B",
+    "reason": "航路の範囲は標識や文字がないと確定しにくく、浮標配置の誤った一般化を招く。",
+    "learningPoint": "通航する航路・水域。",
+    "risk": "特定の浮標方式や優先航路を捏造。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "航路・通航すべき水域",
+      "misleading_meanings": "一般的なゴルフのfairwayではありません。",
+      "japanese_explanation": "船が通航する航路・水域です。keep the fairway clearなら、通航の妨げにならないよう空けておく意味です。",
+      "why_it_matters": "港の通航路を塞いでいるかどうかという指示を理解できます。",
+      "example": {
+        "english": "Keep the fairway clear.",
+        "japanese": "航路を空けておく。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-keep-clear",
+        "term-congested"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-under-keel-clearance",
+    "term": "under keel clearance",
+    "decision": "A",
+    "reason": "船底と海底の間の余裕を空間として見せられる。",
+    "learningPoint": "船底の下に残る水の隙間。",
+    "risk": "水深全体や水面上の高さと混同しない。数値・技術図面へ広げない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "under-keel-gap",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船底と海底の余裕水深",
+      "misleading_meanings": "air draughtは水面から船の最高部までの高さで、船底下の余裕ではありません。",
+      "japanese_explanation": "船底と海底の間に残る余裕水深です。水深全体ではなく、船が通れるだけの下側の余裕を表します。",
+      "why_it_matters": "船の下側の余裕と、水面上の高さ制限を区別できます。",
+      "example": {
+        "english": "The ship waited for the tide to rise because the under keel clearance was too small.",
+        "japanese": "船底下の余裕水深が不足していたため、船は潮位が上がるのを待った。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-air-draught",
+        "term-aground"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-air-draught",
+    "term": "air draught",
+    "decision": "A",
+    "reason": "水面から船の最上部までの高さを橋梁の通過場面と結び付けられる。",
+    "learningPoint": "船の水面上の高さと上方の橋梁の関係。",
+    "risk": "橋梁の空き高さそのものをair draughtとして描かない。bridgeカードの船橋と区別。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-height-below-bridge",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "水面から船の最高部までの高さ",
+      "misleading_meanings": "橋梁のbridgeと操船場所のbridge（船橋）は別の意味です。",
+      "japanese_explanation": "水面から船の最高部までの高さです。橋梁の下を通れるかを考える場面では、上側の余裕が問題になります。",
+      "why_it_matters": "橋の下の通過に必要な船の高さを、船底下の余裕水深と区別できます。",
+      "example": {
+        "english": "Check the air draught before passing under the bridge.",
+        "japanese": "橋の下を通る前に水面から船の最高部までの高さを確認する。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-bridge",
+        "term-under-keel-clearance"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-make-fast",
+    "term": "make fast",
+    "decision": "B",
+    "reason": "索の固定方法を描くと未確認の巻き方・結び方を実運用の正解に見せやすい。",
+    "learningPoint": "係留索を固定する作業。",
+    "risk": "特定の索取扱手順を勝手に教える。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "係留索を固定する",
+      "misleading_meanings": "fastはここでは「速い」ではなく「しっかり固定した」の意味です。",
+      "japanese_explanation": "係留索を所定の場所に固定することです。fastを速度の話として読まないようにします。",
+      "why_it_matters": "速く動かす指示ではなく、索を固定する作業だと分かります。",
+      "example": {
+        "english": "Please make fast the forward mooring line at this berth.",
+        "japanese": "この係留場所で船首側の係留索を固定してください。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-lines",
+        "term-single-up"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-single-up",
+    "term": "single up",
+    "decision": "B",
+    "reason": "最小限の索を描くと本数・配置を普遍的な正解と受け取られやすい。",
+    "learningPoint": "出港前に索を最小限残す状態。",
+    "risk": "全索解放や固定本数を正解にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "出港前に係留索を最小限だけ残す状態にする",
+      "misleading_meanings": "すべての索を解いて岸壁から離れることそのものとは区別します。",
+      "japanese_explanation": "出港前に余分な係留索を外し、最小限の索を残した係留状態にすることです。まだすべてを解いた状態ではありません。",
+      "why_it_matters": "係留中から出港への準備段階に移ったことを読み取れます。",
+      "example": {
+        "english": "The crew will single up the mooring lines while preparing to leave the quay.",
+        "japanese": "乗組員は岸壁からの出港準備として、係留索を最小限だけ残す状態にする。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-lines",
+        "term-make-fast"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-lines",
+    "term": "lines",
+    "decision": "B",
+    "reason": "係留場面の索は描けるが、独立したロープの絵は文脈によるlineの読み分けを増やしにくい。",
+    "learningPoint": "係留索という対象。",
+    "risk": "通信回線や航路のlineとの区別が消える。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "線",
+      "specialized_meaning": "係留索",
+      "misleading_meanings": "一般の線、通信回線、航路などのlineとは、mooringの文脈で分けます。",
+      "japanese_explanation": "mooring linesは船を係留する索です。解く・固定するという動詞と一緒に、出港や係留の作業を読みます。",
+      "why_it_matters": "線や航路という直訳ではなく、作業する係留索だと分かります。",
+      "example": {
+        "english": "Release the mooring lines before departure.",
+        "japanese": "出港前に係留索を解く。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-make-fast",
+        "term-single-up"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-lock",
+    "term": "lock",
+    "decision": "B",
+    "reason": "水位調整を示すには段階表示が必要で、単一場面では運河の門と誤認しやすい。",
+    "learningPoint": "水位を調整して船を通す閘門。",
+    "risk": "設備構造・動作を未確認で具体化する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "錠・鍵を掛ける",
+      "specialized_meaning": "水位調整用の閘門",
+      "misleading_meanings": "普通の鍵・錠のlockとは異なります。",
+      "japanese_explanation": "船が通る際に水位を調整する閘門です。水が入る・水位が変わる描写が手がかりになります。",
+      "why_it_matters": "鍵をかける話ではなく、水位を調整して船を通す施設だと分かります。",
+      "example": {
+        "english": "The vessel waits while the lock fills with water.",
+        "japanese": "閘門に水が入る間、船は待つ。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-under-keel-clearance"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-estimated-time-of-arrival",
+    "term": "estimated time of arrival",
+    "decision": "C",
+    "reason": "到着の見込み時刻は数字なしの時計や港の絵では予定と実績を区別できない。",
+    "learningPoint": "到着予定時刻。",
+    "risk": "到着済みの場面を予定と教える。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "到着予定時刻",
+      "misleading_meanings": "",
+      "japanese_explanation": "目的地に到着する予定の時刻です。まだ到着したという報告ではなく、見込みを伝えます。",
+      "why_it_matters": "到着済みの時刻と、これからの到着予定を区別できます。",
+      "example": {
+        "english": "Our estimated time of arrival at the pilot station is 0900.",
+        "japanese": "水先人の乗船地点への到着予定時刻は09時00分だ。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-next-port-of-call",
+        "term-final-destination"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-next-port-of-call",
+    "term": "next port of call",
+    "decision": "C",
+    "reason": "寄港の順序は経路の図解が必要で、単一港の絵には語のnextが表れない。",
+    "learningPoint": "次に立ち寄る港。",
+    "risk": "最終目的地と同じ絵になる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "次の寄港地",
+      "misleading_meanings": "final destinationと一致するとは限りません。",
+      "japanese_explanation": "航海中に次に立ち寄る港です。最後の目的地とは限らず、航路の順序を示します。",
+      "why_it_matters": "次の寄港先を最終目的地と混同せずに読み取れます。",
+      "example": {
+        "english": "What is your next port of call?",
+        "japanese": "次の寄港地はどこか。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-final-destination",
+        "term-estimated-time-of-arrival"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-final-destination",
+    "term": "final destination",
+    "decision": "C",
+    "reason": "移動の終点という概念は一港の画像だけでは途中の寄港地と区別できない。",
+    "learningPoint": "最後の目的地。",
+    "risk": "寄港順を画像で捏造する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "最終目的地",
+      "misleading_meanings": "next port of callは次の寄港地であり、最終目的地とは限りません。",
+      "japanese_explanation": "航海や移動の最後の目的地です。途中で寄港する港と区別して、経路の終点を読みます。",
+      "why_it_matters": "途中の立寄り先ではなく、最終的に向かう場所を特定できます。",
+      "example": {
+        "english": "Our final destination is the port beyond the strait.",
+        "japanese": "最終目的地は海峡の先の港だ。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-next-port-of-call",
+        "term-estimated-time-of-arrival"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-radio-quarantine",
+    "term": "radio quarantine",
+    "decision": "B",
+    "reason": "通報場面は描けるが、検疫と普通の無線連絡の違いは文字の内容に依存する。",
+    "learningPoint": "検疫に関する無線連絡。",
+    "risk": "無線機隔離や特定国の手続を描く。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "無線による検疫",
+      "misleading_meanings": "",
+      "japanese_explanation": "入港前などに無線で検疫に関する連絡を行う場面です。radioは連絡手段を示しています。",
+      "why_it_matters": "通信の話が機器調整ではなく、検疫の手続に関するものだと分かります。",
+      "example": {
+        "english": "Before entering the port, the master sent a health report for radio quarantine.",
+        "japanese": "入港前に、船長は無線検疫のために健康状態の報告を送った。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "port"
+      ],
+      "related_terms": [
+        "term-estimated-time-of-arrival",
+        "term-port"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-dense-fog",
+    "term": "dense fog",
+    "decision": "A",
+    "reason": "港の入口の輪郭が濃霧で見えにくいという状況を直感的に理解できる。",
+    "learningPoint": "濃い霧が港の入口を覆う場面。",
+    "risk": "煙や単なる曇天にしない。視界不良の原因すべてが霧という表現にしない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "fog-at-harbour",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "濃霧",
+      "misleading_meanings": "poor visibilityは視界の状態、dense fogはその原因となる気象です。",
+      "japanese_explanation": "濃い霧で周囲が見えにくくなった状況です。視界不良の原因として読みます。",
+      "why_it_matters": "悪天候の中でも、視界を悪くしている原因が霧だと分かります。",
+      "example": {
+        "english": "Dense fog is covering the harbour entrance.",
+        "japanese": "濃霧が港の入口を覆っている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-poor-visibility",
+        "term-restricted-visibility"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-poor-visibility",
+    "term": "poor visibility",
+    "decision": "B",
+    "reason": "濃霧の画像で代用すると、視界の状態と原因の対比を消しやすい。",
+    "learningPoint": "周囲の見通しが悪い状態。",
+    "risk": "視界不良を濃霧だけに固定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "視界不良",
+      "misleading_meanings": "",
+      "japanese_explanation": "見通しが悪い状態です。原因が霧なのか別のものなのかは、文中の情報で判断します。",
+      "why_it_matters": "船の故障ではなく、周囲を見渡しにくい状況だとつかめます。",
+      "example": {
+        "english": "Reduce speed because of poor visibility.",
+        "japanese": "視界不良のため速度を落とす。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-dense-fog",
+        "term-restricted-visibility"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-restricted-visibility",
+    "term": "restricted visibility",
+    "decision": "B",
+    "reason": "視界制限の絵は濃霧カードと重なり、船の能力制約との区別は本文の方が正確。",
+    "learningPoint": "視界が制限されている状況。",
+    "risk": "特定の原因へ狭める。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "視界制限",
+      "misleading_meanings": "hamperedは操船の制約で、見通しの制限とは別です。",
+      "japanese_explanation": "霧などで視界が制限されている状況です。船そのものの運動能力の制約とは分けます。",
+      "why_it_matters": "視界が制限される話と、操船できる範囲が制限される話を区別できます。",
+      "example": {
+        "english": "The vessel is operating in restricted visibility.",
+        "japanese": "船は視界が制限された状況で運航している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-poor-visibility",
+        "term-hampered"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-hampered",
+    "term": "hampered",
+    "decision": "B",
+    "reason": "舵の損傷を描くと一般の操船制約を一原因に固定し、技術的な故障図になりやすい。",
+    "learningPoint": "操船が制約されている状態。",
+    "risk": "故障部位を捏造。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "妨げられた",
+      "specialized_meaning": "操船に制約がある",
+      "misleading_meanings": "視界が悪いrestricted visibilityとは、制約の対象が異なります。",
+      "japanese_explanation": "損傷などで船の操船に制約がある状態です。何によって妨げられているかをbyの後などから読みます。",
+      "why_it_matters": "船が動きにくい原因と、それに伴う運航上の制約を読み取れます。",
+      "example": {
+        "english": "The vessel is hampered by damage to its steering gear.",
+        "japanese": "操舵装置の損傷により操船が制約されている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-fouled",
+        "term-unseaworthy"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-fouled",
+    "term": "fouled",
+    "decision": "A",
+    "reason": "推進器に索が絡まる状態は、単に汚れたという一般義と区別しやすい。",
+    "learningPoint": "船の推進器にロープが絡んでいる状態。",
+    "risk": "propellerを船外の空中に置かない。装置の精密構造を必須として描かない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "rope-fouled-propeller",
+    "learnerSource": {
+      "general_meaning": "汚れた・絡まった等",
+      "specialized_meaning": "錨・推進器に絡まり等がある状態",
+      "misleading_meanings": "走錨draggingとは別の状態です。",
+      "japanese_explanation": "ロープなどが推進器や錨に絡まり、働きが妨げられた状態です。何がどこに絡んだのかを読みます。",
+      "why_it_matters": "単なる汚れではなく、絡まりによる機器の問題だと分かります。",
+      "example": {
+        "english": "The propeller is fouled by a rope.",
+        "japanese": "推進器にロープが絡まっている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-dragging",
+        "term-hampered"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-congested",
+    "term": "congested",
+    "decision": "B",
+    "reason": "多数の船の画像は描けるが、港の混雑以上の意味情報が少なく一カードの視認性を落とす。",
+    "learningPoint": "船舶の往来が混雑した状態。",
+    "risk": "衝突や遭難を余分に追加。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船舶交通等が混雑した",
+      "misleading_meanings": "ここでのtrafficは船舶の往来で、無線通信の内容ではありません。",
+      "japanese_explanation": "港や航路に船が多く、混雑している状態です。船が単独で故障した話とは区別します。",
+      "why_it_matters": "交通量の多さが運航の問題になっているとつかめます。",
+      "example": {
+        "english": "The harbour entrance is congested with vessels.",
+        "japanese": "港の入口は船で混雑している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-traffic",
+        "term-fairway"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-unseaworthy",
+    "term": "unseaworthy",
+    "decision": "C",
+    "reason": "航海に適するかの判断は船の見た目だけで確定できない。",
+    "learningPoint": "航海に適さない状態。",
+    "risk": "損傷の見た目を航海不適の一般基準にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "航海に適さない状態",
+      "misleading_meanings": "",
+      "japanese_explanation": "損傷などにより、航海に適さない状態です。修理の必要性や出港の可否につながる表現です。",
+      "why_it_matters": "小さな不具合の報告ではなく、航海に適するかが問題だと分かります。",
+      "example": {
+        "english": "The damaged vessel is unseaworthy.",
+        "japanese": "損傷した船は航海に適さない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-hampered",
+        "term-flooded"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-dragging",
+    "term": "dragging",
+    "decision": "B",
+    "reason": "錨が海底を引きずられる動きは単一画像で投錨と分けにくく、図解か複数段階が必要。",
+    "learningPoint": "錨が船の位置を保てない走錨。",
+    "risk": "錨を巻き上げる作業と誤認。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "引きずる",
+      "specialized_meaning": "走錨している",
+      "misleading_meanings": "錨を巻き上げている作業や、錨に索が絡むfouledとは区別します。",
+      "japanese_explanation": "anchor is draggingなら、錨が海底を引きずられて船を保持できない走錨の状態です。",
+      "why_it_matters": "錨を下ろしているのに船の位置が保てないという危険を読み取れます。",
+      "example": {
+        "english": "Our anchor is dragging in the strong wind.",
+        "japanese": "強風でこちらの錨が走錨している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-anchorage",
+        "term-fouled"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-rolling",
+    "term": "rolling",
+    "decision": "A",
+    "reason": "船幅方向の傾きと往復運動を船首側から示すと、縦揺れと区別できる。",
+    "learningPoint": "左右の横揺れ。",
+    "risk": "単なる恒常的な傾斜や転覆にせず、pitchingの方向を混ぜない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-rolling",
+    "learnerSource": {
+      "general_meaning": "転がる動き",
+      "specialized_meaning": "船の横揺れ",
+      "misleading_meanings": "pitchingは船首と船尾が上下する縦揺れです。",
+      "japanese_explanation": "船が左右に横揺れすることです。縦揺れのpitchingと対にして、揺れの向きを読みます。",
+      "why_it_matters": "波による船の動きが横揺れか縦揺れかを区別できます。",
+      "example": {
+        "english": "The vessel is rolling heavily from side to side.",
+        "japanese": "船は左右に激しく横揺れしている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-pitching",
+        "term-capsize"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-pitching",
+    "term": "pitching",
+    "decision": "A",
+    "reason": "横から船首・船尾の上下動を示すことで横揺れと明確に分けられる。",
+    "learningPoint": "船首と船尾が上下する縦揺れ。",
+    "risk": "横揺れの図を使い回さず、船が水面から完全に浮く描写を避ける。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-pitching",
+    "learnerSource": {
+      "general_meaning": "投げる動き等",
+      "specialized_meaning": "船の縦揺れ",
+      "misleading_meanings": "rollingは横揺れであり、pitchingとは別の動きです。",
+      "japanese_explanation": "船首と船尾が上下する縦揺れです。左右に傾くrollingとは揺れの向きが異なります。",
+      "why_it_matters": "船首・船尾の上下動を、左右の傾きと取り違えずに読めます。",
+      "example": {
+        "english": "The vessel is pitching, with its bow rising and falling.",
+        "japanese": "船首が上がったり下がったりして、船が縦揺れしている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-rolling",
+        "term-swell"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-swell",
+    "term": "swell",
+    "decision": "B",
+    "reason": "静止した波の絵では遠方から伝わるうねりと現地の風波を区別しにくい。",
+    "learningPoint": "離れた場所から伝わるうねり。",
+    "risk": "荒波の一般画像へ置換。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "うねり",
+      "misleading_meanings": "船の揺れそのものではなく、揺れを起こす海の状態です。",
+      "japanese_explanation": "離れた場所から伝わってくる波によるうねりです。風の強さだけではなく、海面の動きを表します。",
+      "why_it_matters": "気象の風と、船に届く海のうねりを分けて状況をつかめます。",
+      "example": {
+        "english": "A heavy swell is approaching from the west.",
+        "japanese": "大きなうねりが西から近づいている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-rolling",
+        "term-pitching"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-ballast",
+    "term": "ballast",
+    "decision": "B",
+    "reason": "バラストタンクの場所・水の調整は船型依存で、未確認の配管図へ広がる。",
+    "learningPoint": "船の姿勢・安定のための重し。",
+    "risk": "意図的な水と浸水を同じ絵にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船の姿勢を保つバラスト",
+      "misleading_meanings": "バラストの水は船の安定のためで、floodedが示す浸水とは異なります。",
+      "japanese_explanation": "船の姿勢や安定を保つための重しです。水のバラストについて書かれる場合もあります。",
+      "why_it_matters": "船内の水が意図的なバラストか、浸水した水かを区別できます。",
+      "example": {
+        "english": "Adjust the ballast before departure.",
+        "japanese": "出港前にバラストを調整する。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition",
+        "structure"
+      ],
+      "related_terms": [
+        "term-flooded",
+        "term-rolling"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-heading",
+    "term": "heading",
+    "decision": "C",
+    "reason": "向首方向と進行方向の差を確実に示すには複数ベクトルの図解が必要で、単一矢印画像では意味を壊しやすい。",
+    "learningPoint": "船首・機首の向く方向。",
+    "risk": "courseと同じ船＋矢印へ単純化。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "見出し／向かうこと",
+      "specialized_meaning": "船・航空機の向首方向",
+      "misleading_meanings": "heading for a portは港へ向かうという用法です。名詞のheadingと同じ説明にしません。",
+      "japanese_explanation": "船首・機首が向いている方向です。向首方向を保持する装置などで使われます。",
+      "why_it_matters": "目的地へ向かうという動詞用法と、向首方向という名詞用法を区別できます。",
+      "example": {
+        "english": "The heading control system maintains the assigned direction.",
+        "japanese": "向首方向制御装置は指定された方向を維持する。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-course",
+        "term-bearing"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-bearing",
+    "term": "bearing",
+    "decision": "C",
+    "reason": "方位は基準・観測位置を明示する必要があり、単一場面から値や方向を読み取れない。",
+    "learningPoint": "対象の位置を示す方位。",
+    "risk": "自船の向首方向と混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "態度・関連等",
+      "specialized_meaning": "基準方向からの方位",
+      "misleading_meanings": "自船の向首方向headingや針路courseと同じものとは限りません。",
+      "japanese_explanation": "船などの対象が基準方向からどちらにあるかを表す方位です。誰の何の方位かを確認します。",
+      "why_it_matters": "船が向く方向と、別の船の位置を示す方位を区別できます。",
+      "example": {
+        "english": "Report the bearing of the rescue vessel.",
+        "japanese": "救助船の方位を報告する。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition",
+        "aviation"
+      ],
+      "related_terms": [
+        "term-heading",
+        "term-course"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-course",
+    "term": "course",
+    "decision": "C",
+    "reason": "針路とheadingの対比を無文字の単一船画像で精確に示すのは難しい。",
+    "learningPoint": "船・航空機の針路。",
+    "risk": "headingと同じ矢印画像にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "講座／経過",
+      "specialized_meaning": "船舶・航空機の針路",
+      "misleading_meanings": "during the course ofは「〜の過程で」です。台風の進路も船の針路とは対象が違います。",
+      "japanese_explanation": "船や航空機が進む針路です。course and speedなら、航行方向と速度を報告しています。",
+      "why_it_matters": "航行の針路を、過程や講座という一般的な意味から切り分けられます。",
+      "example": {
+        "english": "Send the vessel's course and speed.",
+        "japanese": "船の針路と速度を送る。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-heading",
+        "term-bearing"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-cable",
+    "term": "cable",
+    "decision": "C",
+    "reason": "距離単位は縮尺・数値なしの絵では学習情報を増やせない。",
+    "learningPoint": "海事の距離単位。",
+    "risk": "電線の一般義を描く。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "ケーブル",
+      "specialized_meaning": "海事の距離単位ケーブル",
+      "misleading_meanings": "一般の電線・ケーブルの意味もあるので、数値とfromなどの位置表現を確認します。",
+      "japanese_explanation": "海事の距離単位として、数と一緒に使われます。浮標から何cablesという表現では距離を読みます。",
+      "why_it_matters": "船と目標の離れ具合を、索や電線の話と取り違えずに読めます。",
+      "example": {
+        "english": "The vessel is two cables from the buoy.",
+        "japanese": "船は浮標から2ケーブルの距離にいる。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-knots",
+        "term-bearing"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-knots",
+    "term": "knots",
+    "decision": "C",
+    "reason": "速度単位は静止画だけでは数や意味を示せない。",
+    "learningPoint": "船速の単位ノット。",
+    "risk": "結び目の一般義を描く。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "結び目",
+      "specialized_meaning": "船速の単位ノット",
+      "misleading_meanings": "索の結び目を表すknotsとは別です。",
+      "japanese_explanation": "船の速さを示すノットです。数値と一緒に船速を読むための単位として扱います。",
+      "why_it_matters": "船速の数値を、索の結び目の数と混同せずに理解できます。",
+      "example": {
+        "english": "The vessel is travelling at twelve knots.",
+        "japanese": "船は12ノットで航行している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-cable",
+        "term-course"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-make-a-lee",
+    "term": "make a lee",
+    "decision": "B",
+    "reason": "風向と遮蔽側を描くには図解が必要で、船の大小や配置を未確認の操船手順へ固定しやすい。",
+    "learningPoint": "風の影響が小さい場所を作る。",
+    "risk": "避航の優先関係を追加する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "風よけを作る",
+      "misleading_meanings": "",
+      "japanese_explanation": "船などを風よけにして、風の影響が小さい場所を作ることです。救助艇が作業する場面などで読みます。",
+      "why_it_matters": "救助艇のために風を避ける場所を作る行為だと分かります。",
+      "example": {
+        "english": "The larger vessel will make a lee for the rescue boat.",
+        "japanese": "大型船が救助艇のために風よけを作る。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-heave-to",
+        "term-on-scene"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-heave-to",
+    "term": "heave to",
+    "decision": "B",
+    "reason": "低速・停船に近い状態は航行中の船と静止画で分けにくい。",
+    "learningPoint": "援助を待つために船の動きを抑える。",
+    "risk": "投錨や機関故障と同じ場面になる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船を減速・停船に近い状態に保つ",
+      "misleading_meanings": "",
+      "japanese_explanation": "船を減速させ、停船に近い状態を保つことです。援助を待つなど、航行を抑える場面で読みます。",
+      "why_it_matters": "援助を待つ船が進み続けるのではなく、動きを抑えていると分かります。",
+      "example": {
+        "english": "The vessel will heave to while waiting for assistance.",
+        "japanese": "船は援助を待つ間、停船に近い状態を保つ。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-make-a-lee",
+        "term-anchorage"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-give-way",
+    "term": "give way",
+    "decision": "C",
+    "reason": "避航の関係を絵にすると未確認の優先規則を暗示しやすい。",
+    "learningPoint": "他船を避ける側の行動。",
+    "risk": "船の大小や船型を優先の規則として描く。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "避航する",
+      "misleading_meanings": "船の大小だけで避航する側を決める意味ではありません。",
+      "japanese_explanation": "他船の進路を避けることです。どの船が避航するかは、その文が示す関係から読みます。",
+      "why_it_matters": "他船との位置関係の中で、避ける側の行動を読み取れます。",
+      "example": {
+        "english": "Our vessel will give way and let the other vessel pass.",
+        "japanese": "こちらの船は避航して、他船を通す。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-keep-clear",
+        "term-course"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-keep-clear",
+    "term": "keep clear",
+    "decision": "B",
+    "reason": "対象から離れる関係は描けるが、静止画では安全距離や動作を普遍的な指示に見せやすい。",
+    "learningPoint": "対象から離れている。",
+    "risk": "clear the fairwayと混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "対象から離れている（keep clear of）",
+      "misleading_meanings": "clear a channelの「航路を空ける」と、keep clear ofの「対象から離れる」を区別します。",
+      "japanese_explanation": "keep clear ofに続く船や航路などから離れていることです。ofの後ろが避ける対象になります。",
+      "why_it_matters": "どの対象に近づかないよう指示されているかを特定できます。",
+      "example": {
+        "english": "Keep clear of the rescue vessel.",
+        "japanese": "救助船から離れておく。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-clear",
+        "term-give-way",
+        "term-fairway"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-automatic-identification-system",
+    "term": "automatic identification system",
+    "decision": "B",
+    "reason": "機器外観では船の識別情報を自動で送る機能が見えず文字を必要とする。",
+    "learningPoint": "船の識別情報を伝える装置。",
+    "risk": "EPIRBとの機能差を見た目だけで判定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "船舶自動識別装置",
+      "misleading_meanings": "",
+      "japanese_explanation": "船の識別情報などを自動で伝える装置です。誰の船の情報かを確認する場面で読みます。",
+      "why_it_matters": "船の識別情報を送る設備だと分かり、遭難用装置と役割を分けられます。",
+      "example": {
+        "english": "The automatic identification system reported the vessel's identity and position.",
+        "japanese": "船舶自動識別装置は船の識別情報と位置を伝えた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-epirb",
+        "term-ship-station"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-bridge",
+    "term": "bridge",
+    "decision": "A",
+    "reason": "船の上部で前方を見ながら操船する場所が普通の橋梁と明確に区別できる。",
+    "learningPoint": "操船・航行を管理する船橋。",
+    "risk": "道路橋に置換しない。細かい計器や機種を識別の条件にしない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "ship-bridge",
+    "learnerSource": {
+      "general_meaning": "川などを渡る橋",
+      "specialized_meaning": "船の操船・航行を管理する船橋",
+      "misleading_meanings": "pass under the bridgeなら橋梁です。船橋の意味をそのまま当てはめません。",
+      "japanese_explanation": "船内で操船・航行を管理する船橋です。人がon the bridgeにいるなら、勤務する場所を表します。",
+      "why_it_matters": "船長のいる船橋と、船がくぐる橋梁を文脈で区別できます。",
+      "example": {
+        "english": "The master called the operator from the bridge before departure.",
+        "japanese": "出港前に、船長は船橋から通信士を呼んだ。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "condition"
+      ],
+      "related_terms": [
+        "term-air-draught",
+        "term-master"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-regularity-of-flight",
+    "term": "regularity of flight",
+    "decision": "C",
+    "reason": "正常な運航という概念は飛行機の絵だけでは伝わらない。",
+    "learningPoint": "飛行の正常な運航。",
+    "risk": "定時性だけに狭める。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "飛行の正常な運航",
+      "misleading_meanings": "定時性だけを意味するとは限りません。flight regularityも同じ運航概念の表現です。",
+      "japanese_explanation": "飛行が正常に運航されることを表します。安全と並んで、通信の目的として述べられる概念です。",
+      "why_it_matters": "運航に関する通報を、時刻の正確さだけの話へ狭めずに読めます。",
+      "example": {
+        "english": "The message concerned the regularity of flight, not the passengers' personal calls.",
+        "japanese": "その通報は飛行の正常な運航に関するもので、乗客の私的な通話ではなかった。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-air-traffic-services",
+        "term-public-correspondence"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-public-correspondence",
+    "term": "public correspondence",
+    "decision": "C",
+    "reason": "公衆通信は通信内容の区分で、郵便や人物の画像では専門義がずれる。",
+    "learningPoint": "業務通報と区別される公衆通信。",
+    "risk": "私的な手紙の一般義へ引っ張る。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "公衆通信",
+      "misleading_meanings": "",
+      "japanese_explanation": "業務用の通報と区別して扱われる公衆通信です。通信サービスが何を取り扱うかを読みます。",
+      "why_it_matters": "業務連絡と公衆通信の区別を、局の役割の説明から読み取れます。",
+      "example": {
+        "english": "The station handled public correspondence after the operational messages.",
+        "japanese": "局は運航に関する通報の後に公衆通信を取り扱った。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-regularity-of-flight",
+        "term-aeronautical-station"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-air-traffic-services",
+    "term": "air traffic services",
+    "decision": "B",
+    "reason": "航空機と管制塔の絵は描けるが、業務全体を特定の建物・局へ狭める。",
+    "learningPoint": "航空交通に関わる業務。",
+    "risk": "航空局と業務を同一視する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "航空交通業務",
+      "misleading_meanings": "",
+      "japanese_explanation": "航空交通の管理などに関する業務です。通報の宛先・目的として現れる表現です。",
+      "why_it_matters": "航空交通に関する業務へ送られる通報だと位置付けられます。",
+      "example": {
+        "english": "The aircraft sent its position report to air traffic services.",
+        "japanese": "航空機は航空交通業務に向けて位置報告を送った。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-aeronautical-station",
+        "term-regularity-of-flight"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-standardized-phraseology",
+    "term": "standardized phraseology",
+    "decision": "C",
+    "reason": "標準通信表現は言葉の使い方であり、航空機の絵では識別できない。",
+    "learningPoint": "標準化された通信表現。",
+    "risk": "一般航空のイメージを添えるだけ。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "標準通信表現",
+      "misleading_meanings": "",
+      "japanese_explanation": "通信で用いる標準化された表現です。指定された状況の表現を使う、という規定を読む入口になります。",
+      "why_it_matters": "標準表現を使う原則と、普通の言葉で伝える例外を分けて読めます。",
+      "example": {
+        "english": "The pilot used standardized phraseology to report the aircraft's position.",
+        "japanese": "操縦士は標準通信表現を使って航空機の位置を報告した。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-plain-language",
+        "term-only-when"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-plain-language",
+    "term": "plain language",
+    "decision": "C",
+    "reason": "普通の言葉という表現方法は文字なし画像で標準表現と対比できない。",
+    "learningPoint": "標準表現で伝えきれない場合の普通の言葉。",
+    "risk": "暗号に対する平文の絵にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "普通の言葉による表現",
+      "misleading_meanings": "暗号に対する「平文」という意味に読み替えません。この場面では標準通信表現との対比です。",
+      "japanese_explanation": "標準表現で伝えきれない内容を、普通の言葉で伝えることです。使用できる条件と合わせて読みます。",
+      "why_it_matters": "自由な表現をいつ使えるのか、標準表現との関係から読めます。",
+      "example": {
+        "english": "The pilot used plain language because the standard phrase could not convey the problem.",
+        "japanese": "操縦士は標準表現では問題を伝えられなかったため、普通の言葉で伝えた。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-standardized-phraseology",
+        "term-only-when"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-receiver-failure",
+    "term": "receiver failure",
+    "decision": "B",
+    "reason": "破損した受信機の外観は実際の受信故障の意味を固定してしまう。",
+    "learningPoint": "応答を受信できない故障。",
+    "risk": "干渉や送信機故障と混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "受信機故障",
+      "misleading_meanings": "",
+      "japanese_explanation": "受信機の故障です。送信ができても相手の応答を受信できない状況を読みます。",
+      "why_it_matters": "通信不能の原因が受信側にあると判断できます。",
+      "example": {
+        "english": "A receiver failure prevented the aircraft from hearing the station's reply.",
+        "japanese": "受信機の故障で、航空機は局からの返答を聞けなかった。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-transmitting-blind",
+        "term-interference"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-transmitting-blind",
+    "term": "transmitting blind",
+    "decision": "C",
+    "reason": "送信できても受信できない状況は単一無文字場面で示せない。",
+    "learningPoint": "応答を聞けないまま送信する。",
+    "risk": "無送信や視覚障害の一般義へ引っ張る。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "受信できない状態での送信",
+      "misleading_meanings": "",
+      "japanese_explanation": "相手の応答を受信できない状態で送信していることです。受信機故障などの理由と一緒に読みます。",
+      "why_it_matters": "送信は続いていても、返答を聞けない通信状況だと分かります。",
+      "example": {
+        "english": "The aircraft is transmitting blind because its receiver has failed.",
+        "japanese": "受信機故障のため航空機は応答を受信できないまま送信している。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "aviation"
+      ],
+      "related_terms": [
+        "term-receiver-failure",
+        "term-aircraft-station"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-shall",
+    "term": "shall",
+    "decision": "C",
+    "reason": "義務の構文機能は物・人物の絵で正確に示せない。",
+    "learningPoint": "主体に義務を課す。",
+    "risk": "法律書やハンマーの装飾になる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "未来・申し出等で習う助動詞",
+      "specialized_meaning": "規定文の義務",
+      "misleading_meanings": "一般的な未来表現と同じ読み方にせず、規定上の義務を確認します。",
+      "japanese_explanation": "規定が主体に義務を課す語です。shallの前に誰が、後ろに何をするかを確認します。",
+      "why_it_matters": "行為の予定ではなく、誰に何が義務付けられるかを読めます。",
+      "example": {
+        "english": "The operator shall report the failure before departure.",
+        "japanese": "通信士は出発前に故障を報告しなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-shall-not",
+        "term-may"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-shall-not",
+    "term": "shall not",
+    "decision": "C",
+    "reason": "禁止の構文は画像の動作だけでは義務との区別が成立しない。",
+    "learningPoint": "行為を禁止する。",
+    "risk": "非義務と禁止の混同。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "禁止を表す規定",
+      "misleading_meanings": "「しなくてもよい」ではなく「してはならない」です。",
+      "japanese_explanation": "規定が行為を禁止する形です。notを落とすと義務と反対の意味になります。",
+      "why_it_matters": "禁止を義務に読み違えることを防げます。",
+      "example": {
+        "english": "The station shall not interfere with distress traffic.",
+        "japanese": "局は遭難通信を妨げてはならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-shall",
+        "term-may"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-may",
+    "term": "may",
+    "decision": "C",
+    "reason": "許可と可能性は画像の行為から判定できない。",
+    "learningPoint": "文脈に応じた許可。",
+    "risk": "実行した行為を許可・義務と断定。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "〜かもしれない",
+      "specialized_meaning": "規定文の許可・可能性：文脈を区別",
+      "misleading_meanings": "許可のmayは義務のshallと異なります。可能性のmayも別にあります。",
+      "japanese_explanation": "規定では許可を表すことがあります。一般的な可能性の意味か、行為が認められる意味かを文脈で判断します。",
+      "why_it_matters": "許可された行為を、必ず行う義務と取り違えずに読めます。",
+      "example": {
+        "english": "The station may relay the message if the channel is clear.",
+        "japanese": "通信路が空いていれば局は通報を中継してよい。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-shall",
+        "term-only-when",
+        "term-provided"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-unless",
+    "term": "unless",
+    "decision": "C",
+    "reason": "例外条件は単一場面で論理関係を保てない。",
+    "learningPoint": "本則が外れる条件。",
+    "risk": "条件を逆に示す。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "例外条件",
+      "misleading_meanings": "unless以下を、その行為を行うための条件と逆に読まないようにします。",
+      "japanese_explanation": "ある場合を除いて本則が適用されることを表します。例外になる条件を後ろの節で確認します。",
+      "why_it_matters": "義務が外れる条件を読み落とさずに理解できます。",
+      "example": {
+        "english": "The station shall keep watch unless another station takes over.",
+        "japanese": "別の局が引き継ぐ場合を除き、その局は聴守を続けなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-except",
+        "term-provided"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-except",
+    "term": "except",
+    "decision": "C",
+    "reason": "対象の除外は無文字の場面だけでは特定できない。",
+    "learningPoint": "適用対象からの除外。",
+    "risk": "適用対象を画像で固定する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "除外・例外",
+      "misleading_meanings": "unlessが条件節で例外を示すのに対し、exceptの後ろでは除外対象を確認します。",
+      "japanese_explanation": "規定の対象から外す人・物・場合を示します。allと一緒なら、除外される対象に注目します。",
+      "why_it_matters": "全員に適用されるように見える規定の除外対象を見つけられます。",
+      "example": {
+        "english": "All stations except the controlling station shall remain silent.",
+        "japanese": "統制局を除くすべての局は沈黙しなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-unless",
+        "term-regardless-of"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-provided",
+    "term": "provided",
+    "decision": "C",
+    "reason": "条件付きの許可は物の外観に置換できない。",
+    "learningPoint": "許可が成立する条件。",
+    "risk": "装備されているprovidedの用法へ引っ張る。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "提供された",
+      "specialized_meaning": "〜という条件で（provided that）",
+      "misleading_meanings": "be provided withは「備えている」であり、この条件節の用法とは別です。",
+      "japanese_explanation": "provided that以下で、許可などが成り立つ条件を示します。前半の行為と、後半の条件を対応させます。",
+      "why_it_matters": "条件付きの許可を無条件の許可と取り違えずに読めます。",
+      "example": {
+        "english": "The station may transmit, provided that the frequency is clear.",
+        "japanese": "周波数が空いているという条件で局は送信してよい。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-only-when",
+        "term-subject-to"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-subject-to",
+    "term": "subject to",
+    "decision": "C",
+    "reason": "承認や他規定との適用関係は単一場面にできない。",
+    "learningPoint": "承認・規定による制約。",
+    "risk": "無条件の許可の絵になる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": "subjectの教科・主題等からは句の関係を取りにくい",
+      "specialized_meaning": "〜に従う・〜による制約を受ける",
+      "misleading_meanings": "単に話題を示すsubjectという名詞の用法とは異なります。",
+      "japanese_explanation": "行為が承認や別の規定などによる制約を受けることを示します。後ろにある制約の内容を確認します。",
+      "why_it_matters": "使用などが認められていても、必要な承認や制約を見落とさずに読めます。",
+      "example": {
+        "english": "The equipment may be used subject to approval by the Administration.",
+        "japanese": "主管庁の承認を条件に設備を使用してよい。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-provided",
+        "term-in-accordance-with",
+        "term-administration"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-at-least",
+    "term": "at least",
+    "decision": "C",
+    "reason": "下限は数値・比較が必要で、物の数を描くと実際の必要数を捏造する。",
+    "learningPoint": "数量の下限。",
+    "risk": "二台の機器を普遍的義務にする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "最低限・少なくとも",
+      "misleading_meanings": "「ちょうど」でも「多くとも」でもありません。",
+      "japanese_explanation": "数量の下限を示します。at least twoなら、二つだけに限定せず二つ以上を含みます。",
+      "why_it_matters": "必要数の下限を、上限や固定数と取り違えずに読めます。",
+      "example": {
+        "english": "The station shall use at least two receivers.",
+        "japanese": "局は少なくとも2台の受信機を使用しなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-shall"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-in-accordance-with",
+    "term": "in accordance with",
+    "decision": "C",
+    "reason": "準拠先という構文は書類の絵だけでは伝わらない。",
+    "learningPoint": "従う手順・規定との関係。",
+    "risk": "法令講座へ拡張。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "〜に従って",
+      "misleading_meanings": "",
+      "japanese_explanation": "行為がどの規定・手順に従うかを示します。withの後ろにある準拠先を読みます。",
+      "why_it_matters": "行動の内容と、従うべき手順や規定を結び付けて読めます。",
+      "example": {
+        "english": "The operator shall act in accordance with the approved procedure.",
+        "japanese": "通信士は承認済みの手順に従って行動しなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-subject-to",
+        "term-administration"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-prior-to",
+    "term": "prior to",
+    "decision": "C",
+    "reason": "時系列は単一場面では前後を識別できない。",
+    "learningPoint": "ある出来事の前。",
+    "risk": "出発時刻を捏造する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "〜の前に",
+      "misleading_meanings": "",
+      "japanese_explanation": "ある出来事より前の時点を示します。departureなら、出発前に済ませる行為を読みます。",
+      "why_it_matters": "必要な作業の順序を、出発後と取り違えずに理解できます。",
+      "example": {
+        "english": "The operator shall test the equipment prior to departure.",
+        "japanese": "通信士は出発前に設備を試験しなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-without-delay"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-only-when",
+    "term": "only when",
+    "decision": "C",
+    "reason": "限定条件を無文字の場面から読めない。",
+    "learningPoint": "条件が満たされる場合に限る。",
+    "risk": "一つの状況を許可の全条件とする。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "〜の場合に限って",
+      "misleading_meanings": "単なるwhenと違い、onlyが適用条件を限定しています。",
+      "japanese_explanation": "行為が許される条件を限定します。when以下が満たされる場合に限られる、と読みます。",
+      "why_it_matters": "条件以外の場面でも許されるという読み過ぎを防げます。",
+      "example": {
+        "english": "The station may transmit only when the channel is clear.",
+        "japanese": "通信路が空いている場合に限り局は送信してよい。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-provided",
+        "term-plain-language"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-where-practicable",
+    "term": "where practicable",
+    "decision": "C",
+    "reason": "実行可能性の限定は一つの場面へ固定できない。",
+    "learningPoint": "実行可能な場合の条件。",
+    "risk": "場所を示すwhereに誤読させる。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "実行可能な場合",
+      "misleading_meanings": "whereを場所の指定と読むのではなく、実行可能な場合という条件です。",
+      "japanese_explanation": "実行可能な場合に、という限定です。場所を尋ねるwhereではなく、行為の実行可能性を見ます。",
+      "why_it_matters": "実行可能性を伴う義務を、無条件の義務と取り違えずに読めます。",
+      "example": {
+        "english": "The master shall inform the rescue service where practicable.",
+        "japanese": "実行可能な場合、船長は救助機関に知らせなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-shall",
+        "term-unless"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-on-the-authority-of",
+    "term": "on the authority of",
+    "decision": "C",
+    "reason": "権限関係は人物の服装や位置では確定できない。",
+    "learningPoint": "誰の権限に基づく行為か。",
+    "risk": "役職の見た目で権限を推測する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "〜の権限に基づいて",
+      "misleading_meanings": "",
+      "japanese_explanation": "誰の権限に基づいて行為を行うかを示します。ofの後ろに来る人や機関を確認します。",
+      "why_it_matters": "実行する人と、その行為を認める権限を持つ人を分けられます。",
+      "example": {
+        "english": "The operator may transmit on the authority of the master.",
+        "japanese": "通信士は船長の権限に基づいて送信してよい。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-master",
+        "term-subject-to"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-without-delay",
+    "term": "without delay",
+    "decision": "C",
+    "reason": "遅滞なくという時の指示は時計画像では示せない。",
+    "learningPoint": "先送りせず行う。",
+    "risk": "具体的な時間の下限を捏造する。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "遅滞なく",
+      "misleading_meanings": "",
+      "japanese_explanation": "知らせるなどの行為を遅滞なく行うことを表します。具体的な分数を指定する表現ではありません。",
+      "why_it_matters": "行為を先送りしてよいかどうかを、時間に関する指示から読めます。",
+      "example": {
+        "english": "The master shall notify the rescue service without delay.",
+        "japanese": "船長は遅滞なく救助機関へ知らせなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-prior-to"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-regardless-of",
+    "term": "regardless of",
+    "decision": "C",
+    "reason": "違いに左右されない適用は一場面だけでは論理関係を描けない。",
+    "learningPoint": "相違にかかわらない適用。",
+    "risk": "適用除外を逆に示す。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "〜にかかわらず",
+      "misleading_meanings": "exceptが除外を示すのに対し、regardless ofはその違いにかかわらない適用を示します。",
+      "japanese_explanation": "後ろに示す違いに左右されず、本則が適用されることを表します。何を条件にしないかを確認します。",
+      "why_it_matters": "発信元などを理由に規定の対象から外さないことが読めます。",
+      "example": {
+        "english": "The station shall accept distress calls regardless of their origin.",
+        "japanese": "局は発信元にかかわらず遭難呼出しを受け付けなければならない。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "rules"
+      ],
+      "related_terms": [
+        "term-except"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-bulkhead",
+    "term": "bulkhead",
+    "decision": "B",
+    "reason": "船内壁は描けるが区画を分ける機能には断面・構造図が必要で、通常の壁との差が小さい。",
+    "learningPoint": "船内を区画に分ける隔壁。",
+    "risk": "未確認の水密構造を一律に描く。",
+    "sharedIllustration": null,
+    "candidateAssetId": null,
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "隔壁",
+      "misleading_meanings": "",
+      "japanese_explanation": "船内を区画に分ける隔壁です。水漏れの描写では、どの区画へ浸水が広がるかを読む手がかりになります。",
+      "why_it_matters": "船体のどの部分から水が漏れているかを特定できます。",
+      "example": {
+        "english": "Water is leaking through the bulkhead.",
+        "japanese": "隔壁から水が漏れている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "structure"
+      ],
+      "related_terms": [
+        "term-flooded"
+      ]
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  },
+  {
+    "learningEntityId": "term-bulbous-bow",
+    "term": "bulbous bow",
+    "decision": "A",
+    "reason": "水線下の球状突出部の位置・形を直感的に確認できる。",
+    "learningPoint": "船首の水面付近にある球状の突出部分。",
+    "risk": "船尾やプロペラにしない。全船に装備されるという一般化をしない。",
+    "sharedIllustration": null,
+    "candidateAssetId": "bulbous-bow",
+    "learnerSource": {
+      "general_meaning": null,
+      "specialized_meaning": "球状船首",
+      "misleading_meanings": "",
+      "japanese_explanation": "船首の水面付近にある球状の突出部分です。船の構造を説明する文章では、その位置と形を読みます。",
+      "why_it_matters": "船首の形を説明していることが分かり、船の状態の話と区別できます。",
+      "example": {
+        "english": "The drawing shows the bulbous bow below the waterline.",
+        "japanese": "図には水線より下の球状船首が示されている。",
+        "source": "E2_original_teaching_example_not_exam_quote",
+        "not_operational_instruction": true
+      },
+      "learning_groups": [
+        "structure"
+      ],
+      "related_terms": []
+    },
+    "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403"
+  }
+]

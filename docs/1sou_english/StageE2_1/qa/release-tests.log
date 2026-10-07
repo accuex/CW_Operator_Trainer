@@ -1,0 +1,18 @@
+
+> sites-project@1.1.0 test
+> vitest run --config vitest.config.ts lib/english lib/appPaths.test.ts
+
+
+ RUN  v3.2.4 /Users/macha/Project/CW_Operator_Trainer
+
+ ✓ lib/appPaths.test.ts (2 tests) 1ms
+ ✓ lib/english/english.test.ts (5 tests) 8ms
+ ✓ lib/english/editorial.test.ts (4 tests) 14ms
+ ✓ lib/english/illustrations.test.ts (4 tests) 396ms
+   ✓ English illustration release safeguards > preserves the complete E2.0.1 master, including learner wording and metadata  380ms
+
+ Test Files  4 passed (4)
+      Tests  15 passed (15)
+   Start at  14:07:05
+   Duration  598ms (transform 88ms, setup 0ms, collect 141ms, tests 420ms, environment 0ms, prepare 147ms)
+

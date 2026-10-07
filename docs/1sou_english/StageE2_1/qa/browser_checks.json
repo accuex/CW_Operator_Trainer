@@ -1,0 +1,1179 @@
+[
+  {
+    "name": "desktop CORE image coast station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "海岸側の無線局と船側の無線局が通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/shore-ship-radio-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/shore-ship-radio-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 7項目",
+    "term": "coast station"
+  },
+  {
+    "name": "desktop term-coast-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "海岸側の無線局と船側の無線局が通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/shore-ship-radio-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/shore-ship-radio-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "coast station"
+  },
+  {
+    "name": "desktop term-ship-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船にある無線局が海岸側と通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/shore-ship-radio-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/shore-ship-radio-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "ship station"
+  },
+  {
+    "name": "desktop term-aircraft-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "航空機上の局と地上の航空局が通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/air-ground-radio-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/air-ground-radio-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "aircraft station"
+  },
+  {
+    "name": "desktop term-aeronautical-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "航空機と通信する地上側の無線局。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/air-ground-radio-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/air-ground-radio-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "aeronautical station"
+  },
+  {
+    "name": "desktop term-overboard",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "乗組員が船外の海中に転落した状況。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/person-overboard-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/person-overboard-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "overboard"
+  },
+  {
+    "name": "desktop term-aground",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船が浅瀬の底に接して座礁している状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-aground-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-aground-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "aground"
+  },
+  {
+    "name": "desktop term-capsize",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "小型船が転覆した事故状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/boat-capsized-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/boat-capsized-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "capsize"
+  },
+  {
+    "name": "desktop term-flooded",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船の機関室が浸水している状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/flooded-engine-room-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/flooded-engine-room-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "flooded"
+  },
+  {
+    "name": "desktop term-berth",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船が岸壁の係留位置に着いている場面。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-at-berth-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-at-berth-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "berth"
+  },
+  {
+    "name": "desktop term-anchorage",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "錨を下ろして待つ水域。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-at-anchorage-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-at-anchorage-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "anchorage"
+  },
+  {
+    "name": "desktop term-under-keel-clearance",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船底の下に残る水の隙間。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/under-keel-gap-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/under-keel-gap-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "under keel clearance"
+  },
+  {
+    "name": "desktop term-air-draught",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船の水面上の高さと上方の橋梁の関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-height-below-bridge-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-height-below-bridge-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "air draught"
+  },
+  {
+    "name": "desktop term-dense-fog",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "濃い霧が港の入口を覆う場面。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/fog-at-harbour-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/fog-at-harbour-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "dense fog"
+  },
+  {
+    "name": "desktop term-fouled",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船の推進器にロープが絡んでいる状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/rope-fouled-propeller-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/rope-fouled-propeller-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "fouled"
+  },
+  {
+    "name": "desktop term-rolling",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "左右の横揺れ。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-rolling-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-rolling-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "rolling"
+  },
+  {
+    "name": "desktop term-pitching",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船首と船尾が上下する縦揺れ。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-pitching-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-pitching-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "pitching"
+  },
+  {
+    "name": "desktop term-bridge",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "desktop term-bulbous-bow",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船首の水面付近にある球状の突出部分。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/bulbous-bow-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/bulbous-bow-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bulbous bow"
+  },
+  {
+    "name": "desktop no image term-guard",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "guard"
+  },
+  {
+    "name": "desktop no image term-distress",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "distress"
+  },
+  {
+    "name": "desktop no image term-poor-visibility",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "poor visibility"
+  },
+  {
+    "name": "desktop no image term-bulkhead",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bulkhead"
+  },
+  {
+    "name": "desktop no image term-shall",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "shall"
+  },
+  {
+    "name": "desktop bridge hidden DOM",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "desktop confirmed and reload bridge",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false
+  },
+  {
+    "name": "desktop reload loaded bridge",
+    "confirm": "true",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 1 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "desktop previous",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "automatic identification system"
+  },
+  {
+    "name": "desktop next",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "desktop tier outside related bridge from master",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "preview": "関連項目を参照中 · しっかりの項目（現在の学習範囲外）。学習範囲と読んでいた位置はそのままです。元の項目へ戻る · master",
+    "summary": "この範囲の確認済み 0 / 7項目",
+    "term": "bridge"
+  },
+  {
+    "name": "desktop related bridge hidden",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "preview": "関連項目を参照中 · しっかりの項目（現在の学習範囲外）。学習範囲と読んでいた位置はそのままです。元の項目へ戻る · master",
+    "summary": "この範囲の確認済み 0 / 7項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile term-coast-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "海岸側の無線局と船側の無線局が通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/shore-ship-radio-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/shore-ship-radio-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "coast station"
+  },
+  {
+    "name": "mobile term-ship-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船にある無線局が海岸側と通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/shore-ship-radio-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/shore-ship-radio-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "ship station"
+  },
+  {
+    "name": "mobile term-aircraft-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "航空機上の局と地上の航空局が通信する関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/air-ground-radio-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/air-ground-radio-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "aircraft station"
+  },
+  {
+    "name": "mobile term-aeronautical-station",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "航空機と通信する地上側の無線局。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/air-ground-radio-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/air-ground-radio-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "aeronautical station"
+  },
+  {
+    "name": "mobile term-overboard",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "乗組員が船外の海中に転落した状況。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/person-overboard-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/person-overboard-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "overboard"
+  },
+  {
+    "name": "mobile term-aground",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船が浅瀬の底に接して座礁している状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-aground-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-aground-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "aground"
+  },
+  {
+    "name": "mobile term-capsize",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "小型船が転覆した事故状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/boat-capsized-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/boat-capsized-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "capsize"
+  },
+  {
+    "name": "mobile term-flooded",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船の機関室が浸水している状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/flooded-engine-room-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/flooded-engine-room-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "flooded"
+  },
+  {
+    "name": "mobile term-berth",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船が岸壁の係留位置に着いている場面。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-at-berth-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-at-berth-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "berth"
+  },
+  {
+    "name": "mobile term-anchorage",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "錨を下ろして待つ水域。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-at-anchorage-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-at-anchorage-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "anchorage"
+  },
+  {
+    "name": "mobile term-under-keel-clearance",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船底の下に残る水の隙間。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/under-keel-gap-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/under-keel-gap-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "under keel clearance"
+  },
+  {
+    "name": "mobile term-air-draught",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船の水面上の高さと上方の橋梁の関係。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-height-below-bridge-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-height-below-bridge-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "air draught"
+  },
+  {
+    "name": "mobile term-dense-fog",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "濃い霧が港の入口を覆う場面。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/fog-at-harbour-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/fog-at-harbour-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "dense fog"
+  },
+  {
+    "name": "mobile term-fouled",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船の推進器にロープが絡んでいる状態。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/rope-fouled-propeller-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/rope-fouled-propeller-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "fouled"
+  },
+  {
+    "name": "mobile term-rolling",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "左右の横揺れ。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-rolling-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-rolling-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "rolling"
+  },
+  {
+    "name": "mobile term-pitching",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船首と船尾が上下する縦揺れ。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-pitching-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-pitching-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "pitching"
+  },
+  {
+    "name": "mobile term-bridge",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile term-bulbous-bow",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "船首の水面付近にある球状の突出部分。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/bulbous-bow-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/bulbous-bow-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bulbous bow"
+  },
+  {
+    "name": "mobile no image term-guard",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "guard"
+  },
+  {
+    "name": "mobile no image term-distress",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "distress"
+  },
+  {
+    "name": "mobile no image term-poor-visibility",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "poor visibility"
+  },
+  {
+    "name": "mobile no image term-bulkhead",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bulkhead"
+  },
+  {
+    "name": "mobile no image term-shall",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "shall"
+  },
+  {
+    "name": "mobile CONTEXT hidden",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile confirmed reload",
+    "confirm": "true",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 1 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile previous",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "automatic identification system"
+  },
+  {
+    "name": "mobile next",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile tier outside related",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "preview": "関連項目を参照中 · しっかりの項目（現在の学習範囲外）。学習範囲と読んでいた位置はそのままです。元の項目へ戻る · master",
+    "summary": "この範囲の確認済み 0 / 7項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile return related preserves origin",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 7項目",
+    "term": "master"
+  },
+  {
+    "name": "geography smoke",
+    "pass": true,
+    "scopeCounts": "32 / 81 / 128 / 160 observed in AX"
+  },
+  {
+    "name": "home smoke",
+    "pass": true
+  },
+  {
+    "name": "CW learn smoke",
+    "pass": true,
+    "auditoryQA": "not performed"
+  },
+  {
+    "name": "restored initial reading position",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 9項目",
+    "term": "guard"
+  },
+  {
+    "name": "mobile review sheet",
+    "images": [
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      },
+      {
+        "height": 195.328125,
+        "width": 293
+      }
+    ],
+    "overflow": false,
+    "tiles": 16,
+    "viewport": 375
+  },
+  {
+    "name": "mobile bridge v2 final",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-v2-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-v2-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile bridge v2 hidden",
+    "confirm": "false",
+    "figureCount": 0,
+    "images": [],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "mobile bridge v2 additional check (viewport on review tab)",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-v2-480.webp",
+        "decoded": true,
+        "height": 206,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-v2-480.webp",
+        "width": 309
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  },
+  {
+    "name": "desktop bridge v2 final",
+    "confirm": "false",
+    "figureCount": 1,
+    "images": [
+      {
+        "alt": "操船・航行を管理する船橋。",
+        "aspect": 1.5,
+        "currentSrc": "http://localhost:5187/english/illustrations/ship-bridge-v2-960.webp",
+        "decoded": true,
+        "height": 400,
+        "loading": "lazy",
+        "src": "/english/illustrations/ship-bridge-v2-480.webp",
+        "width": 600
+      }
+    ],
+    "overflow": false,
+    "summary": "この範囲の確認済み 0 / 101項目",
+    "term": "bridge"
+  }
+]

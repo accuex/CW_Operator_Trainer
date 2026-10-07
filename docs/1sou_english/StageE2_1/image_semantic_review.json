@@ -1,0 +1,180 @@
+[
+  {
+    "assetId": "shore-ship-radio",
+    "learningEntityIds": [
+      "term-coast-station",
+      "term-ship-station"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "岸側の建物・垂直アンテナと船側の位置が別。双方向の通信を示す。最初の候補は写実的すぎたため再生成。アンテナ型式は例示であり必須設備を示さない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "air-ground-radio",
+    "learningEntityIds": [
+      "term-aircraft-station",
+      "term-aeronautical-station"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "飛行中の航空機と地上局の位置が別。地上局を管制塔の外観に固定していない。機体の細部は教材の判定対象ではない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "person-overboard",
+    "learningEntityIds": [
+      "term-overboard"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船外の水中に人の頭と肩が見える。転覆や救助手順を付加していない。人物の装具を必須の救命装備として教えない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-aground",
+    "learningEntityIds": [
+      "term-aground"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船底が浅瀬の底に接している。投錨待機の絵ではなく、under keel clearanceの隙間と区別できる。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "boat-capsized",
+    "learningEntityIds": [
+      "term-capsize"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船底が上になった転覆状態。単なる横揺れとは区別できる。事故原因や全船型の復原性を教えるものではない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "flooded-engine-room",
+    "learningEntityIds": [
+      "term-flooded"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船内の固定機械の下部が水に浸っている。外の波だけになっていない。機械・配管の構造の正確さは保証せず、浸水という一点のみを示す。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-at-berth",
+    "learningEntityIds": [
+      "term-berth"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "岸壁と船の横付け位置・防舷材が見える。索の本数・結び方・配置を運用の正解として扱わない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-at-anchorage",
+    "learningEntityIds": [
+      "term-anchorage"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "岸壁から離れた水域に船が待機し、船首の錨鎖が水中へ続く。錨の構造・投錨手順は描いていない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "under-keel-gap",
+    "learningEntityIds": [
+      "term-under-keel-clearance"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船底の最下部と海底の間に青い水の隙間が残る。水深全体ではなく船底下の空間を示す。工学的な縮尺や寸法値ではない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-height-below-bridge",
+    "learningEntityIds": [
+      "term-air-draught"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "高さの目印は水面から船の最上部で止まり、橋の下端まで伸びない。橋下の空き高さそのものと区別できる。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "fog-at-harbour",
+    "learningEntityIds": [
+      "term-dense-fog"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "近い船首は明瞭、遠い防波堤・灯台は霧に薄れる。煙や単に曇った空の絵ではない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "rope-fouled-propeller",
+    "learningEntityIds": [
+      "term-fouled"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "水中の船尾で索が推進器の軸に巻き付き羽根にも掛かる。汚れ・腐食の一般義へ引っ張られていない。羽根形状は機種の仕様図ではない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-rolling",
+    "learningEntityIds": [
+      "term-rolling"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船首側から見て船幅方向に傾き、左右の往復を示す矢印がある。転覆ではない。静止画だけでは動きを示せないため控えめな無文字の矢印を使用。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-pitching",
+    "learningEntityIds": [
+      "term-pitching"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "側面から船首と船尾の上下差が見え、船首側の上下矢印で往復を補う。横揺れの絵と視点・方向が異なり、船全体が浮いていない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "ship-bridge",
+    "learningEntityIds": [
+      "term-bridge"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "人物を除く修正後、前方窓・前甲板・舵輪がある船内の場所が主役。道路橋・航空機の操縦室ではない。計器配置や舵輪の形は必須条件を示さない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  },
+  {
+    "assetId": "bulbous-bow",
+    "learningEntityIds": [
+      "term-bulbous-bow"
+    ],
+    "aiSemanticReview": "passed",
+    "aiReviewNotes": "船首の水線下に丸い突出部がある。船尾や推進器ではない。全船の標準装備や抵抗低減の物理説明を付加していない。",
+    "humanVisualReview": "approved",
+    "humanReviewReference": "human_visual_review.json",
+    "cardSizeReview": "AI card-size QA completed; human review approved"
+  }
+]

@@ -1,0 +1,17 @@
+
+> sites-project@1.1.0 test
+> vitest run --config vitest.config.ts lib/english lib/appPaths.test.ts lib/examMaterial.test.ts
+
+
+ RUN  v3.2.4 /Users/macha/Project/CW_Operator_Trainer
+
+ ✓ lib/appPaths.test.ts (2 tests) 1ms
+ ✓ lib/examMaterial.test.ts (3 tests) 2ms
+ ✓ lib/english/english.test.ts (5 tests) 7ms
+ ✓ lib/english/editorial.test.ts (4 tests) 13ms
+
+ Test Files  4 passed (4)
+      Tests  14 passed (14)
+   Start at  13:04:55
+   Duration  214ms (transform 70ms, setup 0ms, collect 103ms, tests 23ms, environment 0ms, prepare 144ms)
+

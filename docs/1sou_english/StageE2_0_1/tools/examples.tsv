@@ -1,0 +1,43 @@
+term	english	japanese	review_reason
+coast station	The coast station asked the ship to repeat its position.	海岸局は船に位置をもう一度伝えるよう求めた。	陸上側から船へ情報を確認する役割を示す。
+ship station	The ship station reported engine trouble to the coast station.	船舶局は機関の不具合を海岸局に報告した。	通信主体・相手・報告内容を示す。
+aircraft station	The aircraft station reported a receiver problem before landing.	航空機局は着陸前に受信機の問題を報告した。	航空機側の通信と受信問題の場面を示す。
+aeronautical station	The aeronautical station asked the aircraft to repeat the message.	航空局は航空機に通報を繰り返すよう求めた。	航空機と地上局の役割の違いを示す。
+coast earth station	The ship's distress alert reached the coast earth station via satellite.	船の遭難警報は衛星を経由して海岸地球局に届いた。	衛星経由の通信経路を示す。
+master	The operator informed the master that a nearby vessel needed help.	通信士は付近の船が援助を必要としていることを船長に知らせた。	船長が報告を受ける人物だと分かる場面にする。
+administration	The Administration approved the ship's new radio equipment.	主管庁は船の新しい無線設備を承認した。	主管庁による設備承認を具体的にする。
+rescue coordination center	The coast station passed the vessel's position to the rescue coordination center.	海岸局は船の位置を救助調整機関に伝えた。	現場ではなく救助調整の連絡先だと示す。
+urgency	The urgency message concerned an injured crew member.	その緊急通報は負傷した乗組員に関するものだった。	安全に関する通報内容を示す。負傷なら必ずurgencyという一般規則は教えない。
+distress alert	After receiving the distress alert, the coast station called the vessel.	遭難警報を受信した後、海岸局はその船を呼び出した。	警報受信と後続通信を分ける。
+radiotelephony	The rescue vessels used radiotelephony to exchange their positions.	救助船は無線電話で互いの位置を伝えた。	現場で音声を使う通信方式として示す。
+acknowledge	Please acknowledge receipt of our position report.	こちらの位置報告を受信したことを知らせてください。	内容の完了ではなく受信確認を示す。
+relay	Please relay our position report to the coast station.	こちらの位置報告を海岸局へ中継してください。	受信確認との対比ができる例にする。
+medical advice	The master requested medical advice for a sick crew member.	船長は病気の乗組員について医療上の助言を求めた。	人の健康の問題を扱うことが分かる。
+maritime safety information	The ship received maritime safety information about a damaged buoy.	船は損傷した浮標についての海上安全情報を受信した。	航行に関する安全情報の内容を具体化する。
+mayday	The call began with MAYDAY: the vessel was sinking.	呼出しはMAYDAYで始まった。その船は沈みかけていた。	信号が呼出しで使われる遭難状況を短く示す。
+pan pan	The call began with PAN PAN, followed by a request for medical advice.	呼出しはPAN PANで始まり、続いて医療上の助言が求められた。	緊急信号と通報内容を結び付ける。医療相談すべてへの信号指定にはしない。
+survival craft	The crew left the sinking vessel in a survival craft.	乗組員は救命用船艇で沈みかけた船から退避した。	救命用船艇が退避先であることを示す。
+gmdss	The operator checked the GMDSS equipment before departure.	通信士は出港前にGMDSSの設備を点検した。	単独装置ではなく制度に関わる設備の話とする。
+navtex	The NAVTEX receiver printed a warning about a damaged buoy.	NAVTEX受信機は損傷した浮標に関する警報を印刷した。	安全情報を受信する役割を具体化する。
+epirb	The rescue team received an alert from the vessel's EPIRB.	救助班はその船のEPIRBからの警報を受信した。	遭難警報を伝える機器の役割を示す。
+digital selective calling	The operator made contact by digital selective calling before speaking by radio.	通信士は無線で話す前にデジタル選択呼出で連絡を取った。	呼出しと音声通信の段階を分ける。普遍的な手順の義務は教えない。
+seelonce feenee	The message SEELONCE FEENEE announced the end of distress silence.	SEELONCE FEENEEという通報は遭難通信に伴う沈黙の終了を知らせた。	終了通知だと文中で分かる。
+interference	Another transmission caused interference with the position report.	別の送信が位置報告への干渉を起こした。	原因と妨害される通信を示す。
+berth	The harbour master told us to wait until our berth was clear.	港の管理者は、こちらの係留場所が空くまで待つよう伝えた。	指定された係留位置の意味を示す。
+under keel clearance	The ship waited for the tide to rise because the under keel clearance was too small.	船底下の余裕水深が不足していたため、船は潮位が上がるのを待った。	船底下の余裕と水深・潮位を結び付ける。
+make fast	Please make fast the forward mooring line at this berth.	この係留場所で船首側の係留索を固定してください。	fastが索の固定であると示す。
+single up	The crew will single up the mooring lines while preparing to leave the quay.	乗組員は岸壁からの出港準備として、係留索を最小限だけ残す状態にする。	出港準備であり全索解放ではないことを示す。
+estimated time of arrival	Our estimated time of arrival at the pilot station is 0900.	水先人の乗船地点への到着予定時刻は09時00分だ。	予定の時刻と到着先を具体化する。
+radio quarantine	Before entering the port, the master sent a health report for radio quarantine.	入港前に、船長は無線検疫のために健康状態の報告を送った。	検疫に関する連絡手段を示す。
+rolling	The vessel is rolling heavily from side to side.	船は左右に激しく横揺れしている。	横揺れの向きを文中で示す。
+pitching	The vessel is pitching, with its bow rising and falling.	船首が上がったり下がったりして、船が縦揺れしている。	縦揺れの向きを文中で示す。
+give way	Our vessel will give way and let the other vessel pass.	こちらの船は避航して、他船を通す。	大小による誤った避航義務を示す旧例を除去する。
+automatic identification system	The automatic identification system reported the vessel's identity and position.	船舶自動識別装置は船の識別情報と位置を伝えた。	識別情報を扱う装置の役割を示す。
+bridge	The master called the operator from the bridge before departure.	出港前に、船長は船橋から通信士を呼んだ。	人が操船場所にいる文脈を示す。
+regularity of flight	The message concerned the regularity of flight, not the passengers' personal calls.	その通報は飛行の正常な運航に関するもので、乗客の私的な通話ではなかった。	運航関係の通報と公衆通信の対比を示す。
+public correspondence	The station handled public correspondence after the operational messages.	局は運航に関する通報の後に公衆通信を取り扱った。	業務通報との対比を示す。必ずこの順序という規則にはしない。
+air traffic services	The aircraft sent its position report to air traffic services.	航空機は航空交通業務に向けて位置報告を送った。	通報の宛先となる業務を示す。
+standardized phraseology	The pilot used standardized phraseology to report the aircraft's position.	操縦士は標準通信表現を使って航空機の位置を報告した。	標準表現が通信で使われる具体的場面を示す。
+plain language	The pilot used plain language because the standard phrase could not convey the problem.	操縦士は標準表現では問題を伝えられなかったため、普通の言葉で伝えた。	標準表現で伝えきれない条件を示し、暗号対比にしない。
+receiver failure	A receiver failure prevented the aircraft from hearing the station's reply.	受信機の故障で、航空機は局からの返答を聞けなかった。	受信側の故障の影響を示す。
+bulbous bow	The drawing shows the bulbous bow below the waterline.	図には水線より下の球状船首が示されている。	名称を球状船首へ統一し、船首の形・位置を示す。

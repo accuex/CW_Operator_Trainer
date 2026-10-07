@@ -1,0 +1,51 @@
+
+> sites-project@1.1.0 build
+> vinext build
+
+
+  vinext build  (Vite 8.0.13)
+
+[1/5] analyze client references...
+[2Ktransforming...✓ 227 modules transformed.
+rendering chunks...
+✓ built in 415ms
+[2/5] analyze server references...
+[2Ktransforming...✓ 347 modules transformed.
+rendering chunks...
+✓ built in 395ms
+[3/5] build rsc environment...
+[2Ktransforming...✓ 225 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.11s
+[4/5] build client environment...
+[2Ktransforming...✓ 355 modules transformed.
+rendering chunks...
+computing gzip size...
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.41s
+[5/5] build ssr environment...
+[2Ktransforming...✓ 349 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 888ms
+[0m
+  Route (app)
+  ┌ ? /          
+  ├ ƒ /:section  
+  ├ ƒ /app/:view*
+  ├ ? /dev/decode
+  └ ? /dev/pileup
+
+  ƒ Dynamic  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+

@@ -33,3 +33,11 @@
 .english-evidence li {margin:12px 0;}
 .english-notice {padding:14px;border:1px solid var(--gold);border-radius:8px;}
 @media(max-width:700px) {.english-heading {flex-direction:column;}.english-workspace {grid-template-columns:1fr;}.english-list {max-height:220px;}.english-controls {padding:14px;}.english-tiers .btn {flex:1;min-width:80px;padding:10px 8px;}.english-tiers span {display:block;margin:4px 0 0;}.english-actions .btn {padding:10px 12px;}.english-view {min-width:0;}}
+
+.english-preview { margin: 1rem 0; padding: .8rem; border: 1px solid var(--line-2); border-radius: .6rem; }
+.english-preview p { margin-top: 0; }
+.english-preview .btn, .english-related .btn { white-space: normal; overflow-wrap: anywhere; }
+.english-why { color: var(--muted); }
+.english-illustration { margin: 24px 0; max-width: 600px; }
+.english-illustration img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; border-radius: 10px; background: var(--surface-2); }
+.english-illustration figcaption { margin-top: 8px; color: var(--muted); font-size: .85rem; line-height: 1.7; }

@@ -1,0 +1,55 @@
+{
+  "desktop": {
+    "viewport": "1440x1000",
+    "horizontal_overflow": false,
+    "checks_passed": [
+      "32/74/101実表示",
+      "場面切替",
+      "list/detail",
+      "prev/next",
+      "空の注意欄非表示",
+      "CONTEXT hide/reveal",
+      "LEGAL structure",
+      "evidence folding",
+      "範囲外related注記",
+      "範囲・場面を変えない関連参照",
+      "元の項目へ戻る",
+      "confirmed/reload",
+      "範囲外項目のconfirmed/reloadは元の読書位置へ復帰"
+    ]
+  },
+  "mobile": {
+    "viewport": "375x812",
+    "horizontal_overflow": false,
+    "checks_passed": [
+      "8場面表示",
+      "list/detail",
+      "CONTEXT hide/reveal",
+      "範囲外related参照・復帰",
+      "空の注意欄・関連タイトル非表示",
+      "LEGAL structure",
+      "evidence folding",
+      "confirmed/reload",
+      "一総通menu往復"
+    ]
+  },
+  "scene_counts_extended": {
+    "actors": 8,
+    "distress": 23,
+    "operations": 11,
+    "port": 16,
+    "condition": 24,
+    "aviation": 15,
+    "rules": 15,
+    "structure": 3
+  },
+  "scene_counts_note": "複数場面への所属があるため合計は101を超える。",
+  "browser_errors": 0,
+  "progress_test_cleanup": "guard/starboardのQA用確認記録を取り消し、元の最小/operations/guardへ戻した。ブラウザ保存を直接編集していない。",
+  "build": "PASS",
+  "related_tests": "14/14 PASS (English9 + navigation5)",
+  "full_tests": "679 PASS / 1 pre-existing FAIL / 680",
+  "typecheck": "FAIL: pre-existing 2 errors; HEAD comparison identical",
+  "baseline_commit": "de9df04",
+  "commit_for_this_stage": false
+}

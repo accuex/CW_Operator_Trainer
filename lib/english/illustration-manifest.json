@@ -1,0 +1,403 @@
+{
+  "schemaVersion": 1,
+  "selectionSource": "StageE2_1/english_illustration_selection.json",
+  "sourceMasterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403",
+  "assets": {
+    "shore-ship-radio": {
+      "assetId": "shore-ship-radio",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/shore-ship-radio-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 22136
+        },
+        {
+          "src": "/english/illustrations/shore-ship-radio-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 62012
+        }
+      ]
+    },
+    "air-ground-radio": {
+      "assetId": "air-ground-radio",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/air-ground-radio-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 16906
+        },
+        {
+          "src": "/english/illustrations/air-ground-radio-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 48340
+        }
+      ]
+    },
+    "person-overboard": {
+      "assetId": "person-overboard",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/person-overboard-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 16054
+        },
+        {
+          "src": "/english/illustrations/person-overboard-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 46284
+        }
+      ]
+    },
+    "ship-aground": {
+      "assetId": "ship-aground",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-aground-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 17822
+        },
+        {
+          "src": "/english/illustrations/ship-aground-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 53482
+        }
+      ]
+    },
+    "boat-capsized": {
+      "assetId": "boat-capsized",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/boat-capsized-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 15156
+        },
+        {
+          "src": "/english/illustrations/boat-capsized-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 43950
+        }
+      ]
+    },
+    "flooded-engine-room": {
+      "assetId": "flooded-engine-room",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/flooded-engine-room-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 29040
+        },
+        {
+          "src": "/english/illustrations/flooded-engine-room-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 78584
+        }
+      ]
+    },
+    "ship-at-berth": {
+      "assetId": "ship-at-berth",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-at-berth-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 21978
+        },
+        {
+          "src": "/english/illustrations/ship-at-berth-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 61258
+        }
+      ]
+    },
+    "ship-at-anchorage": {
+      "assetId": "ship-at-anchorage",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-at-anchorage-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 15894
+        },
+        {
+          "src": "/english/illustrations/ship-at-anchorage-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 45464
+        }
+      ]
+    },
+    "under-keel-gap": {
+      "assetId": "under-keel-gap",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/under-keel-gap-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 16272
+        },
+        {
+          "src": "/english/illustrations/under-keel-gap-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 49384
+        }
+      ]
+    },
+    "ship-height-below-bridge": {
+      "assetId": "ship-height-below-bridge",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-height-below-bridge-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 15966
+        },
+        {
+          "src": "/english/illustrations/ship-height-below-bridge-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 44812
+        }
+      ]
+    },
+    "fog-at-harbour": {
+      "assetId": "fog-at-harbour",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/fog-at-harbour-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 7446
+        },
+        {
+          "src": "/english/illustrations/fog-at-harbour-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 19864
+        }
+      ]
+    },
+    "rope-fouled-propeller": {
+      "assetId": "rope-fouled-propeller",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/rope-fouled-propeller-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 15308
+        },
+        {
+          "src": "/english/illustrations/rope-fouled-propeller-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 43470
+        }
+      ]
+    },
+    "ship-rolling": {
+      "assetId": "ship-rolling",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-rolling-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 15010
+        },
+        {
+          "src": "/english/illustrations/ship-rolling-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 42602
+        }
+      ]
+    },
+    "ship-pitching": {
+      "assetId": "ship-pitching",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-pitching-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 14514
+        },
+        {
+          "src": "/english/illustrations/ship-pitching-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 42114
+        }
+      ]
+    },
+    "ship-bridge": {
+      "assetId": "ship-bridge",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/ship-bridge-v2-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 20384
+        },
+        {
+          "src": "/english/illustrations/ship-bridge-v2-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 51094
+        }
+      ]
+    },
+    "bulbous-bow": {
+      "assetId": "bulbous-bow",
+      "status": "approved",
+      "aiSemanticReview": "passed",
+      "variants": [
+        {
+          "src": "/english/illustrations/bulbous-bow-480.webp",
+          "width": 480,
+          "height": 320,
+          "bytes": 8346
+        },
+        {
+          "src": "/english/illustrations/bulbous-bow-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 22566
+        }
+      ]
+    }
+  },
+  "items": {
+    "term-coast-station": {
+      "assetId": "shore-ship-radio",
+      "alt": "海岸側の無線局と船側の無線局が通信する関係。",
+      "caption": "海岸側の無線局と船側の無線局が通信する関係。"
+    },
+    "term-ship-station": {
+      "assetId": "shore-ship-radio",
+      "alt": "船にある無線局が海岸側と通信する関係。",
+      "caption": "船にある無線局が海岸側と通信する関係。"
+    },
+    "term-aircraft-station": {
+      "assetId": "air-ground-radio",
+      "alt": "航空機上の局と地上の航空局が通信する関係。",
+      "caption": "航空機上の局と地上の航空局が通信する関係。"
+    },
+    "term-aeronautical-station": {
+      "assetId": "air-ground-radio",
+      "alt": "航空機と通信する地上側の無線局。",
+      "caption": "航空機と通信する地上側の無線局。"
+    },
+    "term-overboard": {
+      "assetId": "person-overboard",
+      "alt": "乗組員が船外の海中に転落した状況。",
+      "caption": "乗組員が船外の海中に転落した状況。"
+    },
+    "term-aground": {
+      "assetId": "ship-aground",
+      "alt": "船が浅瀬の底に接して座礁している状態。",
+      "caption": "船が浅瀬の底に接して座礁している状態。"
+    },
+    "term-capsize": {
+      "assetId": "boat-capsized",
+      "alt": "小型船が転覆した事故状態。",
+      "caption": "小型船が転覆した事故状態。"
+    },
+    "term-flooded": {
+      "assetId": "flooded-engine-room",
+      "alt": "船の機関室が浸水している状態。",
+      "caption": "船の機関室が浸水している状態。"
+    },
+    "term-berth": {
+      "assetId": "ship-at-berth",
+      "alt": "船が岸壁の係留位置に着いている場面。",
+      "caption": "船が岸壁の係留位置に着いている場面。"
+    },
+    "term-anchorage": {
+      "assetId": "ship-at-anchorage",
+      "alt": "錨を下ろして待つ水域。",
+      "caption": "錨を下ろして待つ水域。"
+    },
+    "term-under-keel-clearance": {
+      "assetId": "under-keel-gap",
+      "alt": "船底の下に残る水の隙間。",
+      "caption": "船底の下に残る水の隙間。"
+    },
+    "term-air-draught": {
+      "assetId": "ship-height-below-bridge",
+      "alt": "船の水面上の高さと上方の橋梁の関係。",
+      "caption": "船の水面上の高さと上方の橋梁の関係。"
+    },
+    "term-dense-fog": {
+      "assetId": "fog-at-harbour",
+      "alt": "濃い霧が港の入口を覆う場面。",
+      "caption": "濃い霧が港の入口を覆う場面。"
+    },
+    "term-fouled": {
+      "assetId": "rope-fouled-propeller",
+      "alt": "船の推進器にロープが絡んでいる状態。",
+      "caption": "船の推進器にロープが絡んでいる状態。"
+    },
+    "term-rolling": {
+      "assetId": "ship-rolling",
+      "alt": "左右の横揺れ。",
+      "caption": "左右の横揺れ。"
+    },
+    "term-pitching": {
+      "assetId": "ship-pitching",
+      "alt": "船首と船尾が上下する縦揺れ。",
+      "caption": "船首と船尾が上下する縦揺れ。"
+    },
+    "term-bridge": {
+      "assetId": "ship-bridge",
+      "alt": "操船・航行を管理する船橋。",
+      "caption": "操船・航行を管理する船橋。"
+    },
+    "term-bulbous-bow": {
+      "assetId": "bulbous-bow",
+      "alt": "船首の水面付近にある球状の突出部分。",
+      "caption": "船首の水面付近にある球状の突出部分。"
+    }
+  }
+}

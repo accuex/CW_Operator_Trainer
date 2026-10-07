@@ -1,0 +1,129 @@
+
+> sites-project@1.1.0 test
+> vitest run --config vitest.config.ts
+
+
+ RUN  v3.2.4 /Users/macha/Project/CW_Operator_Trainer
+
+ ✓ lib/radio/wabun/sim.test.ts (8 tests) 1594ms
+   ✓ wabun QSO on the band (headless) > Level 2: completes Latin call → ホレ → wabun → ラタ → Latin E E, the log right from what was heard  705ms
+ ✓ lib/radio/decode/decode.test.ts (28 tests) 459ms
+ ✓ lib/radio/wabun/stage4.test.ts (12 tests) 2735ms
+   ✓ wabun Stage 4: copy.wabun / follow.wabun apart > copy.wabun only with a memo: no memo is not measured, not failed  543ms
+   ✓ wabun Stage 4: the Lv4 long over > splits the news into the closing only when the talk would run long, and the QSO still ends  538ms
+   ✓ wabun Stage 5: the CQ station listens while we call > does not start another CQ over our call (its loop waits until we stand by)  344ms
+ ✓ lib/radio/sim/golden.test.ts (1 test) 2966ms
+   ✓ CQ Run golden runs > reproduces every fixed-seed run exactly  2965ms
+ ✓ lib/radio/wabun/practical.test.ts (18 tests) 3202ms
+   ✓ wabun practical QSO on the band (headless) > runs Lv3 / Lv4 QSOs to the end over many stations: theme (and news) followed  1991ms
+ ❯ lib/radio/sim/pileupGolden.test.ts (1 test | 1 failed) 3212ms
+   × Pileup Run golden runs > reproduces every fixed-seed run exactly 3211ms
+     → intro-average#1: expected '25467add797c9d7b0647e69131c9fad56acb3…' to be 'ae4b01cfea1e0d14ae002e96590c3dc264492…' // Object.is equality
+ ✓ lib/radio/agents/occupant.test.ts (8 tests) 309ms
+ ✓ lib/radio/wabun/stage5.test.ts (13 tests) 3332ms
+   ✓ wabun Stage 5: the fist > the band, not the fist, decides what is received (the sim bot follows every fist)  1063ms
+   ✓ wabun Stage 5: QA presets > every preset runs to the end in the sim, the same station every time  2251ms
+ ✓ lib/geography/geography.test.ts (11 tests) 220ms
+ ✓ lib/radio/air/intent.test.ts (11 tests) 60ms
+ ✓ lib/radio/air/persona.test.ts (5 tests) 46ms
+ ✓ lib/radio/modes/ragchew.test.ts (4 tests) 168ms
+ ✓ lib/radio/pileup/nextAction.test.ts (83 tests) 42ms
+ ✓ lib/core.test.ts (63 tests) 56ms
+ ✓ lib/geography/explorer.test.ts (4 tests) 34ms
+ ✓ lib/radio/decode/integration.test.ts (8 tests) 36ms
+ ✓ lib/wabunKoch.test.ts (8 tests) 22ms
+ ✓ lib/radio/contest/learning.test.ts (33 tests) 595ms
+   ✓ contest おまかせ: headless run series > look-alikes everywhere: the similar axis eases, nothing else does  445ms
+ ✓ lib/radio/modes/pileupRun.test.ts (24 tests) 19ms
+ ✓ lib/radio/modes/cqRun.test.ts (3 tests) 3995ms
+   ✓ RunSession arrivals > brings callers per minute on the air, however fast we CQ  3992ms
+ ✓ lib/radio/wabun/dialogue.test.ts (18 tests) 28ms
+ ✓ lib/radio/contest/analysis.test.ts (30 tests) 8ms
+ ✓ lib/english/editorial.test.ts (4 tests) 15ms
+ ✓ lib/radio/pileup/learning.test.ts (13 tests) 8ms
+ ✓ lib/api/client.test.ts (2 tests) 6ms
+ ✓ lib/radio/attribution.test.ts (18 tests) 16ms
+ ✓ lib/radio/wabun/segments.test.ts (11 tests) 5ms
+ ✓ lib/radio/agents/caller.test.ts (17 tests) 15ms
+ ✓ lib/english/english.test.ts (5 tests) 11ms
+ ✓ lib/radio/contest/contest.test.ts (17 tests) 9ms
+ ✓ lib/radio/pileup/review.test.ts (9 tests) 3ms
+ ✓ lib/radio/contest/esm.test.ts (12 tests) 5ms
+ ✓ lib/radio/pileup/ear.test.ts (8 tests) 7ms
+ ✓ lib/radio/overlap.test.ts (8 tests) 4ms
+ ✓ lib/radio/situations.test.ts (6 tests) 5ms
+ ✓ lib/radio/radio.test.ts (17 tests) 6ms
+ ✓ lib/radio/badges.test.ts (7 tests) 5ms
+ ✓ lib/koch.test.ts (9 tests) 5ms
+ ✓ lib/radio/runReview.test.ts (5 tests) 5ms
+ ✓ lib/achievements.test.ts (8 tests) 5ms
+ ✓ lib/radio/logbook.test.ts (2 tests) 3ms
+ ✓ lib/radio/modes/demoRun.test.ts (2 tests) 2ms
+ ✓ lib/radio/air/ether.test.ts (6 tests) 2ms
+ ✓ lib/examMaterial.test.ts (3 tests) 4ms
+ ✓ lib/radio/pileup/coach.test.ts (6 tests) 3ms
+ ✓ lib/storage.returning.test.ts (10 tests) 2ms
+ ✓ lib/appPaths.test.ts (2 tests) 1ms
+ ✓ lib/collectionReveal.test.ts (3 tests) 3ms
+ ✓ lib/radio/contest/review.test.ts (15 tests) 12ms
+ ✓ lib/radio/sim/contestSim.test.ts (10 tests) 5780ms
+   ✓ contest simulator: invariants > intro: every bot — no breach, everyone settles, our serials count up  358ms
+   ✓ contest simulator: invariants > beginner: every bot — no breach, everyone settles, our serials count up  472ms
+   ✓ contest simulator: invariants > intermediate: every bot — no breach, everyone settles, our serials count up  512ms
+   ✓ contest simulator: invariants > advanced: every bot — no breach, everyone settles, our serials count up  644ms
+   ✓ contest simulator: invariants > expert: every bot — no breach, everyone settles, our serials count up  596ms
+   ✓ contest simulator: invariants > through the desk's ESM: no breach, and every serial sent is the one logged  970ms
+   ✓ contest simulator: the log check > a perfect ear never busts a call or is not in the log, and few serials go wrong  1471ms
+   ✓ contest simulator: the log check > a busier frequency makes more contacts for a perfect ear, and loses more callers  441ms
+ ✓ lib/radio/sim/contestQa.test.ts (9 tests) 6980ms
+   ✓ contest v1 QA: おまかせ ON, runs chained > every move is a contest axis, in bounds, at most two a run, with this run's vote behind it; pinned axes hold  1823ms
+ ✓ lib/radio/sim/pileupQa.test.ts (6 tests) 8388ms
+   ✓ pileup v1 QA: おまかせ ON, runs chained > every move is one of the pileup axes, in bounds, with this run’s evidence behind it  3168ms
+ ✓ lib/radio/sim/pileupLearning.test.ts (11 tests) 9129ms
+   ✓ pileup learning under six kinds of pile > every condition plays out and gets judged  7113ms
+   ✓ pileup badge goals are reachable > a few hours of runs at sensible levels get every tier  1937ms
+ ✓ lib/radio/sim/pileupSim.test.ts (9 tests) 10386ms
+   ✓ pileup simulator: invariants > intro: every bot — no breach, nobody left on frequency, nothing unsettled  1091ms
+   ✓ pileup simulator: invariants > beginner: every bot — no breach, nobody left on frequency, nothing unsettled  811ms
+   ✓ pileup simulator: invariants > intermediate: every bot — no breach, nobody left on frequency, nothing unsettled  1032ms
+   ✓ pileup simulator: invariants > advanced: every bot — no breach, nobody left on frequency, nothing unsettled  1860ms
+   ✓ pileup simulator: invariants > dx: every bot — no breach, nobody left on frequency, nothing unsettled  2940ms
+   ✓ pileup simulator: invariants > rounds end and come again; a continuous pile stays about its size  556ms
+   ✓ pileup simulator: invariants > the same bot does worse as the level goes up  792ms
+   ✓ pileup simulator: invariants > DX: a perfect ear always gets through  1109ms
+ ✓ lib/radio/sim/runSim.test.ts (16 tests) 8624ms
+   ✓ headless CQ run > turns wrong calls into corrections, or into busts when they are ignored  734ms
+   ✓ headless CQ run > counts partials and flags phantom log lines as NIL  706ms
+   ✓ headless CQ run > keeps running with crowds and slow, weak callers  837ms
+   ✓ headless CQ run > checks the frequency with QRL? and moves off a QSO in progress  564ms
+   ✓ headless CQ run > calling CQ on top of a QSO is flagged, and the bot QSYs when asked  368ms
+   ✓ headless CQ run > settles to a few waiting callers, even with CQ repeat left running and nobody picked  1084ms
+   ✓ headless CQ run > builds a pileup from the same callers with other parameters, and it stays bounded  3171ms
+   ✓ headless CQ run > still works callers it doubled with  328ms
+   ✓ headless CQ run > flags CQs sent without listening after QRL?  304ms
+   ✓ headless CQ run > counts a QRL? that found the frequency in use, and the check before a clear CQ  441ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  lib/radio/sim/pileupGolden.test.ts > Pileup Run golden runs > reproduces every fixed-seed run exactly
+AssertionError: intro-average#1: expected '25467add797c9d7b0647e69131c9fad56acb3…' to be 'ae4b01cfea1e0d14ae002e96590c3dc264492…' // Object.is equality
+
+Expected: "ae4b01cfea1e0d14ae002e96590c3dc264492c58fe281d0f5ef0d27aa5ba3cee"
+Received: "25467add797c9d7b0647e69131c9fad56acb354d8a49a66c121a57e84331bc2a"
+
+ ❯ lib/radio/sim/pileupGolden.test.ts:32:59
+     30|       // Summary first: when a digest moves, it says which numbers did.
+     31|       expect({ run: `${entry.name}#${entry.seed}`, ...entry.summary })…
+     32|       expect(entry.digest, `${entry.name}#${entry.seed}`).toBe(expecte…
+       |                                                           ^
+     33|     }
+     34|   }, 120_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 54 passed (55)
+      Tests  1 failed | 679 passed (680)
+   Start at  13:04:57
+   Duration  11.55s (transform 1.71s, setup 0ms, collect 10.26s, tests 72.59s, environment 5ms, prepare 2.08s)
+

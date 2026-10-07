@@ -1,0 +1,102 @@
+term	explanation	why	confusion	related
+coast station	陸上側から船と通信する局です。船舶局からの呼出しを受け、通報を扱います。	海岸側の局と船側の局を区別して、通信の相手を追えます。	ship stationは船側の局、masterは船長です。coast stationは人の役職ではありません。	ship station,coast earth station
+ship station	船に設けられた無線局です。位置や船の状態を海岸側へ伝える場面で登場します。	位置を送った主体が船の無線局だと分かります。	shipそのものと、船上で通信を行うship stationを区別します。	coast station,master
+ aircraft station	航空機上の無線局を指します。地上の航空局と周波数を合わせて通信します。	送受信している局が航空機側にあると判断できます。	航空機側がaircraft station、地上側がaeronautical stationです。	aeronautical station,receiver failure
+ aeronautical station	地上側の航空無線局です。航空機局との通信で、どちらが呼び出し、応答するかを読みます。	航空機からの通信に応答する地上側の主体を特定できます。	航空機上のaircraft stationとは設置場所が異なります。	aircraft station,air traffic services
+coast earth station	衛星通信の地上側を受け持つ海岸地球局です。船の通報が衛星を経て届く経路を意識します。	earth stationが入ると、衛星を経由する通信経路だと分かります。	coast stationと同じ陸上側でも、earth stationは衛星通信の地上局を指します。	coast station,relay
+master	船内の指示や通報について書かれるmasterは船長です。誰に知らせるか、誰の権限で行うかに注目します。	船長が報告の宛先か判断する主体かを読み取れます。	船のmasterは船長ですが、harbour masterは港の管理者です。	ship station,bridge,on the authority of
+administration	規定に出てくるAdministrationは主管庁です。設備の承認などを行う主体として読みます。	承認や許可を出すのが通信士ではなく主管庁だと分かります。	一般的な管理業務ではなく、規定を所管する行政機関を指します。	subject to,in accordance with
+rescue coordination center	救助活動の連絡・調整を担う機関です。現場の救助船と、活動を調整する連絡先を分けて読みます。	救助の依頼や情報がどこへ送られるのかを追えます。	現場にいる救助船そのものを指す名称ではありません。	on scene,relay
+ distress	船や人が重大な危険にあり、直ちに援助を必要とする遭難の場面です。	単なる遅延や不便ではなく、直ちに援助が必要な状況だとつかめます。	urgencyと同じ通信区分ではありません。重大で差し迫った危険を示すdistressを分けて読みます。	urgency,distress alert,mayday
+urgency	船や人の安全に関する緊急の通報です。遭難通信とは区別して、何を急いで伝えるのかを読みます。	緊急通報を遭難通報と取り違えずに状況を整理できます。	急ぐ通報をすべてdistressとするのではなく、urgencyという区分を見ます。	distress,pan pan,medical advice
+ distress alert	遭難を知らせる警報です。警報を受けた後の受信確認や中継と、最初の通知を区別します。	遭難の発生を知らせる段階と、その後の通信を分けられます。	alertは警報、distress trafficは遭難に関する通信のやり取りです。	distress traffic,acknowledge,epirb
+ distress traffic	遭難に関する通信のやり取りを指します。ここでのtrafficは道路や船の混雑ではありません。	妨害してはいけない対象が遭難通信だと分かります。	遭難の最初の警報だけを指すdistress alertとは範囲が異なります。	traffic,distress alert,seelonce feenee
+radiotelephony	無線を使って音声で通話する通信方式です。文字を送る方式と対比して読みます。	位置報告などを音声で行うのか、文字で行うのかを区別できます。	通常の有線電話や文字通信と同じ意味ではありません。	narrow band direct printing,digital selective calling
+acknowledge	通報を受け取ったことを相手に知らせます。内容を転送するrelayとは別の行為です。	受信確認を、中継や救助実施と取り違えずに通信の順序を追えます。	受け取ったことの確認であり、依頼された作業の完了を意味するとは限りません。	relay,distress alert
+relay	受け取った通報を別の局へ中継します。送信元・中継局・宛先を順に追うと経路が分かります。	直接届かない通報を誰がどこへ取り次ぐのか読めます。	受信を確認するacknowledgeとは異なり、通報を次の相手へ送ります。	acknowledge,coast earth station
+medical advice	病気やけがについて医療上の助言を受ける場面です。船長などが船外の専門家へ相談します。	船の機器故障ではなく、人の健康について相談しているとつかめます。	adviceは助言であり、それ自体が救助艇や搬送の手配を意味するわけではありません。	urgency,pan pan
+maritime safety information	航行警報や気象情報など、海上の安全に関わる情報です。個別の遭難通報とは分けて読みます。	船に向けた放送が安全情報の提供だと判断できます。	遭難中の船とのdistress trafficとは情報の目的が異なります。	navtex,distress traffic
+mayday	遭難を示す信号です。呼出しの冒頭に現れると、直ちに援助を必要とする通信だと分かります。	MAYDAYを手がかりに、続く船名や状態を遭難の情報として読めます。	緊急のPAN PANと区別します。日付のMay Dayという一般表現ではありません。	distress,pan pan
+pan pan	緊急通信を示す信号です。船や人の安全について、急いで知らせる通信の入口になります。	PAN PANから、後続の内容が安全に関する緊急通報だと分かります。	遭難を示すMAYDAYと同じ信号ではありません。	urgency,mayday
+survival craft	遭難時に人が退避する救命用の船艇です。lifeboatやlife raftなどが含まれます。	乗り移る先が通常の船ではなく、救命用の船艇だと分かります。	救助に来る船をすべてsurvival craftと呼ぶわけではありません。	overboard,on scene
+on scene	救助などの現場に到着していることを表します。on-scene communicationsなら、現場で行う通信です。	船が現場にいるのか、現場へ向かっている途中なのかを区別できます。	現場へ向かう途中ではなく、現場にいる状態を表します。	rescue coordination center,survival craft
+ gmdss	遭難警報や安全情報を扱う世界的な制度の名称です。単独の機器名ではなく、関連する通信・設備の枠組みを表します。	装置名が並ぶ文章で、GMDSSを全体の制度として位置付けられます。	EPIRBやNAVTEXのような個別の機器・方式の名前と区別します。	epirb,navtex,digital selective calling
+navtex	航行警報や気象情報などの海上安全情報を受信する方式です。船が情報を受け取る場面で読みます。	安全情報を受信する話を、個別の遭難呼出しと混同せずに読めます。	NAVTEXによる情報受信と、船からの遭難警報の送信は別の働きです。	maritime safety information,narrow band direct printing
+ epirb	遭難時に警報と位置に関する情報を伝える無線標識です。船の通常の通話装置とは役割が異なります。	遭難位置を知らせる機器だと分かり、船の状態と装置の働きを結び付けられます。	通常の音声通話やNAVTEXの安全情報受信を行う機器ではありません。	distress alert,gmdss
+ digital selective calling	デジタル信号を使って局を呼び出す方式です。音声の通話そのものとは区別します。	呼出しと、その後に行う音声通信の段階を分けて読めます。	デジタル呼出しを、radiotelephonyによる音声のやり取りと同一視しません。	radiotelephony,distress alert
+narrow band direct printing	受け取った文字通報を直接印刷・表示する狭帯域の通信方式です。音声通話との違いに注目します。	通信方式の指定が文字か音声かを取り違えずに読めます。	音声によるradiotelephonyとは別の方式です。	radiotelephony,navtex
+ overboard	船から外へ、とくに海中へ落ちたことを表します。人が主語なら転落の状況を読みます。	船自体の事故と、乗組員の海中転落を区別できます。	船の転覆capsizeや座礁agroundを表す語ではありません。	survival craft,capsize
+aground	船底が海底などに接して座礁した状態です。船が進めない理由として現れます。	停船しているだけなのか、座礁して動けないのかを判別できます。	錨を下ろして待つanchorageの場面とは異なります。	anchorage,under keel clearance
+capsize	船が横倒しになるなどして転覆することです。波の話では、何が起きるおそれがあるのかを読みます。	単なる船の揺れと、転覆という事故を区別できます。	rollingは横揺れであり、それだけで転覆したことを意味しません。	rolling,flooded
+ flooded	船内などに水が入り、浸水した状態です。engine roomなら機関室で起きている問題を示します。	どの区画が浸水し、船にどんな危険があるかをつかめます。	波による揺れではなく、区画に水が入った状態を表します。	bulkhead,capsize
+seelonce feenee	遭難通信に伴う沈黙が終了したことを知らせる表現です。終了の通知として読みます。	沈黙を続ける指示と、沈黙が終了した通知を区別できます。	沈黙を開始・継続させる表現ではありません。	distress traffic,clear
+watch	radio watchやkeep watchは、通信を受信できるよう聴守を続けることです。当直の意味も周囲の語で読み分けます。	watchを時計と読まず、通信を聞き続ける役割として理解できます。	時計のwatchや、単に目で見る行為とは区別します。	guard,frequency
+ guard	動詞として周波数を目的語に取ると、その周波数を聴守する意味です。	周波数を守るという直訳から、通信を聞き続ける行為へ読み替えられます。	Coast GuardのGuardは海上保安機関の名称で、動詞の聴守とは別です。	watch,frequency
+traffic	radio trafficやdistress trafficは無線通信のやり取りです。vessel trafficなら船舶の往来を表します。	通信内容と船の混雑を、trafficの前後の語から区別できます。	無線通信、船舶交通、道路交通を同じ意味に固定しません。	distress traffic,congested
+frequency	呼出しや聴守の対象となる無線周波数です。数値と単位が出る場合は、その指定先を読みます。	通信する周波数の指定を、物事の起きる頻度と取り違えずに読めます。	一般英語の「出現頻度」とは違い、ここでは電波の周波数です。	watch,interference
+interference	他の送信などによって通信が妨げられることです。何が干渉を起こし、どの通信に影響するかを追います。	送信の停止が必要な理由を、通信への妨害として理解できます。	受信機そのものが故障するreceiver failureとは原因が異なります。	clear,receiver failure
+clear	周波数なら他の通信のために空けておくこと、係留場所なら空いていることを表します。何がclearなのかを見ます。	対象が周波数か水域かを見て、空いている状態の意味を読めます。	keep clear ofは対象から離れている意味です。「明瞭な」という訳だけに固定しません。	keep clear,fairway
+sensitivity	受信機がどの程度弱い信号まで検出できるかに関わる感度です。設備の性能の話として読みます。	人の感受性ではなく、受信機の性能を比較していると分かります。	一般的な感情の敏感さではなく、receiverの受信感度です。	receiver failure,interference
+port	portに入る・出るなら港、port sideなら左舷です。同じ文章に両方の意味が出ることもあります。	既知の「港」だけで読まず、左舷側という位置関係も追えます。	左舷のportの反対はstarboardです。港の意味か左舷の意味かを周囲の語で判断します。	starboard,next port of call
+starboard	船首に向かって右側の舷を指します。船に対してどちら側にあるかを表す語です。	他船の接近方向を、自分から見た右という曖昧な読み方から区別できます。	左舷はportです。見る人の向きに合わせて左右を入れ替える語ではありません。	port
+pilot	港への出入りなどを助ける水先人です。boardやportがある海事の場面では、この役割を読みます。	pilotを操縦士だけと考えず、船に乗る水先人として理解できます。	航空機の操縦士のpilotと、海事の水先人を区別します。	port,bridge
+berth	岸壁などで船が係留される指定位置です。到着する港全体よりも狭い、船を着ける場所を表します。	港への到着と、具体的な係留位置への移動を分けて読めます。	港全体のport、錨を下ろすanchorageとは場所の種類が異なります。	anchorage,make fast
+anchorage	錨を下ろして停泊する水域です。入港前にそこで待つ、といった位置指定として読みます。	待機場所が岸壁ではなく錨地だと分かります。	岸壁等の係留位置を指すberthとは区別します。	berth,dragging
+fairway	船が通航する航路・水域です。keep the fairway clearなら、通航の妨げにならないよう空けておく意味です。	港の通航路を塞いでいるかどうかという指示を理解できます。	一般的なゴルフのfairwayではありません。	keep clear,congested
+under keel clearance	船底と海底の間に残る余裕水深です。水深全体ではなく、船が通れるだけの下側の余裕を表します。	船の下側の余裕と、水面上の高さ制限を区別できます。	air draughtは水面から船の最高部までの高さで、船底下の余裕ではありません。	air draught,aground
+ air draught	水面から船の最高部までの高さです。橋梁の下を通れるかを考える場面では、上側の余裕が問題になります。	橋の下の通過に必要な船の高さを、船底下の余裕水深と区別できます。	橋梁のbridgeと操船場所のbridge（船橋）は別の意味です。	bridge,under keel clearance
+make fast	係留索を所定の場所に固定することです。fastを速度の話として読まないようにします。	速く動かす指示ではなく、索を固定する作業だと分かります。	fastはここでは「速い」ではなく「しっかり固定した」の意味です。	lines,single up
+single up	出港前に余分な係留索を外し、最小限の索を残した係留状態にすることです。まだすべてを解いた状態ではありません。	係留中から出港への準備段階に移ったことを読み取れます。	すべての索を解いて岸壁から離れることそのものとは区別します。	lines,make fast
+lines	mooring linesは船を係留する索です。解く・固定するという動詞と一緒に、出港や係留の作業を読みます。	線や航路という直訳ではなく、作業する係留索だと分かります。	一般の線、通信回線、航路などのlineとは、mooringの文脈で分けます。	make fast,single up
+lock	船が通る際に水位を調整する閘門です。水が入る・水位が変わる描写が手がかりになります。	鍵をかける話ではなく、水位を調整して船を通す施設だと分かります。	普通の鍵・錠のlockとは異なります。	under keel clearance
+estimated time of arrival	目的地に到着する予定の時刻です。まだ到着したという報告ではなく、見込みを伝えます。	到着済みの時刻と、これからの到着予定を区別できます。	estimatedなので、実際の到着時刻が確定したという意味ではありません。	next port of call,final destination
+next port of call	航海中に次に立ち寄る港です。最後の目的地とは限らず、航路の順序を示します。	次の寄港先を最終目的地と混同せずに読み取れます。	final destinationと一致するとは限りません。	final destination,estimated time of arrival
+final destination	航海や移動の最後の目的地です。途中で寄港する港と区別して、経路の終点を読みます。	途中の立寄り先ではなく、最終的に向かう場所を特定できます。	next port of callは次の寄港地であり、最終目的地とは限りません。	next port of call,estimated time of arrival
+radio quarantine	入港前などに無線で検疫に関する連絡を行う場面です。radioは連絡手段を示しています。	通信の話が機器調整ではなく、検疫の手続に関するものだと分かります。	無線機を隔離するという意味ではありません。	estimated time of arrival,port
+ dense fog	濃い霧で周囲が見えにくくなった状況です。視界不良の原因として読みます。	悪天候の中でも、視界を悪くしている原因が霧だと分かります。	poor visibilityは視界の状態、dense fogはその原因となる気象です。	poor visibility,restricted visibility
+poor visibility	見通しが悪い状態です。原因が霧なのか別のものなのかは、文中の情報で判断します。	船の故障ではなく、周囲を見渡しにくい状況だとつかめます。	視界不良だけで原因を濃霧と決めつけず、周囲の説明を見ます。	dense fog,restricted visibility
+restricted visibility	霧などで視界が制限されている状況です。船そのものの運動能力の制約とは分けます。	視界が制限される話と、操船できる範囲が制限される話を区別できます。	hamperedは操船の制約で、見通しの制限とは別です。	poor visibility,hampered
+hampered	損傷などで船の操船に制約がある状態です。何によって妨げられているかをbyの後などから読みます。	船が動きにくい原因と、それに伴う運航上の制約を読み取れます。	視界が悪いrestricted visibilityとは、制約の対象が異なります。	fouled,unseaworthy
+fouled	ロープなどが推進器や錨に絡まり、働きが妨げられた状態です。何がどこに絡んだのかを読みます。	単なる汚れではなく、絡まりによる機器の問題だと分かります。	走錨draggingとは別の状態です。	dragging,hampered
+congested	港や航路に船が多く、混雑している状態です。船が単独で故障した話とは区別します。	交通量の多さが運航の問題になっているとつかめます。	ここでのtrafficは船舶の往来で、無線通信の内容ではありません。	traffic,fairway
+unseaworthy	損傷などにより、航海に適さない状態です。修理の必要性や出港の可否につながる表現です。	小さな不具合の報告ではなく、航海に適するかが問題だと分かります。	単に荒天で航海が難しいという意味に限定しません。	hampered,flooded
+dragging	anchor is draggingなら、錨が海底を引きずられて船を保持できない走錨の状態です。	錨を下ろしているのに船の位置が保てないという危険を読み取れます。	錨を巻き上げている作業や、錨に索が絡むfouledとは区別します。	anchorage,fouled
+rolling	船が左右に横揺れすることです。縦揺れのpitchingと対にして、揺れの向きを読みます。	波による船の動きが横揺れか縦揺れかを区別できます。	pitchingは船首と船尾が上下する縦揺れです。	pitching,capsize
+pitching	船首と船尾が上下する縦揺れです。左右に傾くrollingとは揺れの向きが異なります。	船首・船尾の上下動を、左右の傾きと取り違えずに読めます。	rollingは横揺れであり、pitchingとは別の動きです。	rolling,swell
+swell	離れた場所から伝わってくる波によるうねりです。風の強さだけではなく、海面の動きを表します。	気象の風と、船に届く海のうねりを分けて状況をつかめます。	船の揺れそのものではなく、揺れを起こす海の状態です。	rolling,pitching
+ballast	船の姿勢や安定を保つための重しです。水のバラストについて書かれる場合もあります。	船内の水が意図的なバラストか、浸水した水かを区別できます。	バラストの水は船の安定のためで、floodedが示す浸水とは異なります。	flooded,rolling
+heading	船首・機首が向いている方向です。向首方向を保持する装置などで使われます。	目的地へ向かうという動詞用法と、向首方向という名詞用法を区別できます。	heading for a portは港へ向かうという用法です。名詞のheadingと同じ説明にしません。	course,bearing
+bearing	船などの対象が基準方向からどちらにあるかを表す方位です。誰の何の方位かを確認します。	船が向く方向と、別の船の位置を示す方位を区別できます。	自船の向首方向headingや針路courseと同じものとは限りません。	heading,course
+course	船や航空機が進む針路です。course and speedなら、航行方向と速度を報告しています。	航行の針路を、過程や講座という一般的な意味から切り分けられます。	during the course ofは「〜の過程で」です。台風の進路も船の針路とは対象が違います。	heading,bearing
+cable	海事の距離単位として、数と一緒に使われます。浮標から何cablesという表現では距離を読みます。	船と目標の離れ具合を、索や電線の話と取り違えずに読めます。	一般の電線・ケーブルの意味もあるので、数値とfromなどの位置表現を確認します。	knots,bearing
+knots	船の速さを示すノットです。数値と一緒に船速を読むための単位として扱います。	船速の数値を、索の結び目の数と混同せずに理解できます。	索の結び目を表すknotsとは別です。	cable,course
+make a lee	船などを風よけにして、風の影響が小さい場所を作ることです。救助艇が作業する場面などで読みます。	救助艇のために風を避ける場所を作る行為だと分かります。	船を止めるheave toと同じ操作を指すわけではありません。	heave to,on scene
+heave to	船を減速させ、停船に近い状態を保つことです。援助を待つなど、航行を抑える場面で読みます。	援助を待つ船が進み続けるのではなく、動きを抑えていると分かります。	錨を下ろして停泊することと同義ではありません。	make a lee,anchorage
+ give way	他船の進路を避けることです。どの船が避航するかは、その文が示す関係から読みます。	他船との位置関係の中で、避ける側の行動を読み取れます。	船の大小だけで避航する側を決める意味ではありません。	keep clear,course
+keep clear	keep clear ofに続く船や航路などから離れていることです。ofの後ろが避ける対象になります。	どの対象に近づかないよう指示されているかを特定できます。	clear a channelの「航路を空ける」と、keep clear ofの「対象から離れる」を区別します。	clear,give way,fairway
+ automatic identification system	船の識別情報などを自動で伝える装置です。誰の船の情報かを確認する場面で読みます。	船の識別情報を送る設備だと分かり、遭難用装置と役割を分けられます。	EPIRBのように遭難を知らせることを主目的とする装置とは異なります。	epirb,ship station
+bridge	船内で操船・航行を管理する船橋です。人がon the bridgeにいるなら、勤務する場所を表します。	船長のいる船橋と、船がくぐる橋梁を文脈で区別できます。	pass under the bridgeなら橋梁です。船橋の意味をそのまま当てはめません。	air draught,master
+regularity of flight	飛行が正常に運航されることを表します。安全と並んで、通信の目的として述べられる概念です。	運航に関する通報を、時刻の正確さだけの話へ狭めずに読めます。	定時性だけを意味するとは限りません。flight regularityも同じ運航概念の表現です。	air traffic services,public correspondence
+ public correspondence	業務用の通報と区別して扱われる公衆通信です。通信サービスが何を取り扱うかを読みます。	業務連絡と公衆通信の区別を、局の役割の説明から読み取れます。	私的な手紙だけを指す一般的なcorrespondenceに固定しません。	regularity of flight,aeronautical station
+ air traffic services	航空交通の管理などに関する業務です。通報の宛先・目的として現れる表現です。	航空交通に関する業務へ送られる通報だと位置付けられます。	trafficは道路交通や単なる無線通信のやり取りとは限りません。	aeronautical station,regularity of flight
+standardized phraseology	通信で用いる標準化された表現です。指定された状況の表現を使う、という規定を読む入口になります。	標準表現を使う原則と、普通の言葉で伝える例外を分けて読めます。	plain languageは標準表現で意図を伝えられない場合の表現として区別します。	plain language,only when
+plain language	標準表現で伝えきれない内容を、普通の言葉で伝えることです。使用できる条件と合わせて読みます。	自由な表現をいつ使えるのか、標準表現との関係から読めます。	暗号に対する「平文」という意味に読み替えません。この場面では標準通信表現との対比です。	standardized phraseology,only when
+receiver failure	受信機の故障です。送信ができても相手の応答を受信できない状況を読みます。	通信不能の原因が受信側にあると判断できます。	干渉interferenceや送信機の故障と同一視しません。	transmitting blind,interference
+transmitting blind	相手の応答を受信できない状態で送信していることです。受信機故障などの理由と一緒に読みます。	送信は続いていても、返答を聞けない通信状況だと分かります。	何も送信していない状態ではなく、受信できないまま送信する状態です。	receiver failure,aircraft station
+shall	規定が主体に義務を課す語です。shallの前に誰が、後ろに何をするかを確認します。	行為の予定ではなく、誰に何が義務付けられるかを読めます。	一般的な未来表現と同じ読み方にせず、規定上の義務を確認します。	shall not,may
+shall not	規定が行為を禁止する形です。notを落とすと義務と反対の意味になります。	禁止を義務に読み違えることを防げます。	「しなくてもよい」ではなく「してはならない」です。	shall,may
+may	規定では許可を表すことがあります。一般的な可能性の意味か、行為が認められる意味かを文脈で判断します。	許可された行為を、必ず行う義務と取り違えずに読めます。	許可のmayは義務のshallと異なります。可能性のmayも別にあります。	shall,only when,provided
+unless	ある場合を除いて本則が適用されることを表します。例外になる条件を後ろの節で確認します。	義務が外れる条件を読み落とさずに理解できます。	unless以下を、その行為を行うための条件と逆に読まないようにします。	except,provided
+except	規定の対象から外す人・物・場合を示します。allと一緒なら、除外される対象に注目します。	全員に適用されるように見える規定の除外対象を見つけられます。	unlessが条件節で例外を示すのに対し、exceptの後ろでは除外対象を確認します。	unless,regardless of
+provided	provided that以下で、許可などが成り立つ条件を示します。前半の行為と、後半の条件を対応させます。	条件付きの許可を無条件の許可と取り違えずに読めます。	be provided withは「備えている」であり、この条件節の用法とは別です。	only when,subject to
+subject to	行為が承認や別の規定などによる制約を受けることを示します。後ろにある制約の内容を確認します。	使用などが認められていても、必要な承認や制約を見落とさずに読めます。	単に話題を示すsubjectという名詞の用法とは異なります。	provided,in accordance with,administration
+at least	数量の下限を示します。at least twoなら、二つだけに限定せず二つ以上を含みます。	必要数の下限を、上限や固定数と取り違えずに読めます。	「ちょうど」でも「多くとも」でもありません。	shall
+in accordance with	行為がどの規定・手順に従うかを示します。withの後ろにある準拠先を読みます。	行動の内容と、従うべき手順や規定を結び付けて読めます。	準拠先を示す表現であり、それ自体が新たな許可を与える語ではありません。	subject to,administration
+prior to	ある出来事より前の時点を示します。departureなら、出発前に済ませる行為を読みます。	必要な作業の順序を、出発後と取り違えずに理解できます。	後の時点ではなく、先に行うという順序です。	without delay
+only when	行為が許される条件を限定します。when以下が満たされる場合に限られる、と読みます。	条件以外の場面でも許されるという読み過ぎを防げます。	単なるwhenと違い、onlyが適用条件を限定しています。	provided,plain language
+where practicable	実行可能な場合に、という限定です。場所を尋ねるwhereではなく、行為の実行可能性を見ます。	実行可能性を伴う義務を、無条件の義務と取り違えずに読めます。	whereを場所の指定と読むのではなく、実行可能な場合という条件です。	shall,unless
+on the authority of	誰の権限に基づいて行為を行うかを示します。ofの後ろに来る人や機関を確認します。	実行する人と、その行為を認める権限を持つ人を分けられます。	単に誰から聞いた情報かを示す表現ではありません。	master,subject to
+without delay	知らせるなどの行為を遅滞なく行うことを表します。具体的な分数を指定する表現ではありません。	行為を先送りしてよいかどうかを、時間に関する指示から読めます。	一定の時間が経つまで待つ指示ではありません。	prior to
+regardless of	後ろに示す違いに左右されず、本則が適用されることを表します。何を条件にしないかを確認します。	発信元などを理由に規定の対象から外さないことが読めます。	exceptが除外を示すのに対し、regardless ofはその違いにかかわらない適用を示します。	except
+bulkhead	船内を区画に分ける隔壁です。水漏れの描写では、どの区画へ浸水が広がるかを読む手がかりになります。	船体のどの部分から水が漏れているかを特定できます。		flooded
+bulbous bow	船首の水面付近にある球状の突出部分です。船の構造を説明する文章では、その位置と形を読みます。	船首の形を説明していることが分かり、船の状態の話と区別できます。		

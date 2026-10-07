@@ -1,0 +1,1091 @@
+{
+  "root": {
+    "schemaVersion": 1,
+    "masterVersion": "E2-v1",
+    "qualification": "第一級総合無線通信士",
+    "tier_counts": {
+      "minimum": 32,
+      "standard": 74,
+      "extended": 101
+    },
+    "groups": [
+      {
+        "id": "actors",
+        "title": "誰が通信するか",
+        "goal": "主体と役割を分け、船長・主管庁・救助機関を通信局と混同しない"
+      },
+      {
+        "id": "distress",
+        "title": "遭難・緊急と救助",
+        "goal": "警報→受信確認→中継→救助と通常通信の違いをつなぐ"
+      },
+      {
+        "id": "operations",
+        "title": "周波数を聴守・運用する",
+        "goal": "何を聴守し、何を止め、どの通信を中継するのかを読む"
+      },
+      {
+        "id": "port",
+        "title": "港へ入り、係留し、出港する",
+        "goal": "港・左舷、錨地・係留場所、余裕水深・橋の高さ、次寄港地と目的地を区別"
+      },
+      {
+        "id": "condition",
+        "title": "船の状態・進路・視界を読む",
+        "goal": "視界とその変化、操船制約・絡まり・揺れ・座礁を区別する"
+      },
+      {
+        "id": "aviation",
+        "title": "一総通で出た航空通信規定",
+        "goal": "複数周波数聴守・通信中継・公衆通信・標準句・受信障害の扱いを読む"
+      },
+      {
+        "id": "rules",
+        "title": "規定の条件と例外を読む",
+        "goal": "主体→義務/禁止/許可→条件/例外→時系列/下限を場面に沿って読む"
+      },
+      {
+        "id": "structure",
+        "title": "少数の船体語を補う",
+        "goal": "一記事の説明を短い部位・働きに結ぶ補助。船舶工学の章にはしない"
+      }
+    ],
+    "frequency_definition": "E0の表記パターン検出値。専門義のみの出現回数ではありません。",
+    "modality_definition": "採用した意味の根拠資料がリーディング／英会話のどちらにあるか。音声認識難易度・放送された語数は示しません。",
+    "example_definition": "例文は教材用の自作。実際の運用指示・現行規則を提示するものではありません。",
+    "impact_scale": {
+      "A": "大意・主体・規定の結論を失う可能性",
+      "B": "一部の情報・条件を失う可能性",
+      "C": "本文の説明から推測できる",
+      "D": "知らなくてもほぼ困らない"
+    },
+    "candidate_decisions": [
+      {
+        "term_id": "term-fairway",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-fairway"
+      },
+      {
+        "term_id": "term-berth",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-berth"
+      },
+      {
+        "term_id": "term-anchorage",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-anchorage"
+      },
+      {
+        "term_id": "term-bulkhead",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-bulkhead"
+      },
+      {
+        "term_id": "term-bulbous-bow",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-bulbous-bow"
+      },
+      {
+        "term_id": "term-air-draught",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-air-draught"
+      },
+      {
+        "term_id": "term-under-keel-clearance",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-under-keel-clearance"
+      },
+      {
+        "term_id": "term-starboard",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-starboard"
+      },
+      {
+        "term_id": "term-ballast",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-ballast"
+      },
+      {
+        "term_id": "term-unseaworthy",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-unseaworthy"
+      },
+      {
+        "term_id": "term-capsize",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-capsize"
+      },
+      {
+        "term_id": "term-aground",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-aground"
+      },
+      {
+        "term_id": "term-overboard",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-overboard"
+      },
+      {
+        "term_id": "term-receiver-failure",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-receiver-failure"
+      },
+      {
+        "term_id": "term-dense-fog",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-dense-fog"
+      },
+      {
+        "term_id": "term-poor-visibility",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-poor-visibility"
+      },
+      {
+        "term_id": "term-restricted-visibility",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-restricted-visibility"
+      },
+      {
+        "term_id": "term-swell",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-swell"
+      },
+      {
+        "term_id": "term-rolling",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-rolling"
+      },
+      {
+        "term_id": "term-pitching",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-pitching"
+      },
+      {
+        "term_id": "term-hampered",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-hampered"
+      },
+      {
+        "term_id": "term-fouled",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-fouled"
+      },
+      {
+        "term_id": "term-master",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-master"
+      },
+      {
+        "term_id": "term-watch",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-watch"
+      },
+      {
+        "term_id": "term-guard",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-guard"
+      },
+      {
+        "term_id": "term-traffic",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-traffic"
+      },
+      {
+        "term_id": "term-clear",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-clear"
+      },
+      {
+        "term_id": "term-pilot",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-pilot"
+      },
+      {
+        "term_id": "term-bearing",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-bearing"
+      },
+      {
+        "term_id": "term-heading",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-heading"
+      },
+      {
+        "term_id": "term-course",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-course"
+      },
+      {
+        "term_id": "term-port",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-port"
+      },
+      {
+        "term_id": "term-administration",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-administration"
+      },
+      {
+        "term_id": "term-coast-station",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-coast-station"
+      },
+      {
+        "term_id": "term-ship-station",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-ship-station"
+      },
+      {
+        "term_id": "term-aircraft-station",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-aircraft-station"
+      },
+      {
+        "term_id": "term-aeronautical-station",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-aeronautical-station"
+      },
+      {
+        "term_id": "term-coast-earth-station",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-coast-earth-station"
+      },
+      {
+        "term_id": "term-survival-craft",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-survival-craft"
+      },
+      {
+        "term_id": "term-radiotelephony",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-radiotelephony"
+      },
+      {
+        "term_id": "term-interference",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-interference"
+      },
+      {
+        "term_id": "term-distress",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-distress"
+      },
+      {
+        "term_id": "term-urgency",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-urgency"
+      },
+      {
+        "term_id": "term-distress-alert",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-distress-alert"
+      },
+      {
+        "term_id": "term-distress-traffic",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-distress-traffic"
+      },
+      {
+        "term_id": "term-acknowledge",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-acknowledge"
+      },
+      {
+        "term_id": "term-relay",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-relay"
+      },
+      {
+        "term_id": "term-rescue-coordination-center",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-rescue-coordination-center"
+      },
+      {
+        "term_id": "term-on-scene",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-on-scene"
+      },
+      {
+        "term_id": "term-medical-advice",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-medical-advice"
+      },
+      {
+        "term_id": "term-maritime-safety-information",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-maritime-safety-information"
+      },
+      {
+        "term_id": "term-estimated-time-of-arrival",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-estimated-time-of-arrival"
+      },
+      {
+        "term_id": "term-next-port-of-call",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-next-port-of-call"
+      },
+      {
+        "term_id": "term-final-destination",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-final-destination"
+      },
+      {
+        "term_id": "term-make-fast",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-make-fast"
+      },
+      {
+        "term_id": "term-make-a-lee",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-make-a-lee"
+      },
+      {
+        "term_id": "term-heave-to",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-heave-to"
+      },
+      {
+        "term_id": "term-single-up",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-single-up"
+      },
+      {
+        "term_id": "term-give-way",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-give-way"
+      },
+      {
+        "term_id": "term-keep-clear",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-keep-clear"
+      },
+      {
+        "term_id": "term-transmitting-blind",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-transmitting-blind"
+      },
+      {
+        "term_id": "term-mayday",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-mayday"
+      },
+      {
+        "term_id": "term-pan-pan",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-pan-pan"
+      },
+      {
+        "term_id": "term-seelonce-feenee",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-seelonce-feenee"
+      },
+      {
+        "term_id": "term-automatic-identification-system",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-automatic-identification-system"
+      },
+      {
+        "term_id": "term-digital-selective-calling",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-digital-selective-calling"
+      },
+      {
+        "term_id": "term-narrow-band-direct-printing",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-narrow-band-direct-printing"
+      },
+      {
+        "term_id": "term-navtex",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-navtex"
+      },
+      {
+        "term_id": "term-epirb",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-epirb"
+      },
+      {
+        "term_id": "term-gmdss",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-gmdss"
+      },
+      {
+        "term_id": "term-radio-quarantine",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-radio-quarantine"
+      },
+      {
+        "term_id": "term-knots",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-knots"
+      },
+      {
+        "term_id": "term-cable",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-cable"
+      },
+      {
+        "term_id": "term-frequency",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-frequency"
+      },
+      {
+        "term_id": "term-shall",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-shall"
+      },
+      {
+        "term_id": "term-may",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-may"
+      },
+      {
+        "term_id": "term-unless",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-unless"
+      },
+      {
+        "term_id": "term-except",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-except"
+      },
+      {
+        "term_id": "term-provided",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-provided"
+      },
+      {
+        "term_id": "term-subject-to",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-subject-to"
+      },
+      {
+        "term_id": "term-in-accordance-with",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-in-accordance-with"
+      },
+      {
+        "term_id": "term-prior-to",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-prior-to"
+      },
+      {
+        "term_id": "term-at-least",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-at-least"
+      },
+      {
+        "term_id": "term-only-when",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-only-when"
+      },
+      {
+        "term_id": "term-where-practicable",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-where-practicable"
+      },
+      {
+        "term_id": "term-regardless-of",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-regardless-of"
+      },
+      {
+        "term_id": "term-on-the-authority-of",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-on-the-authority-of"
+      },
+      {
+        "term_id": "term-shall-not",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-shall-not"
+      },
+      {
+        "term_id": "term-without-delay",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-without-delay"
+      },
+      {
+        "term_id": "term-regularity-of-flight",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-regularity-of-flight"
+      },
+      {
+        "term_id": "term-plain-language",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-plain-language"
+      },
+      {
+        "term_id": "term-standardized-phraseology",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-standardized-phraseology"
+      },
+      {
+        "term_id": "term-air-traffic-services",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-air-traffic-services"
+      },
+      {
+        "term_id": "term-public-correspondence",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-public-correspondence"
+      },
+      {
+        "term_id": "term-congested",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-congested"
+      },
+      {
+        "term_id": "term-flooded",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-flooded"
+      },
+      {
+        "term_id": "term-dragging",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-dragging"
+      },
+      {
+        "term_id": "term-lock",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-lock"
+      },
+      {
+        "term_id": "term-lines",
+        "e1_decision": "selected",
+        "e2_decision": "adopted",
+        "target_id": "term-lines"
+      },
+      {
+        "term_id": "term-strait",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "専門的な地理語だが今回の本文1回。fairway等の入港場面から離れた場所名暗記を増やさず補足に留める。"
+      },
+      {
+        "term_id": "term-tugboat",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "曳船は入港のpilot場面で補足する。追加の船種暗記を増やさない。"
+      },
+      {
+        "term_id": "term-rudder",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "舵の説明は操船不能のfouled/hamperedの場面へ添える。単独の船体用語を増やさない。"
+      },
+      {
+        "term_id": "term-propeller",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "絡まった推進器というfouledの場面で部位を説明する。別カード化を避ける。"
+      },
+      {
+        "term_id": "term-hull",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "bulbous bowや船体状態の説明で基礎語として扱う。独立暗記項目から外す。"
+      },
+      {
+        "term_id": "term-waterline",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "air draught/under keel clearanceの対比で水面基準を説明する。別カード化しない。"
+      },
+      {
+        "term_id": "term-keel",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "under keel clearanceを船底側の余裕として説明する際の構成語。竜骨単独の構造講座は不要。"
+      },
+      {
+        "term_id": "term-draught",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "単独検出はair draughtの構成語でもある。水面上の高さと喫水を曖昧に一つの訳で暗記しない。"
+      },
+      {
+        "term_id": "term-port-side",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "portの左舷とstarboardの対比へ統合。別の暗記項目にしない。"
+      },
+      {
+        "term_id": "term-quay",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "係留場所・係留索の場面で岸壁として補足できる。独立の場所語を増やさない。"
+      },
+      {
+        "term_id": "term-bilge",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一回の船底油の漏出文脈だけで、最小教材の場面網へ入れる追加負担が大きい。油処理語彙へ広げない。"
+      },
+      {
+        "term_id": "term-run-aground",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "agroundの動詞形の場面へ統合する。別項目化しない。"
+      },
+      {
+        "term_id": "term-man-overboard",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "overboardの転落場面の使用句として扱う。同じ状況を二項目に数えない。"
+      },
+      {
+        "term_id": "term-visibility",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "poor/restricted visibilityの場面に基礎語として添える。一般的な見通しという語義を独立カードにしない。"
+      },
+      {
+        "term_id": "term-rough-seas",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "荒れた海という通常の組合せ。swell・揺れの説明に添え、一般形容詞を専門語へ格上げしない。"
+      },
+      {
+        "term_id": "term-ebb-tide",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般の潮汐の説明に添える。今回の専門義・通信の中核として独立項目にする優先度は低い。"
+      },
+      {
+        "term_id": "term-spring-tide",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "大潮という一回の専門義はあるが本文に定義・起こる条件が与えられる。潮汐語彙を独立章に広げない。"
+      },
+      {
+        "term_id": "term-station",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "局種のCORE項目で説明する基礎要素。同じ語をもう一枚暗記する追加効果が小さい。"
+      },
+      {
+        "term_id": "term-radio",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "Port Radioという固有の通信相手の例はcoast stationの説明に置く。単独でradio＝局とするカードは不適切。"
+      },
+      {
+        "term_id": "term-service",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "業務・運用の意味は複数の局種・規定の説明で扱う。文脈を離れた一義の暗記は誤解につながる。"
+      },
+      {
+        "term_id": "term-radiocommunication",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "radio＋communicationの読みは局・無線運用の導入で説明できる。独立暗記項目として重複が大きい。"
+      },
+      {
+        "term_id": "term-harmful-interference",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "interferenceの規定文で形容語とともに説明できる。新しい単独語義が増えない。"
+      },
+      {
+        "term_id": "term-acknowledgement",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "acknowledgeの名詞形として同じ受信確認場面へ添える。独立項目数を増やさない。"
+      },
+      {
+        "term_id": "term-keep-watch",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "watchの短い使用形として同じ聴守場面へ添える。別の暗記項目にしない。"
+      },
+      {
+        "term_id": "term-transmission-delay",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "問いは方式の物理的な遅延の比較で、通常の通信技術表現。専門英語の意味変化を埋める教材からは外す。"
+      },
+      {
+        "term_id": "term-watertight",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "bulkheadとsurvival craftの状態を説明する補足。独立項目では船体の語彙を増やしすぎる。"
+      },
+      {
+        "term_id": "term-meteorological",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "気象という分野ラベルは必要だが、一般語としても理解可能。air-report等の規定文内の補助説明に留める。"
+      },
+      {
+        "term_id": "term-cold-front",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般気象の内容。船舶専用の意味変化が確認できず、英語学校の気象語彙へ広げない。"
+      },
+      {
+        "term_id": "term-low-pressure",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般気象の語。場面説明に出ても独立暗記の対象外。"
+      },
+      {
+        "term_id": "term-as-soon-as-possible",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般連語で、without delay等の時系列場面の注で読める。独立項目は増やさない。"
+      },
+      {
+        "term_id": "term-on-request",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般的な要求に応じるという句。航空局の言語提供の規定例で補足すればよい。"
+      },
+      {
+        "term_id": "term-on-schedule",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般連語。到着予定時刻の場面説明で扱え、別教材の必要性が小さい。"
+      },
+      {
+        "term_id": "term-behind-schedule",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般連語。到着時刻の場面に添えればよい。"
+      },
+      {
+        "term_id": "term-competent-authority",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "管轄する権限者の役割はAdministration/権限の規定で補足。一般authority等の語彙へ広げない。"
+      },
+      {
+        "term_id": "term-clearing",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "霧が晴れる意味は通常の動詞。視界の変化の説明に添え独立専門語にはしない。"
+      },
+      {
+        "term_id": "term-thickening",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "濃くなるという通常の意味。視界の変化の対比に添えればよい。"
+      },
+      {
+        "term_id": "term-drag",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "当該船体記事でも通常の技術語の抵抗。単独の一総通専門義教材を作る価値は小さい。"
+      },
+      {
+        "term_id": "term-range",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "航続距離の文脈はあるが当該一記事の補足で読める。単独カードは優先しない。"
+      },
+      {
+        "term_id": "term-carbon-dioxide",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般的な環境・科学語。専門通信を理解する独自の損失を埋める対象ではない。"
+      },
+      {
+        "term_id": "term-coral",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般の自然科学記事に由来。海が舞台でも海事運用語ではない。"
+      },
+      {
+        "term_id": "term-artificial-intelligence",
+        "e1_decision": "rejected",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "一般技術・ニュース語。一総通だけの意味は確認できず対象外。"
+      },
+      {
+        "term_id": "term-bridge",
+        "e1_decision": "hold",
+        "e2_decision": "adopted",
+        "target_id": "term-bridge",
+        "reason": "2024-09英会話問5の定義と正答2が船橋を確定。選択肢語であり放送された語とは扱わない。しっかり範囲のCONTEXT補助。"
+      },
+      {
+        "term_id": "term-sensitivity",
+        "e1_decision": "hold",
+        "e2_decision": "adopted",
+        "target_id": "term-sensitivity",
+        "reason": "2018-09英会話問4は受信機の最小入力の定義、正答1。一般的な敏感さとは異なる感度。物理講座には広げずしっかり範囲のCONTEXT補助。"
+      },
+      {
+        "term_id": "term-bound",
+        "e1_decision": "hold",
+        "e2_decision": "integrated",
+        "target_id": "term-shall",
+        "reason": "2026-03問5エ=1 boundでis bound toの義務を確認。独立語カードを増やさずshallの義務表現対比へ統合。行き先を表すbound forは今回の根拠ではない。"
+      },
+      {
+        "term_id": "term-life-raft",
+        "e1_decision": "hold",
+        "e2_decision": "integrated",
+        "target_id": "term-survival-craft",
+        "reason": "2016-03問5ウ=7 life rafts。救命いかだはsurvival craftの一種として補足し完全な同義語として扱わない。"
+      },
+      {
+        "term_id": "term-flight-regularity",
+        "e1_decision": "hold",
+        "e2_decision": "integrated",
+        "target_id": "term-regularity-of-flight",
+        "reason": "2003-03問5本文Flight regularity messagesと注記を分離。既存regularity of flightと同じ運航概念の語順違いとして統合。E0検出数を足して専門義頻度とはしない。"
+      },
+      {
+        "term_id": "term-line-of-sight",
+        "e1_decision": "hold",
+        "e2_decision": "excluded",
+        "target_id": null,
+        "reason": "選択肢のみの検出4。2026-03英会話問7の正答は2（静止衛星）、VHF line-of-sightは選択肢1。通信方式の比較を理解する補助語だがv1独立教材は見送り。誤答選択肢であることだけを除外理由にはしない。"
+      }
+    ]
+  },
+  "items": {
+    "term-coast-station": "e6fccb14549cc1c837d32569eb2063601931fdc473453a27daa459af5078b3a6",
+    "term-ship-station": "58b58931fe93fccb30261e50181a455781c8756330fd7cc3609ec706ec4236c5",
+    "term-aircraft-station": "4bdbf76be77b9339f9d7d5a44f8fa462cd3caddca834dae0ccaa5b9a890e0c23",
+    "term-aeronautical-station": "fff65bb470e9ad5f6f75254279374132b3af122b6f0baa14b6b10f3bb250d238",
+    "term-coast-earth-station": "e528ceb0a746fb6a0f758c76f11b894d1b4a33795c2a74f8bed66c0a3241a4f5",
+    "term-master": "7a640cace7cab91dea0c68af0d8d9c12a0809a645de90fb6598b59e77a90e14d",
+    "term-administration": "8376d64c7468acedf6c21cb3a6bbde0534f5735795293286b863e5431dc54805",
+    "term-rescue-coordination-center": "c8d64436410e9ab5196f2bcaf4b3cf66830c78b86de73acfcfc557c2f8087dcd",
+    "term-distress": "95ca10d2c6727db139f4178c8bff96a322ea1e63215ba150cf816cccfd0a8f6c",
+    "term-urgency": "5057c42b11998efbcab35519ac801bc9dff1ae2d201525972b0491c57282b77b",
+    "term-distress-alert": "b38aac2cbb4a4bb129a5a97a8429dd2500c5248d91ad07f744df0c83c00f1e35",
+    "term-distress-traffic": "43ef3f7eebbad154a51722e9e86b39a32dac3cccc0e9a0ccfa8d72563925c11b",
+    "term-radiotelephony": "5a72b8bf7778fe6a618f6fb6af544fc5b509ffdf517439bb00e96302274aed47",
+    "term-acknowledge": "6a694b7be1cdf07c56f39a5fc20d7ff38ff490948d81c0a1480e3e55008cb9ea",
+    "term-relay": "6dbd444ff86db49d90dd1b68a202bcf52b77708d29b9c633566b2a82e86f21fe",
+    "term-medical-advice": "a24eb5dbfa52e2e0e2ec0950d5b3258b38855226c18ebb7dd679914d36ad7588",
+    "term-maritime-safety-information": "bb8d47d0ea9217329cd636db4156bc8d2a37f11abaec06b308ef190d89b0e84a",
+    "term-mayday": "c8d6d11943cb788a96f90a00ecf3044609ea9c639bcb58b2d6718e12cc8eb63c",
+    "term-pan-pan": "11f757a50aba790623a53f5616acdaca66dfafaf5348ce99d270df1fc5daa096",
+    "term-survival-craft": "a69c98b6e5445b60d74f68418ab3ecbe0182822f8053581100148a2c08dd5f50",
+    "term-on-scene": "616cf0912a20de30e95a5f5e13464c298bf091cfac3ada6299ccbc91b56d1d2f",
+    "term-gmdss": "73aeacc6bc70e3acea010ec739b154245af58ec38763939530d19813ebb9b19d",
+    "term-navtex": "ade2052bd3b1836fd057d172ef9e5c931b289c0334986f88fddee62070209114",
+    "term-epirb": "5f3f64107318413375f4ed1f8f5305472fd092dd3531d7c4cbd2168ce62d98e0",
+    "term-digital-selective-calling": "c411bf2af327c6efbb8562bd236461677caebc9ee47886c2a5f1a4d2ba58dcef",
+    "term-narrow-band-direct-printing": "a6abfd9a3fd7c4c7c88ed255bd06b7dc71641de38067f37cf2496ca52bdc515f",
+    "term-overboard": "e3e783f6e01a074633d0b252c72b0f5801aa534e472b3f1fd4540d9a1ea64029",
+    "term-aground": "6199bae42545ba8852eed36c4214fcd4ddc866ab109c099dab3dcb113072f9ca",
+    "term-capsize": "a135842ef04350fdd6cd2ee23e439b9f624bf0239f9bf626dcd8396a1a85ffd7",
+    "term-flooded": "052e8db9ab3336bdd38a977a831e2f116651a8de4a1369850c79f018a7852b17",
+    "term-seelonce-feenee": "0aeaae1592f9a68cf73825745e105a6bfacbddb06cbf865e7596bf7525b57888",
+    "term-watch": "2ba7296315f45a37c413d86e5da9624912668eb8ec7b79519766d1e63a95360f",
+    "term-guard": "9fa6b33a8c71aff9718dd4e8e5f7f2d19c7def7bd65eca616293f06aa6442b18",
+    "term-traffic": "7d3b96ff5528cf784482a909fa974621faa3a48df56125bb4724d868496b582b",
+    "term-frequency": "07702d696adeedf3631e235e5132d3377e3f35bd2121e068deb01154f5685642",
+    "term-interference": "45d952344f00168235a51ea828f78d649e7fa28182afd77ff031ae3a67f0d8bb",
+    "term-clear": "6833d692f34641f361ffa055c5fff62d4109ce86638e35b1e9d4bf63b509cc2c",
+    "term-sensitivity": "4e540ae073418bd8f867a3b5be9308566954a403dc34c5b57ada7fe3c4e5896d",
+    "term-port": "3e830ed498f84a96bb57f9b615d911ce90c7294caf3ce63bbec9719623f36239",
+    "term-starboard": "fc1d8ce432da70ad26423220956c049fd5808268732a22fd399cb2c9addec09e",
+    "term-pilot": "980e06e546703d5749242c4928697f5d0cf24dcbe252d179655134e1f4aa6f53",
+    "term-berth": "691d5914dc0cc0bebe0fe27bf425e70bdc8301aa37503345a0e71100164c0e8f",
+    "term-anchorage": "9c2d4da2d019843282174f82a8f98f39ef2282490c770ac0711277a5c8aa0361",
+    "term-fairway": "e961155c09cfab922b2ead4f810b2cd423c1beee603acdfe848b44bacc1e17dc",
+    "term-under-keel-clearance": "19a09f61a14211499af1299fc6d934f9221a77f392369b644217985c6de0c37a",
+    "term-air-draught": "b0f8c0b929520d7a8ab7b797c9861205460d0c7580ab7fc92a55b994ec2a8d5f",
+    "term-make-fast": "ca6546c711524330ee842eb0b267eaa09f9ff79c1ce36e778e69903bc1c5a1ac",
+    "term-single-up": "7c9e812d47d9444296005d980c438942bd08296ba63cb345a8f5b8b669534135",
+    "term-lines": "b3b453e7809315f5d24518fb38dc4913d2db1e099baaacdc9909e3cc8dd441fd",
+    "term-lock": "2d405dc106a6e9427f56918a6bf2a30807b7d60341915ea0c237edacc1e5bba1",
+    "term-estimated-time-of-arrival": "16ddaea53137f86bf550c6bfceb98dce9ac1bf0ca36ca2f692a4b7c201f922d5",
+    "term-next-port-of-call": "84a8b69bd37c030cf018d72e1fc4ccefccd909d2bfc106d971d21ccb04671de6",
+    "term-final-destination": "da56d590c8323d2d97b55792b9a21b0ed863b2579a264a77daf541fc60bec3bb",
+    "term-radio-quarantine": "3b425ba93a1bddc138b82a39b51061e38359a580bb26441dbf9eebcd115eaca9",
+    "term-dense-fog": "7994c84578d21d380e455c89ffc56a6a96049d88355772718f6bf5e7cefcebd7",
+    "term-poor-visibility": "c339cbc043a9bb593755c2b475ce5fcc6f3ee1f75dba790e4a250b16c0a39fd4",
+    "term-restricted-visibility": "8dec45d254d8a97c82c4084ecf7aec768448bfe8d6ba23a95e5bea2dbb42f44d",
+    "term-hampered": "9f2a20d0318b299883a8326bfd67bebecf8b78be1a04763575646f966f8c3dbb",
+    "term-fouled": "8d3381e870ab0b0214d89eeef003d49c7fa7a22816ce5620ea11303bac4b718b",
+    "term-congested": "0652ccf7afa16f8b5fe202d0cd574dd02f8268fc1a905cd60195a93c95129f0f",
+    "term-unseaworthy": "7028102c4d7427d73314a7765dc63c79fa3cddd8141991c40304a5289a5cd4b5",
+    "term-dragging": "5aa41528976b42f825a0c3ee4347e107d10838c8dc25119cb219f15330442114",
+    "term-rolling": "53067c2650aede57090a3210881ddb8bb066918fc4e35bbd34a72da76ecede2b",
+    "term-pitching": "1f320677c7d3f4a9fa09edcc9eca63cf109355cd56ce27a731f83cd9e41cbe84",
+    "term-swell": "eb64fd920940503f0cbb5012517579952eea924800d812af669f40ee08da5b4c",
+    "term-ballast": "8d6a496fb5f4ca8d7051ff6b840190b6c9144e89aca3509781063db75bf3589b",
+    "term-heading": "58b486da23aaaae9e8bd81f6dc026e8d3ef719b60d0e000b2d714f5fff00ffc4",
+    "term-bearing": "2ec0f59b9e69c65007e3f4401531dd8b7167d4f075b74d108f9495e41dab0a2b",
+    "term-course": "d54edef4031ae6cdf71cff3befd5c13bceb80e4d232025f8f3217d1e13c5b80f",
+    "term-cable": "97d20c6afc63fa5b93a019ea240c4a4f5f358ad78df5c42b0e87ddcee5ccef45",
+    "term-knots": "046937eff4c502ad4a6cfc20365a5654206f3b0c63e3424d27afaf4c0a1c8865",
+    "term-make-a-lee": "85f36bf15a2660a7aad9e377e93ef589e12bfbe65b2c283be4ab66160e16c3eb",
+    "term-heave-to": "179fec1f0bdafe3707512c72e35abed0cce49c0c25ec2d57cb427dd9e8914017",
+    "term-give-way": "f2846862779e2c70aa8485905b6e4347b811b7f50d96fb90591719b3f0901640",
+    "term-keep-clear": "08302f9ddb663425a189cc6b47e3f133a0e0ed07de159f5535e9c5155e013c4e",
+    "term-automatic-identification-system": "6469fae08ae46e8a7bf505cef43f0feea0510bd2d5439a22012fa3721972e3fa",
+    "term-bridge": "e3123c6ea44098f3c1de8512a55b6d9f1ef008bd803f3556b6f93609cbd56e80",
+    "term-regularity-of-flight": "1485296ffab1012f12d0f8835de2254e943cad5018a99b2eddf12fd4ddfe9ce0",
+    "term-public-correspondence": "e195867cca4ef71ac6728bfd598fb995cebc8f6175bd4d3635b08a3364b73f20",
+    "term-air-traffic-services": "707fcc16ede7162c6b662cb5469e50a5a4732dc80e8036fef51c886804ddc10a",
+    "term-standardized-phraseology": "d8ac3efb1fcc760071325602e4b98e866da9a605a225cbd3fcb2653263bf54e0",
+    "term-plain-language": "5bde69cc3165266920da02f46acf7ceca39f294c17966133a72a3a4359be9dc9",
+    "term-receiver-failure": "cbdf3e16ada878568d4b08ab39a2b3c94e66229a41fefaaa0be3140dd4929151",
+    "term-transmitting-blind": "369b1c236836fbdfed1d0d52d48bc503cb92bf110b7421eb562d80212c6710c1",
+    "term-shall": "1da2eb301a97a1b889b8da43261895f54e560a46faf77284a68b4f4eed9f651c",
+    "term-shall-not": "e512d4e0645c1a4a74b0538e1f6f8deb2daca1bf857f108ccaa0fcca945591df",
+    "term-may": "7a204597f74371b814b7e894956775564fb0953ce65b713843cf43579ddd7559",
+    "term-unless": "21cbd057ab1670e1ea41c61326031942e6507721d88bdd397e778cd4fb80533b",
+    "term-except": "8f51a2c82e8b9e3c2e6aa284c12927c91a63262774e9c036c77f4b75ba6bd679",
+    "term-provided": "66ae56d35fb7c59f7d40239cc1a227bb3f28f41a841ec160bcdb4907c172bfa0",
+    "term-subject-to": "0fcfe009adc00867c5d6322dc2212c5d355807a13fa039f874e3d9e240ec4b09",
+    "term-at-least": "3f782d6ad6be9b239020a7c718ace9926540352b6886848dc5838f42ab7420d7",
+    "term-in-accordance-with": "ac4e81cc2b216537f4191c5a1465f9881e89458e45ed5b51b6fc5a6e505177d7",
+    "term-prior-to": "29a605418ee7e3ef83f966517f58756ba60cb97aa244cb6efa000a488d685784",
+    "term-only-when": "9d081e1ddfc88032bc08c1e4cf8d3e369c762d6c16320405a84d58a31fe51d02",
+    "term-where-practicable": "ee5367b5d4e8e2af9e5a18422392bb5f338e7d8f0bb01a10634fd69dce128751",
+    "term-on-the-authority-of": "8a7ffaabe23007c548926f902b0693213c95f2a4ecc68fa7877ad5f3e398fbd1",
+    "term-without-delay": "59c5e8fcfe6df607cffa3729bd8667ef762394acc64ecbb714930214b9b25edf",
+    "term-regardless-of": "18e4a2c0b51f73154e1ec8b0d2d0c8f5631a28ce5d70655e30f67565ae450066",
+    "term-bulkhead": "7978fea83a35645c3fd5dcc0abfa321ba7fafb582d19c94d32eaa1fcb4ad14e2",
+    "term-bulbous-bow": "c3f93ed7b6a04b06fbba2d0e468d3526c758456cfcc9ed74b660c8e2925e4cbe"
+  }
+}

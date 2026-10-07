@@ -1,0 +1,20 @@
+{
+  "verifiedOn": "2026-10-07",
+  "build": "PASS",
+  "relatedTests": {
+    "passed": 15,
+    "failed": 0
+  },
+  "canonicalPublicAndFrozenMaster": "byte_identical",
+  "masterSha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403",
+  "imageAssets": 16,
+  "imageVariants": 32,
+  "humanReview": "approved",
+  "imageBytesChangedSinceApproval": false,
+  "preExistingFailures": [
+    "pileupGolden intro-average#1 digest mismatch",
+    "LandingRigDemo number/Timeout type mismatch",
+    "cloudSync TrainerProfile conversion type mismatch"
+  ],
+  "nextStageStarted": false
+}

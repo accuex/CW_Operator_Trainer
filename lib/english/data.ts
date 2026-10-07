@@ -12,6 +12,7 @@ export interface EnglishItem {
   meaning_impact: string; e0_frequency_facts: { occurrence_count: number; stem_years: number[]; stem_exam_dates: string[] };
   evidence_references: Evidence[]; related_terms: string[];
   supplements: { term_id: string; term: string; meaning: string }[];
+  audit_metadata?: { original_inclusion_rationale: string; original_scope_or_confusion: string; supplement_modality_note?: string };
   legal_structure: { label: string; text: string }[]; evidence_role_note?: string; supplement_modality_note?: string;
 }
 export interface EnglishMaster { schemaVersion: 1; masterVersion: string; tier_counts: Record<Tier, number>; groups: { id: string; title: string; goal: string }[]; frequency_definition: string; modality_definition: string; example_definition: string; impact_scale: Record<string, string>; items: EnglishItem[] }
