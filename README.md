@@ -1,9 +1,3 @@
-
-
-
-
-
-
 # CW Operator Trainer
 
 <p align="center">
@@ -21,6 +15,8 @@
 登録なしですぐに使えます。PCでもスマートフォンでも、イヤホンやヘッドフォンを用意してどうぞ。
 
 <img width="1298" height="824" alt="top_hero" src="https://github.com/user-attachments/assets/f211c633-c9a3-45ba-878a-26e8ceae1007" />
+<img width="1049" height="231" alt="top_card" src="https://github.com/user-attachments/assets/570557a3-8a7d-477c-bdb9-7a1cac80e8b9" />
+
 
 ## 音で覚えて、耳で追う
 
