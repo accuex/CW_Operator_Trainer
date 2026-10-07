@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { SiteFooter } from '@/app/landing/SiteFooter';
 import { viewToPath } from '@/lib/appPaths';
 
@@ -52,7 +51,7 @@ export default function SitemapPage() {
   return (
     <div className="lp-frame">
       <header className="lp-nav">
-        <Link className="brand lp-brand" href="/" aria-label="CW Operator Trainer">
+        <a className="brand lp-brand" href="/" aria-label="CW Operator Trainer">
           <span className="brand-mark" aria-hidden="true">
             <i />
             <i className="dah" />
@@ -65,10 +64,10 @@ export default function SitemapPage() {
               <span>TRAINER</span>
             </small>
           </span>
-        </Link>
+        </a>
         <nav className="lp-nav-links" aria-label="ページ">
-          <Link href="/">トップ</Link>
-          <Link href="/app">アプリへ</Link>
+          <a href="/">トップ</a>
+          <a href="/app">アプリへ</a>
         </nav>
       </header>
 
@@ -83,10 +82,10 @@ export default function SitemapPage() {
               <ul>
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href}>
+                    <a href={link.href}>
                       <b>{link.label}</b>
                       <small>{link.note}</small>
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
