@@ -14,6 +14,7 @@ describe('app paths', () => {
     expect(pathToView('/app/')).toBe('home');
     expect(pathToView('/app/exam')).toBe('exam');
     expect(pathToView('/app/communication')).toBe('communication');
+    expect(pathToView('/app/houki')).toBe('houki');
     expect(pathToView('/app/learn/extra')).toBe('learn');
     expect(pathToView('/')).toBe('home');
     expect(pathToView('/learn')).toBe('home');

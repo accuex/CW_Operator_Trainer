@@ -6,7 +6,7 @@
 .exam-menu-continue small,.exam-menu-continue strong {display:block;}
 .exam-menu-continue small {color:var(--muted);margin-bottom:5px;}
 .exam-menu-continue strong {font-size:1.15rem;}
-.exam-menu-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;}
+.exam-menu-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;}
 .exam-menu-card {display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:28px;text-align:left;color:var(--text);cursor:pointer;min-width:0;transition:border-color .15s,background .15s;}
 .exam-menu-card:hover,.exam-menu-card:focus-visible {border-color:var(--gold);background:var(--surface-2);}
 .exam-menu-card>svg {color:var(--gold);margin-bottom:6px;}

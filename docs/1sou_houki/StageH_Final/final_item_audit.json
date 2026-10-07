@@ -1,0 +1,674 @@
+[
+  {
+    "id": "houki-distress-call-watch",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の7",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "dc92f770456d584558168c82c38309773d9e5eb745d47292d53683732d85b453",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-coast-report-rescue",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の7",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "dbd371c606fb8b1e6e02a1931c77a8cceedb60dd59f12f59f41d127b9d9a2be5",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-notify-responsible",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の7",
+      "paragraph": 3,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "15db356f818069dabccbdb7519ad1e8b006c7ab6c20f3b0a6f194eb72313863f",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-coast-near-response",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の7",
+      "paragraph": 4,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "216117a266af1ab4ceace2dde181659b1767a9aedc3c5844115f94d3ef2b7cf2",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-cannot-rescue",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の7",
+      "paragraph": 6,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "fa43a92c5d0fcbc8c9e06ae1d3ff4f556f30d0081ae1b80819f7b9965f9c3d0a",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-urgency-listen",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "67",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "ecc4663ea82d591eb4e08c11f62b1deeca175409c52e2a6ca076194b950a67bb",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-urgency-definition",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "52",
+      "paragraph": 1,
+      "item": "2",
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "bd5ffb5e17fd1a34b0768ae1343a966de253729933d9ca0240d108df6ede0e84",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-chief-qualification",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "39",
+      "paragraph": 3,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "fddf4797571e311ecff8afaf3d4d9143ade2ec9b3af2d76544c1024c48d2c015",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-morse-licensed",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "39",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "3a2ef50501e3336f1a514dc48f683684641436d70aaac3cd91c0fff1ee13b633",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-chief-duty",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "39",
+      "paragraph": 5,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "eba4ae2dc47182f613f5fcb1ce2998715cf4d1165e9d6a2d3af285c5c5ad73f0",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-report-transmission",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "80",
+      "paragraph": 1,
+      "item": "1",
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "51c5347ebad1c490a1ca221795592ef28ad4176b90b9c51ffb16b34be22a6939",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-distress-definition",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "52",
+      "paragraph": 1,
+      "item": "1",
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "bd5ffb5e17fd1a34b0768ae1343a966de253729933d9ca0240d108df6ede0e84",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-stop-interference",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "66",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "5ad560925c834cf3c5b8e42f7ba55e9c4e3a1f7cbc179735fe6a126c9244b6ac",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-coast-earth-response",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の4",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "d0a4d854f2c6df3fb10dabd3d142b3e2a7180c29a95a6fbfcf76979fdb4042ed",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-coast-dsc-response",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の3",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "118bbb5f5804aa068c1ec9d1cd4129d4d528e4a3cf90119c12dd65814051f67e",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-coast-dsc-frequency",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の8",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "cd6e07056fd21469a4a95d2731899811e1115c761126049fb0f87827eb05daf8",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-coast-related-watch",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の3",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "a11b48c37dee6608d958b88e6bcf942b753a6b50dea20cabfd1821b27be0133f",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-nonhf-watch",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の5",
+      "paragraph": 3,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "dd0d2472a133ccdbfe3a5b27cf31c9adf3cbbde768814de39f734fd88e296024",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-hf-relay",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の5",
+      "paragraph": 6,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "4ecd424abe07c0f7239b33fe6fa3f122145367708a22cfd26c764f024ef33c51",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-dsc-notify",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の5",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "df022a0c09b9ef076b5df49062fec3233535a337df185197ce729ec3f0d87d32",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-nonhf-response",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の5",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "2adf991befaa9540415aad4aa0d93b119834b11279025e14b366b75918c01845",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-related-watch",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "無線局運用規則",
+      "lawId": "325M50080000017",
+      "article": "81の5",
+      "paragraph": 7,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+    },
+    "evidenceSha256": "2531fdc4395d00e40d59df1aa2d72271a36292722835583daee0299d3704aff6",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-distress-officer",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "50",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "f57e619cee3a9ea206752319cbf24dd454a0dad0b304d6030013d1d266b382e6",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-certificate-apply",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "48の2",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "d8071dd223a2ea6f8053ee6a6c2f7c60cd4e772f7d89ed0f6b07883ea1b691b3",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-ship-certificate-training",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "48の2",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "91db8ba48213e5af521f7eac7064ee2de3f37c4cbc3123655a4ea570ffdc7ebb",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-secrecy-general-penalty",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "109",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "31b612ec58227ba5c7491d7878aa1fd17c6c08f57f19c6c9361049e429e6e45d",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-secrecy-professional-penalty",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "109",
+      "paragraph": 2,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "9ab644b848f899f56b306082f1243c24b8ae47da5e1e1094193ea3b912b9404e",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  },
+  {
+    "id": "houki-distress-neglect-penalty",
+    "status": "PASS",
+    "verification": "verified",
+    "checkedDate": "2026-10-07",
+    "legalBasis": {
+      "law": "電波法",
+      "lawId": "325AC0000000131",
+      "article": "105",
+      "paragraph": 1,
+      "item": null,
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+    },
+    "evidenceSha256": "fe63d482243dc94dd0a9b884bbbbe684dde39e5efbc7d3a4b56a4a6fcac57ebc",
+    "checks": [
+      "主体と対象を条項と対照",
+      "条件・時点・例外を条項と対照",
+      "数字・期間・現行用語を対照",
+      "正しい学習句と歴史的判定を分離",
+      "自作設問の全選択肢を評価し正答1つ",
+      "公開データに原本選択肢集合なし"
+    ],
+    "scopeNote": "指定した条項・論点の教材として確認。法令全体の網羅性を意味しない。"
+  }
+]

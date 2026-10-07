@@ -13,8 +13,10 @@ describe('last 一総通 material', () => {
     expect(readExamMaterial('exam', storage)).toBe('geography');
     rememberExamMaterial('english', storage);
     expect(readExamMaterial('exam', storage)).toBe('english');
+    rememberExamMaterial('houki', storage);
+    expect(readExamMaterial('exam', storage)).toBe('houki');
     rememberExamMaterial('exam', storage);
-    expect(readExamMaterial('exam', storage)).toBe('english');
+    expect(readExamMaterial('exam', storage)).toBe('houki');
     rememberExamMaterial('communication', storage);
     expect(readExamMaterial('geography', storage)).toBe('exam');
   });

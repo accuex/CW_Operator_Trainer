@@ -1,0 +1,1765 @@
+{
+  "schemaVersion": 2,
+  "masterVersion": "H-final-v2",
+  "referenceDate": "2026-10-07",
+  "blockPoint": 25,
+  "groups": [
+    {
+      "id": "distress",
+      "title": "遭難・緊急通信",
+      "goal": "誰が、どの条件で、何をするか。"
+    },
+    {
+      "id": "watch",
+      "title": "聴守",
+      "goal": "呼出し・警報と聴守周波数を区別する。"
+    },
+    {
+      "id": "operator",
+      "title": "無線従事者・責務",
+      "goal": "監督・報告・罰則の主体を区別する。"
+    },
+    {
+      "id": "license",
+      "title": "船舶局の証明・配置",
+      "goal": "資格、対象船舶、訓練期間を確かめる。"
+    }
+  ],
+  "items": [
+    {
+      "id": "houki-distress-call-watch",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "watch",
+      "law": "無線局運用規則",
+      "title": "遭難呼出しの聴守周波数",
+      "prompt": "海岸局・船舶局は、遭難呼出しを［　］で聴守する。",
+      "answer": "受信した周波数",
+      "options": [
+        "受信した周波数",
+        "任意の業務用周波数",
+        "送信予定の周波数",
+        "関連する無線電話周波数"
+      ],
+      "optionAssessments": [
+        {
+          "option": "受信した周波数",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "任意の業務用周波数",
+          "correct": false,
+          "reason": "この条件の条項は「受信した周波数」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "送信予定の周波数",
+          "correct": false,
+          "reason": "この条件の条項は「受信した周波数」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "関連する無線電話周波数",
+          "correct": false,
+          "reason": "この条件の条項は「受信した周波数」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "海岸局・船舶局は、遭難呼出しを受信した周波数で聴守する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0028",
+          "sourceExam": {
+            "exam": "2021-09",
+            "question": "B-4ア"
+          },
+          "sourceStatementRef": "private:original-master/houki-0028",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の7",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "dc92f770456d584558168c82c38309773d9e5eb745d47292d53683732d85b453",
+        "evidence": "海岸局及び船舶局は、遭難呼出しを受信したときは、これを受信した周波数で聴守を行わなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-coast-report-rescue",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "海岸局の通報先",
+      "prompt": "海岸局は、遭難通報を受信したとき、遅滞なく［　］に通報する。",
+      "answer": "海上保安庁その他の救助機関",
+      "options": [
+        "海上保安庁その他の救助機関",
+        "船舶の運行者だけ",
+        "最寄りの放送局",
+        "総務大臣だけ"
+      ],
+      "optionAssessments": [
+        {
+          "option": "海上保安庁その他の救助機関",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "船舶の運行者だけ",
+          "correct": false,
+          "reason": "この条件の条項は「海上保安庁その他の救助機関」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "最寄りの放送局",
+          "correct": false,
+          "reason": "この条件の条項は「海上保安庁その他の救助機関」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "総務大臣だけ",
+          "correct": false,
+          "reason": "この条件の条項は「海上保安庁その他の救助機関」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "海岸局は、遭難通報を受信したとき、遅滞なく海上保安庁その他の救助機関に通報する。",
+      "correction": "通報先は船舶の運行者ではなく、海上保安庁その他の救助機関。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0029",
+          "sourceExam": {
+            "exam": "2021-09",
+            "question": "B-4イ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0029",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の7",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "dbd371c606fb8b1e6e02a1931c77a8cceedb60dd59f12f59f41d127b9d9a2be5",
+        "evidence": "２海岸局は、遭難通報、携帯用位置指示無線標識の通報、衛星非常用位置指示無線標識の通報、捜索救助用レーダートランスポンダの通報、捜索救助用位置指示送信装置の通報又は航空機用救命無線機等の通報を受信したときは、遅滞なく、これを海上保安庁その他の救助機関に通報しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-notify-responsible",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "船舶局から責任者への通知",
+      "prompt": "船舶局は、遭難通報を受信したとき、直ちに［　］に通知する。",
+      "answer": "その船舶の責任者",
+      "options": [
+        "その船舶の責任者",
+        "船舶の運行者だけ",
+        "最寄りの放送局",
+        "総務大臣だけ"
+      ],
+      "optionAssessments": [
+        {
+          "option": "その船舶の責任者",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "船舶の運行者だけ",
+          "correct": false,
+          "reason": "この条件の条項は「その船舶の責任者」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "最寄りの放送局",
+          "correct": false,
+          "reason": "この条件の条項は「その船舶の責任者」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "総務大臣だけ",
+          "correct": false,
+          "reason": "この条件の条項は「その船舶の責任者」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "船舶局は、遭難通報を受信したとき、直ちにその船舶の責任者に通知する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0030",
+          "sourceExam": {
+            "exam": "2021-09",
+            "question": "B-4ウ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0030",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の7",
+        "paragraph": 3,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "15db356f818069dabccbdb7519ad1e8b006c7ab6c20f3b0a6f194eb72313863f",
+        "evidence": "３船舶局は、遭難通報、携帯用位置指示無線標識の通報、衛星非常用位置指示無線標識の通報、捜索救助用レーダートランスポンダの通報、捜索救助用位置指示送信装置の通報又は航空機用救命無線機等の通報を受信したときは、直ちにこれをその船舶の責任者に通知しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-coast-near-response",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "付近の遭難通報への応答",
+      "prompt": "遭難呼出しを聴守した海岸局は、遭難通報を受信し、遭難船舶・航空機が自局の付近にあることが明らかなら、通常通信を終えてから応答する。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「通常通信を終えてから」を「直ちに」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「通常通信を終えてから」を「直ちに」に直す。"
+        }
+      ],
+      "learningClause": "遭難呼出しを聴守した海岸局は、遭難通報を受信し、遭難船舶・航空機が自局の付近にあることが明らかなら、直ちに応答する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0031",
+          "sourceExam": {
+            "exam": "2021-09",
+            "question": "B-4エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0031",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の7",
+        "paragraph": 4,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "216117a266af1ab4ceace2dde181659b1767a9aedc3c5844115f94d3ef2b7cf2",
+        "evidence": "４海岸局は、第一項の規定により聴守を行つた場合であつて、その聴守において、遭難通報を受信し、かつ、遭難している船舶又は航空機が自局の付近にあることが明らかであるときは、直ちにその遭難通報に対して応答しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-cannot-rescue",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "救助できず、他局も応答しない場合",
+      "prompt": "船舶局は、遭難通報を受信し、自船が救助できず、他の無線局も応答しないとき、遭難通報を送信する。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "船舶局は、遭難通報を受信し、自船が救助できず、他の無線局も応答しないとき、遭難通報を送信する。",
+      "correction": "救助できず他局も応答しない場合は、応答ではなく遭難通報を送信する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0032",
+          "sourceExam": {
+            "exam": "2021-09",
+            "question": "B-4オ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0032",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の7",
+        "paragraph": 6,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "fa43a92c5d0fcbc8c9e06ae1d3ff4f556f30d0081ae1b80819f7b9965f9c3d0a",
+        "evidence": "６船舶局は、遭難通報を受信した場合において、その船舶が救助を行うことができず、かつ、その遭難通報に対し他のいずれの無線局も応答しないときは、遭難通報を送信しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-urgency-listen",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "watch",
+      "law": "電波法",
+      "title": "緊急通信の継続受信",
+      "prompt": "海岸局等は緊急通信を受信したとき、遭難通信を行う場合を除き、自局に無関係と確認するまで受信を続ける。総務省令で定める場合は少なくとも［　］受信する。",
+      "answer": "3分間",
+      "options": [
+        "3分間",
+        "1分間",
+        "2分間",
+        "5分間"
+      ],
+      "optionAssessments": [
+        {
+          "option": "3分間",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "1分間",
+          "correct": false,
+          "reason": "この条件の条項は「3分間」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "2分間",
+          "correct": false,
+          "reason": "この条件の条項は「3分間」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "5分間",
+          "correct": false,
+          "reason": "この条件の条項は「3分間」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "海岸局等は緊急通信を受信したとき、遭難通信を行う場合を除き、自局に無関係と確認するまで受信を続ける。総務省令で定める場合は少なくとも3分間受信する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0070",
+          "sourceExam": {
+            "exam": "2023-03",
+            "question": "B-4エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0070",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "67",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "ecc4663ea82d591eb4e08c11f62b1deeca175409c52e2a6ca076194b950a67bb",
+        "evidence": "２海岸局等は、緊急信号又は第五十二条第二号の総務省令で定める方法により行われる無線通信を受信したときは、遭難通信を行う場合を除き、その通信が自局に関係のないことを確認するまでの間（総務省令で定める場合には、少なくとも三分間）継続してその緊急通信を受信しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-urgency-definition",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "電波法",
+      "title": "緊急通信と危険のおそれ",
+      "prompt": "緊急通信は、船舶・航空機が重大かつ急迫の危険に既に陥った場合その他緊急の事態に、緊急信号を前置するなど総務省令で定める方法で行う無線通信。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「既に陥った」を「陥るおそれがある」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「既に陥った」を「陥るおそれがある」に直す。"
+        }
+      ],
+      "learningClause": "緊急通信は、船舶・航空機が重大かつ急迫の危険に陥るおそれがある場合その他緊急の事態に、緊急信号を前置するなど総務省令で定める方法で行う無線通信。",
+      "correction": "緊急は危険に陥るおそれ。遭難は危険に陥った場合。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0071",
+          "sourceExam": {
+            "exam": "2023-03",
+            "question": "B-4オ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0071",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "52",
+        "paragraph": 1,
+        "item": "2",
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "bd5ffb5e17fd1a34b0768ae1343a966de253729933d9ca0240d108df6ede0e84",
+        "evidence": "無線局は、免許記録に記録されている目的又は通信の相手方若しくは通信事項（特定地上基幹放送局については放送事項）の範囲を超えて運用してはならない。ただし、次に掲げる通信については、この限りでない。一遭難通信（船舶又は航空機が重大かつ急迫の危険に陥つた場合に遭難信号を前置する方法その他総務省令で定める方法により行う無線通信をいう。以下同じ。）二緊急通信（船舶又は航空機が重大かつ急迫の危険に陥るおそれがある場合その他緊急の事態が発生した場合に緊急信号を前置する方法その他総務省令で定める方法により行う無線通信をいう。以下同じ。）三安全通信（船舶又は航空機の航行に対する重大な危険を予防するために安全信号を前置する方法その他総務省令で定める方法により行う無線通信をいう。以下同じ。）四非常通信（地震、台風、洪水、津波、雪害、火災、暴動その他非常の事態が発生し、又は発生するおそれがある場合において、有線通信を利用することができないか又はこれを利用することが著しく困難であるときに人命の救助、災害の救援、交通通信の確保又は秩序の維持のために行われる無線通信をいう。以下同じ。）五放送の受信六その他総務省令で定める通信",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-chief-qualification",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "主任無線従事者の要件",
+      "prompt": "主任無線従事者は、電波法第40条により操作の監督ができる無線従事者で、総務省令で定める欠格事由に該当しない者でなければならない。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "主任無線従事者は、電波法第40条により操作の監督ができる無線従事者で、総務省令で定める欠格事由に該当しない者でなければならない。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0083",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-4ウ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0083",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "39",
+        "paragraph": 3,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "fddf4797571e311ecff8afaf3d4d9143ade2ec9b3af2d76544c1024c48d2c015",
+        "evidence": "３主任無線従事者は、第四十条の定めるところにより無線設備の操作の監督を行うことができる無線従事者であつて、総務省令で定める事由に該当しないものでなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-morse-licensed",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "モールス操作と無線従事者",
+      "prompt": "モールス符号を送受する無線電信の操作は、主任無線従事者の監督があっても、電波法第40条により無線従事者でなくても行える。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「無線従事者でなくても行える」を「無線従事者でなければ行えない」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「無線従事者でなくても行える」を「無線従事者でなければ行えない」に直す。"
+        }
+      ],
+      "learningClause": "モールス符号を送受する無線電信の操作は、主任無線従事者の監督があっても、電波法第40条により無線従事者でなければ行えない。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。不適合だった記述は、下の正しい句に置き換える。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0084",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-4エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0084",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "39",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "3a2ef50501e3336f1a514dc48f683684641436d70aaac3cd91c0fff1ee13b633",
+        "evidence": "２モールス符号を送り、又は受ける無線電信の操作その他総務省令で定める無線設備の操作は、前項本文の規定にかかわらず、第四十条の定めるところにより、無線従事者でなければ行つてはならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-chief-duty",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "主任無線従事者の職務",
+      "prompt": "選任の届出がされた主任無線従事者は、操作の監督に関し総務省令で定める職務を誠実に行う。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "選任の届出がされた主任無線従事者は、操作の監督に関し総務省令で定める職務を誠実に行う。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0085",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-4オ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0085",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "39",
+        "paragraph": 5,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "eba4ae2dc47182f613f5fcb1ce2998715cf4d1165e9d6a2d3af285c5c5ad73f0",
+        "evidence": "５前項の規定によりその選任の届出がされた主任無線従事者は、無線設備の操作の監督に関し総務省令で定める職務を誠実に行わなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-report-transmission",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "通信を行った場合の報告",
+      "prompt": "遭難・緊急・安全・非常通信を行ったとき、無線局の免許人等は総務省令の手続により総務大臣に報告する。第80条第1号には、受信しただけの場合を報告事由とする規定がある。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「規定がある」を「規定はない」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「規定がある」を「規定はない」に直す。"
+        }
+      ],
+      "learningClause": "遭難・緊急・安全・非常通信を行ったとき、無線局の免許人等は総務省令の手続により総務大臣に報告する。第80条第1号には、受信しただけの場合を報告事由とする規定はない。",
+      "correction": "通信を行った場合の報告と、受信した際の電波発射中止を区別する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0086",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-5ア"
+          },
+          "sourceStatementRef": "private:original-master/houki-0086",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "80",
+        "paragraph": 1,
+        "item": "1",
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "51c5347ebad1c490a1ca221795592ef28ad4176b90b9c51ffb16b34be22a6939",
+        "evidence": "無線局の免許人等は、次に掲げる場合は、総務省令で定める手続により、総務大臣に報告しなければならない。一遭難通信、緊急通信、安全通信又は非常通信を行つたとき（第七十条の七第一項、第七十条の八第一項又は第七十条の九第一項の規定により無線局を運用させた免許人等以外の者が行つたときを含む。）。二この法律又はこの法律に基づく命令の規定に違反して運用した無線局を認めたとき。三無線局が外国において、あらかじめ総務大臣が告示した以外の運用の制限をされたとき。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-distress-definition",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "電波法",
+      "title": "遭難通信と現に生じた危険",
+      "prompt": "遭難通信は、船舶・航空機が重大かつ急迫の危険に陥った場合に、遭難信号を前置するなど総務省令で定める方法で行う無線通信。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "遭難通信は、船舶・航空機が重大かつ急迫の危険に陥った場合に、遭難信号を前置するなど総務省令で定める方法で行う無線通信。",
+      "correction": "遭難は危険に陥った場合。危険のおそれだけと取り違えない。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0087",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-5イ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0087",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "52",
+        "paragraph": 1,
+        "item": "1",
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "bd5ffb5e17fd1a34b0768ae1343a966de253729933d9ca0240d108df6ede0e84",
+        "evidence": "無線局は、免許記録に記録されている目的又は通信の相手方若しくは通信事項（特定地上基幹放送局については放送事項）の範囲を超えて運用してはならない。ただし、次に掲げる通信については、この限りでない。一遭難通信（船舶又は航空機が重大かつ急迫の危険に陥つた場合に遭難信号を前置する方法その他総務省令で定める方法により行う無線通信をいう。以下同じ。）二緊急通信（船舶又は航空機が重大かつ急迫の危険に陥るおそれがある場合その他緊急の事態が発生した場合に緊急信号を前置する方法その他総務省令で定める方法により行う無線通信をいう。以下同じ。）三安全通信（船舶又は航空機の航行に対する重大な危険を予防するために安全信号を前置する方法その他総務省令で定める方法により行う無線通信をいう。以下同じ。）四非常通信（地震、台風、洪水、津波、雪害、火災、暴動その他非常の事態が発生し、又は発生するおそれがある場合において、有線通信を利用することができないか又はこれを利用することが著しく困難であるときに人命の救助、災害の救援、交通通信の確保又は秩序の維持のために行われる無線通信をいう。以下同じ。）五放送の受信六その他総務省令で定める通信",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-stop-interference",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "distress",
+      "law": "電波法",
+      "title": "妨害のおそれがある電波の停止",
+      "prompt": "無線局は、遭難信号又は電波法第52条第1号の方法による通信を受信したとき、遭難通信を妨害するおそれのある電波の発射を［　］中止する。",
+      "answer": "直ちに",
+      "options": [
+        "直ちに",
+        "3分後に",
+        "通常通信の終了後に",
+        "救助機関の許可後に"
+      ],
+      "optionAssessments": [
+        {
+          "option": "直ちに",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "3分後に",
+          "correct": false,
+          "reason": "この条件の条項は「直ちに」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "通常通信の終了後に",
+          "correct": false,
+          "reason": "この条件の条項は「直ちに」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "救助機関の許可後に",
+          "correct": false,
+          "reason": "この条件の条項は「直ちに」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "無線局は、遭難信号又は電波法第52条第1号の方法による通信を受信したとき、遭難通信を妨害するおそれのある電波の発射を直ちに中止する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0089",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-5エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0089",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "66",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "5ad560925c834cf3c5b8e42f7ba55e9c4e3a1f7cbc179735fe6a126c9244b6ac",
+        "evidence": "２無線局は、遭難信号又は第五十二条第一号の総務省令で定める方法により行われる無線通信を受信したときは、遭難通信を妨害するおそれのある電波の発射を直ちに中止しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-coast-earth-response",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "海岸地球局の応答と通報",
+      "prompt": "海岸地球局は、船舶地球局からの遭難警報又はその中継を受信したとき、遅滞なく応答し、船舶の運行者だけに通報する。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「船舶の運行者だけ」を「海上保安庁その他の救助機関」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「船舶の運行者だけ」を「海上保安庁その他の救助機関」に直す。"
+        }
+      ],
+      "learningClause": "海岸地球局は、船舶地球局からの遭難警報又はその中継を受信したとき、遅滞なく応答し、海上保安庁その他の救助機関に通報する。",
+      "correction": "付近の船舶局へ中継するという誤文ではなく、応答と救助機関への通報を覚える。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0105",
+          "sourceExam": {
+            "exam": "2025-03",
+            "question": "B-3ア"
+          },
+          "sourceStatementRef": "private:original-master/houki-0105",
+          "sourceJudgement": "不適合"
+        },
+        {
+          "legacyId": "houki-0108",
+          "sourceExam": {
+            "exam": "2025-03",
+            "question": "B-3エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0108",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の4",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "d0a4d854f2c6df3fb10dabd3d142b3e2a7180c29a95a6fbfcf76979fdb4042ed",
+        "evidence": "海岸地球局は、船舶地球局から送信された遭難警報又は遭難警報の中継を受信したときは、遅滞なく、これに応答し、かつ、その遭難警報又は遭難警報の中継を海上保安庁その他の救助機関に通報しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-coast-dsc-response",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "海岸局のDSC応答と通報",
+      "prompt": "海岸局は、船舶局がDSCで送信した遭難警報又はその中継を受信したとき、遅滞なく応答し、海上保安庁その他の救助機関に通報する。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "海岸局は、船舶局がDSCで送信した遭難警報又はその中継を受信したとき、遅滞なく応答し、海上保安庁その他の救助機関に通報する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0106",
+          "sourceExam": {
+            "exam": "2025-03",
+            "question": "B-3イ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0106",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の3",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "118bbb5f5804aa068c1ec9d1cd4129d4d528e4a3cf90119c12dd65814051f67e",
+        "evidence": "海岸局は、船舶局がデジタル選択呼出装置を使用して送信した遭難警報又は遭難警報の中継を受信したときは、遅滞なく、これに応答し、かつ、その遭難警報又は遭難警報の中継を海上保安庁その他の救助機関に通報しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-coast-dsc-frequency",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "海岸局のDSC応答周波数と間隔",
+      "prompt": "海岸局が遭難警報又はその中継に応答するときは、受信した周波数の電波を使い、DSCで行う。中短波帯・短波帯では、受信から［　］の間隔を置く。",
+      "answer": "1分以上2分45秒以下",
+      "options": [
+        "1分以上2分45秒以下",
+        "直ちに（間隔の指定なし）",
+        "3分以上5分以下",
+        "10分以上15分以下"
+      ],
+      "optionAssessments": [
+        {
+          "option": "1分以上2分45秒以下",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "直ちに（間隔の指定なし）",
+          "correct": false,
+          "reason": "この条件の条項は「1分以上2分45秒以下」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "3分以上5分以下",
+          "correct": false,
+          "reason": "この条件の条項は「1分以上2分45秒以下」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "10分以上15分以下",
+          "correct": false,
+          "reason": "この条件の条項は「1分以上2分45秒以下」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "海岸局が遭難警報又はその中継に応答するときは、受信した周波数の電波を使い、DSCで行う。中短波帯・短波帯では、受信から1分以上2分45秒以下の間隔を置く。",
+      "correction": "海岸局の応答は受信周波数・DSC。関連する無線電話周波数での聴守とは別。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0107",
+          "sourceExam": {
+            "exam": "2025-03",
+            "question": "B-3ウ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0107",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の8",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "cd6e07056fd21469a4a95d2731899811e1115c761126049fb0f87827eb05daf8",
+        "evidence": "海岸局は、遭難警報又は遭難警報の中継を受信した場合において、これに応答するときは、当該遭難警報又は遭難警報の中継を受信した周波数の電波を使用して、デジタル選択呼出装置により、施行規則別図第一号３（遭難警報の中継に対する応答にあつては、同規則別図第一号２）に定める構成のものを送信して行うものとする。この場合において、受信した遭難警報又は遭難警報の中継が中短波帯又は短波帯の周波数の電波を使用するものであるときは、受信から一分以上二分四十五秒以下の間隔を置いて送信するものとする。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-coast-related-watch",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "watch",
+      "law": "無線局運用規則",
+      "title": "海岸局の関連周波数聴守",
+      "prompt": "DSCの遭難警報又はその中継を受信した海岸局は、受信周波数に関連する第70条の2第1項第2号の任意の業務用周波数で聴守する。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「任意の業務用周波数」を「無線電話周波数」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「任意の業務用周波数」を「無線電話周波数」に直す。"
+        }
+      ],
+      "learningClause": "DSCの遭難警報又はその中継を受信した海岸局は、受信周波数に関連する第70条の2第1項第2号の無線電話周波数で聴守する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0109",
+          "sourceExam": {
+            "exam": "2025-03",
+            "question": "B-3オ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0109",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の3",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "a11b48c37dee6608d958b88e6bcf942b753a6b50dea20cabfd1821b27be0133f",
+        "evidence": "２海岸局は、前項に規定する場合においては、当該遭難警報又は遭難警報の中継を受信した周波数と関連する第七十条の二第一項第二号に規定する周波数で聴守を行わなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-nonhf-watch",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "watch",
+      "law": "無線局運用規則",
+      "title": "短波帯以外の警報と聴守",
+      "prompt": "短波帯以外のDSC遭難警報を受信した船舶局は、受信周波数で海岸局と通信できるか、付近の船舶からの警報だと明らかでないとき、受信周波数で聴守する。他局の応答がなければ適当な海岸局に通報し、応答まで聴守を続ける。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "短波帯以外のDSC遭難警報を受信した船舶局は、受信周波数で海岸局と通信できるか、付近の船舶からの警報だと明らかでないとき、受信周波数で聴守する。他局の応答がなければ適当な海岸局に通報し、応答まで聴守を続ける。",
+      "correction": "条件がそろわない場合はまず聴守。応答がなければ適当な海岸局に通報する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0121",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-1ア"
+          },
+          "sourceStatementRef": "private:original-master/houki-0121",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の5",
+        "paragraph": 3,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "dd0d2472a133ccdbfe3a5b27cf31c9adf3cbbde768814de39f734fd88e296024",
+        "evidence": "３船舶局は、前項の遭難警報を受信した場合において、当該遭難警報に使用された周波数の電波によつて海岸局と通信を行うことができない海域にあるとき以外のとき、又は当該遭難警報が付近にある船舶からのものであることが明らかであるとき以外のときは、当該遭難警報を受信した周波数で聴守を行わなければならない。",
+        "additionalEvidence": [
+          "４船舶局は、前項の規定により聴守を行つた場合であつて、その聴守において、当該遭難警報に対して他のいずれの無線局の応答（第七十八条第七項の規定による海岸局からの遭難警報の中継の送信及び第八十一条の三第一項の規定による遭難警報の中継に対する海岸局の応答を含む。以下この項において同じ。）も認められないときは、これを適当な海岸局に通報し、かつ、当該遭難警報に対する他の無線局の応答があるまで引き続き聴守を行わなければならない。"
+        ]
+      }
+    },
+    {
+      "id": "houki-ship-hf-relay",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "短波帯の警報と海岸局への中継",
+      "prompt": "短波帯のDSC遭難警報を聴守した船舶局は、海岸局の応答が認められなければ、［　］へ遭難警報を中継し、海岸局の応答まで聴守を続ける。",
+      "answer": "適当な海岸局",
+      "options": [
+        "適当な海岸局",
+        "すべての船舶局だけ",
+        "船舶の運行者だけ",
+        "最寄りの放送局"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適当な海岸局",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "すべての船舶局だけ",
+          "correct": false,
+          "reason": "この条件の条項は「適当な海岸局」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "船舶の運行者だけ",
+          "correct": false,
+          "reason": "この条件の条項は「適当な海岸局」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "最寄りの放送局",
+          "correct": false,
+          "reason": "この条件の条項は「適当な海岸局」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "短波帯のDSC遭難警報を聴守した船舶局は、海岸局の応答が認められなければ、適当な海岸局へ遭難警報を中継し、海岸局の応答まで聴守を続ける。",
+      "correction": "中継先は適当な海岸局。全船舶局への中継としない。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0122",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-1イ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0122",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の5",
+        "paragraph": 6,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "4ecd424abe07c0f7239b33fe6fa3f122145367708a22cfd26c764f024ef33c51",
+        "evidence": "６船舶局は、前項の規定により聴守を行つた場合であつて、その聴守において、当該遭難警報に対していずれの海岸局の応答（第七十八条第七項の規定による遭難警報の中継の送信及び第八十一条の三第一項の規定による遭難警報の中継に対する応答を含む。以下この項において同じ。）も認められないときは、適当な海岸局に対して遭難警報の中継の送信を行い、かつ、当該遭難警報に対する海岸局の応答があるまで引き続き聴守を行わなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-dsc-notify",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "DSC警報の責任者への通知",
+      "prompt": "船舶局は、DSCの遭難警報若しくはその中継、又は施行規則第36条の2第1項第4号の方法による中継を受信したとき、通常通信の終了を待ってその船舶の責任者に通知する。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「通常通信の終了を待って」を「直ちに」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「通常通信の終了を待って」を「直ちに」に直す。"
+        }
+      ],
+      "learningClause": "船舶局は、DSCの遭難警報若しくはその中継、又は施行規則第36条の2第1項第4号の方法による中継を受信したとき、直ちにその船舶の責任者に通知する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0123",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-1ウ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0123",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の5",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "df022a0c09b9ef076b5df49062fec3233535a337df185197ce729ec3f0d87d32",
+        "evidence": "船舶局は、デジタル選択呼出装置を使用して送信された遭難警報若しくは遭難警報の中継又は施行規則第三十六条の二第一項第四号に定める方法により送信された遭難警報の中継を受信したときは、直ちにこれをその船舶の責任者に通知しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-nonhf-response",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "distress",
+      "law": "無線局運用規則",
+      "title": "短波帯以外の警報に応答する条件",
+      "prompt": "短波帯以外のDSC遭難警報を受信した船舶局は、受信周波数で海岸局と通信できない海域にあり、かつ付近の船舶からの警報だと明らかなとき、遅滞なく応答し、適当な海岸局に通報する。",
+      "answer": "適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": true,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        },
+        {
+          "option": "不適合",
+          "correct": false,
+          "reason": "この自作確認文は根拠条項の主体・条件と一致する。"
+        }
+      ],
+      "learningClause": "短波帯以外のDSC遭難警報を受信した船舶局は、受信周波数で海岸局と通信できない海域にあり、かつ付近の船舶からの警報だと明らかなとき、遅滞なく応答し、適当な海岸局に通報する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0124",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-1エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0124",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の5",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "2adf991befaa9540415aad4aa0d93b119834b11279025e14b366b75918c01845",
+        "evidence": "２船舶局は、デジタル選択呼出装置を使用して短波帯以外の周波数の電波により送信された遭難警報を受信した場合において、当該遭難警報に使用された周波数の電波によつては海岸局と通信を行うことができない海域にあり、かつ、当該遭難警報が付近にある船舶からのものであることが明らかであるときは、遅滞なく、これに応答し、かつ、当該遭難警報を適当な海岸局に通報しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-related-watch",
+      "kind": "judge",
+      "points": 1,
+      "bundle": "watch",
+      "law": "無線局運用規則",
+      "title": "船舶局の関連周波数聴守",
+      "prompt": "DSCの遭難警報又はその中継を受信した船舶局は、受信周波数に関連する第70条の2第1項第2号の任意の業務用周波数で聴守する。",
+      "answer": "不適合",
+      "options": [
+        "適合",
+        "不適合"
+      ],
+      "optionAssessments": [
+        {
+          "option": "適合",
+          "correct": false,
+          "reason": "自作確認文の「任意の業務用周波数」を「無線電話周波数」に直す。"
+        },
+        {
+          "option": "不適合",
+          "correct": true,
+          "reason": "自作確認文の「任意の業務用周波数」を「無線電話周波数」に直す。"
+        }
+      ],
+      "learningClause": "DSCの遭難警報又はその中継を受信した船舶局は、受信周波数に関連する第70条の2第1項第2号の無線電話周波数で聴守する。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0125",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-1オ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0125",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "無線局運用規則",
+        "lawId": "325M50080000017",
+        "article": "81の5",
+        "paragraph": 7,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325M50080000017"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325M50080000017?asof=2026-10-07",
+        "revisionId": "325M50080000017_20260723_508M60000008090",
+        "evidenceSha256": "2531fdc4395d00e40d59df1aa2d72271a36292722835583daee0299d3704aff6",
+        "evidence": "７船舶局は、デジタル選択呼出装置を使用して送信された遭難警報又は遭難警報の中継を受信したときは、当該遭難警報又は遭難警報の中継を受信した周波数と関連する第七十条の二第一項第二号に規定する周波数で聴守を行わなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-distress-officer",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "license",
+      "law": "電波法",
+      "title": "遭難通信責任者を置く船舶",
+      "prompt": "国際航海に従事する旅客船又は総トン数［　］以上の船舶の義務船舶局等には、遭難通信責任者として、省令で定める無線従事者で船舶局無線従事者証明を受けた者を配置する。",
+      "answer": "300トン",
+      "options": [
+        "300トン",
+        "500トン",
+        "1,000トン",
+        "3,000トン"
+      ],
+      "optionAssessments": [
+        {
+          "option": "300トン",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "500トン",
+          "correct": false,
+          "reason": "この条件の条項は「300トン」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "1,000トン",
+          "correct": false,
+          "reason": "この条件の条項は「300トン」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "3,000トン",
+          "correct": false,
+          "reason": "この条件の条項は「300トン」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "国際航海に従事する旅客船又は総トン数300トン以上の船舶の義務船舶局等には、遭難通信責任者として、省令で定める無線従事者で船舶局無線従事者証明を受けた者を配置する。",
+      "correction": "国際航海という条件と、旅客船又は300トン以上という対象をセットで覚える。500トンではない。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0126",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-4ア"
+          },
+          "sourceStatementRef": "private:original-master/houki-0126",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "50",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "f57e619cee3a9ea206752319cbf24dd454a0dad0b304d6030013d1d266b382e6",
+        "evidence": "旅客船又は総トン数三百トン以上の船舶であつて、国際航海に従事するものの義務船舶局等には、遭難通信責任者（その船舶における第五十二条第一号から第三号までに掲げる通信に関する事項を統括管理する者をいう。）として、総務省令で定める無線従事者であつて、船舶局無線従事者証明を受けているものを配置しなければならない。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-certificate-apply",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "license",
+      "law": "電波法",
+      "title": "船舶局無線従事者証明の申請",
+      "prompt": "電波法第39条第1項本文の省令で定める義務船舶局等の設備を操作又は監督しようとする者は、［　］に申請して船舶局無線従事者証明を受けられる。",
+      "answer": "総務大臣",
+      "options": [
+        "総務大臣",
+        "国土交通大臣",
+        "都道府県知事",
+        "船舶の責任者"
+      ],
+      "optionAssessments": [
+        {
+          "option": "総務大臣",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "国土交通大臣",
+          "correct": false,
+          "reason": "この条件の条項は「総務大臣」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "都道府県知事",
+          "correct": false,
+          "reason": "この条件の条項は「総務大臣」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "船舶の責任者",
+          "correct": false,
+          "reason": "この条件の条項は「総務大臣」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "電波法第39条第1項本文の省令で定める義務船舶局等の設備を操作又は監督しようとする者は、総務大臣に申請して船舶局無線従事者証明を受けられる。",
+      "correction": "過去問の判定と現在覚える句は別に扱う。現在の主体・条件を下の句で確認する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0128",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-4ウ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0128",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "48の2",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "d8071dd223a2ea6f8053ee6a6c2f7c60cd4e772f7d89ed0f6b07883ea1b691b3",
+        "evidence": "第三十九条第一項本文の総務省令で定める義務船舶局等の無線設備の操作又はその監督を行おうとする者は、総務大臣に申請して、船舶局無線従事者証明を受けることができる。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-ship-certificate-training",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "license",
+      "law": "電波法",
+      "title": "同等訓練課程の修了からの年数",
+      "prompt": "船舶局無線従事者証明には、省令で定める資格を持ち、大臣の訓練課程を修了するか、同等と認定された訓練課程の修了から［　］を経過していないことが必要。",
+      "answer": "5年",
+      "options": [
+        "5年",
+        "3年",
+        "10年",
+        "15年"
+      ],
+      "optionAssessments": [
+        {
+          "option": "5年",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "3年",
+          "correct": false,
+          "reason": "この条件の条項は「5年」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "10年",
+          "correct": false,
+          "reason": "この条件の条項は「5年」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "15年",
+          "correct": false,
+          "reason": "この条件の条項は「5年」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "船舶局無線従事者証明には、省令で定める資格を持ち、大臣の訓練課程を修了するか、同等と認定された訓練課程の修了から5年を経過していないことが必要。",
+      "correction": "同等訓練の修了から5年未経過。10年や追加の業務経験を要件にしない。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0129",
+          "sourceExam": {
+            "exam": "2026-03",
+            "question": "B-4エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0129",
+          "sourceJudgement": "不適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "48の2",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "91db8ba48213e5af521f7eac7064ee2de3f37c4cbc3123655a4ea570ffdc7ebb",
+        "evidence": "２総務大臣は、船舶局無線従事者証明を申請した者が、総務省令で定める無線従事者の資格を有し、かつ、次の各号の一に該当するときは、船舶局無線従事者証明を行わなければならない。一総務大臣が当該申請者に対して行う義務船舶局等の無線設備の操作又はその監督に関する訓練の課程を修了したとき。二総務大臣が前号の訓練の課程と同等の内容を有するものであると認定した訓練の課程を修了しており、その修了した日から五年を経過していないとき。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-secrecy-general-penalty",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "通信の秘密：一般の罰則",
+      "prompt": "無線局の取扱中の通信の秘密を漏らし、又は窃用した者は、［　］。",
+      "answer": "1年以下の拘禁刑又は50万円以下の罰金",
+      "options": [
+        "1年以下の拘禁刑又は50万円以下の罰金",
+        "2年以下の拘禁刑又は100万円以下の罰金",
+        "1年以上の有期拘禁刑",
+        "罰則なし"
+      ],
+      "optionAssessments": [
+        {
+          "option": "1年以下の拘禁刑又は50万円以下の罰金",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "2年以下の拘禁刑又は100万円以下の罰金",
+          "correct": false,
+          "reason": "この条件の条項は「1年以下の拘禁刑又は50万円以下の罰金」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "1年以上の有期拘禁刑",
+          "correct": false,
+          "reason": "この条件の条項は「1年以下の拘禁刑又は50万円以下の罰金」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "罰則なし",
+          "correct": false,
+          "reason": "この条件の条項は「1年以下の拘禁刑又は50万円以下の罰金」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "無線局の取扱中の通信の秘密を漏らし、又は窃用した者は、1年以下の拘禁刑又は50万円以下の罰金。",
+      "correction": "旧設問の懲役は現行の拘禁刑に直す。刑期・罰金額も条項別に区別する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0044",
+          "sourceExam": {
+            "exam": "2022-03",
+            "question": "B-1エ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0044",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "109",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "31b612ec58227ba5c7491d7878aa1fd17c6c08f57f19c6c9361049e429e6e45d",
+        "evidence": "無線局の取扱中に係る無線通信の秘密を漏らし、又は窃用した者は、一年以下の拘禁刑又は五十万円以下の罰金に処する。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-secrecy-professional-penalty",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "通信の秘密：業務従事者の罰則",
+      "prompt": "無線通信の業務従事者が、業務で知った取扱中の通信の秘密を漏らし、又は窃用したときは、［　］。",
+      "answer": "2年以下の拘禁刑又は100万円以下の罰金",
+      "options": [
+        "2年以下の拘禁刑又は100万円以下の罰金",
+        "1年以下の拘禁刑又は50万円以下の罰金",
+        "1年以上の有期拘禁刑",
+        "罰則なし"
+      ],
+      "optionAssessments": [
+        {
+          "option": "2年以下の拘禁刑又は100万円以下の罰金",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "1年以下の拘禁刑又は50万円以下の罰金",
+          "correct": false,
+          "reason": "この条件の条項は「2年以下の拘禁刑又は100万円以下の罰金」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "1年以上の有期拘禁刑",
+          "correct": false,
+          "reason": "この条件の条項は「2年以下の拘禁刑又は100万円以下の罰金」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "罰則なし",
+          "correct": false,
+          "reason": "この条件の条項は「2年以下の拘禁刑又は100万円以下の罰金」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "無線通信の業務従事者が、業務で知った取扱中の通信の秘密を漏らし、又は窃用したときは、2年以下の拘禁刑又は100万円以下の罰金。",
+      "correction": "旧設問の懲役は現行の拘禁刑に直す。刑期・罰金額も条項別に区別する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0045",
+          "sourceExam": {
+            "exam": "2022-03",
+            "question": "B-1オ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0045",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "109",
+        "paragraph": 2,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "9ab644b848f899f56b306082f1243c24b8ae47da5e1e1094193ea3b912b9404e",
+        "evidence": "２無線通信の業務に従事する者がその業務に関し知り得た前項の秘密を漏らし、又は窃用したときは、二年以下の拘禁刑又は百万円以下の罰金に処する。",
+        "additionalEvidence": []
+      }
+    },
+    {
+      "id": "houki-distress-neglect-penalty",
+      "kind": "pick",
+      "points": 5,
+      "bundle": "operator",
+      "law": "電波法",
+      "title": "遭難通信の不取扱い・遅延の罰則",
+      "prompt": "無線通信の業務従事者が電波法第66条第1項（第70条の6第2項の準用を含む）の遭難通信を取り扱わず、又は遅延させたときは、［　］。",
+      "answer": "1年以上の有期拘禁刑",
+      "options": [
+        "1年以上の有期拘禁刑",
+        "1年以下の拘禁刑又は50万円以下の罰金",
+        "2年以下の拘禁刑又は100万円以下の罰金",
+        "罰則なし"
+      ],
+      "optionAssessments": [
+        {
+          "option": "1年以上の有期拘禁刑",
+          "correct": true,
+          "reason": "根拠条項の主体・条件・数値と一致。"
+        },
+        {
+          "option": "1年以下の拘禁刑又は50万円以下の罰金",
+          "correct": false,
+          "reason": "この条件の条項は「1年以上の有期拘禁刑」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "2年以下の拘禁刑又は100万円以下の罰金",
+          "correct": false,
+          "reason": "この条件の条項は「1年以上の有期拘禁刑」と定めており、この補充句は一致しない。"
+        },
+        {
+          "option": "罰則なし",
+          "correct": false,
+          "reason": "この条件の条項は「1年以上の有期拘禁刑」と定めており、この補充句は一致しない。"
+        }
+      ],
+      "learningClause": "無線通信の業務従事者が電波法第66条第1項（第70条の6第2項の準用を含む）の遭難通信を取り扱わず、又は遅延させたときは、1年以上の有期拘禁刑。",
+      "correction": "旧設問の懲役は現行の拘禁刑に直す。刑期・罰金額も条項別に区別する。",
+      "sourceEvidence": [
+        {
+          "legacyId": "houki-0088",
+          "sourceExam": {
+            "exam": "2024-03",
+            "question": "B-5ウ"
+          },
+          "sourceStatementRef": "private:original-master/houki-0088",
+          "sourceJudgement": "適合"
+        }
+      ],
+      "legalBasis": {
+        "law": "電波法",
+        "lawId": "325AC0000000131",
+        "article": "105",
+        "paragraph": 1,
+        "item": null,
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000131"
+      },
+      "verification": {
+        "status": "verified",
+        "date": "2026-10-07",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/325AC0000000131?asof=2026-10-07",
+        "revisionId": "325AC0000000131_20260903_508AC0000000027",
+        "evidenceSha256": "fe63d482243dc94dd0a9b884bbbbe684dde39e5efbc7d3a4b56a4a6fcac57ebc",
+        "evidence": "無線通信の業務に従事する者が第六十六条第一項（第七十条の六第二項において準用する場合を含む。）の規定による遭難通信の取扱いをしなかつたとき、又はこれを遅延させたときは、一年以上の有期拘禁刑に処する。",
+        "additionalEvidence": []
+      }
+    }
+  ]
+}

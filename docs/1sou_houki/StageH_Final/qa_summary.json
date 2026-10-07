@@ -1,0 +1,137 @@
+{
+  "verdict": "PASS",
+  "referenceDate": "2026-10-07",
+  "publicItems": 28,
+  "verified": 28,
+  "fail": 0,
+  "review": 0,
+  "legacyItems": 129,
+  "legacyDispositions": {
+    "maintained": 0,
+    "corrected": 28,
+    "merged": 1,
+    "split": 0,
+    "deferred": 100
+  },
+  "questionForms": {
+    "judge": 15,
+    "cloze": 13
+  },
+  "tests": {
+    "filesPassed": 57,
+    "testsPassed": 692,
+    "relatedTestsPassed": 8
+  },
+  "build": "PASS",
+  "typecheck": {
+    "result": "FAIL_PRE_EXISTING_ONLY",
+    "errors": [
+      "app/landing/LandingRigDemo.tsx:63 number vs Timeout",
+      "lib/api/cloudSync.ts:154 Record<string, unknown> vs TrainerProfile"
+    ]
+  },
+  "lint": {
+    "result": "FAIL_PRE_EXISTING_ONLY",
+    "wholeRepository": {
+      "errors": 106,
+      "warnings": 40
+    },
+    "productionExcludingDocs": {
+      "errors": 28,
+      "warnings": 12
+    },
+    "newLawFiles": {
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "baselineCommit": "6c4938a",
+  "simulation": [
+    {
+      "held": 0,
+      "sets": 10000,
+      "minItemHits": 1969,
+      "maxItemHits": 5000,
+      "meanOverlap": 0,
+      "maxOverlap": 0,
+      "heldHits": 0,
+      "groups": {
+        "operator": 26775,
+        "distress": 29836,
+        "watch": 23389,
+        "license": 10000
+      }
+    },
+    {
+      "held": 14,
+      "sets": 10000,
+      "minItemHits": 1087,
+      "maxItemHits": 6964,
+      "meanOverlap": 2,
+      "maxOverlap": 2,
+      "heldHits": 20000,
+      "groups": {
+        "operator": 15674,
+        "distress": 38324,
+        "watch": 24812,
+        "license": 11190
+      }
+    },
+    {
+      "held": 27,
+      "sets": 10000,
+      "minItemHits": 1001,
+      "maxItemHits": 10000,
+      "meanOverlap": 1,
+      "maxOverlap": 1,
+      "heldHits": 80000,
+      "groups": {
+        "operator": 28810,
+        "distress": 29631,
+        "watch": 22170,
+        "license": 9389
+      }
+    },
+    {
+      "held": 28,
+      "sets": 10000,
+      "minItemHits": 1969,
+      "maxItemHits": 5000,
+      "meanOverlap": 0,
+      "maxOverlap": 0,
+      "heldHits": 90000,
+      "groups": {
+        "operator": 26775,
+        "distress": 29836,
+        "watch": 23389,
+        "license": 10000
+      }
+    }
+  ],
+  "browser": {
+    "desktop": "1440x900 PASS",
+    "mobile": "375x812 PASS",
+    "midwayReload": "answers and cursor restored",
+    "gradedReload": "10/25 result and wrong items restored",
+    "leaveReturn": "drill and reading state restored",
+    "heldToggleUndo": "PASS; QA marks restored to zero",
+    "nearlyAllHeld": "27/28, nine questions completed",
+    "groups": {
+      "distress": 13,
+      "watch": 5,
+      "operator": 7,
+      "license": 3
+    },
+    "overflow": "none in all 28 clauses or observed long choices",
+    "desktopScore": "10/25",
+    "mobileScore": "11/25",
+    "nearlyHeldScore": "8/25",
+    "history": "3 QA attempts in v2; original v1 preserved"
+  },
+  "regression": {
+    "navigation": "home/menu/law/English/geography/QSO modes smoke PASS",
+    "automated": "all existing suites passed",
+    "auditory": "not assessed; no audio implementation changes"
+  },
+  "privateBoundary": "No PDF, page images, extracted exam text, private sourceStatement archive or temporary QA bundle included in public/commit."
+}

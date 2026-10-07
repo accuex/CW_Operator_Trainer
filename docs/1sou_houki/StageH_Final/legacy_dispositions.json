@@ -1,0 +1,905 @@
+[
+  {
+    "legacyId": "houki-0001",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0002",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 示した出典と選択肢集合が不一致（答え文字列は一致）。原本別回の選択肢を残す重複除去処理"
+  },
+  {
+    "legacyId": "houki-0003",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0004",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 漢数字の一括変換で一般・一切等の日本語を破損。選択肢も対象"
+  },
+  {
+    "legacyId": "houki-0005",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 示した出典と選択肢集合が不一致（答え文字列は一致）。原本別回の選択肢を残す重複除去処理"
+  },
+  {
+    "legacyId": "houki-0006",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0007",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0008",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0009",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0010",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0011",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0012",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0013",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0014",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。漢数字の一括変換で一般・一切等の日本語を破損。選択肢も対象 / 原本は無線通信規則32条。電波法というメタデータは誤り"
+  },
+  {
+    "legacyId": "houki-0015",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線通信規則32条。電波法というメタデータは誤り"
+  },
+  {
+    "legacyId": "houki-0016",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線通信規則32条。電波法というメタデータは誤り"
+  },
+  {
+    "legacyId": "houki-0017",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線通信規則32条。電波法というメタデータは誤り"
+  },
+  {
+    "legacyId": "houki-0018",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線通信規則32条。電波法というメタデータは誤り"
+  },
+  {
+    "legacyId": "houki-0019",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0020",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0021",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0022",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0023",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0024",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0025",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 現行法への照合で複数の不適合が生じる又は切れた選択肢あり。詳細はレポート"
+  },
+  {
+    "legacyId": "houki-0026",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0027",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0028",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-distress-call-watch",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0029",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-coast-report-rescue",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0030",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-notify-responsible",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0031",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-coast-near-response",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0032",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-cannot-rescue",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0033",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0034",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0035",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0036",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0037",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0038",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 漢数字の一括変換で一般・一切等の日本語を破損。選択肢も対象"
+  },
+  {
+    "legacyId": "houki-0039",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0040",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0041",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0042",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0043",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0044",
+    "priorStatus": "FAIL",
+    "disposition": "corrected",
+    "learningEntityId": "houki-secrecy-general-penalty",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0045",
+    "priorStatus": "FAIL",
+    "disposition": "corrected",
+    "learningEntityId": "houki-secrecy-professional-penalty",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0046",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0047",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0048",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0049",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0050",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0051",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。示した出典と選択肢集合が不一致（答え文字列は一致）。原本別回の選択肢を残す重複除去処理"
+  },
+  {
+    "legacyId": "houki-0052",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0053",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0054",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0055",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0056",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0057",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0058",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0059",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0060",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0061",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0062",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線局運用規則14・18・26条。電波法とするメタデータと免許分類は誤り"
+  },
+  {
+    "legacyId": "houki-0063",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線局運用規則14・18・26条。電波法とするメタデータと免許分類は誤り"
+  },
+  {
+    "legacyId": "houki-0064",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線局運用規則14・18・26条。電波法とするメタデータと免許分類は誤り"
+  },
+  {
+    "legacyId": "houki-0065",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線局運用規則14・18・26条。電波法とするメタデータと免許分類は誤り"
+  },
+  {
+    "legacyId": "houki-0066",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本は無線局運用規則14・18・26条。電波法とするメタデータと免許分類は誤り"
+  },
+  {
+    "legacyId": "houki-0067",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0068",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0069",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0070",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-urgency-listen",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0071",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-urgency-definition",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0072",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0073",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 正答本文「遭難通信責任者無線従事者」で定義・条件が欠落。選択肢2/3にも注記混入・欠落"
+  },
+  {
+    "legacyId": "houki-0074",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0075",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0076",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0077",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0078",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0079",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0080",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0081",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0082",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0083",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-chief-qualification",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0084",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-morse-licensed",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0085",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-chief-duty",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0086",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-report-transmission",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0087",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-distress-definition",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0088",
+    "priorStatus": "FAIL",
+    "disposition": "corrected",
+    "learningEntityId": "houki-distress-neglect-penalty",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0089",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-stop-interference",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0090",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。漢数字の一括変換で一般・一切等の日本語を破損。選択肢も対象"
+  },
+  {
+    "legacyId": "houki-0091",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0092",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0093",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0094",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0095",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0096",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0097",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0098",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。ふりがなの「ふく」が本文に混入"
+  },
+  {
+    "legacyId": "houki-0099",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0100",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0101",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0102",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0103",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0104",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 現行法への照合で複数の不適合が生じる又は切れた選択肢あり。詳細はレポート"
+  },
+  {
+    "legacyId": "houki-0105",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-coast-earth-response",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0106",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-coast-dsc-response",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0107",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-coast-dsc-frequency",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0108",
+    "priorStatus": "PASS",
+    "disposition": "merged",
+    "learningEntityId": "houki-coast-earth-response",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0109",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-coast-related-watch",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0110",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0111",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0112",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。ふりがなの「ふく」が本文に混入"
+  },
+  {
+    "legacyId": "houki-0113",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0114",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0115",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 正答の列挙(1)〜(3)が欠落。主任の問題を遭難分類へ割り当てる誤分類"
+  },
+  {
+    "legacyId": "houki-0116",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 現行法への照合で複数の不適合が生じる又は切れた選択肢あり。詳細はレポート"
+  },
+  {
+    "legacyId": "houki-0117",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている"
+  },
+  {
+    "legacyId": "houki-0118",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。選択肢2が日誌記載事項の断片だけで元の主語・記録条件が欠落"
+  },
+  {
+    "legacyId": "houki-0119",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。不適合の選択肢を訂正文・誤り理由なしで学習句として提示する。設問の対象・条件も落ちている / 現行法への照合で複数の不適合が生じる又は切れた選択肢あり。詳細はレポート"
+  },
+  {
+    "legacyId": "houki-0120",
+    "priorStatus": "FAIL",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "国際規則の現行一次資料未確定のため公開対象外。"
+  },
+  {
+    "legacyId": "houki-0121",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-nonhf-watch",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0122",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-hf-relay",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0123",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-dsc-notify",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0124",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-nonhf-response",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0125",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-related-watch",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0126",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-distress-officer",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0127",
+    "priorStatus": "REVIEW",
+    "disposition": "deferred",
+    "learningEntityId": null,
+    "reason": "現行の全条件・選択肢一意性を確定していないため公開対象外。原本由来と採点文字列は機械照合したが、現行条文の全条件・号・例外と各選択肢の一意性を確定していない。人間による法令対照が必要"
+  },
+  {
+    "legacyId": "houki-0128",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-certificate-apply",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  },
+  {
+    "legacyId": "houki-0129",
+    "priorStatus": "PASS",
+    "disposition": "corrected",
+    "learningEntityId": "houki-ship-certificate-training",
+    "reason": "現行一次資料と主体・条件・数値を照合し、自作教材に再構築。"
+  }
+]

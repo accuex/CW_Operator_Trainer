@@ -13,6 +13,7 @@ export const APP_VIEWS = [
   'communication',
   'geography',
   'english',
+  'houki',
   'qso',
   'collection',
   'settings',
