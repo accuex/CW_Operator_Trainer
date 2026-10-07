@@ -73,7 +73,8 @@ https://github.com/user-attachments/assets/7298f2a5-c57e-47b3-a67e-891faaef871b
 
 「一総通」メニューは前回使った教材を覚えます。次に開くときも、地理なら地理、電気通信術ならその画面から。
 
-<img width="1056" height="670" alt="1sotu_tiri" src="https://github.com/user-attachments/assets/d53f40c3-415e-46d1-a1f7-df33d6fa9a45" />
+<img width="847" height="799" alt="top_tiri" src="https://github.com/user-attachments/assets/eb85e738-dd25-4c05-959f-e998b4f3089f" />
+
 
 
 ## 記録を残して、また続きから
