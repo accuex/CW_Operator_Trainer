@@ -1,3 +1,9 @@
+
+
+
+
+
+
 # CW Operator Trainer
 
 <p align="center">
@@ -14,7 +20,7 @@
 
 登録なしですぐに使えます。PCでもスマートフォンでも、イヤホンやヘッドフォンを用意してどうぞ。
 
-<!-- 画像・動画の差し込み：ホーム画面、または「符号を覚える → QSO → 地理」の短い紹介動画。 -->
+<img width="1298" height="824" alt="top_hero" src="https://github.com/user-attachments/assets/f211c633-c9a3-45ba-878a-26e8ceae1007" />
 
 ## 音で覚えて、耳で追う
 
@@ -40,7 +46,8 @@
 
 受信を助けるDECODE表示も使えます。
 
-<!-- 画像・動画の差し込み：リグとウォーターフォール。音つきのQSO／Pileup動画があると雰囲気が伝わります。 -->
+https://github.com/user-attachments/assets/7298f2a5-c57e-47b3-a67e-891faaef871b
+
 
 ## 一総通を目指す
 
@@ -49,6 +56,10 @@
 和文普通語・欧文暗語・欧文普通語を、試験呼称から終了符号まで通して練習できます。科目ごとに1,000セットを収録。手書きで取りたい日は視聴モード、採点して振り返りたい日は入力モードを選べます。
 
 額表を使った受信や、通と通の間の休止も含めて、試験の流れに慣れていきます。
+
+<img width="893" height="742" alt="oubun" src="https://github.com/user-attachments/assets/cb0b5d3f-c86c-4dc0-a4dd-ed5d907f323e" />
+<img width="865" height="884" alt="wabun" src="https://github.com/user-attachments/assets/83259b51-3169-407e-a680-736e5bab0b97" />
+
 
 ### 地理
 
@@ -62,7 +73,8 @@
 
 「一総通」メニューは前回使った教材を覚えます。次に開くときも、地理なら地理、電気通信術ならその画面から。
 
-<!-- 画像・動画の差し込み：地理マップの全体表示と、白地図練習。レイヤー切替やマーカーの大きさが分かる画面がおすすめです。 -->
+<img width="1056" height="670" alt="1sotu_tiri" src="https://github.com/user-attachments/assets/d53f40c3-415e-46d1-a1f7-df33d6fa9a45" />
+
 
 ## 記録を残して、また続きから
 
