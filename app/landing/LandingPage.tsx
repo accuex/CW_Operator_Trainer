@@ -9,6 +9,7 @@ import { DEFAULT_UNLOCK } from '@/lib/course';
 import { getProfile, isLandingReturning, markTrainerStarted, normalizeProfile, saveProfile } from '@/lib/storage';
 import type { TrainerProfile } from '@/lib/types';
 import { Icon, type IconName } from '@/app/components/icons';
+import { SiteFooter } from '@/app/landing/SiteFooter';
 
 const LandingRigDemo = dynamic(
   () => import('./LandingRigDemo').then((mod) => mod.LandingRigDemo),
@@ -447,11 +448,7 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="lp-foot">
-        <p className="app-credit">
-          (C) 2026 Int Design LLC.
-        </p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
