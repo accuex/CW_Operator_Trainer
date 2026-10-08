@@ -9,7 +9,7 @@ export function validateTrainer(data:TrainerMaster):TrainerMaster {
   const review=data.reviews.find(r=>r.id===item.reviewId);
   const sample=data.edition==='original_sample';
   if(!review || review.contentRef?.id!==item.id || review.contentRef?.version!==item.version || sample && (review.purpose!=='original_sample'||review.rights!=='original_author'||review.humanApproval!=='not_applicable_sample'||review.releaseApproved) || !sample && (review.rights!=='cleared'||review.humanApproval!=='approved'||!review.releaseApproved))throw Error('配信審査が完了していません');
-  if(!sample && review.purpose!==('themeId' in item?'historical':'kind' in item&&item.kind==='amendment'?'amendment':'current_note'))throw Error('教材用途の審査が一致しません');
+  if(!sample && review.purpose!==('themeId' in item?(item.provenance==='original_practice'?'original_practice':'historical'):'kind' in item&&item.kind==='amendment'?'amendment':'current_note'))throw Error('教材用途の審査が一致しません');
   if('chapterId' in item && !has(data.chapters,[item.chapterId]))throw Error('章が見つかりません');
  }
  if(data.edition==='original_sample'&&(data.historicalCanonicals.length||data.historicalQuestions.length||data.historicalBlanks.length))throw Error('歴史的データをサンプルへ混入できません');

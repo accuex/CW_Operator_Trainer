@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "protectedFileCount": 1402,
+  "changedProtectedFiles": [],
+  "historical": [
+    615,
+    486,
+    2161
+  ],
+  "priority1": {
+    "verified": 41,
+    "unresolved": 22
+  },
+  "HFinal28Unchanged": true,
+  "packageVersion": "1.1.1",
+  "actualPublicApprovalCount": 0,
+  "productionPublicAssetsUnchanged": true
+}

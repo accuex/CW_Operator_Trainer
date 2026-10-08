@@ -1,0 +1,26 @@
+{
+  "stage": "REVIEW",
+  "fullSuite": {
+    "files": 61,
+    "tests": 730,
+    "status": "PASS"
+  },
+  "related": {
+    "tests": 25,
+    "status": "PASS"
+  },
+  "productionTypes": "PASS",
+  "previewTypes": "PASS",
+  "build": "PASS",
+  "realThemeSSR": "PASS",
+  "lawSourceHashAnd7ItemStructure": "PASS",
+  "reviewHTTP": "PASS",
+  "productionHTTP": "PASS",
+  "desktop": "NOT_RUN",
+  "mobile375": "NOT_RUN",
+  "keyboard": "NOT_RUN",
+  "VoiceOver": "NOT_RUN",
+  "actualPublicApproval": 0,
+  "realThemes": 1,
+  "originalPractices": 4
+}

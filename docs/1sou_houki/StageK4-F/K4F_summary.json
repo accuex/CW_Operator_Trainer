@@ -1,0 +1,13 @@
+{
+  "stage": "REVIEW",
+  "releaseApproved": false,
+  "publishedAt": null,
+  "humanApproval": "pending",
+  "rightsReview": "pending",
+  "themeCount": 1,
+  "practiceCount": 4,
+  "privateAuthoring": "private/false-alert.authoring.json",
+  "previewEntry": "preview/serve.mjs",
+  "protectedFileCount": 1402,
+  "publicAssetChanges": 0
+}

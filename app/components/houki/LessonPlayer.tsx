@@ -15,7 +15,7 @@ export function BlockRenderer({block,release,openQuestion}:{block:LessonBlock;re
  case 'keyPoints':return <ul>{block.items.map((x,i)=><li key={i}>{x}</li>)}</ul>;
  case 'procedure':return <ol>{block.items.map((x,i)=><li key={i}>{x}</li>)}</ol>;
  case 'comparison':return <div className="ht-compare">{block.entries.map((e,i)=><div key={i}><h4>{e.label}</h4><p>{e.body}</p></div>)}</div>;
- case 'conditions':return <>{block.ruleIds.map(id=>{const r=master.rules.find(x=>x.id===id)!;return <div key={id}><p><strong>主体：</strong>{r.subject}</p><p><strong>行為：</strong>{r.action}</p>{r.conditionIds.map(cid=>{const c=master.conditions.find(x=>x.id===cid)!;return <div key={cid}><strong>{c.operator==='AND'?'両方必要（AND）':'いずれかでよい（OR）'}</strong><ul>{c.requirements.map((x,i)=><li key={i}>{x}</li>)}</ul><p>例外：{c.exceptions.join(' / ')||'設定なし'}</p></div>;})}</div>;})}</>;
+ case 'conditions':return <>{block.ruleIds.map(id=>{const r=master.rules.find(x=>x.id===id)!;return <div key={id}><p><strong>主体：</strong>{r.subject}</p><p><strong>行為：</strong>{r.action}</p>{r.conditionIds.map(cid=>{const c=master.conditions.find(x=>x.id===cid)!;return <div key={cid}><strong>{c.operator==='AND'?'すべて必要（AND）':'いずれかでよい（OR）'}</strong><ul>{c.requirements.map((x,i)=><li key={i}>{x}</li>)}</ul><p>例外：{c.exceptions.join(' / ')||'設定なし'}</p></div>;})}</div>;})}</>;
  case 'question':return <button className="btn btn-primary" onClick={()=>openQuestion(block.questionId)}>{master.questions.find(q=>q.id===block.questionId)!.title}</button>;
  case 'redSheet':return <EmbeddedSheet question={master.questions.find(q=>q.id===block.questionId)!}/>;
  case 'amendment':case 'pitfall':return <Card card={master.cards.find(c=>c.id===block.cardId)!} master={master}/>;

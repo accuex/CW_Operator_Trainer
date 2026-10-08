@@ -423,7 +423,11 @@
                 "minimum": 0
               },
               "provenance": {
-                "type": "string"
+                "enum": [
+                  "original_sample",
+                  "original_practice",
+                  "historical"
+                ]
               },
               "title": {
                 "type": "string"
@@ -435,7 +439,10 @@
                 "type": "string"
               },
               "sampleYear": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "historicalRef": {
                 "anyOf": [
