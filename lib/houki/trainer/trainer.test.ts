@@ -4,8 +4,9 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import HoukiTrainerView from '../../../app/views/HoukiTrainerView';
 import {validateTrainer,questionOrder,toggleRevealed,readLocation,trainerPath,loadTrainerMaster} from './engine';
+import {generateRelease} from './release-validator.mjs';
 import type {TrainerMaster} from './types';
-const sample=JSON.parse(readFileSync('public/houki/trainer/original-samples-v1.json','utf8')) as TrainerMaster;
+const sample=generateRelease(JSON.parse(readFileSync('data/houki/original-samples.authoring.json','utf8'))).master as TrainerMaster;
 describe('production trainer samples and release safety',()=>{
  it('loads only original authored samples, not verified law or real exams',()=>{expect(validateTrainer(sample)).toBe(sample);expect(sample.notes).toHaveLength(2);expect(sample.questions).toHaveLength(3);expect(sample.questions.every(q=>q.historicalRef===null&&q.provenance==='original_sample')).toBe(true);expect(sample.reviews.every(r=>!r.releaseApproved)).toBe(true);});
  it('rejects pending/incorrect-version reviews, missing dependencies, private evidence and duplicates',()=>{

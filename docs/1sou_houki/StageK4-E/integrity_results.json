@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "protectedHashCount": 1388,
+  "changes": [],
+  "historical": [
+    615,
+    486,
+    2161
+  ],
+  "priority1": {
+    "verified": 41,
+    "unresolved": 22
+  },
+  "packageVersion": "1.1.1",
+  "push": false,
+  "actualLawPublicApprovals": 0
+}

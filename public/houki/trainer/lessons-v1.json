@@ -1,0 +1,1335 @@
+{
+  "schemaVersion": "1.0.0",
+  "contentVersion": 1,
+  "editionId": "original-samples-lesson-v1",
+  "master": {
+    "schemaVersion": 1,
+    "edition": "original_sample",
+    "chapters": [
+      {
+        "id": "sample-delivery",
+        "title": "架空の配達ルール"
+      },
+      {
+        "id": "sample-library",
+        "title": "架空の図書室ルール"
+      }
+    ],
+    "notes": [
+      {
+        "id": "sample-delivery",
+        "version": 1,
+        "chapterId": "sample-delivery",
+        "title": "雲の郵便屋さんの配達",
+        "ruleIds": [
+          "sample-delivery-rule"
+        ],
+        "questionIds": [
+          "sample-question-1",
+          "sample-question-2"
+        ],
+        "cardIds": [
+          "sample-pitfall",
+          "sample-change-card"
+        ],
+        "sourceIds": [
+          "sample-source"
+        ],
+        "scope": "架空の物語の中だけのルール",
+        "unknowns": [
+          "実際の法律・試験には適用できません"
+        ],
+        "asOfDate": null,
+        "effectiveStatus": "not_applicable_sample",
+        "publicEligibility": "sample",
+        "reviewId": "review-sample-delivery",
+        "goal": "両方必要な条件と、例外を分けて読む",
+        "explanation": "架空の郵便屋さんは、晴れていて青い帽子をかぶっているときに配達します。ただし虹が出ている日は休みます。",
+        "steps": [
+          "誰のルールかを確かめる",
+          "必要な条件を読む",
+          "例外があれば先に適用する"
+        ]
+      },
+      {
+        "id": "sample-library",
+        "version": 1,
+        "chapterId": "sample-library",
+        "title": "月の図書室の貸出し",
+        "ruleIds": [
+          "sample-library-rule"
+        ],
+        "questionIds": [
+          "sample-question-3"
+        ],
+        "cardIds": [],
+        "sourceIds": [
+          "sample-source"
+        ],
+        "scope": "架空の物語の中だけのルール",
+        "unknowns": [
+          "実際の法律・試験には適用できません"
+        ],
+        "asOfDate": null,
+        "effectiveStatus": "not_applicable_sample",
+        "publicEligibility": "sample",
+        "reviewId": "review-sample-library",
+        "goal": "いずれかの条件でよいことを確かめる",
+        "explanation": "架空の図書室では、銀のカード又は金のしおりのどちらかがあれば絵本を借りられます。",
+        "steps": [
+          "誰のルールかを確かめる",
+          "必要な条件を読む",
+          "例外があれば先に適用する"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "id": "sample-delivery-rule",
+        "version": 1,
+        "subject": "雲の郵便屋さん",
+        "action": "星の封筒を配達する",
+        "conditionIds": [
+          "sample-delivery-condition"
+        ],
+        "sourceIds": [
+          "sample-source"
+        ]
+      },
+      {
+        "id": "sample-library-rule",
+        "version": 1,
+        "subject": "月の図書室の係",
+        "action": "絵本を貸し出す",
+        "conditionIds": [
+          "sample-library-condition"
+        ],
+        "sourceIds": [
+          "sample-source"
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "sample-delivery-condition",
+        "version": 1,
+        "label": "架空の条件",
+        "operator": "AND",
+        "requirements": [
+          "空が晴れている",
+          "青い帽子をかぶっている"
+        ],
+        "exceptions": [
+          "虹が出ている日は配達を休む"
+        ]
+      },
+      {
+        "id": "sample-library-condition",
+        "version": 1,
+        "label": "架空の条件",
+        "operator": "OR",
+        "requirements": [
+          "銀のカードを持っている",
+          "金のしおりを持っている"
+        ],
+        "exceptions": []
+      }
+    ],
+    "questions": [
+      {
+        "id": "sample-question-1",
+        "version": 1,
+        "provenance": "original_sample",
+        "title": "オリジナルサンプル 1",
+        "chapterId": "sample-delivery",
+        "themeId": "sample-delivery",
+        "sampleYear": "2026",
+        "historicalRef": null,
+        "tokens": [
+          {
+            "kind": "text",
+            "text": "晴れていて、"
+          },
+          {
+            "kind": "blank",
+            "blankId": "sample-question-1-blank-1"
+          },
+          {
+            "kind": "text",
+            "text": "をかぶっているときに配達する。"
+          },
+          {
+            "kind": "blank",
+            "blankId": "sample-question-1-blank-2"
+          },
+          {
+            "kind": "text",
+            "text": "が出ている日は休む。"
+          }
+        ],
+        "blanks": [
+          {
+            "id": "sample-question-1-blank-1",
+            "version": 1,
+            "printedPositionId": "sample-question-1:position:1",
+            "slotLabel": "1",
+            "answer": "青い帽子"
+          },
+          {
+            "id": "sample-question-1-blank-2",
+            "version": 1,
+            "printedPositionId": "sample-question-1:position:2",
+            "slotLabel": "2",
+            "answer": "虹"
+          }
+        ],
+        "explanation": "両方の条件が必要です。虹がある場合は、通常条件が揃っていても休みます。",
+        "relationToCurrent": "架空のサンプル。現行法・過去問との対応なし。",
+        "reviewId": "review-sample-question-1"
+      },
+      {
+        "id": "sample-question-2",
+        "version": 1,
+        "provenance": "original_sample",
+        "title": "オリジナルサンプル 2",
+        "chapterId": "sample-delivery",
+        "themeId": "sample-delivery",
+        "sampleYear": "2025",
+        "historicalRef": null,
+        "tokens": [
+          {
+            "kind": "text",
+            "text": "星の封筒を届けるのは、"
+          },
+          {
+            "kind": "blank",
+            "blankId": "sample-question-2-blank-1"
+          },
+          {
+            "kind": "text",
+            "text": "。"
+          }
+        ],
+        "blanks": [
+          {
+            "id": "sample-question-2-blank-1",
+            "version": 1,
+            "printedPositionId": "sample-question-2:position:1",
+            "slotLabel": "1",
+            "answer": "雲の郵便屋さん"
+          }
+        ],
+        "explanation": "条件だけでなく、誰のルールかを区別します。",
+        "relationToCurrent": "架空のサンプル。現行法・過去問との対応なし。",
+        "reviewId": "review-sample-question-2"
+      },
+      {
+        "id": "sample-question-3",
+        "version": 1,
+        "provenance": "original_sample",
+        "title": "オリジナルサンプル 3",
+        "chapterId": "sample-library",
+        "themeId": "sample-library",
+        "sampleYear": "2026",
+        "historicalRef": null,
+        "tokens": [
+          {
+            "kind": "text",
+            "text": "銀のカード"
+          },
+          {
+            "kind": "blank",
+            "blankId": "sample-question-3-blank-1"
+          },
+          {
+            "kind": "text",
+            "text": "金のしおりがあれば借りられる。"
+          }
+        ],
+        "blanks": [
+          {
+            "id": "sample-question-3-blank-1",
+            "version": 1,
+            "printedPositionId": "sample-question-3:position:1",
+            "slotLabel": "1",
+            "answer": "又は"
+          }
+        ],
+        "explanation": "いずれか一方で足ります。両方必要とは読みません。",
+        "relationToCurrent": "架空のサンプル。現行法・過去問との対応なし。",
+        "reviewId": "review-sample-question-3"
+      }
+    ],
+    "cards": [
+      {
+        "id": "sample-pitfall",
+        "version": 1,
+        "kind": "pitfall",
+        "title": "「両方」と「どちらか」を区別する",
+        "text": "架空の配達ルールは両方必要、図書室のルールはいずれか一方で足ります。例外は、そのルールで示された対象にだけ適用します。",
+        "eventId": null,
+        "sourceIds": [
+          "sample-source"
+        ],
+        "reviewId": "review-sample-pitfall"
+      },
+      {
+        "id": "sample-change-card",
+        "version": 1,
+        "kind": "amendment",
+        "title": "架空ルールの変更サンプル",
+        "text": "改正カードの表示を確かめるための架空の変更です。実際の法令改正ではありません。",
+        "eventId": "sample-change",
+        "sourceIds": [
+          "sample-source"
+        ],
+        "reviewId": "review-sample-change-card"
+      }
+    ],
+    "amendments": [
+      {
+        "id": "sample-change",
+        "version": 1,
+        "before": "架空の封筒の色：白",
+        "after": "架空の封筒の色：星色",
+        "change": "物語上の封筒の色だけを変更",
+        "promulgatedAt": null,
+        "effectiveAt": null,
+        "reason": null,
+        "sourceIds": [
+          "sample-source"
+        ],
+        "unknowns": [
+          "実際の法令改正ではありません",
+          "公布日・施行日・理由は設定していません"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": "sample-source",
+        "version": 1,
+        "title": "CWOTが作成した架空ルール（法令ではありません）",
+        "url": null,
+        "locatorLabel": null,
+        "asOfDate": null
+      }
+    ],
+    "reviews": [
+      {
+        "id": "review-sample-delivery",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-delivery",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      },
+      {
+        "id": "review-sample-library",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-library",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      },
+      {
+        "id": "review-sample-question-1",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-question-1",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      },
+      {
+        "id": "review-sample-question-2",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-question-2",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      },
+      {
+        "id": "review-sample-question-3",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-question-3",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      },
+      {
+        "id": "review-sample-pitfall",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-pitfall",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      },
+      {
+        "id": "review-sample-change-card",
+        "version": 1,
+        "contentRef": {
+          "id": "sample-change-card",
+          "version": 1
+        },
+        "purpose": "original_sample",
+        "rights": "original_author",
+        "humanApproval": "not_applicable_sample",
+        "releaseApproved": false
+      }
+    ],
+    "historicalCanonicals": [],
+    "historicalQuestions": [],
+    "historicalBlanks": []
+  },
+  "lessons": [
+    {
+      "id": "sample-delivery",
+      "contentVersion": 1,
+      "chapterId": "sample-delivery",
+      "themeId": "sample-delivery",
+      "title": "雲の郵便屋さんの配達",
+      "questionIds": [
+        "sample-question-1",
+        "sample-question-2"
+      ],
+      "ruleIds": [
+        "sample-delivery-rule"
+      ],
+      "amendmentIds": [
+        "sample-change"
+      ],
+      "sourceIds": [
+        "sample-source"
+      ],
+      "prerequisiteLessonIds": [],
+      "blocks": [
+        {
+          "id": "sample-delivery-block-1",
+          "contentVersion": 1,
+          "type": "keyPoints",
+          "heading": "このテーマで覚えること",
+          "items": [
+            "両方必要な条件と、例外を分けて読む"
+          ]
+        },
+        {
+          "id": "sample-delivery-block-2",
+          "contentVersion": 1,
+          "type": "explanation",
+          "heading": "要点の解説",
+          "body": "架空の郵便屋さんは、晴れていて青い帽子をかぶっているときに配達します。ただし虹が出ている日は休みます。"
+        },
+        {
+          "id": "sample-delivery-block-3",
+          "contentVersion": 1,
+          "type": "conditions",
+          "heading": "条件・例外",
+          "ruleIds": [
+            "sample-delivery-rule"
+          ]
+        },
+        {
+          "id": "sample-delivery-block-4",
+          "contentVersion": 1,
+          "type": "procedure",
+          "heading": "手順で確かめる",
+          "items": [
+            "誰のルールかを確かめる",
+            "必要な条件を読む",
+            "例外があれば先に適用する"
+          ]
+        },
+        {
+          "id": "sample-delivery-block-5",
+          "contentVersion": 1,
+          "type": "comparison",
+          "heading": "条件の読み分け（架空）",
+          "entries": [
+            {
+              "label": "AND",
+              "body": "両方必要"
+            },
+            {
+              "label": "OR",
+              "body": "いずれかでよい"
+            }
+          ]
+        },
+        {
+          "id": "sample-delivery-block-6",
+          "contentVersion": 1,
+          "type": "question",
+          "heading": "確認問題",
+          "questionId": "sample-question-1"
+        },
+        {
+          "id": "sample-delivery-block-7",
+          "contentVersion": 1,
+          "type": "question",
+          "heading": "確認問題",
+          "questionId": "sample-question-2"
+        },
+        {
+          "id": "sample-delivery-block-8",
+          "contentVersion": 1,
+          "type": "pitfall",
+          "heading": "「両方」と「どちらか」を区別する",
+          "cardId": "sample-pitfall",
+          "ruleIds": [
+            "sample-delivery-rule"
+          ],
+          "conditionIds": [
+            "sample-delivery-condition"
+          ]
+        },
+        {
+          "id": "sample-delivery-block-9",
+          "contentVersion": 1,
+          "type": "amendment",
+          "heading": "架空ルールの変更サンプル",
+          "cardId": "sample-change-card"
+        },
+        {
+          "id": "sample-delivery-block-10",
+          "contentVersion": 1,
+          "type": "source",
+          "heading": "出典・確認範囲",
+          "sourceIds": [
+            "sample-source"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-library",
+      "contentVersion": 1,
+      "chapterId": "sample-library",
+      "themeId": "sample-library",
+      "title": "月の図書室の貸出し",
+      "questionIds": [
+        "sample-question-3"
+      ],
+      "ruleIds": [
+        "sample-library-rule"
+      ],
+      "amendmentIds": [],
+      "sourceIds": [
+        "sample-source"
+      ],
+      "prerequisiteLessonIds": [],
+      "blocks": [
+        {
+          "id": "sample-library-block-1",
+          "contentVersion": 1,
+          "type": "keyPoints",
+          "heading": "このテーマで覚えること",
+          "items": [
+            "いずれかの条件でよいことを確かめる"
+          ]
+        },
+        {
+          "id": "sample-library-block-2",
+          "contentVersion": 1,
+          "type": "explanation",
+          "heading": "要点の解説",
+          "body": "架空の図書室では、銀のカード又は金のしおりのどちらかがあれば絵本を借りられます。"
+        },
+        {
+          "id": "sample-library-block-3",
+          "contentVersion": 1,
+          "type": "conditions",
+          "heading": "条件・例外",
+          "ruleIds": [
+            "sample-library-rule"
+          ]
+        },
+        {
+          "id": "sample-library-block-4",
+          "contentVersion": 1,
+          "type": "procedure",
+          "heading": "手順で確かめる",
+          "items": [
+            "誰のルールかを確かめる",
+            "必要な条件を読む",
+            "例外があれば先に適用する"
+          ]
+        },
+        {
+          "id": "sample-library-block-5",
+          "contentVersion": 1,
+          "type": "comparison",
+          "heading": "条件の読み分け（架空）",
+          "entries": [
+            {
+              "label": "AND",
+              "body": "両方必要"
+            },
+            {
+              "label": "OR",
+              "body": "いずれかでよい"
+            }
+          ]
+        },
+        {
+          "id": "sample-library-block-6",
+          "contentVersion": 1,
+          "type": "question",
+          "heading": "確認問題",
+          "questionId": "sample-question-3"
+        },
+        {
+          "id": "sample-library-block-7",
+          "contentVersion": 1,
+          "type": "redSheet",
+          "heading": "この場で確かめる",
+          "questionId": "sample-question-3"
+        },
+        {
+          "id": "sample-library-block-8",
+          "contentVersion": 1,
+          "type": "source",
+          "heading": "出典・確認範囲",
+          "sourceIds": [
+            "sample-source"
+          ]
+        }
+      ]
+    }
+  ],
+  "dates": {
+    "lawEffectiveAt": null,
+    "verificationAsOf": null,
+    "sourceRetrievedAt": null,
+    "editorialVersion": 1,
+    "humanApprovedAt": null
+  },
+  "publicReviews": [
+    {
+      "id": "sample-delivery",
+      "contentVersion": 1,
+      "purpose": "sample:chapters",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library",
+      "contentVersion": 1,
+      "purpose": "sample:chapters",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery",
+      "contentVersion": 1,
+      "purpose": "sample:notes",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library",
+      "contentVersion": 1,
+      "purpose": "sample:notes",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-rule",
+      "contentVersion": 1,
+      "purpose": "sample:rules",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-rule",
+      "contentVersion": 1,
+      "purpose": "sample:rules",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-condition",
+      "contentVersion": 1,
+      "purpose": "sample:conditions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-condition",
+      "contentVersion": 1,
+      "purpose": "sample:conditions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-1",
+      "contentVersion": 1,
+      "purpose": "sample:questions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-1-blank-1",
+      "contentVersion": 1,
+      "purpose": "sample:blank",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-1-blank-2",
+      "contentVersion": 1,
+      "purpose": "sample:blank",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-2",
+      "contentVersion": 1,
+      "purpose": "sample:questions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-2-blank-1",
+      "contentVersion": 1,
+      "purpose": "sample:blank",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-3",
+      "contentVersion": 1,
+      "purpose": "sample:questions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-question-3-blank-1",
+      "contentVersion": 1,
+      "purpose": "sample:blank",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-pitfall",
+      "contentVersion": 1,
+      "purpose": "sample:cards",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-change-card",
+      "contentVersion": 1,
+      "purpose": "sample:cards",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-change",
+      "contentVersion": 1,
+      "purpose": "sample:amendments",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-source",
+      "contentVersion": 1,
+      "purpose": "sample:sources",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery",
+      "contentVersion": 1,
+      "purpose": "sample:lesson",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-1",
+      "contentVersion": 1,
+      "purpose": "sample:block:keyPoints",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-2",
+      "contentVersion": 1,
+      "purpose": "sample:block:explanation",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-3",
+      "contentVersion": 1,
+      "purpose": "sample:block:conditions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-4",
+      "contentVersion": 1,
+      "purpose": "sample:block:procedure",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-5",
+      "contentVersion": 1,
+      "purpose": "sample:block:comparison",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-6",
+      "contentVersion": 1,
+      "purpose": "sample:block:question",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-7",
+      "contentVersion": 1,
+      "purpose": "sample:block:question",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-8",
+      "contentVersion": 1,
+      "purpose": "sample:block:pitfall",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-9",
+      "contentVersion": 1,
+      "purpose": "sample:block:amendment",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-delivery-block-10",
+      "contentVersion": 1,
+      "purpose": "sample:block:source",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library",
+      "contentVersion": 1,
+      "purpose": "sample:lesson",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-1",
+      "contentVersion": 1,
+      "purpose": "sample:block:keyPoints",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-2",
+      "contentVersion": 1,
+      "purpose": "sample:block:explanation",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-3",
+      "contentVersion": 1,
+      "purpose": "sample:block:conditions",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-4",
+      "contentVersion": 1,
+      "purpose": "sample:block:procedure",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-5",
+      "contentVersion": 1,
+      "purpose": "sample:block:comparison",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-6",
+      "contentVersion": 1,
+      "purpose": "sample:block:question",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-7",
+      "contentVersion": 1,
+      "purpose": "sample:block:redSheet",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    },
+    {
+      "id": "sample-library-block-8",
+      "contentVersion": 1,
+      "purpose": "sample:block:source",
+      "rights": "original_author",
+      "humanApproval": "not_applicable_sample",
+      "approvedAt": null,
+      "releaseApproved": false
+    }
+  ],
+  "temporalRecords": [
+    {
+      "entityId": "sample-delivery",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-rule",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-rule",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-condition",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-condition",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-1",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-1-blank-1",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-1-blank-2",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-2",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-2-blank-1",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-3",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-question-3-blank-1",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-pitfall",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-change-card",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-change",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-source",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-1",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-2",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-3",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-4",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-5",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-6",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-7",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-8",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-9",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-delivery-block-10",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-1",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-2",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-3",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-4",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-5",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-6",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-7",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    },
+    {
+      "entityId": "sample-library-block-8",
+      "contentVersion": 1,
+      "historicalExamDate": null,
+      "lawEffectiveAt": null,
+      "verificationAsOf": null,
+      "sourceRetrievedAt": null,
+      "editorialReviewedAt": null,
+      "publishedAt": null
+    }
+  ]
+}

@@ -13,12 +13,15 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "test": "vitest run --config vitest.config.ts",
     "generate:exam-sets": "node scripts/generateExamSets.mjs",
-    "split:exam-sets": "node scripts/splitExamSets.mjs"
+    "split:exam-sets": "node scripts/splitExamSets.mjs",
+    "generate:houki-lessons": "node scripts/generateHoukiLessons.mjs",
+    "prebuild": "node scripts/generateHoukiLessons.mjs --check"
   },
   "dependencies": {
     "next": "16.2.6",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "ajv": "6.15.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",

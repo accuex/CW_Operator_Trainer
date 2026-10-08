@@ -35,7 +35,7 @@ export function validateTrainer(data:TrainerMaster):TrainerMaster {
  const serialized=JSON.stringify(data);if(/"(?:sha256|pointer|exactRange|sourceHash|evidenceHash)"|private:|docs\/1sou_houki|\/Users\//.test(serialized))throw Error('内部証拠は配信できません');
  return data;
 }
-export async function loadTrainerMaster():Promise<TrainerMaster>{const r=await fetch('/houki/trainer/original-samples-v1.json');if(!r.ok)throw Error('サンプル教材を読み込めません');return validateTrainer(await r.json());}
+export async function loadTrainerMaster():Promise<TrainerMaster>{const {loadLessonRelease}=await import('./lesson-loader');return (await loadLessonRelease()).master;}
 export function questionOrder(items:RedQuestion[],year:string,chapter:string,random:boolean,seed:number):RedQuestion[]{
  const result=items.filter(q=>(year==='all'||(q.historicalRef?.examDate.slice(0,4)??q.sampleYear)===year)&&(chapter==='all'||q.chapterId===chapter));
  let x=seed>>>0;const next=()=>{x=(Math.imul(1664525,x)+1013904223)>>>0;return x/4294967296;};

@@ -1,0 +1,23 @@
+{
+  "fullSuite": {
+    "status": "PASS",
+    "files": 60,
+    "tests": 725
+  },
+  "finalRelated": {
+    "status": "PASS",
+    "tests": 20
+  },
+  "productionTypes": "PASS",
+  "rootTypes": {
+    "status": "PRE_EXISTING_FAIL",
+    "location": "docs/1sou_houki/StageK4-B/preview/main.tsx:4",
+    "error": "TS2345 unknown to StagingDTO",
+    "unchangedHash": true
+  },
+  "desktop": "NOT_RUN",
+  "mobile375": "NOT_RUN",
+  "keyboard": "NOT_RUN",
+  "VoiceOver": "NOT_RUN",
+  "HTTPDev": "NOT_RUN: connection failed; vinext reports existing PID 86185; no process killed"
+}
