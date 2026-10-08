@@ -1,0 +1,56 @@
+{
+  "schemaAndReferenceCheck": "PASS",
+  "retainedSixThemeRecords": "PASS: all existing master records, lessons, clocks deeply equal",
+  "practiceAnswerAndClauseReview": "PASS: editorial review against cached official sources; not independent human audit",
+  "primaryEvidenceHashAndPointerCheck": "PASS",
+  "relatedTests": {
+    "files": 6,
+    "tests": 43,
+    "result": "PASS"
+  },
+  "productionTypes": "PASS: repo source excluding protected docs prototypes",
+  "productionBuild": "PASS",
+  "rootTypes": "NOT_RUN this Stage; pre-existing StageK4-B prototype TS2345 remains unchanged",
+  "productionExclusion": {
+    "result": "PASS",
+    "scannedFiles": 1213,
+    "privateMatches": 0,
+    "pendingReleaseRejected": true
+  },
+  "browser": {
+    "existingThemes": "6/6 light DOM reading; screenshot spot check; not exhaustive interaction audit",
+    "desktop": "PASS: new DSC lesson 1280x900, comparison and questions",
+    "mobile": "PASS: DSC book/sheet at 375x812, scrollWidth=375",
+    "newRepresentativeThemes": [
+      "k4h-ordinary-dsc",
+      "k4h-restricted-frequencies"
+    ],
+    "revealHide": "PASS: Enter/Space individual and all shown/hidden",
+    "fieldFilter": "PASS: operation 18 questions",
+    "randomAndReload": "PASS: 8291kHz question and chosen field retained",
+    "returnSheetState": "PASS: 2/2 answers and explanation restored",
+    "sourceDisplay": "PASS: e-Gov URL, article, enforcement date, revision, as-of",
+    "headingNavigation": "PASS: destination top at 96px below fixed header",
+    "VoiceOver": "NOT_RUN",
+    "allThemeBrowserAudit": "NOT_RUN (not requested)"
+  },
+  "protectedIntegrity": {
+    "result": "PASS",
+    "builtFilesScanned": 1213,
+    "privateMaterialMatches": [],
+    "protectedFiles": 1454,
+    "changedProtectedFiles": [],
+    "pendingReleaseRejected": true,
+    "newPublicAssets": 0,
+    "historical": [
+      615,
+      486,
+      2161
+    ],
+    "priority1": {
+      "verified": 41,
+      "unresolved": 22
+    },
+    "humanPublicApproval": 0
+  }
+}

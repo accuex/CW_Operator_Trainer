@@ -1,0 +1,73 @@
+{
+  "stage": "K4-H",
+  "stageResult": "PASS: 制作・dev統合・実施QA",
+  "publicApproval": "pending; zero public release",
+  "editionId": "k4h-internal-batch2",
+  "contentVersion": 2,
+  "verificationAsOf": "2026-10-07",
+  "addedThemes": [
+    {
+      "id": "k4h-unlicensed-supervision",
+      "title": "免許不要局の監督：継続的かつ重大な障害",
+      "questions": 3
+    },
+    {
+      "id": "k4h-ordinary-dsc",
+      "title": "通常DSCの呼出し：45秒・5分・15分",
+      "questions": 3
+    },
+    {
+      "id": "k4h-restricted-frequencies",
+      "title": "呼出周波数の使用制限：1分未満と例外",
+      "questions": 3
+    },
+    {
+      "id": "k4h-ship-closing",
+      "title": "船舶局の閉局：二つの終了条件と例外",
+      "questions": 3
+    },
+    {
+      "id": "k4h-before-calling",
+      "title": "呼出し前の確認：聴守してから発射する",
+      "questions": 3
+    },
+    {
+      "id": "k4h-coast-hours",
+      "title": "海岸局の常時運用：三類型だけでは足りない",
+      "questions": 3
+    },
+    {
+      "id": "k4h-emergency-command",
+      "title": "非常時の通信：命令・実費・事前の体制整備",
+      "questions": 3
+    },
+    {
+      "id": "k4h-license-succession",
+      "title": "免許承継：相続・運行者変更と届出",
+      "questions": 3
+    },
+    {
+      "id": "k4h-emission-stop",
+      "title": "電波の質が不適合：停止→試験→直ちに解除",
+      "questions": 3
+    },
+    {
+      "id": "k4h-interference",
+      "title": "混信・妨害の防止：保護対象と四通信の例外",
+      "questions": 3
+    }
+  ],
+  "counts": {
+    "existingThemes": 6,
+    "addedThemes": 10,
+    "addedQuestions": 30,
+    "addedBlanks": 59,
+    "totalThemes": 16,
+    "totalQuestions": 49,
+    "totalBlanks": 97
+  },
+  "protectedFilesUnchanged": 1454,
+  "publicAssetsAdded": 0,
+  "push": false,
+  "privateAuthoringSha256": "7bb15177a76f33e442cdceab03179e7dc8a1a056daf5d08e4fd71df20c86d61f"
+}

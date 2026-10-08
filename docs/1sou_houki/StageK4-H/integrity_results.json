@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "builtFilesScanned": 1213,
+  "privateMaterialMatches": [],
+  "protectedFiles": 1454,
+  "changedProtectedFiles": [],
+  "pendingReleaseRejected": true,
+  "newPublicAssets": 0,
+  "historical": [
+    615,
+    486,
+    2161
+  ],
+  "priority1": {
+    "verified": 41,
+    "unresolved": 22
+  },
+  "humanPublicApproval": 0
+}

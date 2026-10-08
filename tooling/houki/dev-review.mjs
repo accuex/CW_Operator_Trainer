@@ -1,7 +1,8 @@
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto';
 import {resolve} from 'node:path';
-const base='docs/1sou_houki/StageK4-G/private';
+const base='docs/1sou_houki/StageK4-G/private'; // Existing reviewer credentials remain unchanged.
+const contentBase='docs/1sou_houki/StageK4-H/private';
 export async function initializeReviewAccounts(root){
  const path=resolve(root,base,'review-accounts.json');
  try{return JSON.parse(await readFile(path,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
@@ -51,7 +52,7 @@ export function houkiReviewPlugin(){return {name:'cwot-houki-dev-review',apply:'
  const root=server.config.root;const accounts=await initializeReviewAccounts(root);
  const middleware=createReviewMiddleware({accounts,production:process.env.NODE_ENV==='production',loadData:async()=>{
   const {validateReviewPreview}=await import('../../lib/houki/trainer/release-validator.mjs');
-  const raw=JSON.parse(await readFile(resolve(root,base,'batch1.authoring.json'),'utf8'));
+  const raw=JSON.parse(await readFile(resolve(root,contentBase,'batch1.authoring.json'),'utf8'));
   if(raw.releaseApproved!==false||raw.humanPublicApproval!=='pending'||raw.environment!=='local_review_only')throw Error();
   return validateReviewPreview(raw.displayData);
  }});server.middlewares.use(middleware);
