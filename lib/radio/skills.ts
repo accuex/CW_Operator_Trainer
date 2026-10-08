@@ -1,5 +1,5 @@
 import type { AlphabetType, CallSkillBuckets, CallsignSkill, CopySituation, QsoEnvCondition, QsoModeProgress, QsoProfile, SkillEstimate } from '../types';
-import { DEFAULT_DIFFICULTY, normalizeDifficulty, type CallTally, type DifficultyVector } from './difficulty';
+import { DEFAULT_DIFFICULTY, normalizeDifficulty, type BandPresetId, type CallTally, type DifficultyVector } from './difficulty';
 import type { QsoEvidence } from './difficulty';
 
 /**
@@ -87,7 +87,7 @@ export function updateSkills(
 /* ── Recommended stage (display only, never stored, never locks) ─────────── */
 
 export type StageId = 'S0' | 'S1' | 'S2' | 'S3' | 'S4';
-export interface StageAdvice { stage: StageId; title: string; reason: string; modeId: string; preset?: Partial<DifficultyVector> }
+export interface StageAdvice { stage: StageId; title: string; reason: string; modeId: string; band?: BandPresetId }
 
 export const STAGES: Record<StageId, string> = {
   S0: 'はじめての QSO',
@@ -104,14 +104,14 @@ export function recommendStage(profile: QsoProfile | undefined): StageAdvice {
   const ragchew = qso.modes.ragchew;
   const copy = qso.skills.copy.international;
   if (!ragchew || ragchew.qsos < 3 || !copy || copy.n < 2) {
-    return { stage: 'S0', modeId: 'ragchew', title: STAGES.S0, reason: 'まずは混信少なめの 1 対 1 で、呼ぶ → 書き取る → 73 の流れに慣れましょう', preset: { crowd: 1, qsb: 0.1, qrn: 0.1, noise: 0.2, weak: 0 } };
+    return { stage: 'S0', modeId: 'ragchew', title: STAGES.S0, reason: 'まずは混信少なめの 1 対 1 で、呼ぶ → 書き取る → 73 の流れに慣れましょう', band: 'quiet' };
   }
   const robust = (['qrm', 'qsb', 'qrn', 'weak'] as const).filter((condition) => solid(qso.skills.robustness[condition], 0.85, 2)).length;
   if (!solid(copy, 0.9) || (copy.wpm ?? 0) < 15) {
-    return { stage: 'S1', modeId: 'ragchew', title: STAGES.S1, reason: `通常環境での受信 ${Math.round(copy.value * 100)}%（${copy.wpm} WPM）。15 WPM・90% が次の目安です` };
+    return { stage: 'S1', modeId: 'ragchew', title: STAGES.S1, reason: `通常環境での受信 ${Math.round(copy.value * 100)}%（${copy.wpm} WPM）。15 WPM・90% が次の目安です`, band: 'standard' };
   }
   if (robust < 3) {
-    return { stage: 'S2', modeId: 'ragchew', title: STAGES.S2, reason: `QRM・QSB・QRN・弱信号のうち ${robust} 種類で安定。混信やフェージングの中でも取れるようにしましょう` };
+    return { stage: 'S2', modeId: 'ragchew', title: STAGES.S2, reason: `QRM・QSB・QRN・弱信号のうち ${robust} 種類で安定。混信やフェージングの中でも取れるようにしましょう`, band: 'rough' };
   }
   return { stage: 'S3', modeId: 'ragchew', title: STAGES.S3, reason: '実戦環境でも安定しています。コンテストモードの準備ができたら挑戦しましょう（準備中）' };
 }

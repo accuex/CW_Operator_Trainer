@@ -36,6 +36,30 @@ export const DEFAULT_DIFFICULTY: DifficultyVector = {
   speed: 14, crowd: 3, qsb: 0.25, qrn: 0.2, noise: 0.3, weak: 0.15, drift: 0, pile: 3, stack: 100, even: 6, manners: 0.25, timing: 0.25, similar: 0.12, density: 4, serial: 0.5,
 };
 
+/** Band conditions to start from. Speed is not part of them; おまかせ moves on from here. */
+export const BAND_PRESETS = [
+  { id: 'quiet', label: '静か', axes: { crowd: 1, qsb: 0.1, qrn: 0.1, noise: 0.2, weak: 0, drift: 0 } },
+  { id: 'standard', label: '標準', axes: { crowd: 3, qsb: 0.25, qrn: 0.2, noise: 0.3, weak: 0.15, drift: 0 } },
+  { id: 'rough', label: '荒れ', axes: { crowd: 6, qsb: 0.5, qrn: 0.45, noise: 0.45, weak: 0.35, drift: 0.3 } },
+  { id: 'brutal', label: '極悪', axes: { crowd: 10, qsb: 0.75, qrn: 0.7, noise: 0.6, weak: 0.6, drift: 0.6 } },
+] as const satisfies readonly { id: string; label: string; axes: Partial<DifficultyVector> }[];
+export type BandPresetId = (typeof BAND_PRESETS)[number]['id'];
+
+/** The preset's values on the axes a mode has. */
+export function bandPresetAxes(id: BandPresetId, axes: readonly Axis[]): Partial<DifficultyVector> {
+  const preset = BAND_PRESETS.find((item) => item.id === id)!.axes as Partial<DifficultyVector>;
+  return Object.fromEntries(axes.flatMap((axis) => (preset[axis] === undefined ? [] : [[axis, preset[axis]]])));
+}
+
+/** The preset the vector sits on over a mode's axes, or null (custom). */
+export function matchBandPreset(difficulty: DifficultyVector, axes: readonly Axis[]): BandPresetId | null {
+  for (const preset of BAND_PRESETS) {
+    const values = Object.entries(bandPresetAxes(preset.id, axes)) as [Axis, number][];
+    if (values.length && values.every(([axis, value]) => Math.abs(difficulty[axis] - value) < 1e-6)) return preset.id;
+  }
+  return null;
+}
+
 export const clampAxis = (axis: Axis, value: number) => {
   const { min, max, step } = AXIS_SPECS[axis];
   return Math.min(max, Math.max(min, Math.round(value / step) * step));

@@ -504,7 +504,7 @@ export function WabunDesk({ rig, myCall, auto = false, adapt, onAuto, onSave }: 
         <p className="qso-note">{LEVEL_NOTE[level]}（レベルを変えると別の局になります）</p>
         <label className="wabun-auto">
           <input type="checkbox" checked={auto} onChange={(event) => onAuto?.(event.target.checked)} disabled={txOn} />
-          おまかせ（相手の速さ・話の量・電波・周波数のずれを、結果に合わせて少しずつ調整）
+          結果で自動調整（相手の速さ・話の量・電波・周波数のずれを、結果に合わせて少しずつ調整）
         </label>
         {auto && axes && !preset && (
           <p className="qso-note wabun-axes">
@@ -814,7 +814,7 @@ function WabunReviewPanel({ result, traces }: { result: Result; traces: WabunTxT
       </p>
       {result.adjusted && (
         <p className="qso-note wabun-adjusted">
-          おまかせ: {Object.keys(result.adjusted).length
+          自動調整: {Object.keys(result.adjusted).length
             ? (Object.entries(result.adjusted) as [WabunAxis, [number, number]][]).map(([axis, move]) => describeWabunMove(axis, move)).join('・')
             : '今回は変更なし（同じ傾向が 2 回続くと少しずつ調整します。手順の結果では変えません）'}
         </p>

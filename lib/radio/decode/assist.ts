@@ -109,7 +109,7 @@ export function wabunWithoutCopy(evidence: WabunEvidence): WabunEvidence {
 export function decodeNote(assist: QsoAssist | undefined | null) {
   if (!assist) return null;
   if (assist.decode === 'on') return `DECODE: オン（${assist.decodeSeconds} 秒・表示なし）。受信の評価はいつも通りです。`;
-  return `DECODE: オン（${assist.decodeSeconds} 秒・${assist.decodeShown} 字表示）。画面の補助があったので、この回の受信はスキル・苦手分析・おまかせの速さには入れていません。`;
+  return `DECODE: オン（${assist.decodeSeconds} 秒・${assist.decodeShown} 字表示）。画面の補助があったので、この回の受信はスキル・苦手分析・自動調整の速さには入れていません。`;
 }
 
 /** One over of a station: what it keyed, what DECODE printed, how sure and why not. */

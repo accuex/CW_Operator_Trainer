@@ -227,6 +227,7 @@ export function ContestDesk({ rig, myCall, myName, myQth, axesFor, stored, auto,
       liveRef.current = null;
       engine.setStations([]);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one run per mount; 新しいラン replaces it
   }, [engineRef, tapRef]);
 
   /** Key the action on the air; the run hears it the moment its span is fixed. */
@@ -575,7 +576,7 @@ export function ContestDesk({ rig, myCall, myName, myQth, axesFor, stored, auto,
           </label>
         </div>
         <div className="run-control-row pileup-auto">
-          <label className="qso-auto"><input type="checkbox" checked={auto} onChange={(event) => onAuto(event.target.checked)} />おまかせ調整</label>
+          <label className="qso-auto"><input type="checkbox" checked={auto} onChange={(event) => onAuto(event.target.checked)} />結果で自動調整</label>
           {moves.length > 0 && (
             <>
               <small>{level.label}から：{moves.join('・')}</small>

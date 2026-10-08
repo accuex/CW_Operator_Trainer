@@ -4,7 +4,7 @@ import { forWeakAnalysis, qsoConditionBreakdown } from '../analytics';
 import { makeStation, type Transmission } from './band';
 import { align, collectEvidence, fieldAnswers, scoreFields } from './attribution';
 import { CopyMonitor, judgeSamples, sampleBand, type BandSample, type RxRecord } from './conditions';
-import { DEFAULT_DIFFICULTY, adjustDifficulty, voteAxes, type QsoEvidence } from './difficulty';
+import { BAND_AXES, BAND_PRESETS, DEFAULT_DIFFICULTY, adjustDifficulty, bandPresetAxes, matchBandPreset, voteAxes, type QsoEvidence } from './difficulty';
 import { BASIC_RST_NAME_QTH } from './exchange';
 import { keyText } from './keying';
 import { qsoMode } from './modes';
@@ -222,6 +222,28 @@ describe('skills and recommended stage', () => {
     const rough: QsoEvidence = { ...good, env: { qrm: { total: 8, correct: 8 }, qsb: { total: 8, correct: 8 }, qrn: { total: 8, correct: 8 } } };
     for (let i = 0; i < 3; i += 1) profile = updateSkills(profile, { modeId: 'ragchew', alphabet: 'international', wpm: 18, evidence: rough });
     expect(recommendStage(profile).stage).toBe('S3');
+  });
+
+  it('points each early stage at a band preset', () => {
+    expect(recommendStage(undefined).band).toBe('quiet');
+  });
+});
+
+describe('band presets', () => {
+  it('set only the band axes a mode has, never speed', () => {
+    const run = ['speed', 'crowd', 'qsb', 'qrn', 'noise', 'weak'] as const;
+    for (const preset of BAND_PRESETS) {
+      const values = bandPresetAxes(preset.id, run);
+      expect(values).not.toHaveProperty('speed');
+      expect(values).not.toHaveProperty('drift');
+    }
+  });
+
+  it('names the preset the band sits on, or none once an axis is moved', () => {
+    expect(matchBandPreset(DEFAULT_DIFFICULTY, BAND_AXES)).toBe('standard');
+    const rough = { ...DEFAULT_DIFFICULTY, ...bandPresetAxes('rough', BAND_AXES), speed: 30 };
+    expect(matchBandPreset(rough, BAND_AXES)).toBe('rough');
+    expect(matchBandPreset({ ...rough, qsb: 0.55 }, BAND_AXES)).toBeNull();
   });
 });
 

@@ -259,7 +259,7 @@ export function ContestReview({ review, level, stored, saved, analysis, auto, on
       {!stored && (
         <p className="qso-note">
           {saved ? 'この結果を保存しました。詳しい記録はこの端末に、クラウドには件数・得点・原因の件数の要約だけを残します。' : '交信もログもなかったので、記録・調整はしていません。'}
-          {saved && (!auto ? ' おまかせ調整はオフです。' : moves.length ? ` 次のコンテストから: ${moves.join('、')}` : ' 難易度はそのまま（もう少し様子を見ます）。')}
+          {saved && (!auto ? ' 結果で自動調整はオフです。' : moves.length ? ` 次のコンテストから: ${moves.join('、')}` : ' 難易度はそのまま（もう少し様子を見ます）。')}
         </p>
       )}
       {stored && moves.length > 0 && <p className="qso-note">このあとの調整: {moves.join('、')}</p>}
@@ -305,7 +305,7 @@ function Causes({ analysis }: { analysis: ContestAnalysis }) {
         </details>
       )}
       <p className="qso-note">
-        おまかせ調整と苦手文字の分析には「受信」「弱い信号」「QRM・QSB・QRN」「重なり」だけを使います。似たコール・割り込み・ダブり・手順・記入・DUPE・交換後の破棄は、聞き取りの力とは別に数えます。
+        結果で自動調整と苦手文字の分析には「受信」「弱い信号」「QRM・QSB・QRN」「重なり」だけを使います。似たコール・割り込み・ダブり・手順・記入・DUPE・交換後の破棄は、聞き取りの力とは別に数えます。
         カット数字（T=0、N=9 など）は番号として比べ、文字の取り違えには数えません。
       </p>
     </section>

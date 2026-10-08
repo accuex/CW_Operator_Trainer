@@ -5,7 +5,7 @@ import type { AnswerLog, AudioSettings, QsoCause, QsoProfile, SessionRecord, Ski
 import { makeQrm } from '@/lib/radio/band';
 import { markCut } from '@/lib/radio/conditions';
 import { collectEvidence, fieldAnswers, scoreFields, type FieldResult } from '@/lib/radio/attribution';
-import { AXES, AXIS_SPECS, adjustDifficulty, describeMove, normalizeDifficulty, type Axis, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
+import { AXES, AXIS_SPECS, BAND_PRESETS, adjustDifficulty, bandPresetAxes, describeMove, matchBandPreset, normalizeDifficulty, type Axis, type BandPresetId, type DifficultyVector, type QsoEvidence } from '@/lib/radio/difficulty';
 import { PILEUP_ADAPT_AXES, updatePileupSkills } from '@/lib/radio/pileup/learning';
 import { CONTEST_ADAPT_AXES, contestOutcome, updateContestSkills, voteContestAxes } from '@/lib/radio/contest/learning';
 import { contestAxesOf, contestLevel, isContestLevel, type ContestLevelId } from '@/lib/radio/contest/levels';
@@ -300,11 +300,13 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     if (axis === 'crowd') setCrowd(value);
   };
 
-  const applyAdvice = () => {
-    if (!advice.preset) return;
-    updateMode({ difficulty: { ...difficulty, ...advice.preset } });
-    if (advice.preset.crowd !== undefined) setCrowd(advice.preset.crowd);
+  /** A fresh start: votes from the old band would move an axis after the first QSO. */
+  const applyBand = (id: BandPresetId) => {
+    const values = bandPresetAxes(id, mode.axes);
+    updateMode({ difficulty: { ...difficulty, ...values }, votes: {} });
+    if (values.crowd !== undefined) setCrowd(values.crowd);
   };
+  const bandPreset = matchBandPreset(difficulty, mode.axes);
 
   const togglePin = (axis: Axis) => {
     const pinned = progress.pinned.includes(axis) ? progress.pinned.filter((item) => item !== axis) : [...progress.pinned, axis];
@@ -504,8 +506,10 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
     {mode.kind === 'single' && (
       <div className="qso-advice">
         <span className="chip gold">おすすめ {advice.stage}</span>
-        <p><b>{advice.title}</b> — {advice.reason}</p>
-        {advice.preset && <button type="button" className="btn btn-ghost btn-sm" onClick={applyAdvice}>この条件にする</button>}
+        <p>
+          <b>{advice.title}</b> — {advice.reason}
+          {advice.band && `（電波状況は「${BAND_PRESETS.find((item) => item.id === advice.band)?.label}」がおすすめ）`}
+        </p>
       </div>
     )}
 
@@ -644,17 +648,17 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         {mode.kind === 'wabun' ? (
           <>
             <div className="qso-panel-head"><h2>設定</h2></div>
-            <p className="qso-note">和文 QSO はデスクのレベル（Lv1 打ち逃げ・Lv2 ラバースタンプ・Lv3 天気・設備・Lv4 近況ひとこと・Lv5 実用ラグチュー）と「速さ」で選びます（次の局から反映。QRS で相手を遅くできます）。おまかせはデスクで切り替えます（オンのとき相手の速さ・話の量・電波・周波数のずれ・Lv5 の手打ちのクセを結果に合わせて少しずつ調整。手順の結果では変えません）。オフのときのバンドは弱い QSB・QRN と少しの欧文の混信がある程度に固定です。交信の詳しい記録はこの端末だけに保存します（最大 50 件）。</p>
+            <p className="qso-note">和文 QSO はデスクのレベル（Lv1 打ち逃げ・Lv2 ラバースタンプ・Lv3 天気・設備・Lv4 近況ひとこと・Lv5 実用ラグチュー）と「速さ」で選びます（次の局から反映。QRS で相手を遅くできます）。結果で自動調整はデスクで切り替えます（オンのとき相手の速さ・話の量・電波・周波数のずれ・Lv5 の手打ちのクセを結果に合わせて少しずつ調整。手順の結果では変えません）。オフのときのバンドは弱い QSB・QRN と少しの欧文の混信がある程度に固定です。交信の詳しい記録はこの端末だけに保存します（最大 50 件）。</p>
           </>
         ) : mode.kind === 'pileup' ? (
           <>
             <div className="qso-panel-head"><h2>設定</h2></div>
-            <p className="qso-note">パイルアップの難しさは、デスクのレベル（入門〜DX級）で選びます。おまかせ調整は、ミスの原因に関係する軸（速さ・呼ぶ局数・似たコール・弱信号・集中度）だけを動かします。</p>
+            <p className="qso-note">パイルアップの難しさは、デスクのレベル（入門〜DX級）で選びます。結果で自動調整は、ミスの原因に関係する軸（速さ・呼ぶ局数・似たコール・弱信号・集中度）だけを動かします。</p>
           </>
         ) : mode.kind === 'contest' ? (
           <>
             <div className="qso-panel-head"><h2>設定</h2></div>
-            <p className="qso-note">コンテストの難しさは、デスクのレベル（入門〜エキスパート）で選びます。おまかせ調整は、ミスの原因に関係する軸（速さ・呼ぶ局の多さ・似たコール・弱信号・番号の難しさ）だけを動かします。各レベルの値は暫定です。</p>
+            <p className="qso-note">コンテストの難しさは、デスクのレベル（入門〜エキスパート）で選びます。結果で自動調整は、ミスの原因に関係する軸（速さ・呼ぶ局の多さ・似たコール・弱信号・番号の難しさ）だけを動かします。各レベルの値は暫定です。</p>
           </>
         ) : mode.kind === 'demo' ? (
           <>
@@ -664,13 +668,29 @@ export function QsoView({ settings, stopEpoch, profile, setProfile, sessions, re
         ) : <>
         <div className="qso-panel-head">
           <h2>難易度</h2>
-          <label className="qso-auto">
-            <input type="checkbox" checked={progress.auto} onChange={(event) => updateMode({ auto: event.target.checked })} />
-            おまかせ調整
-          </label>
         </div>
+        <div className="qso-band-presets" role="group" aria-label="電波状況">
+          <span>電波状況</span>
+          {BAND_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              className={`btn btn-sm ${bandPreset === preset.id ? 'btn-primary' : 'btn-ghost'}`}
+              aria-pressed={bandPreset === preset.id}
+              onClick={() => applyBand(preset.id)}
+            >
+              {preset.label}{mode.kind === 'single' && advice.band === preset.id ? '（おすすめ）' : ''}
+            </button>
+          ))}
+          {!bandPreset && <small>カスタム</small>}
+        </div>
+        <p className="qso-note">押すと速さ以外の電波状況をまとめてその値にします（<Icon name="lock" size={12} /> で固定した軸も変わります）。</p>
+        <label className="qso-auto">
+          <input type="checkbox" checked={progress.auto} onChange={(event) => updateMode({ auto: event.target.checked })} />
+          結果で自動調整
+        </label>
         <p className="qso-note">
-          おまかせ調整は交信の成否ではなく、ミスの原因ごとに軸を動かします（受信ミス→速さ、混信下のミス→混信局 など）。
+          交信が終わるたびに、落とした文字の原因に合わせて少しずつ動かします（きれいな条件で落とした→速さ、混信の中で落とした→混信局 など）。チェックしただけでは何も変わりません。
           <Icon name="lock" size={12} /> で固定した軸は動かしません。
         </p>
         <div className="qso-axes">
@@ -816,7 +836,7 @@ function QsoReview({ review }: { review: Review }) {
         ))}
       </div>
       <p className="qso-note">
-        {!auto ? 'おまかせ調整はオフです。'
+        {!auto ? '結果で自動調整はオフです。'
           : moves.length ? `次の局から: ${moves.join('、')}`
             : '難易度はそのまま（もう少し様子を見ます）。'}
         {' '}悪条件で落とした文字は苦手分析に入りません（分析画面のスイッチで表示できます）。

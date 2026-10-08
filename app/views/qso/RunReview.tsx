@@ -207,7 +207,7 @@ export function RunReview<R extends RunBooks>({ review, flavor, preset, onRestar
 
       <p className="qso-note">
         {stored ? '' : !saved ? '交信もログもなかったので、記録・調整はしていません。'
-          : !saved.auto ? 'おまかせ調整はオフです。'
+          : !saved.auto ? '結果で自動調整はオフです。'
             : moves.length ? `次のランから: ${moves.join('、')}`
               : '難易度はそのまま（もう少し様子を見ます）。'}
         {' '}悪条件やダブりで落とした文字は苦手分析に入りません（分析画面のスイッチで表示できます）。

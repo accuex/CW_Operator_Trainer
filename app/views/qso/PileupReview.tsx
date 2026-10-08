@@ -156,7 +156,7 @@ export function PileupReview({ review, auto, onRestart, onClose }: { review: Pil
 
       <p className="qso-note">
         {stored ? '' : !saved ? '交信もログもなかったので、記録・調整はしていません。'
-          : !auto ? 'おまかせ調整はオフです。'
+          : !auto ? '結果で自動調整はオフです。'
             : moves.length ? `次のランから: ${moves.join('、')}`
               : '難易度はそのまま（もう少し様子を見ます）。'}
         {' '}似たコール・割り込み・ダブり・記入ミスで落とした文字は、受信の苦手分析に入りません。

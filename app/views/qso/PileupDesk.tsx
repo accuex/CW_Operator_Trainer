@@ -538,7 +538,7 @@ export function PileupDesk({ rig, myCall, myName, myQth, axesFor, stored, auto, 
         </div>
         {startedAt !== null && <p className="qso-note">ラン中はレベルを変えられません。QRT して振り返りのあとに変えられます。</p>}
         <div className="run-control-row pileup-auto">
-          <label className="qso-auto"><input type="checkbox" checked={auto} onChange={(event) => onAuto(event.target.checked)} />おまかせ調整</label>
+          <label className="qso-auto"><input type="checkbox" checked={auto} onChange={(event) => onAuto(event.target.checked)} />結果で自動調整</label>
           {moves.length > 0 && (
             <>
               <small>{level.label}から：{moves.join('・')}</small>
@@ -656,7 +656,7 @@ export function PileupDesk({ rig, myCall, myName, myQth, axesFor, stored, auto, 
           聞こえた文字を CALL 欄に入れて <kbd>Enter</kbd>。断片なら <b>3AB AGN?</b>、フルコールなら <b>JA3ABC 5NN</b>、相手のレポートを入れて <kbd>Enter</kbd> で <b>TU</b> と記入。
           文字を足しながら何度でも絞れます。<kbd>Space</kbd> CALL⇄RST　<kbd>Esc</kbd> 予約取消・入力を消す　<kbd>Ctrl</kbd>+<kbd>Enter</kbd> 入力どおりに送る（F6 は {'{PIECE}'} AGN?）
           <kbd>F1</kbd>–<kbd>F10</kbd>（または <kbd>Ctrl</kbd>+<kbd>1</kbd>–<kbd>0</kbd>）メモリー　<kbd>PgUp</kbd>/<kbd>PgDn</kbd> 自局の速さ ±2。
-          QRT で記録を保存し、おまかせ調整がオンなら原因に合う軸だけを少しずつ動かします（呼び出しの選局を代わりにすることはありません）。
+          QRT で記録を保存し、結果で自動調整がオンなら原因に合う軸だけを少しずつ動かします（呼び出しの選局を代わりにすることはありません）。
         </p>
       </div>
 
