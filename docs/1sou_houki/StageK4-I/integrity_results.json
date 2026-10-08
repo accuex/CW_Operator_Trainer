@@ -1,0 +1,19 @@
+{
+  "historical615_486_2161": "PASS immutable",
+  "priority1_41_22": "PASS immutable",
+  "K3_A_N_and_K3K": "PASS immutable",
+  "K3O_K4A_H": "PASS immutable",
+  "HFinal28": "PASS immutable",
+  "package1_1_1": "PASS",
+  "publicDTO": "PASS unchanged",
+  "publicAssetsAdded": 0,
+  "privatePublished": 0,
+  "productionCodeChanges": [
+    "tooling/houki/dev-review.mjs contentBase only, serve-only plugin"
+  ],
+  "otherCW_geography_englishChanges": 0,
+  "protectedFiles": 1479,
+  "changedProtectedFiles": [],
+  "sourceAudit": "PASS saved official source hashes/revisions/pointers, 12themes and3tables",
+  "publicApproval": 0
+}

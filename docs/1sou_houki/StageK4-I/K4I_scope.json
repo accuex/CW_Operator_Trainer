@@ -1,0 +1,144 @@
+{
+  "stage": "K4-I",
+  "asOf": "2026-10-07 JST",
+  "fixedAt": "2026-10-08T09:02:43.834101+00:00",
+  "additionalThemes": 12,
+  "selected": [
+    {
+      "queue": 11,
+      "key": "coast-distress-response",
+      "title": "海岸局のDSC遭難応答：方式と待ち時間",
+      "canonicalId": "k1-8f508e9914e3a43b8d38",
+      "scope": "81_8p1、MF/HF1分〜2分45秒・別図1_2/3",
+      "verificationRecord": "StageK3-D/private/current_law_verification_batch1.json",
+      "dependencies": "81_8p1、MF/HF1分〜2分45秒・別図1_2/3",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 16,
+      "key": "safety-call",
+      "title": "安全呼出し・安全通報：3回と送信時点",
+      "canonicalId": "k1-3441a7e8c41cbdcf25c3",
+      "scope": "96全項、14/18/59及び別表10必要範囲",
+      "verificationRecord": "StageK3-D/private/current_law_verification_batch1.json",
+      "dependencies": "96全項、14/18/59及び別表10必要範囲",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 23,
+      "key": "distress-message-reception",
+      "title": "遭難通報を受信したとき：聴守・通知・中継",
+      "canonicalId": "k1-f19be754f504e8d93a1e",
+      "scope": "81_7全項、78p9、責任者指示・救助不能AND無応答",
+      "verificationRecord": "StageK3-D/private/current_law_verification_batch1.json",
+      "dependencies": "81_7全項、78p9、責任者指示・救助不能AND無応答",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 27,
+      "key": "power-reduction",
+      "title": "空中線電力の低下装置：50％と10％",
+      "canonicalId": "k1-feb17e5eff84c5898815",
+      "scope": "設備41p1/p5限定、p2〜4規定存在は注意のみ。未確認ITU周波数表は教材外",
+      "verificationRecord": "StageK3-G/current_law_verification_K3G.json",
+      "dependencies": "設備41p1/p5限定、p2〜4規定存在は注意のみ。未確認ITU周波数表は教材外",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 28,
+      "key": "watch-exceptions",
+      "title": "聴守義務の例外：局種と周波数指定",
+      "canonicalId": "k1-3b362342f5560d2248be",
+      "scope": "法65表・運44、船舶地球局指定対象告示の再同定なし。例外のみ",
+      "verificationRecord": "StageK3-G/current_law_verification_K3G.json",
+      "dependencies": "法65表・運44、船舶地球局指定対象告示の再同定なし。例外のみ",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 29,
+      "key": "aviation-priority",
+      "title": "航空通信の優先順位：気象とノータム",
+      "canonicalId": "k1-4fadb08ec015a5e4d202",
+      "scope": "運150全項・別表12保存済みnative table",
+      "verificationRecord": "StageK3-H/private/status_addenda_full_29_34.json",
+      "dependencies": "運150全項・別表12保存済みnative table",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 33,
+      "key": "ordinary-dsc-response",
+      "title": "通常DSCの応答：局種別の期限と周波数調整",
+      "canonicalId": "k1-2852ba926863c70e9534",
+      "scope": "58_6、58_5と比較は既存Hリンク相当。遭難手順を除外",
+      "verificationRecord": "StageK3-G/current_law_verification_K3G.json",
+      "dependencies": "58_6、58_5と比較は既存Hリンク相当。遭難手順を除外",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 34,
+      "key": "urgent-all-call",
+      "title": "各局あて緊急呼出し：パンパンと識別の回数",
+      "canonicalId": "k1-500750f966afc25b9c19",
+      "scope": "92、59/70_2関連と別表native確認は保存済み。周波数表暗記は除外",
+      "verificationRecord": "StageK3-H/private/status_addenda_full_29_34.json",
+      "dependencies": "92、59/70_2関連と別表native確認は保存済み。周波数表暗記は除外",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 39,
+      "key": "ship-dsc-reception",
+      "title": "船舶局のDSC遭難受信：短波と短波以外",
+      "canonicalId": "k1-ca76b79fac5c0f64e1df",
+      "scope": "81_5各項、81_8p4・70_2/施規36_2必要範囲、別図保存証拠",
+      "verificationRecord": "StageK3-F/P1_three_candidate_verification.json",
+      "dependencies": "81_5各項、81_8p4・70_2/施規36_2必要範囲、別図保存証拠",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_amendment_handling"
+    },
+    {
+      "queue": 46,
+      "key": "ordinary-phone-repeat",
+      "title": "海上無線電話の呼出し：2回・2分・3分",
+      "canonicalId": "k1-e48f540185209f8dca2d",
+      "scope": "21/22/18→58_11読替、航空への一般化禁止",
+      "verificationRecord": "StageK3-I/private/current_verification_detail.json",
+      "dependencies": "21/22/18→58_11読替、航空への一般化禁止",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 55,
+      "key": "distress-phone-send",
+      "title": "無線電話の遭難送信：呼出し・通報・位置",
+      "canonicalId": "k1-05d10ee9727840c6e340",
+      "scope": "75_2/76/77及び78必要参照、DSCパケットは教材外",
+      "verificationRecord": "StageK3-J/private/current_verification_detail.json",
+      "dependencies": "75_2/76/77及び78必要参照、DSCパケットは教材外",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    },
+    {
+      "queue": 60,
+      "key": "earthstation-distress",
+      "title": "海岸地球局の遭難受信：応答と救助機関通報",
+      "canonicalId": "k1-6adac800ec9a03fd6c1d",
+      "scope": "81_4p1とp2区別、75p3必要依存",
+      "verificationRecord": "StageK3-L/private/verification_full.json",
+      "dependencies": "81_4p1とp2区別、75p3必要依存",
+      "effectiveStatus": "verified",
+      "publicEligibility": "needs_context"
+    }
+  ],
+  "notSelected": "未解決22、blocked36/54、既存16と同scopeの1/35/40/52/57/62等を除外。81_8は海岸局応答、81_5は船舶受信判断で重複しない。",
+  "scopeChangeRule": "資料不足はscopeを拡大せず保留、追加テーマなし",
+  "humanApproval": "pending",
+  "publicRelease": false
+}

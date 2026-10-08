@@ -1,0 +1,42 @@
+{
+  "schemaAndReviewValidator": "PASS",
+  "pendingReleaseRejected": "PASS",
+  "fixedVerifiedSelection12": "PASS",
+  "old16ThemesAndMasterAndClocksUnchanged": "PASS",
+  "officialSourceHashesRevisionsLocators": "PASS",
+  "annexTables4_10_12": "PASS",
+  "contentAnchorReview": "PASS editorial source comparison, not independent human legal review",
+  "relatedTests": {
+    "result": "PASS",
+    "files": 6,
+    "tests": 43,
+    "command": "npx vitest run --config vitest.config.ts lib/houki"
+  },
+  "productionTypes": {
+    "result": "PASS",
+    "command": "npx tsc --noEmit -p docs/1sou_houki/StageK4-H/private/tsconfig.production.json",
+    "scope": "production; protected docs prototypes excluded"
+  },
+  "rootTypes": "NOT_RUN; previously known K4-B prototype TS2345 file unchanged",
+  "formalBuild": {
+    "result": "PASS",
+    "command": "npm run build",
+    "exitCode": 0,
+    "log": "private/build.log"
+  },
+  "productionOutput": "PASS 1213 files, private IDs/titles/edition/credential matches0",
+  "browser": {
+    "desktop": "PASS 1280x900 safety lesson text/points/comparison/questions",
+    "mobile": "PASS 375x812 aviation and DSC lesson, sheet, wrapping; scrollWidth375",
+    "keyboard": "PASS Enter individual reveal, Space allshow, Enter sheet allshow",
+    "showHide": "PASS individual/allshow/allhide",
+    "fieldRandom": "PASS aviation3questions, random seed reload sameNOTAM question",
+    "referenceReturn": "PASS same NOTAM sheet,2/2revealed, explanation open restored",
+    "reloadCaveat": "Random seed/location remained. Full page reload reset current answer reveals and explanation to hidden; no persistent reveal claim. Existing logic unchanged.",
+    "officialLink": "PASS eGov operation law URL and150 article/revision/asof labels",
+    "VoiceOver": "NOT_RUN",
+    "exhaustiveAllThemesAllOperations": "NOT_RUN",
+    "viewportTransitionObservation": "viewport reset後の一覧戻りclickが1度反映されず、同ボタンEnterで一覧へ戻った。直前までのmouse操作は成功。原因未確定、ナビゲーションソース変更なし。"
+  },
+  "productionRegression": "PASS relevant existing28/25sets tests + protected publicDTO hashes; unrelated CW audio/manual smoke NOT_RUN (no source changes)"
+}

@@ -1,0 +1,117 @@
+{
+  "stage": "K4-I",
+  "status": "PASS (制作・dev統合・実施QA。公開承認ではない)",
+  "verificationAsOf": "2026-10-07 JST",
+  "themes": [
+    {
+      "title": "海岸局のDSC遭難応答：方式と待ち時間",
+      "queue": 11,
+      "canonicalId": "k1-8f508e9914e3a43b8d38",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "安全呼出し・安全通報：3回と送信時点",
+      "queue": 16,
+      "canonicalId": "k1-3441a7e8c41cbdcf25c3",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "遭難通報を受信したとき：聴守・通知・中継",
+      "queue": 23,
+      "canonicalId": "k1-f19be754f504e8d93a1e",
+      "questions": 4,
+      "blanks": 8
+    },
+    {
+      "title": "空中線電力の低下装置：50％と10％",
+      "queue": 27,
+      "canonicalId": "k1-feb17e5eff84c5898815",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "聴守義務の例外：局種と周波数指定",
+      "queue": 28,
+      "canonicalId": "k1-3b362342f5560d2248be",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "航空通信の優先順位：気象とノータム",
+      "queue": 29,
+      "canonicalId": "k1-4fadb08ec015a5e4d202",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "通常DSCの応答：局種別の期限と周波数調整",
+      "queue": 33,
+      "canonicalId": "k1-2852ba926863c70e9534",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "各局あて緊急呼出し：パンパンと識別の回数",
+      "queue": 34,
+      "canonicalId": "k1-500750f966afc25b9c19",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "船舶局のDSC遭難受信：短波と短波以外",
+      "queue": 39,
+      "canonicalId": "k1-ca76b79fac5c0f64e1df",
+      "questions": 4,
+      "blanks": 8
+    },
+    {
+      "title": "海上無線電話の呼出し：2回・2分・3分",
+      "queue": 46,
+      "canonicalId": "k1-e48f540185209f8dca2d",
+      "questions": 3,
+      "blanks": 6
+    },
+    {
+      "title": "無線電話の遭難送信：呼出し・通報・位置",
+      "queue": 55,
+      "canonicalId": "k1-05d10ee9727840c6e340",
+      "questions": 4,
+      "blanks": 8
+    },
+    {
+      "title": "海岸地球局の遭難受信：応答と救助機関通報",
+      "queue": 60,
+      "canonicalId": "k1-6adac800ec9a03fd6c1d",
+      "questions": 3,
+      "blanks": 6
+    }
+  ],
+  "added": {
+    "themes": 12,
+    "questions": 39,
+    "blanks": 78
+  },
+  "total": {
+    "themes": 28,
+    "questions": 88,
+    "blanks": 175
+  },
+  "oldThemesUnchanged": 16,
+  "edition": "k4i-internal-batch3",
+  "contentVersion": 3,
+  "authoringSha256": "1bb7c1a0b89c98292b38a57ec63d976987f268d27c5fd19610cc8b593018594f",
+  "humanContentReview": "pending",
+  "rightsReview": "pending",
+  "releaseApproved": false,
+  "publicChanges": 0,
+  "article74Result": "第74条の2は全2項。第1項は大臣の事前措置義務、第2項は大臣の協力要請権限。免許人等の協力努力義務という保存メモは不支持。元status不変、独立追補。",
+  "changedSourceFiles": [
+    "tooling/houki/dev-review.mjs",
+    "scripts/houkiReviewTransfer.mjs",
+    "scripts/checkHoukiReviewBatch.mjs"
+  ],
+  "localCommit": "Completion commit contains integration/tools/safe reports; hash recorded in private/completion.json after commit.",
+  "backupSha256": "31cc58a5fa514d95389cead6c1e29295cc88b1baba0baf0f4de44655d2b8d07a"
+}
