@@ -1,0 +1,174 @@
+{
+  "stage": "K4-J",
+  "aggregate": {
+    "canonicalCount": 63,
+    "effectiveVerified": 41,
+    "effectiveUnresolved": 22,
+    "existingLessonCount": 28,
+    "coverageCounts": {
+      "covered": 33,
+      "unresolved": 22,
+      "partially_covered": 6,
+      "blocked": 2,
+      "not_covered": 0
+    },
+    "verifiedCounts": {
+      "covered": 33,
+      "partially_covered": 6,
+      "blocked": 2,
+      "not_covered": 0
+    },
+    "blockedVerifiedQueues": [
+      36,
+      54
+    ],
+    "publicApproved": 0,
+    "distinctSafeNewLessons": 9,
+    "newLessonCount": 9,
+    "totalLessonCount": 37,
+    "practiceCount": 124,
+    "blankCount": 247
+  },
+  "method": "Actual rule/condition/practice scope analysis; titles and full article references do not establish coverage. Historical canonical IDs remain distinct.",
+  "initialVerifiedCounts": {
+    "covered": 31,
+    "partially_covered": 8,
+    "blocked": 2,
+    "not_covered": 0
+  },
+  "finalVerifiedCounts": {
+    "covered": 33,
+    "partially_covered": 6,
+    "blocked": 2,
+    "not_covered": 0
+  },
+  "residuals": [
+    {
+      "queue": 27,
+      "scopeSummary": [
+        "今回41p2及び40_7p1の除外クラス定義を追加。41p3/p4のRR付録18表依存の詳細は未教材化/未確認。原問の固定scope外の個別機種認証・全40_7技術告示適合は行わない。"
+      ]
+    },
+    {
+      "queue": 31,
+      "scopeSummary": [
+        "81_8p2六事項を追加。p3の第2項応答不受信時DSC送信が未教材化。p4は旧39の限られた中継説明として維持。"
+      ]
+    },
+    {
+      "queue": 41,
+      "scopeSummary": [
+        "同じ現行81_8p2を共有lessonで追加するがcanonicalは別。p3の応答不受信時DSC送信が未教材化。"
+      ]
+    },
+    {
+      "queue": 38,
+      "scopeSummary": [
+        "70_2p1i1/i2/i4及び遭難限定ただし書、2p2条件付きA3E→H3Eを追加。i3船舶航空機間の実際の使用電波とp2医事送信/再送信、p3安全通報の通常通信電波分岐は未教材化。"
+      ]
+    },
+    {
+      "queue": 49,
+      "scopeSummary": [
+        "方式別70_2p1i1/i2/i4・ただし書・2p2を追加。i3の121.5MHz及びp2/p3の特則は今回対象外で未教材化。"
+      ]
+    },
+    {
+      "queue": 62,
+      "scopeSummary": [
+        "20p2/p3許可承継、p6の5/7条への接続、p8→p7航空機とp9届出を追加。p10予備免許準用が未教材化。5/7は接続の確認のみで全技術基準/省令審査・許可可否の適合判定を行わない。放送局特則4/5は今回候補外。"
+      ]
+    }
+  ],
+  "coveredQueues": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    10,
+    11,
+    16,
+    18,
+    21,
+    22,
+    23,
+    24,
+    28,
+    29,
+    30,
+    33,
+    34,
+    35,
+    37,
+    39,
+    40,
+    42,
+    44,
+    45,
+    46,
+    48,
+    52,
+    53,
+    55,
+    57,
+    60
+  ],
+  "partiallyCoveredQueues": [
+    27,
+    31,
+    41,
+    38,
+    49,
+    62
+  ],
+  "blockedVerifiedQueues": [
+    36,
+    54
+  ],
+  "unresolvedQueues": [
+    4,
+    8,
+    9,
+    12,
+    13,
+    14,
+    15,
+    17,
+    19,
+    20,
+    25,
+    26,
+    32,
+    43,
+    47,
+    50,
+    51,
+    56,
+    58,
+    59,
+    61,
+    63
+  ],
+  "publicApproved": 0,
+  "legalStatusChanges": false,
+  "independentAudit": {
+    "practiceAnswersChecked": 36,
+    "materialCorrectionsBeforeFreeze": [
+      {
+        "issue": "DSC例外practice answer erroneously used chapter label遭難・非常通信",
+        "correctedAnswer": "遭難通信",
+        "verifiedLatest": true
+      },
+      {
+        "issue": "q27 exclusion class initially only source reference",
+        "correction": "40_7p1 J3E+DSC/NBDP1606.5–26175kHz class definition added;individualtechnicalcompliance remains outside",
+        "verifiedLatest": true
+      }
+    ],
+    "openMaterialErrors": 0,
+    "humanApprovalPending": true
+  },
+  "authoringHash": "e8fab41efa601f9cec2d45e5b07cbfb6fff534bdf957b93e1ef41e8266d745bf"
+}

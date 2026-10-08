@@ -1,0 +1,41 @@
+{
+  "schemaReviewValidator": "PASS",
+  "releasePendingRejected": "PASS",
+  "old28Themes88Questions175BlanksDeepUnchanged": "PASS",
+  "sourceHashRevisionPointer": "PASS",
+  "relatedTests": {
+    "status": "PASS",
+    "files": 6,
+    "tests": 43
+  },
+  "productionTypeScript": "PASS",
+  "rootTypeScript": "NOT_RUN; protected docs prototype outside production scope",
+  "formalBuild": "PASS",
+  "productionPrivateExclusion": {
+    "result": "PASS",
+    "scannedFiles": 1213,
+    "privateThemeIdsAndTitles": 37,
+    "credentialSecretsIncludedInScan": true,
+    "hits": [],
+    "releaseApproved": false
+  },
+  "browser": {
+    "desktop": "PASS 1280x900 after-DSC frequency text/conditions/comparison",
+    "mobile": "PASS 375x812 corporate note and aircraft red-sheet; document scrollWidth375",
+    "keyboard": "PASS Enter individual reveal, Space all reveal",
+    "allHide": "PASS 0/2",
+    "fieldFilter": "PASS license chapter11 practices",
+    "yearFilter": "only all option; no invented exam years in original practices",
+    "random": "PASS seed and selected new aircraft practice",
+    "bookRoundTrip": "PASS 2/2 revealed + explanation restored",
+    "sourceLinks": "PASS official e-Gov law20/5/7 URL and enforcement/revision/asof labels visible; external navigation not performed",
+    "nextQuestion": "PASS 1/11 to2/11",
+    "deepLinkReload": "PASS frequency lesson reloaded",
+    "viewportReturnClick": "NOT_REPRODUCED after set375 and reset; semantic and native AX click returned chapter list",
+    "consoleErrors": 0,
+    "VoiceOver": "NOT_RUN",
+    "allThemesAllOperations": "NOT_RUN",
+    "unrelatedCWAudioQA": "NOT_RUN"
+  },
+  "preExistingFailures": "No failures in executed checks. Whole-root tsc not run; pre-existing protected K4-B prototype type issue not fixed."
+}

@@ -1,0 +1,205 @@
+{
+  "stage": "K4-J",
+  "asOf": "2026-10-07 JST",
+  "fixedAt": "2026-10-08T10:10:30.428865+00:00",
+  "additionalThemes": 9,
+  "selected": [
+    {
+      "key": "ship-dsc-phone-response",
+      "themeId": "k4j-ship-dsc-phone-response",
+      "title": "船舶局の遭難警報への電話応答",
+      "queue": 31,
+      "canonicalIds": [
+        "k1-ead01c447b73b23c6860",
+        "k1-70913cc652ad4997f30d"
+      ],
+      "queues": [
+        31,
+        41
+      ],
+      "scope": "運規81_8p2。p3/p4は今回学習対象外。",
+      "conditions": "船舶局が警報又は中継を受信し応答するとき。関連70_2p1i2の電話波、6事項を順次1/3/1/3/1/1回。",
+      "scopeEvidence": [
+        "StageK3-F/verification_evidence_K3F.json#k1-ead01c447b73b23c6860",
+        "StageK3-F/dependency_checks_K3F.json#k1-ead01c447b73b23c6860"
+      ],
+      "distinctFromExisting": "Iは海岸局81_8p1のDSC応答とMF/HF待機。主体・方式・送信事項が異なる。"
+    },
+    {
+      "key": "distress-dsc-frequency",
+      "themeId": "k4j-distress-dsc-frequency",
+      "title": "DSCの遭難・緊急・安全通信の電波",
+      "queue": 38,
+      "canonicalIds": [
+        "k1-8885b33734e72b3e6589",
+        "k1-231cbf6872f134ea1bfa"
+      ],
+      "queues": [
+        38,
+        49
+      ],
+      "scope": "運規70_2p1i1",
+      "conditions": "海上移動業務、DSC使用。F1Bの6周波数又はF2B156.525MHz。p1ただし書は遭難のみ。",
+      "scopeEvidence": [
+        "StageK3-I/private/current_verification_detail.json#queueRank=38",
+        "StageK3-J/private/current_verification_detail.json#queueRank=49"
+      ],
+      "distinctFromExisting": "既存送信手順・海岸局応答と異なる方式別周波数選択。"
+    },
+    {
+      "key": "after-dsc-phone-frequency",
+      "themeId": "k4j-after-dsc-phone-frequency",
+      "title": "DSCに続く無線電話の電波",
+      "queue": 38,
+      "canonicalIds": [
+        "k1-8885b33734e72b3e6589",
+        "k1-231cbf6872f134ea1bfa"
+      ],
+      "queues": [
+        38,
+        49
+      ],
+      "scope": "運規70_2p1i2",
+      "conditions": "DSC通信に引き続く電話。J3E6周波数又はF3E156.8MHz。通常電話i4と混同しない。",
+      "scopeEvidence": [
+        "StageK3-I/private/current_verification_detail.json#queueRank=38",
+        "StageK3-J/private/current_verification_detail.json#queueRank=49"
+      ],
+      "distinctFromExisting": "船舶応答の事項順序から独立した全帯域の方式対応。"
+    },
+    {
+      "key": "other-phone-distress-proviso",
+      "themeId": "k4j-other-phone-distress-proviso",
+      "title": "その他の無線電話と遭難時の周波数例外",
+      "queue": 38,
+      "canonicalIds": [
+        "k1-8885b33734e72b3e6589",
+        "k1-231cbf6872f134ea1bfa"
+      ],
+      "queues": [
+        38,
+        49
+      ],
+      "scope": "運規70_2p1i4とp1ただし書。i3は除外条件だけ保持。",
+      "conditions": "i2及びi3以外の電話はA3E27524kHz/F3E156.8MHz/通常呼出波。遭難通信 AND 使用不能OR不適当のときのみ例外。緊急/安全へ拡張不可。",
+      "scopeEvidence": [
+        "StageK3-I/private/current_verification_detail.json#queueRank=38",
+        "StageK3-J/private/current_verification_detail.json#queueRank=49"
+      ],
+      "distinctFromExisting": "他方式を除く電話と例外の論理を学ぶ。誤警報取消しへ例外を転用不可。"
+    },
+    {
+      "key": "dsc-reserved-frequency",
+      "themeId": "k4j-dsc-reserved-frequency",
+      "title": "DSC専用周波数の使用制限",
+      "queue": 40,
+      "canonicalIds": [
+        "k1-2d2e70f4262639edd4e2"
+      ],
+      "queues": [
+        40
+      ],
+      "scope": "運規58p1（58p6条件付き試験調整例外を保持）",
+      "conditions": "6周波数はDSCで遭難/緊急/安全の場合のみ。発射しなければ機器試験調整不可の場合のp6例外、警急自動電話装置除外。",
+      "scopeEvidence": [
+        "StageK3-I/private/current_verification_detail.json#queueRank=40"
+      ],
+      "distinctFromExisting": "Hq22の1分以上禁止とは別の使用目的制限。"
+    },
+    {
+      "key": "vhf-medical-safety-restriction",
+      "themeId": "k4j-vhf-medical-safety-restriction",
+      "title": "27524kHzと156.8MHzの通信別使用制限",
+      "queue": 40,
+      "canonicalIds": [
+        "k1-2d2e70f4262639edd4e2",
+        "k1-3fff534e5da348abc153"
+      ],
+      "queues": [
+        40,
+        57
+      ],
+      "scope": "運規58p2（p6試験調整条件を保持）。時間上限は今回対象外。",
+      "conditions": "医事通報の156.8は緊急呼出しのみ。安全は156.8で呼出し、27524は安全通信。呼出/応答/準備信号、27524のみ海上保安/航行安全急通信。",
+      "scopeEvidence": [
+        "StageK3-I/private/current_verification_detail.json#queueRank=40",
+        "StageK3-J/private/current_verification_detail.json#queueRank=57"
+      ],
+      "distinctFromExisting": "Hq22の時間制限とは異なる通信内容・周波数対応。"
+    },
+    {
+      "key": "ship-hf-phone-power-reduction",
+      "themeId": "k4j-ship-hf-phone-power-reduction",
+      "title": "船舶局の短波帯電話送信装置の減力",
+      "queue": 27,
+      "canonicalIds": [
+        "k1-feb17e5eff84c5898815"
+      ],
+      "queues": [
+        27
+      ],
+      "scope": "設備規則41p2、40_7p1除外クラス定義",
+      "conditions": "4MHzから26.175MHzまで、40_7p1送信装置除外、前項にかかわらず75W以下へ75%以内ごとに容易に低下。個別型式適合不可。",
+      "scopeEvidence": [
+        "StageK3-G/private/verification_full.json#queueRank=27",
+        "StageK3-G/private/dependencies.json"
+      ],
+      "distinctFromExisting": "Iの41p1(50%/75W例外)、p5(1W以下)と異なる対象帯域・減力方法。"
+    },
+    {
+      "key": "aircraft-license-succession",
+      "themeId": "k4j-aircraft-license-succession",
+      "title": "航空機運行者変更と免許承継",
+      "queue": 62,
+      "canonicalIds": [
+        "k1-a9c59e6a4f0117f76e92"
+      ],
+      "queues": [
+        62
+      ],
+      "scope": "法20p8→p7、p9届出",
+      "conditions": "航空機局/航空機地球局(電気通信業務目的除外)又はレーダーのみ。運行者変更で新運行者承継、証明書面添付し遅滞なく大臣届出。",
+      "scopeEvidence": [
+        "StageK3-L/private/verification_full.json#queueRank=62",
+        "StageK3-L/private/dependency_detail.json#queue62"
+      ],
+      "distinctFromExisting": "既存船舶運行者テーマとは適用対象と除外設備が異なる。航空機に遭難自動通報設備のみ条件を足さない。"
+    },
+    {
+      "key": "corporate-license-succession-permit",
+      "themeId": "k4j-corporate-license-succession-permit",
+      "title": "法人の合併・分割・事業全部譲渡の承継許可",
+      "queue": 62,
+      "canonicalIds": [
+        "k1-a9c59e6a4f0117f76e92"
+      ],
+      "queues": [
+        62
+      ],
+      "scope": "法20p2/p3/p6→法5/7。放送局特則p4/p5は対象外。",
+      "conditions": "p7/p8対象免許人除外。分割は無線局の事業全部承継に限る。譲渡も事業全部。承継できるのは大臣許可を受けて、法5/7準用。",
+      "scopeEvidence": [
+        "StageK3-L/private/verification_full.json#queueRank=62",
+        "StageK3-L/private/dependency_detail.json#queue62"
+      ],
+      "distinctFromExisting": "当然承継の相続/船舶/航空機と異なる許可条件。"
+    }
+  ],
+  "humanApproval": "pending",
+  "publicRelease": false,
+  "excluded": [
+    {
+      "scope": "q35 aviation19_2",
+      "reason": "K3G fixed original scope maritime telephone; aviation expansion not verified scope"
+    },
+    {
+      "scope": "70_2p2/p3;58p5",
+      "reason": "Saved whole article or dependency not enough to establish distinct confirmed pedagogical scope"
+    },
+    {
+      "scope": "81_8p3/p4",
+      "reason": "Confirmed as differences/dependencies but conservative candidate set uses originally tested p2 only"
+    }
+  ],
+  "expansion": "none"
+}

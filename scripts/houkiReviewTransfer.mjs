@@ -4,7 +4,7 @@ import {resolve,relative} from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {validateReviewPreview} from '../lib/houki/trainer/release-validator.mjs';
-const root=process.cwd(),base=resolve(root,'docs/1sou_houki/StageK4-I/private');
+const root=process.cwd(),base=resolve(root,'docs/1sou_houki/StageK4-J/private');
 const hash=x=>createHash('sha256').update(x).digest('hex');
 const [mode,path]=process.argv.slice(2);if(!path||!['export','restore'].includes(mode))throw Error('Usage: node scripts/houkiReviewTransfer.mjs export|restore /absolute/private/package.json');
 const target=resolve(path);const parent=await realpath(resolve(target,'..'));

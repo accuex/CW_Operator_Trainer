@@ -4,23 +4,25 @@ import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import assert from 'node:assert/strict';
 import {validateReviewPreview,validateRelease} from '../lib/houki/trainer/release-validator.mjs';
-const base=resolve('docs/1sou_houki/StageK4-I/private');
+const base=resolve('docs/1sou_houki/StageK4-J/private');
 const read=async path=>JSON.parse(await readFile(path,'utf8'));
 const raw=await read(resolve(base,'batch1.authoring.json'));
 assert.equal(raw.releaseApproved,false);assert.equal(raw.humanPublicApproval,'pending');assert.equal(raw.environment,'local_review_only');
 const d=validateReviewPreview(raw.displayData);assert.throws(()=>validateRelease(d));
-const old=(await read('docs/1sou_houki/StageK4-H/private/batch1.authoring.json')).displayData;
+const old=(await read('docs/1sou_houki/StageK4-I/private/batch1.authoring.json')).displayData;
 for(const [registry,items] of Object.entries(old.master))if(Array.isArray(items))for(const item of items)assert.deepEqual(d.master[registry].find(x=>x.id===item.id),item,`existing ${registry}/${item.id}`);
 for(const lesson of old.lessons)assert.deepEqual(d.lessons.find(x=>x.id===lesson.id),lesson);
 for(const clock of old.temporalRecords)assert.deepEqual(d.temporalRecords.find(x=>x.entityId===clock.entityId),clock);
-const added=d.lessons.filter(l=>!old.lessons.some(x=>x.id===l.id));assert.equal(added.length,12);
+const added=d.lessons.filter(l=>!old.lessons.some(x=>x.id===l.id));assert.equal(added.length,9);
 for(const l of added){assert.ok(l.questionIds.length>=3&&l.questionIds.length<=5);assert.ok(l.sourceIds.length);}
 for(const q of d.master.questions){assert.equal(q.provenance,'original_practice');assert.equal(q.historicalRef,null);assert.ok(q.explanation.trim());const ids=q.tokens.filter(t=>t.kind==='blank').map(t=>t.blankId);assert.equal(ids.length,q.blanks.length);assert.equal(new Set(ids).size,ids.length);for(const b of q.blanks){assert.equal(ids.filter(x=>x===b.id).length,1);assert.ok(b.answer.trim());}}
 assert.equal(new Set(d.master.chapters.map(c=>c.title)).size,d.master.chapters.length,'duplicate chapter title');
-const scope=await read('docs/1sou_houki/StageK4-I/K4I_scope.json');
+const scope=await read('docs/1sou_houki/StageK4-J/K4J_scope.json');
 const registry=(await read('docs/1sou_houki/StageK3-N/priority1_effective_status_registry.json')).entries;
 const evidence=await read(resolve(base,'batch1.evidence.json'));
-assert.deepEqual(evidence.themes.map(t=>t.queue).sort((a,b)=>a-b),scope.selected.map(t=>t.queue).sort((a,b)=>a-b));
+assert.deepEqual(evidence.themes.map(t=>t.themeId).sort(),scope.selected.map(t=>t.themeId).sort());
+assert.equal(old.lessons.length,28); assert.equal(old.master.questions.length,88); assert.equal(old.master.questions.reduce((n,q)=>n+q.blanks.length,0),175);
+for(const selected of scope.selected)for(const id of selected.canonicalIds){const r=registry.find(r=>r.historicalCanonicalId===id);assert.ok(r);assert.equal(r.effectiveStatus,'verified');assert.equal(r.explicitEightGatesComplete,true);assert.notEqual(r.publicEligibility,'blocked');}
 for(const t of evidence.themes){const r=registry.find(r=>r.queueRank===t.queue);assert.ok(r);assert.equal(r.historicalCanonicalId,t.canonicalId);assert.equal(r.effectiveStatus,'verified');assert.equal(r.explicitEightGatesComplete,true);assert.notEqual(r.publicEligibility,'blocked');}
 
 const manifest=await read('docs/1sou_houki/StageK3-N/private/complete_source_manifest.json');

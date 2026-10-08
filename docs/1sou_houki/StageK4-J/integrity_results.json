@@ -1,0 +1,33 @@
+{
+  "result": "PASS",
+  "baselineHead": "ade6258f435e779e80f2320414c67ab4deff74f5",
+  "branch": "main",
+  "startingWorkingTree": "clean",
+  "protectedFiles": 1504,
+  "changedProtectedFiles": [],
+  "historical": [
+    615,
+    486,
+    2161
+  ],
+  "priority1": {
+    "verified": 41,
+    "unresolved": 22,
+    "statusChanges": 0
+  },
+  "HFinal": 28,
+  "oldLearning": [
+    28,
+    88,
+    175
+  ],
+  "oldPublicDTO": "unchanged",
+  "methodology": "unchanged",
+  "packageVersion": "1.1.1",
+  "productionUIProgressCWGeographyEnglish": "unchanged",
+  "newPrivateTracking": 0,
+  "publicAdditions": 0,
+  "publicApprovals": 0,
+  "push": false,
+  "deploy": false
+}
