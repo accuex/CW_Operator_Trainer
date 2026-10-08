@@ -40,7 +40,7 @@ import { markSfxBackground, unlockSfx, wakeSfx } from '@/app/trainer/sfx';
 
 const ExamMenuView = lazy(() => import('@/app/views/ExamMenuView'));
 const EnglishView = lazy(() => import('@/app/views/EnglishView'));
-const HoukiView = lazy(() => import('@/app/views/HoukiView'));
+const HoukiView = lazy(() => import('@/app/views/HoukiTrainerView'));
 const GeographyView = lazy(() => import('@/app/views/GeographyView'));
 
 // The geography view has an in-memory fallback. A blocked browser store must
