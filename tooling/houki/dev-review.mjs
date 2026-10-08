@@ -2,7 +2,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto';
 import {resolve} from 'node:path';
 const base='docs/1sou_houki/StageK4-G/private'; // Existing reviewer credentials remain unchanged.
-const contentBase='docs/1sou_houki/StageK4-K/private';
+const contentBase='docs/1sou_houki/StageK4-L/private';
 export async function initializeReviewAccounts(root){
  const path=resolve(root,base,'review-accounts.json');
  try{return JSON.parse(await readFile(path,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}

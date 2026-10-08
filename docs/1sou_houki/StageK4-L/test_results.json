@@ -1,0 +1,46 @@
+{
+  "result": "PASS",
+  "relatedTests": {
+    "files": 7,
+    "tests": 48
+  },
+  "productionTypeScript": "PASS",
+  "formalBuild": "PASS",
+  "schemaReferencesVersion": "PASS",
+  "privateFieldRejection": "PASS",
+  "unapprovedLoaderRejection": "PASS",
+  "futureApprovedStaticActivation": "PASS_test_fixture_only",
+  "activeIndexUnchanged": "PASS",
+  "browser": {
+    "desktop": [
+      1280,
+      900
+    ],
+    "mobile": [
+      375,
+      812
+    ],
+    "overflow": false,
+    "sourceLinksAndEditorialAttribution": "PASS",
+    "amendmentComparison": "PASS",
+    "individualRevealEnter": "PASS",
+    "showAllSpace": "PASS",
+    "hideAll": "PASS",
+    "bookSheetReturnRestoration": "PASS",
+    "consoleErrors": [],
+    "evidence": [
+      "private/review-captures/desktop.png",
+      "private/review-captures/mobile-card.png",
+      "private/review-captures/mobile-sheet.png"
+    ]
+  },
+  "notRun": [
+    "実VoiceOver音声",
+    "41テーマの全ブラウザ操作",
+    "CW音響品質",
+    "全プロジェクトroot型検査（旧試作含む）",
+    "本番deploy・正式release切替"
+  ],
+  "humanReview": false,
+  "logs": "private/tests.log, types.log, build.log"
+}

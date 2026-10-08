@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "checkedFiles": 1619,
+  "expectedCodeChanges": [
+    "app/components/houki/LessonPlayer.tsx"
+  ],
+  "unexpectedChanges": [],
+  "historical": [
+    615,
+    486,
+    2161
+  ],
+  "priority1": {
+    "verified": 41,
+    "unresolved": 22
+  },
+  "HFinal": 28,
+  "publicActiveDTOUnchanged": true,
+  "oldEditionsUnchanged": true,
+  "packageVersion": "1.1.1"
+}

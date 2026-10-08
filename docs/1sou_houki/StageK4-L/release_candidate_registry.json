@@ -1,0 +1,898 @@
+{
+  "stage": "K4-L",
+  "candidateOnly": true,
+  "contentVersion": 6,
+  "editionId": "k4l-internal-release-candidate-v1",
+  "legalAsOf": "2026-10-07 JST",
+  "releaseApproved": false,
+  "publishedAt": null,
+  "humanApproval": "pending",
+  "candidateCounts": {
+    "themes": 41,
+    "questions": 140,
+    "blanks": 279,
+    "pitfallCards": 1,
+    "amendmentCards": 1
+  },
+  "classificationCounts": {
+    "release_candidate": 41,
+    "needs_revision": 0,
+    "rights_pending": 0,
+    "evidence_pending": 0,
+    "excludedThemes": 0
+  },
+  "contentExclusions": [
+    "権利未確認の原問・公式選択肢・公式解答・PDF・画像",
+    "unresolved22 canonicalの未確認scope",
+    "旧NBDP blocked queue36/54の現行教材用途",
+    "queue27の未完了ITU依存scope",
+    "公式図表・添付・ITU表の転載",
+    "改正理由の推測"
+  ],
+  "conditions": [
+    "用途/version別の人間による権利・公開承認はpending",
+    "出典・CWOT編集・確認基準日・限定scope・未確認事項の表示を維持",
+    "法令へのリンクと自作解説・独自問題だけ。法令APIのlive取得は実装しない"
+  ],
+  "themes": [
+    {
+      "id": "k4g-compass",
+      "title": "磁気羅針儀の保護：表示するのは最小距離",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 5,
+      "questionIds": [
+        "k4g-compass-practice-1",
+        "k4g-compass-practice-2",
+        "k4g-compass-practice-3"
+      ],
+      "sourceIds": [
+        "k4g-compass-source-37-28-325M50080000018"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-power-reduction",
+      "title": "空中線電力の低下装置：50％と10％",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-power-reduction-practice-1",
+        "k4i-power-reduction-practice-2",
+        "k4i-power-reduction-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-power-reduction-source-41-325M50080000018"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-ship-hf-phone-power-reduction",
+      "title": "短波帯の船舶無線電話：75W以下への減力",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-ship-hf-phone-power-reduction-practice-1",
+        "k4j-ship-hf-phone-power-reduction-practice-2",
+        "k4j-ship-hf-phone-power-reduction-practice-3",
+        "k4j-ship-hf-phone-power-reduction-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-ship-hf-phone-power-reduction-source-41-325M50080000018",
+        "k4j-ship-hf-phone-power-reduction-source-40-7-325M50080000018"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4g-aircraft-tests",
+      "title": "義務航空機局の試験：飛行前と1000時間ごと",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4g-aircraft-tests-practice-1",
+        "k4g-aircraft-tests-practice-2",
+        "k4g-aircraft-tests-practice-3"
+      ],
+      "sourceIds": [
+        "k4g-aircraft-tests-source-9-2-325M50080000017",
+        "k4g-aircraft-tests-source-9-3-325M50080000017",
+        "k4g-aircraft-tests-source-13-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4g-operator-certificate",
+      "title": "船舶局無線従事者証明：資格と訓練を分ける",
+      "version": 3,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4g-operator-certificate-practice-1",
+        "k4g-operator-certificate-practice-2",
+        "k4g-operator-certificate-practice-3"
+      ],
+      "sourceIds": [
+        "k4g-operator-certificate-source-48-2-325AC0000000131",
+        "k4g-operator-certificate-source-34-11-325M50080000014",
+        "k4g-operator-certificate-source-42-325AC0000000131",
+        "k4g-operator-certificate-source-79-325AC0000000131",
+        "k4g-operator-certificate-source-77-325AC0000000131",
+        "k4g-operator-certificate-source-39-325AC0000000131",
+        "k4g-operator-certificate-source-32-10-325M50080000014"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4g-distress-manager",
+      "title": "遭難通信責任者：配置対象と代行を読む",
+      "version": 3,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4g-distress-manager-practice-1",
+        "k4g-distress-manager-practice-2",
+        "k4g-distress-manager-practice-3"
+      ],
+      "sourceIds": [
+        "k4g-distress-manager-source-50-325AC0000000131",
+        "k4g-distress-manager-source-52-325AC0000000131",
+        "k4g-distress-manager-source-35-2-325M50080000014",
+        "k4g-distress-manager-source-13-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-license-succession",
+      "title": "免許承継：相続・運行者変更と届出",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-license-succession-practice-1",
+        "k4h-license-succession-practice-2",
+        "k4h-license-succession-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-license-succession-source-20-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-aircraft-license-succession",
+      "title": "航空機の運行者変更：承継と届出",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-aircraft-license-succession-practice-1",
+        "k4j-aircraft-license-succession-practice-2",
+        "k4j-aircraft-license-succession-practice-3",
+        "k4j-aircraft-license-succession-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-aircraft-license-succession-source-20-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-corporate-license-succession-permit",
+      "title": "法人・事業の全部承継：大臣許可の条件",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-corporate-license-succession-permit-practice-1",
+        "k4j-corporate-license-succession-permit-practice-2",
+        "k4j-corporate-license-succession-permit-practice-3",
+        "k4j-corporate-license-succession-permit-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-corporate-license-succession-permit-source-20-325AC0000000131",
+        "k4j-corporate-license-succession-permit-source-5-325AC0000000131",
+        "k4j-corporate-license-succession-permit-source-7-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4k-preliminary-license-succession",
+      "title": "予備免許を受けた者への承継規定の準用",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4k-preliminary-license-succession-practice-1",
+        "k4k-preliminary-license-succession-practice-2",
+        "k4k-preliminary-license-succession-practice-3",
+        "k4k-preliminary-license-succession-practice-4"
+      ],
+      "sourceIds": [
+        "k4k-preliminary-license-succession-source-20-325AC0000000131",
+        "k4k-preliminary-license-succession-source-8-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-interference",
+      "title": "混信・妨害の防止：保護対象と四通信の例外",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-interference-practice-1",
+        "k4h-interference-practice-2",
+        "k4h-interference-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-interference-source-56-325AC0000000131",
+        "k4h-interference-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-before-calling",
+      "title": "呼出し前の確認：聴守してから発射する",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-before-calling-practice-1",
+        "k4h-before-calling-practice-2",
+        "k4h-before-calling-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-before-calling-source-19-2-325M50080000017",
+        "k4h-before-calling-source-74-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-ordinary-dsc",
+      "title": "通常DSCの呼出し：45秒・5分・15分",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-ordinary-dsc-practice-1",
+        "k4h-ordinary-dsc-practice-2",
+        "k4h-ordinary-dsc-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-ordinary-dsc-source-58-3-325M50080000017",
+        "k4h-ordinary-dsc-source-58-4-325M50080000017",
+        "k4h-ordinary-dsc-source-58-5-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-ordinary-dsc-response",
+      "title": "通常DSCの応答：局種別の期限と周波数調整",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-ordinary-dsc-response-practice-1",
+        "k4i-ordinary-dsc-response-practice-2",
+        "k4i-ordinary-dsc-response-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-ordinary-dsc-response-source-58-3-325M50080000017",
+        "k4i-ordinary-dsc-response-source-58-6-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-ordinary-phone-repeat",
+      "title": "海上無線電話の呼出し：2回・2分・3分",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-ordinary-phone-repeat-practice-1",
+        "k4i-ordinary-phone-repeat-practice-2",
+        "k4i-ordinary-phone-repeat-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-ordinary-phone-repeat-source-18-325M50080000017",
+        "k4i-ordinary-phone-repeat-source-21-325M50080000017",
+        "k4i-ordinary-phone-repeat-source-22-325M50080000017",
+        "k4i-ordinary-phone-repeat-source-58-11-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-emergency-command",
+      "title": "非常時の通信：命令・実費・事前の体制整備",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-emergency-command-practice-1",
+        "k4h-emergency-command-practice-2",
+        "k4h-emergency-command-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-emergency-command-source-74-325AC0000000131",
+        "k4h-emergency-command-source-74-2-325AC0000000131",
+        "k4h-emergency-command-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-ship-closing",
+      "title": "船舶局の閉局：二つの終了条件と例外",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 5,
+      "questionIds": [
+        "k4h-ship-closing-practice-1",
+        "k4h-ship-closing-practice-2",
+        "k4h-ship-closing-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-ship-closing-source-41-325M50080000017",
+        "k4h-ship-closing-source-74-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-coast-hours",
+      "title": "海岸局の常時運用：三類型だけでは足りない",
+      "version": 3,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-coast-hours-practice-1",
+        "k4h-coast-hours-practice-2",
+        "k4h-coast-hours-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-coast-hours-source-63-325AC0000000131",
+        "k4h-coast-hours-source-45-325M50080000017",
+        "k4h-coast-hours-source-41-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-watch-exceptions",
+      "title": "聴守義務の例外：局種と周波数指定",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-watch-exceptions-practice-1",
+        "k4i-watch-exceptions-practice-2",
+        "k4i-watch-exceptions-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-watch-exceptions-source-65-325AC0000000131",
+        "k4i-watch-exceptions-source-44-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-aviation-priority",
+      "title": "航空通信の優先順位：気象とノータム",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-aviation-priority-practice-1",
+        "k4i-aviation-priority-practice-2",
+        "k4i-aviation-priority-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-aviation-priority-source-150-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-distress-dsc-frequency",
+      "title": "遭難・緊急・安全通信のDSC電波",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-distress-dsc-frequency-practice-1",
+        "k4j-distress-dsc-frequency-practice-2",
+        "k4j-distress-dsc-frequency-practice-3",
+        "k4j-distress-dsc-frequency-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-distress-dsc-frequency-source-70-2-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-after-dsc-phone-frequency",
+      "title": "DSCに引き続く無線電話の電波",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-after-dsc-phone-frequency-practice-1",
+        "k4j-after-dsc-phone-frequency-practice-2",
+        "k4j-after-dsc-phone-frequency-practice-3",
+        "k4j-after-dsc-phone-frequency-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-after-dsc-phone-frequency-source-70-2-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4k-ship-aircraft-two-way-phone-wave",
+      "title": "船舶航空機間双方向無線電話の使用電波",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4k-ship-aircraft-two-way-phone-wave-practice-1",
+        "k4k-ship-aircraft-two-way-phone-wave-practice-2",
+        "k4k-ship-aircraft-two-way-phone-wave-practice-3",
+        "k4k-ship-aircraft-two-way-phone-wave-practice-4"
+      ],
+      "sourceIds": [
+        "k4k-ship-aircraft-two-way-phone-wave-source-70-2-325M50080000017",
+        "k4k-ship-aircraft-two-way-phone-wave-source-2-325M50080000017",
+        "k4k-ship-aircraft-two-way-phone-wave-source-52-325AC0000000131",
+        "k4k-ship-aircraft-two-way-phone-wave-source-58-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-dsc-reserved-frequency",
+      "title": "DSC六周波数の使用制限と試験例外",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-dsc-reserved-frequency-practice-1",
+        "k4j-dsc-reserved-frequency-practice-2",
+        "k4j-dsc-reserved-frequency-practice-3",
+        "k4j-dsc-reserved-frequency-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-dsc-reserved-frequency-source-58-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-other-phone-distress-proviso",
+      "title": "その他の無線電話：使用電波と遭難時の例外",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-other-phone-distress-proviso-practice-1",
+        "k4j-other-phone-distress-proviso-practice-2",
+        "k4j-other-phone-distress-proviso-practice-3",
+        "k4j-other-phone-distress-proviso-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-other-phone-distress-proviso-source-70-2-325M50080000017",
+        "k4j-other-phone-distress-proviso-source-2-325M50080000017",
+        "k4j-other-phone-distress-proviso-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-vhf-medical-safety-restriction",
+      "title": "156.8MHzと27,524kHzの使用範囲",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-vhf-medical-safety-restriction-practice-1",
+        "k4j-vhf-medical-safety-restriction-practice-2",
+        "k4j-vhf-medical-safety-restriction-practice-3",
+        "k4j-vhf-medical-safety-restriction-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-vhf-medical-safety-restriction-source-58-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4k-medical-safety-report-working-wave",
+      "title": "医事通報・緊急再送・安全通報の通常通信電波",
+      "version": 2,
+      "questionCount": 5,
+      "blankCount": 10,
+      "questionIds": [
+        "k4k-medical-safety-report-working-wave-practice-1",
+        "k4k-medical-safety-report-working-wave-practice-2",
+        "k4k-medical-safety-report-working-wave-practice-3",
+        "k4k-medical-safety-report-working-wave-practice-4",
+        "k4k-medical-safety-report-working-wave-practice-5"
+      ],
+      "sourceIds": [
+        "k4k-medical-safety-report-working-wave-source-70-2-325M50080000017",
+        "k4k-medical-safety-report-working-wave-source-2-325M50080000017",
+        "k4k-medical-safety-report-working-wave-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-distress-phone-send",
+      "title": "無線電話の遭難送信：呼出し・通報・位置",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4i-distress-phone-send-practice-1",
+        "k4i-distress-phone-send-practice-2",
+        "k4i-distress-phone-send-practice-3",
+        "k4i-distress-phone-send-practice-4"
+      ],
+      "sourceIds": [
+        "k4i-distress-phone-send-source-75-2-325M50080000017",
+        "k4i-distress-phone-send-source-76-325M50080000017",
+        "k4i-distress-phone-send-source-77-325M50080000017",
+        "k4i-distress-phone-send-source-78-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-distress-message-reception",
+      "title": "遭難通報を受信したとき：聴守・通知・中継",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4i-distress-message-reception-practice-1",
+        "k4i-distress-message-reception-practice-2",
+        "k4i-distress-message-reception-practice-3",
+        "k4i-distress-message-reception-practice-4"
+      ],
+      "sourceIds": [
+        "k4i-distress-message-reception-source-81-7-325M50080000017",
+        "k4i-distress-message-reception-source-78-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-coast-distress-response",
+      "title": "海岸局のDSC遭難応答：方式と待ち時間",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-coast-distress-response-practice-1",
+        "k4i-coast-distress-response-practice-2",
+        "k4i-coast-distress-response-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-coast-distress-response-source-81-8-325M50080000017",
+        "k4i-coast-distress-response-source-36-2-325M50080000014"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-ship-dsc-reception",
+      "title": "船舶局のDSC遭難受信：短波と短波以外",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4i-ship-dsc-reception-practice-1",
+        "k4i-ship-dsc-reception-practice-2",
+        "k4i-ship-dsc-reception-practice-3",
+        "k4i-ship-dsc-reception-practice-4"
+      ],
+      "sourceIds": [
+        "k4i-ship-dsc-reception-source-81-5-325M50080000017",
+        "k4i-ship-dsc-reception-source-81-8-325M50080000017",
+        "k4i-ship-dsc-reception-source-70-2-325M50080000017",
+        "k4i-ship-dsc-reception-source-78-325M50080000017",
+        "k4i-ship-dsc-reception-source-81-3-325M50080000017",
+        "k4i-ship-dsc-reception-source-36-2-325M50080000014"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4j-ship-dsc-phone-response",
+      "title": "船舶局の遭難警報への電話応答",
+      "version": 2,
+      "questionCount": 4,
+      "blankCount": 8,
+      "questionIds": [
+        "k4j-ship-dsc-phone-response-practice-1",
+        "k4j-ship-dsc-phone-response-practice-2",
+        "k4j-ship-dsc-phone-response-practice-3",
+        "k4j-ship-dsc-phone-response-practice-4"
+      ],
+      "sourceIds": [
+        "k4j-ship-dsc-phone-response-source-81-8-325M50080000017",
+        "k4j-ship-dsc-phone-response-source-70-2-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4k-ship-phone-response-not-received",
+      "title": "船舶局の電話応答が受信されなかった場合",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4k-ship-phone-response-not-received-practice-1",
+        "k4k-ship-phone-response-not-received-practice-2",
+        "k4k-ship-phone-response-not-received-practice-3"
+      ],
+      "sourceIds": [
+        "k4k-ship-phone-response-not-received-source-81-8-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-earthstation-distress",
+      "title": "海岸地球局の遭難受信：応答と救助機関通報",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-earthstation-distress-practice-1",
+        "k4i-earthstation-distress-practice-2",
+        "k4i-earthstation-distress-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-earthstation-distress-source-81-4-325M50080000017",
+        "k4i-earthstation-distress-source-75-325M50080000017",
+        "k4i-earthstation-distress-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4f-false-distress-alert",
+      "title": "誤った遭難警報を送ったとき：通報・取消し・聴守",
+      "version": 3,
+      "questionCount": 4,
+      "blankCount": 9,
+      "questionIds": [
+        "k4f-practice-1",
+        "k4f-practice-2",
+        "k4f-practice-3",
+        "k4f-practice-4"
+      ],
+      "sourceIds": [
+        "k4f-source-operation",
+        "k4f-source-amendment"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-urgent-all-call",
+      "title": "各局あて緊急呼出し：パンパンと識別の回数",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-urgent-all-call-practice-1",
+        "k4i-urgent-all-call-practice-2",
+        "k4i-urgent-all-call-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-urgent-all-call-source-92-325M50080000017",
+        "k4i-urgent-all-call-source-59-325M50080000017",
+        "k4i-urgent-all-call-source-18-325M50080000017",
+        "k4i-urgent-all-call-source-14-325M50080000017",
+        "k4i-urgent-all-call-source-70-2-325M50080000017",
+        "k4i-urgent-all-call-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4i-safety-call",
+      "title": "安全呼出し・安全通報：3回と送信時点",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4i-safety-call-practice-1",
+        "k4i-safety-call-practice-2",
+        "k4i-safety-call-practice-3"
+      ],
+      "sourceIds": [
+        "k4i-safety-call-source-96-325M50080000017",
+        "k4i-safety-call-source-14-325M50080000017",
+        "k4i-safety-call-source-18-325M50080000017",
+        "k4i-safety-call-source-59-325M50080000017",
+        "k4i-safety-call-source-52-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-restricted-frequencies",
+      "title": "呼出周波数の使用制限：1分未満と例外",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-restricted-frequencies-practice-1",
+        "k4h-restricted-frequencies-practice-2",
+        "k4h-restricted-frequencies-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-restricted-frequencies-source-58-325M50080000017"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-emission-stop",
+      "title": "電波の質が不適合：停止→試験→直ちに解除",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-emission-stop-practice-1",
+        "k4h-emission-stop-practice-2",
+        "k4h-emission-stop-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-emission-stop-source-72-325AC0000000131",
+        "k4h-emission-stop-source-28-325AC0000000131",
+        "k4h-emission-stop-source-73-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4h-unlicensed-supervision",
+      "title": "免許不要局の監督：継続的かつ重大な障害",
+      "version": 2,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4h-unlicensed-supervision-practice-1",
+        "k4h-unlicensed-supervision-practice-2",
+        "k4h-unlicensed-supervision-practice-3"
+      ],
+      "sourceIds": [
+        "k4h-unlicensed-supervision-source-82-325AC0000000131",
+        "k4h-unlicensed-supervision-source-4-325AC0000000131",
+        "k4h-unlicensed-supervision-source-39-9-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    },
+    {
+      "id": "k4g-frequency-change",
+      "title": "周波数等の変更：公益と業務の両条件",
+      "version": 3,
+      "questionCount": 3,
+      "blankCount": 6,
+      "questionIds": [
+        "k4g-frequency-change-practice-1",
+        "k4g-frequency-change-practice-2",
+        "k4g-frequency-change-practice-3"
+      ],
+      "sourceIds": [
+        "k4g-frequency-change-source-71-325AC0000000131"
+      ],
+      "classification": "release_candidate",
+      "humanRightsApproval": "pending",
+      "releaseApproved": false,
+      "publishedAt": null
+    }
+  ]
+}

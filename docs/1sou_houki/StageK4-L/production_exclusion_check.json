@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "scannedFiles": 1213,
+  "privateContentMarkers": 615,
+  "bodyFingerprints": 112,
+  "credentialSecretsChecked": true,
+  "hits": [],
+  "releaseApproved": false,
+  "activeIndexUnchanged": true
+}

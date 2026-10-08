@@ -1,0 +1,33 @@
+{
+  "result": "PASS_TECHNICAL",
+  "humanAudit": false,
+  "humanApproval": false,
+  "themesReviewed": 41,
+  "questionsReviewed": 140,
+  "answersReviewed": 279,
+  "rulesReviewed": 76,
+  "conditionsReviewed": 76,
+  "blocksReviewed": 432,
+  "sourceLocatorsChecked": 104,
+  "newBlockingContentErrors": 0,
+  "legalBodyChanges": 0,
+  "answerChanges": 0,
+  "administrativeChangedRecords": 177,
+  "candidateVersion": 6,
+  "oldEditionPreserved": true,
+  "sourceEvidence": "private/content_preflight_audit.json",
+  "rightsSpanAssessment": {
+    "records": 51,
+    "closedSpans": 87,
+    "riskyThirdPartyQuotationIdentified": 0
+  },
+  "remainingScopeExclusions": [
+    "権利未確認の原問・公式選択肢・公式解答・PDF・画像",
+    "unresolved22 canonicalの未確認scope",
+    "旧NBDP blocked queue36/54の現行教材用途",
+    "queue27の未完了ITU依存scope",
+    "公式図表・添付・ITU表の転載",
+    "改正理由の推測"
+  ],
+  "releaseApproved": false
+}

@@ -1,0 +1,19 @@
+{
+  "stage": "K4-L",
+  "executionVerdict": "PASS",
+  "publicReleaseVerdict": "REVIEW_HUMAN_APPROVAL_PENDING",
+  "counts": {
+    "themes": 41,
+    "questions": 140,
+    "blanks": 279,
+    "pitfallCards": 1,
+    "amendmentCards": 1
+  },
+  "contentHolds": 0,
+  "releaseApproved": false,
+  "publishedAt": null,
+  "humanApprovalCount": 0,
+  "push": false,
+  "deploy": false,
+  "contentCandidateOnly": true
+}
