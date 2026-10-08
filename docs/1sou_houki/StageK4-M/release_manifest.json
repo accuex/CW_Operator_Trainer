@@ -1,0 +1,32 @@
+{
+  "stage": "K4-M",
+  "status": "approved_for_release",
+  "editionId": "cwot-houki-v1",
+  "contentVersion": 6,
+  "candidateSha256": "299eefc848e8f35f3fee12d0cfda9a0e4d4f9d445d93d62d57ec50f0bde332e4",
+  "releaseSha256": "294710bb80d5c5b4ee8370c007af7f74545782d4b9e22998c3aee7fd1a41128c",
+  "approver": "project_owner",
+  "approvalObservedAt": "2026-10-08T12:25:32.842707+00:00",
+  "messageTimestamp": null,
+  "timestampNote": "Actual observation time, not an inferred user message timestamp.",
+  "counts": {
+    "themes": 41,
+    "questions": 140,
+    "blanks": 279,
+    "cards": 2
+  },
+  "individualUseVersionApprovalRecords": 1200,
+  "verifiedScopeOnly": true,
+  "futureRevisionsNotApproved": true,
+  "publicOriginalExams": 0,
+  "exclusions": [
+    "権利未確認の原問・公式選択肢・公式解答・PDF・画像",
+    "unresolved22 canonicalの未確認scope",
+    "旧NBDP blocked queue36/54の現行教材用途",
+    "queue27の未完了ITU依存scope",
+    "公式図表・添付・ITU表の転載",
+    "改正理由の推測"
+  ],
+  "lawVerificationAsOf": "2026-10-07",
+  "publicationObservedAt": null
+}

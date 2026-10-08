@@ -1,0 +1,15 @@
+{
+  "protectedFiles": 2573,
+  "baselineChangedOnly": [
+    "app/views/HoukiTrainerView.tsx",
+    "public/houki/trainer/active.json"
+  ],
+  "candidateLegalAndDisplayContentUnchanged": true,
+  "credentialLeakCount": 0,
+  "scannedProductionFiles": 1214,
+  "historicalUnchanged": true,
+  "K3_K4OriginalsUnchanged": true,
+  "HFinalUnchanged": true,
+  "publicHistoricalArraysEmpty": true,
+  "approvedContentIntentionallyPublic": true
+}

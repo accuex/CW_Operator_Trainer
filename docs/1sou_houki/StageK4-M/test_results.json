@@ -1,0 +1,17 @@
+{
+  "releaseValidator": "PASS",
+  "candidateDigest": "PASS",
+  "contentUnchangedExceptApprovalMetadata": "PASS",
+  "productionTypeScript": "PASS",
+  "productionBuild": "PASS",
+  "vitest": {
+    "files": 65,
+    "tests": 748,
+    "status": "PASS"
+  },
+  "desktop": "PASS representative textbook/source/reveal/keyboard",
+  "mobile375x812": "PASS redsheet/reveal/hide/explanation/return restore/filter/random/width375",
+  "VoiceOver": "NOT_RUN",
+  "auditoryQuality": "NOT_RUN",
+  "deployment": "PENDING"
+}
