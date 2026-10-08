@@ -12,7 +12,16 @@ import { buildMorseTimeline, buildRepeatedSymbolTimeline } from './timing';
 import { buildExamSession, formatWabunFilingTimeLabel, formatWabunFilingTimePlay, measureExamAudioSec, randomGroup } from './training';
 import { OUBUN_PLAIN_PASSAGES, WABUN_PLAIN_PASSAGES, plainCorpusStats } from './plainCorpus';
 import { correctionPenaltyPoints, scoreExamCopy, stripExamProcedureMarks } from './examScore';
+import { examSetShardUrl, type ExamSetSubjectId, type StoredExamSet } from './examSets';
 import type { AnswerLog, CardProgress } from './types';
+import examSetsFile from '../data/exam/sets.json';
+import shardManifest from '../data/exam/shards.json';
+
+const STORED_SETS = examSetsFile as unknown as Record<ExamSetSubjectId, StoredExamSet[]>;
+const storedSet = (subjectId: ExamSetSubjectId) => {
+  const pool = STORED_SETS[subjectId];
+  return pool[Math.floor(Math.random() * pool.length)];
+};
 
 describe('Morse data', () => {
   it('maps representative international symbols', () => {
@@ -298,9 +307,9 @@ describe('random group sequencing', () => {
 describe('exam session volume', () => {
   it('builds sheets with audio that fits the official duration where applicable', () => {
     const wabunPlain = buildExamSession({ subjectId: 'wabun', telegram: false });
-    const wabunForm = buildExamSession({ subjectId: 'wabun', telegram: true });
+    const wabunForm = buildExamSession({ subjectId: 'wabun', telegram: true, stored: storedSet('wabun') });
     const codes = buildExamSession({ subjectId: 'codes', telegram: false });
-    const plain = buildExamSession({ subjectId: 'plain', telegram: true });
+    const plain = buildExamSession({ subjectId: 'plain', telegram: true, stored: storedSet('plain') });
     expect(wabunPlain.sheets).toHaveLength(2);
     expect(wabunForm.sheets).toHaveLength(5);
     expect(codes.sheets).toHaveLength(2);
@@ -315,7 +324,7 @@ describe('exam session volume', () => {
   });
   it('builds codes telegram pages as 40 five-letter groups (8×5) with address+body count', () => {
     for (let attempt = 0; attempt < 10; attempt += 1) {
-      const codes = buildExamSession({ subjectId: 'codes', telegram: true });
+      const codes = buildExamSession({ subjectId: 'codes', telegram: true, stored: storedSet('codes') });
       expect(codes.sheets).toHaveLength(2);
       expect(codes.sheets[0].playText.startsWith('HRHR NR ')).toBe(true);
       expect(codes.sheets[1].playText.startsWith('NR ')).toBe(true);
@@ -336,7 +345,7 @@ describe('exam session volume', () => {
   });
   it('builds the wabun exam as exactly 2 telegrams on 5 sheets', () => {
     for (let attempt = 0; attempt < 12; attempt += 1) {
-      const wabun = buildExamSession({ subjectId: 'wabun', telegram: true });
+      const wabun = buildExamSession({ subjectId: 'wabun', telegram: true, stored: storedSet('wabun') });
       expect(wabun.sheets).toHaveLength(5);
 
       const starts = wabun.sheets.filter((sheet) => !sheet.continuation);
@@ -429,7 +438,7 @@ describe('exam session volume', () => {
   });
   it('prefixes exam sessions with シケン シケン announcement', () => {
     for (const subjectId of ['wabun', 'codes', 'plain'] as const) {
-      const session = buildExamSession({ subjectId, telegram: true });
+      const session = buildExamSession({ subjectId, telegram: true, stored: storedSet(subjectId) });
       expect(session.announcement).toBe('シケン シケン');
     }
   });
@@ -443,7 +452,7 @@ describe('exam session volume', () => {
   });
   it('wraps plain telegrams with HRHR on first only, then NR, BT(=); AR(+) only on non-final telegram', () => {
     for (let attempt = 0; attempt < 20; attempt += 1) {
-      const plain = buildExamSession({ subjectId: 'plain', telegram: true, examClass: 'class1' });
+      const plain = buildExamSession({ subjectId: 'plain', telegram: true, examClass: 'class1', stored: storedSet('plain') });
       expect(plain.sheets[0].playText.startsWith('HRHR NR ')).toBe(true);
       expect(plain.sheets[1].playText.startsWith('NR ')).toBe(true);
       expect(plain.sheets[1].playText.startsWith('HRHR')).toBe(false);
@@ -460,7 +469,7 @@ describe('exam session volume', () => {
   });
   it('wraps wabun telegrams with HRHR, 、, [ホレ], [ラタ]', () => {
     for (let attempt = 0; attempt < 20; attempt += 1) {
-      const wabun = buildExamSession({ subjectId: 'wabun', telegram: true });
+      const wabun = buildExamSession({ subjectId: 'wabun', telegram: true, stored: storedSet('wabun') });
       const first = wabun.sheets[0];
       const last = wabun.sheets[wabun.sheets.length - 1];
       const secondStart = wabun.sheets.find((sheet, index) => index > 0 && !sheet.continuation);
@@ -475,11 +484,11 @@ describe('exam session volume', () => {
   });
   it('includes ヰ and ヱ in wabun body only when includeWiWe is on', () => {
     for (let attempt = 0; attempt < 12; attempt += 1) {
-      const off = buildExamSession({ subjectId: 'wabun', telegram: true });
+      const off = buildExamSession({ subjectId: 'wabun', telegram: true, stored: storedSet('wabun') });
       const offBody = off.sheets.map((sheet) => sheet.body).join('');
       expect(offBody).not.toMatch(/[ヰヱ]/);
 
-      const on = buildExamSession({ subjectId: 'wabun', telegram: true, includeWiWe: true });
+      const on = buildExamSession({ subjectId: 'wabun', telegram: true, includeWiWe: true, stored: storedSet('wabun') });
       const onBody = on.sheets.map((sheet) => sheet.body).join('');
       expect(onBody).toContain('ヰ');
       expect(onBody).toContain('ヱ');
@@ -532,15 +541,30 @@ describe('plain corpus', () => {
     expect(WABUN_PLAIN_PASSAGES.every((passage) => /^[\u30A0-\u30FF0-9、ー]+$/.test(passage))).toBe(true);
   });
   it('feeds exam plain bodies from stored sets with natural English patterns', () => {
-    const sheet = buildExamSession({ subjectId: 'plain', telegram: true }).sheets[0];
+    const sheet = buildExamSession({ subjectId: 'plain', telegram: true, stored: storedSet('plain') }).sheets[0];
     expect(sheet.body.split(/\s+/).length).toBeGreaterThan(30);
     expect(/\b(IT IS|THERE IS|AT THE|THESE|THAT)\b/.test(sheet.body)).toBe(true);
   });
-  it('loads 1000 stored exam sets per telegram subject from one JSON', async () => {
-    const { storedExamSetCount } = await import('./examSets');
-    expect(storedExamSetCount('plain')).toBe(1000);
-    expect(storedExamSetCount('codes')).toBe(1000);
-    expect(storedExamSetCount('wabun')).toBe(1000);
+  it('keeps 1000 stored exam sets per telegram subject and shards that cover them', () => {
+    for (const subjectId of ['plain', 'codes', 'wabun'] as const) {
+      expect(STORED_SETS[subjectId]).toHaveLength(1000);
+      expect(shardManifest.shards[subjectId] * shardManifest.setsPerShard).toBeGreaterThanOrEqual(1000);
+    }
+    expect(examSetShardUrl('wabun', 7)).toBe(`/exam/sets/v${shardManifest.version}/wabun/07.json`);
+  });
+  it('keeps every stored wabun body sendable, with balanced brackets in many of them', () => {
+    const bodies = STORED_SETS.wabun.flatMap((set) => set.telegrams.map((telegram) => telegram.body));
+    for (const body of bodies) {
+      const unknown = tokenizeMorseInput(body, 'wabun').filter((token) => !(token in WABUN_MORSE));
+      expect(unknown, body).toEqual([]);
+      expect(body.replace(/（[ァ-ヶー]+）/g, ''), body).not.toMatch(/[（）]/);
+    }
+    expect(bodies.filter((body) => body.includes('（')).length / bodies.length).toBeGreaterThan(0.5);
+  });
+  it('falls back to procedural telegrams when no stored set is supplied', () => {
+    const plain = buildExamSession({ subjectId: 'plain', telegram: true });
+    expect(plain.sheets).toHaveLength(2);
+    expect(plain.sheets[0].playText.startsWith('HRHR NR ')).toBe(true);
   });
   it('expands voiced kana into base + dakuten for playback', () => {
     expect(expandWabunVoicing('ガ')).toEqual(['カ', '゛']);
@@ -580,6 +604,16 @@ describe('exam procedure marks for scoring', () => {
 });
 
 describe('exam recovery scoring', () => {
+  it('accepts half-width brackets in wabun copy', () => {
+    const scored = scoreExamCopy('コクテン（クロイハンテン）ガフエタ', 'コクテン(クロイハンテン)ガフエタ', 'wabun');
+    expect(scored.penalty).toBe(0);
+  });
+  it('accepts kanji or full-width digits for wabun numbers and keeps katakana ニ distinct', () => {
+    expect(scoreExamCopy('ミトオシハ500メートル」ニ', 'ミトオシハ五〇〇メートル」ニ', 'wabun').penalty).toBe(0);
+    expect(scoreExamCopy('ミトオシハ500メートル', 'ミトオシハ５００メートル', 'wabun').penalty).toBe(0);
+    expect(scoreExamCopy('ニ', '二', 'wabun').penalty).toBeGreaterThan(0);
+    expect(scoreExamCopy('2', 'ニ', 'wabun').penalty).toBeGreaterThan(0);
+  });
   it('recovers after a skipped block instead of shifting all later chars', () => {
     const scored = scoreExamCopy('ABCDEFGHIJ', 'DEFGHIJ', 'international');
     expect(scored.matches).toBe(7);

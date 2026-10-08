@@ -108,7 +108,8 @@ npm run dev
 | `npm run start`              | ビルド済みアプリの起動         |
 | `npm test`                   | テスト                         |
 | `npm run lint`               | コードチェック                 |
-| `npm run generate:exam-sets` | 電気通信術の問題セットを再生成 |
+| `npm run generate:exam-sets` | 電気通信術の問題セットを再生成し、配信用シャードへの分割まで行う |
+| `npm run split:exam-sets`    | `data/exam/sets.json` を手で直したときだけ、分割のみ再実行 |
 
 <details>
 <summary>開発構成・設定</summary>
@@ -129,7 +130,7 @@ docs/                設計・検証資料
 
 任意の設定は [`.env.example`](./.env.example) を参照してください。クラウド同期のAPI接続先は `NEXT_PUBLIC_API_BASE_URL`、Google Analyticsは `NEXT_PUBLIC_GA_MEASUREMENT_ID` で指定できます。AnalyticsはIDを設定した本番ビルドで読み込まれます。`NEXT_PUBLIC_*` の変更後は再ビルドが必要です。
 
-電気通信術の問題生成は [`scripts/generateExamSets.mjs`](./scripts/generateExamSets.mjs)、辞書は [`data/exam/dicts.json`](./data/exam/dicts.json)。カード画像の対応表は [`lib/cardArtwork.ts`](./lib/cardArtwork.ts) にあります。
+電気通信術の問題生成は [`scripts/generateExamSets.mjs`](./scripts/generateExamSets.mjs)、和文本文のネタは [`scripts/exam/jaScenarios.mjs`](./scripts/exam/jaScenarios.mjs)、辞書は [`data/exam/dicts.json`](./data/exam/dicts.json)。カード画像の対応表は [`lib/cardArtwork.ts`](./lib/cardArtwork.ts) にあります。
 
 </details>
 

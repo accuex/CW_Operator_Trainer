@@ -12,7 +12,8 @@
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "test": "vitest run --config vitest.config.ts",
-    "generate:exam-sets": "node scripts/generateExamSets.mjs"
+    "generate:exam-sets": "node scripts/generateExamSets.mjs",
+    "split:exam-sets": "node scripts/splitExamSets.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

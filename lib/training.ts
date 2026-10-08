@@ -1,6 +1,5 @@
 import { alphabetSymbols } from './morse';
 import {
-  pickStoredExamSet,
   type StoredCodesSet,
   type StoredExamSet,
   type StoredPlainSet,
@@ -9,6 +8,7 @@ import {
 import { OUBUN_PLAIN_PASSAGES, WABUN_PLAIN_PASSAGES } from './plainCorpus';
 import { buildMorseTimeline } from './timing';
 import type { AlphabetType, AudioSettings } from './types';
+import { buildRandomWabunBodies, type WabunWeakness } from './wabunRandom';
 
 /** 単語プール（短文ドリル・穴埋め用）。電文本文は plainCorpus を優先。 */
 const WORDS = [
@@ -459,6 +459,8 @@ export type ExamSession = {
   targetChars: number;
   /** 試験開始アナウンス（H30.9実録: `シケン シケン`）。採点本文には含めない */
   announcement?: string;
+  /** 和文ランダム本文（練習専用・本試験には無い形式）。採点はするが記録しない */
+  practiceRandom?: boolean;
 };
 
 /** 試験直前の呼称（実録どおり。和文符号で送る） */
@@ -616,6 +618,8 @@ function buildOneWabunTelegram(options: {
   examClass: TelegramExamClass;
   includeHrhr?: boolean;
   includeWiWe?: boolean;
+  /** 本文を外から渡す（ランダム本文）。無ければ普通語コーパスから作る */
+  body?: string;
 }): ExamLedger[] {
   const number = String(1 + Math.floor(Math.random() * 80));
   const officeNumeric = Math.random() < 0.45;
@@ -623,7 +627,7 @@ function buildOneWabunTelegram(options: {
   const office = officeNumeric ? `ハツ${officeRaw}` : officeRaw;
   const serial = officeNumeric ? `タナ${number}` : number;
   const address = buildAddressJa();
-  const fullBody = buildWabunBody(options.bodyChars, options.includeWiWe === true);
+  const fullBody = options.body ?? buildWabunBody(options.bodyChars, options.includeWiWe === true);
   const chunks = chunkWabunBody(fullBody, WABUN_BODY_CHARS_PER_PAGE);
   const totalCount = String(compactLen(fullBody));
   const hour = Math.floor(Math.random() * 24);
@@ -706,6 +710,40 @@ function buildWabunTelegramSheets(options: {
   const first = appendTelegram(bodyCharsForWabunPages(firstPages), 1, true);
   const second = appendTelegram(bodyCharsForWabunPages(secondPages), 1 + first.length, false);
   return [...first, ...second];
+}
+
+/** ランダム本文は普通語より符号が長いので、作るたびに測って5分に収める */
+const RANDOM_WABUN_MAX_SEC = 290;
+/** 字数を詰めても各通の最終ページに残す字数 */
+const RANDOM_WABUN_LAST_PAGE_MIN = 10;
+
+/** 和文ランダム本文の額表（2通・5枚）。苦手な字ほど多く出る */
+function buildRandomWabunSheets(options: {
+  examClass: TelegramExamClass;
+  weakness: WabunWeakness;
+  includeWiWe: boolean;
+}): ExamLedger[] {
+  const firstPages = Math.random() < 0.5 ? 2 : 3;
+  const pages = [firstPages, 5 - firstPages];
+  const chars = pages.map(bodyCharsForWabunPages);
+  const floor = pages.map((count) => (count - 1) * WABUN_BODY_CHARS_PER_PAGE + RANDOM_WABUN_LAST_PAGE_MIN);
+  const wpm = EXAM_SUBJECTS.wabun.wpm;
+  let sheets: ExamLedger[] = [];
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const bodies = buildRandomWabunBodies(chars, { weakness: options.weakness, includeWiWe: options.includeWiWe });
+    const first = buildOneWabunTelegram({ bodyChars: chars[0], startSheet: 1, examClass: options.examClass, body: bodies[0] });
+    const second = buildOneWabunTelegram({
+      bodyChars: chars[1],
+      startSheet: 1 + first.length,
+      examClass: options.examClass,
+      includeHrhr: false,
+      body: bodies[1],
+    });
+    sheets = [...first, ...second];
+    if (measureExamAudioSec(sheets, 'wabun', wpm) <= RANDOM_WABUN_MAX_SEC) break;
+    chars.forEach((count, index) => { chars[index] = Math.max(floor[index], count - 8); });
+  }
+  return sheets;
 }
 
 function sheetsFromStoredWabun(set: StoredWabunSet, includeWiWe: boolean): ExamLedger[] {
@@ -826,6 +864,10 @@ export function buildExamSession(options: {
   includeWiWe?: boolean;
   /** true で事前JSONセットを使わず従来のその場生成 */
   procedural?: boolean;
+  /** 事前セット（lib/examSets の pickStoredExamSet で取得）。無ければその場生成 */
+  stored?: StoredExamSet | null;
+  /** 和文額表をランダム本文で出す（練習専用）。苦手度は wabunWeakness で作る */
+  randomWabun?: { weakness: WabunWeakness };
 }): ExamSession {
   const subject = EXAM_SUBJECTS[options.subjectId];
   const examClass = options.examClass ?? 'class1';
@@ -833,10 +875,26 @@ export function buildExamSession(options: {
   const headerBudget = options.telegram ? (options.subjectId === 'wabun' ? 40 : 70) : 0;
   const includeWiWe = options.subjectId === 'wabun' && options.includeWiWe === true;
 
+  if (options.subjectId === 'wabun' && options.telegram && options.randomWabun) {
+    const sheets = buildRandomWabunSheets({ examClass, weakness: options.randomWabun.weakness, includeWiWe });
+    const playText = sheets.map((sheet) => sheet.playText).join('\n\n');
+    return {
+      subjectId: options.subjectId,
+      telegram: true,
+      examClass,
+      sheets,
+      playText,
+      totalChars: compactLen(playText),
+      targetChars: sheets.reduce((sum, sheet) => sum + compactLen(sheet.body), 0),
+      announcement: EXAM_ANNOUNCEMENT,
+      practiceRandom: true,
+    };
+  }
+
   // 本試験（電報）は事前作文セットを優先。練習用字数上書き時のみ従来生成。
-  if (options.telegram && !options.procedural && options.wabunBodyChars == null) {
-    const stored = pickStoredExamSet(options.subjectId);
-    if (stored) return sessionFromStoredSet(stored, { examClass, includeWiWe, telegram: true });
+  const stored = options.stored;
+  if (options.telegram && !options.procedural && options.wabunBodyChars == null && stored?.subjectId === options.subjectId) {
+    return sessionFromStoredSet(stored, { examClass, includeWiWe, telegram: true });
   }
 
   if (options.subjectId === 'wabun' && options.telegram) {

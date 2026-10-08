@@ -4,6 +4,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { ExamGakuForm, countPlaySymbols, highlightPlayText } from '@/app/components/ExamGakuForm';
 import { DEFAULT_EXAM_PREFS, loadExamPrefs, saveExamPrefs } from '@/lib/examPrefs';
 import { EXAM_SHEET_GAP_SEC, EXAM_SUBJECTS, buildExamSession, examSheetGapSec, type ExamSession, type ExamSubjectId } from '@/lib/training';
+import { pickStoredExamSet, prefetchStoredExamSet } from '@/lib/examSets';
+import { wabunWeakness } from '@/lib/wabunRandom';
 import { EXAM_PENALTY, scoreExamCopy, stripExamProcedureMarks, type ExamScore } from '@/lib/examScore';
 import type { AnswerLog, AudioSettings } from '@/lib/types';
 import { audioEngine, nowId, pct } from '@/app/trainer/shared';
@@ -18,6 +20,7 @@ const MANUAL_SCROLL_HOLD_MS = 4000;
 const WARNING_MARQUEE = 'WARNING　試験開始　'.repeat(8);
 
 const SUBJECT_IDS = Object.keys(EXAM_SUBJECTS) as ExamSubjectId[];
+const RANDOM_WABUN_NOTE = '本試験の和文は普通語のみで、ランダムな本文（暗語）は出題されません。文脈に頼らず全部の字を書き取る練習用です。苦手な字ほど多く出し、採点は表示のみで記録しません。';
 
 function initialExamUi() {
   const prefs = loadExamPrefs();
@@ -29,6 +32,7 @@ export function ExamView({
   settings,
   setSettings,
   record,
+  answers,
   setAudioStatus,
   stopEpoch,
   announce,
@@ -37,6 +41,8 @@ export function ExamView({
   settings: AudioSettings;
   setSettings: (settings: AudioSettings) => void;
   record: (answer: AnswerLog) => void;
+  /** 和文ランダム本文で苦手な字を多めに出すための回答記録 */
+  answers: AnswerLog[];
   setAudioStatus: (status: string) => void;
   stopEpoch: number;
   announce: (message: string) => void;
@@ -52,6 +58,8 @@ export function ExamView({
   const [listenMode, setListenMode] = useState(DEFAULT_EXAM_PREFS.listenMode);
   /** 視聴: セット終了後に次問題を自動再生（ひたすら聞く） */
   const [autoContinueListen, setAutoContinueListen] = useState(DEFAULT_EXAM_PREFS.autoContinueListen);
+  /** 和文額表の本文をランダムに（練習専用。採点は表示のみで記録しない） */
+  const [randomWabunBody, setRandomWabunBody] = useState(DEFAULT_EXAM_PREFS.randomWabunBody);
   const [prefsReady, setPrefsReady] = useState(false);
   /** 開始時に固定（途中でトグルしても表示が壊れない） */
   const [sessionListenMode, setSessionListenMode] = useState(false);
@@ -76,15 +84,18 @@ export function ExamView({
   const listenModeRef = useRef(DEFAULT_EXAM_PREFS.listenMode);
   const autoContinueListenRef = useRef(DEFAULT_EXAM_PREFS.autoContinueListen);
   const phaseRef = useRef(phase);
-  phaseRef.current = phase;
+  useLayoutEffect(() => { phaseRef.current = phase; }, [phase]);
 
   useEffect(() => {
     const boot = initialExamUi();
+    // 保存済み設定は localStorage にしか無いので、SSR と同じ既定値で描画してから反映する
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelected(boot.selected);
     setTelegram(boot.prefs.telegram);
     setIncludeWiWe(boot.prefs.includeWiWe);
     setListenMode(boot.prefs.listenMode);
     setAutoContinueListen(boot.prefs.autoContinueListen);
+    setRandomWabunBody(boot.prefs.randomWabunBody);
     listenModeRef.current = boot.prefs.listenMode;
     autoContinueListenRef.current = boot.prefs.autoContinueListen;
     setPrefsReady(true);
@@ -99,8 +110,9 @@ export function ExamView({
       includeWiWe,
       listenMode,
       autoContinueListen,
+      randomWabunBody,
     });
-  }, [prefsReady, selected, telegram, includeWiWe, listenMode, autoContinueListen]);
+  }, [prefsReady, selected, telegram, includeWiWe, listenMode, autoContinueListen, randomWabunBody]);
   const timer = useRef<number | null>(null);
   const activeRef = useRef(false);
   const pausedRef = useRef(false);
@@ -112,6 +124,17 @@ export function ExamView({
   const followedSheetRef = useRef(-1);
   const manualScrollAtRef = useRef(0);
   const preset = presets[selected];
+  const randomWabunActive = preset.id === 'wabun' && telegram && randomWabunBody;
+  useEffect(() => {
+    if (telegram && !randomWabunActive) prefetchStoredExamSet(preset.id);
+  }, [preset.id, telegram, randomWabunActive]);
+  const nextExamSession = async () => buildExamSession({
+    subjectId: preset.id,
+    telegram,
+    includeWiWe: preset.id === 'wabun' && includeWiWe,
+    randomWabun: randomWabunActive ? { weakness: wabunWeakness(answers) } : undefined,
+    stored: telegram && !randomWabunActive ? await pickStoredExamSet(preset.id) : null,
+  });
   const inSession = phase === 'ready' || phase === 'playing' || phase === 'paused' || phase === 'review';
   const trafficLabel = preset.id === 'wabun' && telegram ? '2通・5枚' : '2通';
 
@@ -267,6 +290,11 @@ export function ExamView({
       revealedRef.current = true;
       playSfx('reveal', settings.volume);
     }
+    window.setTimeout(() => {
+      document.querySelector('.exam-result-inline')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+    // ランダム本文は本試験に無い形式。苦手分析・履歴に混ぜない
+    if (sessionRef.current?.practiceRandom) return;
     const sessionId = `exam-${nowId()}`;
     scored.cells.forEach((cell) => {
       if (cell.op === 'ins') return;
@@ -278,9 +306,6 @@ export function ExamView({
         isCorrect: cell.op === 'match', isEarly: false, sessionId,
       });
     });
-    window.setTimeout(() => {
-      document.querySelector('.exam-result-inline')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
   }, [copy, enterListenReview, preset.alphabet, record, setAudioStatus, settings.characterSpeed, settings.effectiveSpeed, settings.volume, sourceText]);
   const finishRef = useRef(finish);
   useLayoutEffect(() => {
@@ -410,11 +435,8 @@ export function ExamView({
       if (activeRef.current && runIdRef.current === runId) {
         if (listenModeRef.current && autoContinueListenRef.current) {
           // ひたすら聞く: 次の出題をそのまま再生（答え合わせに落とさない）
-          const continued = buildExamSession({
-            subjectId: preset.id,
-            telegram,
-            includeWiWe: preset.id === 'wabun' && includeWiWe,
-          });
+          const continued = await nextExamSession();
+          if (!activeRef.current || runIdRef.current !== runId) return;
           clearTimer();
           setTimeUp(false);
           setHeardCount(0);
@@ -536,12 +558,11 @@ export function ExamView({
     setPhase('ready');
   };
 
-  const start = () => {
-    const next = buildExamSession({
-      subjectId: preset.id,
-      telegram,
-      includeWiWe: preset.id === 'wabun' && includeWiWe,
-    });
+  const preparingRef = useRef(false);
+  const start = async () => {
+    if (preparingRef.current) return;
+    preparingRef.current = true;
+    const next = await nextExamSession().finally(() => { preparingRef.current = false; });
     if (listenMode) {
       prepareListenDesk(next);
       return;
@@ -551,12 +572,10 @@ export function ExamView({
   };
 
   /** 新しい出題を用意（再生はスタート押し待ち） */
-  const renewProblem = () => {
-    const next = buildExamSession({
-      subjectId: preset.id,
-      telegram,
-      includeWiWe: preset.id === 'wabun' && includeWiWe,
-    });
+  const renewProblem = async () => {
+    if (preparingRef.current) return;
+    preparingRef.current = true;
+    const next = await nextExamSession().finally(() => { preparingRef.current = false; });
     if (sessionListenMode || listenModeRef.current || listenMode) {
       prepareListenDesk(next);
       return;
@@ -829,6 +848,23 @@ export function ExamView({
               </span>
             </label>
           )}
+          {preset.id === 'wabun' && telegram && (
+            <label className={`exam-switch${randomWabunBody ? ' on' : ''}`}>
+              <span className="exam-switch-copy">
+                <strong>本文をランダムにする（練習用）</strong>
+                <small>{RANDOM_WABUN_NOTE}</small>
+              </span>
+              <span className="exam-switch-ui">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  checked={randomWabunBody}
+                  onChange={(event) => setRandomWabunBody(event.target.checked)}
+                />
+                <i aria-hidden="true" />
+              </span>
+            </label>
+          )}
         </div>
 
         <div className="panel panel-pad exam-speed-bar">
@@ -885,6 +921,9 @@ export function ExamView({
           <div className="exam-status-row">
             <div className="exam-status-meta">
               <span className="chip gold">{preset.title}</span>
+              {session?.practiceRandom && (
+                <span className="chip" title="本試験には無い形式です（記録しません）">ランダム練習</span>
+              )}
               {sessionListenMode ? (
                 <button
                   type="button"

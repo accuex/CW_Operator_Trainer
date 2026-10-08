@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "setsPerShard": 20,
+  "shards": {
+    "plain": 50,
+    "codes": 50,
+    "wabun": 50
+  }
+}

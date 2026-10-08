@@ -43,10 +43,22 @@ export type ExamScore = {
   cells: ExamAlignCell[];
 };
 
-/** 空白除去。欧文は大文字化。ずれ採点の前処理。 */
+const WABUN_COPY_VARIANTS: Record<string, string> = {
+  '(': '（', ')': '）', '┘': '」',
+  '〇': '0', '一': '1', '二': '2', '三': '3', '四': '4',
+  '五': '5', '六': '6', '七': '7', '八': '8', '九': '9',
+};
+
+/**
+ * 空白除去。欧文は大文字化。和文は半角括弧・全角数字・漢数字を本文の表記へ寄せる
+ * （額表は漢数字印字、本文データは算用数字）。ずれ採点の前処理。
+ */
 export function normalizeExamCopy(text: string, alphabet: AlphabetType): string {
   const compact = text.replace(/\s+/g, '');
-  return alphabet === 'wabun' ? compact : compact.toUpperCase();
+  if (alphabet !== 'wabun') return compact.toUpperCase();
+  return compact
+    .replace(/[０-９]/g, (digit) => String.fromCharCode(digit.charCodeAt(0) - 0xfee0))
+    .replace(/[()┘〇一二三四五六七八九]/g, (ch) => WABUN_COPY_VARIANTS[ch]);
 }
 
 /**

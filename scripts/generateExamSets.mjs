@@ -8,7 +8,8 @@
  * 【役割分担】むやみに全部いじらない
  * ────────────────────────────────────────────────────────────
  * - data/exam/dicts.json … 固有名・局名など「肩書き」だけ
- * - このファイルの EN_SCENARIOS / JA_SCENARIOS … 本文のネタ
+ * - このファイルの EN_SCENARIOS … 欧文本文のネタ
+ * - scripts/exam/jaScenarios.mjs … 和文本文のネタ（表記ルールも同ファイル先頭）
  * - 下の COUNT / PAGE / targetWords / pagesToChars … 長さ・枚数
  * OCR練習帳の原文コピーは禁止（傾向だけ参考にして作文）。
  *
@@ -39,12 +40,17 @@
  * - 長さ合わせで切らない。composeEnBody が完結した候補から最も近いものを選ぶ
  *
  * ────────────────────────────────────────────────────────────
- * 【JA_SCENARIOS の書き方】★他AIが一番壊しやすいところ
+ * 【jaScenarios.mjs の書き方】★他AIが一番壊しやすいところ
  * ────────────────────────────────────────────────────────────
  * - カタカナのみ。ひらがな・漢字・英字・空白禁止（、は本文結合時に付くので
- *   フレーズ自体には入れない）
+ *   フレーズ自体には入れない）。拗音・促音は大書き（シヨウ・ナツタ）
+ * - 記号は （ ） のみ。直前の語の補足・言い換えに使う（コクテン（タイヨウノクロイハンテン））
+ *   「「」は和文モールスに符号が無い。段落「」」は約1割の通で本題と結びの間に生成側が入れる
+ * - 数量は num("3000", "サンゼン")。約1割の通だけ算用数字になる（JA_NUMERIC_RATE）
  * - opening / details / endings は同じ話題で統一し、順番にも意味を持たせる
- * - 電報っぽい短文（だいたい 12–28 字）に分け、途中では切らない
+ * - 書き出しと詳細には言い換え候補を pick で持たせ、1つの書き出しから
+ *   続きが決まってしまわないようにする（例: エキデ→サイフ 固定は不可）
+ * - 電報っぽい短文（だいたい 12–30 字）に分け、途中では切らない
  * - ローマ字変換の生出力を信じない。必ず音を頭で読んで確認:
  *   · 困っている → コマツテイル
  *   · 溜まって → タマツテ
@@ -67,13 +73,17 @@
  * ────────────────────────────────────────────────────────────
  * 1. dicts / シナリオを直す
  * 2. 必要ならシード（mulberry32 の引数）を少し進めて中身を刷新
- * 3. npm run generate:exam-sets
- * 4. 和文はサンプル数通を目で読んでカタカナ破綻がないか確認
- * 5. npm test（stored set 件数など）
+ *    ※生成順は 欧文普通語→暗語→和文。和文だけ直すならシードを触らなければ欧文・暗語は不変
+ * 3. SETS_VERSION を上げる（配信シャードのキャッシュ対策）
+ * 4. npm run generate:exam-sets（シャード分割まで行う）
+ * 5. 和文はサンプル数通を目で読んでカタカナ破綻がないか確認
+ * 6. npm test（stored set 件数など）
  */
 import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createJaScenarios } from "./exam/jaScenarios.mjs";
+import { writeExamShards } from "./splitExamSets.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -83,6 +93,8 @@ const dicts = JSON.parse(
 );
 
 const COUNT = 1000;
+/** 中身を変えたら上げる。配信シャードの URL（/exam/sets/v{n}/）に入り、古いキャッシュと混ざらない */
+const SETS_VERSION = 2;
 /** 和文額表1枚あたりの本文マス数（変更するなら pagesToChars も見直す） */
 const PAGE = 60;
 
@@ -493,290 +505,63 @@ const pickOrderedSubset = (items, count) => {
   return selected;
 };
 
-// 一通の中では同じ話題を保ち、導入から結論まで順に並べる。
-const JA_SCENARIOS = [
-  () => {
-    const place = pick(dicts.placesJa);
-    const date = pick(JA_DATES);
-    const time = pick(JA_TIMES);
-    return {
-      opening: `ライゲツ${date}ニ${place}ヘイクコトニナツタ`,
-      details: [
-        pick(["シゴトノウチアワセガフツカカンアル", "アタラシイミセノケンデソウダンスル"]),
-        `${time}ノキユウコウニノルヨテイダ`,
-        pick(["キツプハキノウヨヤクシテオイタ", "ザセキハマドガワヲトツテオイタ"]),
-        "ニモツハオオキナカバンヒトツダケダ",
-        pick(["エキマデムカエニキテクレルカ", "トチヤクシタラエキカラデンワスル"]),
-        "ホテルハエキノチカクニトツテアル",
-        "オクレルトキハスグレンラクスル",
-        pick(["ヨクジツハアサカラシゴトノヨテイダ", "ヒルノウチニヨウジヲスベテスマセル"]),
-        "カエリハニチヨウビノユウガタニナル",
-      ],
-      endings: ["カゾクニモヨテイヲシラセテオイテクレ", "ヘンジハコンヤノウチニタノム"],
-    };
-  },
-  () => ({
-    opening: pick(["ケサムスメニオンナノコガウマレタ", "キノウムスコニゲンキナオトコノコガウマレタ"]),
-    details: [
-      "ハハコトモニゲンキダカラシンパイイラナイ",
-      pick(["アカチヤンハサンゼンニヒヤクグラムダ", "アカチヤンハヨクナイテトテモゲンキダ"]),
-      "ナマエハカゾクデソウダンシテキメル",
-      "タイインハライシユウノヨテイダ",
-      "イエニベビーベツドヲヨウイシテオイタ",
-      "オイワイハオチツイテカラミンナデシタイ",
-      "シヤシンヲトツタラソチラニモオクル",
-      "オバアチヤンニモスグシラセテクレ",
-      "アエルヒヲミンナタノシミニシテイル",
-    ],
-    endings: ["ツゴウノヨイヒヲヘンジシテクレ", "トリアエズウレシイシラセマデ"],
-  }),
-  () => ({
-    opening: pick(["チチガキノウカラニユウインシテイル", "ハハガケンサノタメビヨウインニハイツタ"]),
-    details: [
-      pick(["ケンサノケツカハオモツタヨリヨカツタ", "イシヤハシバラクアンセイガヒツヨウトイツタ"]),
-      "クスリガキイテユウベハヨクネムレタ",
-      "シヨクジモスコシズツタベテイル",
-      "ネツハサガツテカオイロモヨクナツタ",
-      "タイインハライシユウノヨテイダ",
-      "ムリヲシナケレバスグゲンキニナルソウダ",
-      "ヒツヨウナモノハコチラデヨウイシタ",
-      "ミマイハタイインシテカラデカマワナイ",
-      "ナニカカワツタコトガアレバレンラクスル",
-    ],
-    endings: ["ミンナニシンパイイラナイトツタエテクレ", "オチツイタラマタデンポウスル"],
-  }),
-  () => {
-    const place = pick(dicts.placesJa);
-    return {
-      opening: `タイフウガ${place}ニチカヅイテイル`,
-      details: [
-        "アサカラカゼトアメガツヨクナツタ",
-        "マドニイタヲウツテトビラヲシツカリシメタ",
-        "ニワノウエキハイエノナカニイレタ",
-        "テイデンニソナエテデンチトミズヲヨウイシタ",
-        "カゾクハミンナイエニイテブジダ",
-        "カワノミズガフエテイルノデチカヅカナイ",
-        "コンヤハコウミンカンニヒナンスルカモシレナイ",
-        "デンワガツナガリニククナツテイル",
-        "アスノアサニヨウスヲミテマタレンラクスル",
-      ],
-      endings: ["ソチラモソトニデナイデキヲツケテクレ", "コチラハブジダカラシンパイシナイデクレ"],
-    };
-  },
-  () => ({
-    opening: pick(["シケンガライゲツニセマツテキタ", "サンシユウカンゴニシユウリヨウシケンガアル", "ガツキマツノシケンニムケテベンキヨウシテイル"]),
-    details: [
-      pick(["マイニチヨルマデベンキヨウシテイル", "スウガクハデキタガエイゴガムズカシカツタ"]),
-      "センセイカラフクシユウノモンダイヲモラツタ",
-      "ニガテナトコロハトモダチトオシエアツテイル",
-      "ネブソクニナラナイヨウハヤクネルコトニシタ",
-      "ニチヨウビモトシヨカンデベンキヨウスル",
-      "モシゴウカクシタラミンナデオイワイシタイ",
-      "ケツカハライシユウノゲツヨウビニワカル",
-      "ガツコウカラシラセガキタラスグレンラクスル",
-      "オウエンシテクレテイツモアリガトウ",
-    ],
-    endings: ["サイゴマデガンバルカラミテイテクレ", "ケツカガワカルマデシンパイシナイデクレ"],
-  }),
-  () => {
-    const place = pick(dicts.placesJa);
-    return {
-      opening: pick(["アタラシイシヨウダンガマトマリソウダ", "チユウモンガフエテミセガイソガシクナツタ"]),
-      details: [
-        `アス${place}カラタントウシヤガクル`,
-        "ミツモリシヨハキヨウノウチニシアゲル",
-        "ネダントノウキハサキニカクニンシテアル",
-        "ザイコハソウコニジユウブンノコツテイル",
-        "ハイソウノテハイモウンソウガイシヤニタノンダ",
-        "ケイヤクシヨハブチヨウガサイゴニカクニンスル",
-        "モンダイガナケレバコンゲツカラトリヒキヲハジメル",
-        "ケツカハアスノユウガタニワカルヨテイダ",
-        "ウマクイクヨウミンナデジユンビシテイル",
-      ],
-      endings: ["ヘンカガアレバスグニレンラクスル", "シヨウサイハケイヤクノアトデシラセル"],
-    };
-  },
-  () => ({
-    opening: pick(["コトシモイネノカリイレガハジマツタ", "ハタケノヤサイガシユウカクノジキニナツタ"]),
-    details: [
-      pick(["テンキガヨクシユウカクハジユンチヨウダ", "ナガアメノアトダガサクモツハブジダツタ"]),
-      "キンジヨノヒトニモテツダイニキテモラツタ",
-      "ノウキグハセイビシタノデチヨウシガヨイ",
-      "アサハヤクカラヒルスギマデハタライテイル",
-      "トレタモノハアスイチバヘハコブヨテイダ",
-      "ネダンハキヨネントオナジクライニナリソウダ",
-      "ライシユウマデニオオカタオワルダロウ",
-      "オワツタラミンナデユツクリヤスミタイ",
-      "シンマイガデキタラソチラニモオクル",
-    ],
-    endings: ["カラダニキヲツケテガンバツテイル", "トドケルヒガキマツタラマタシラセル"],
-  }),
-  () => ({
-    opening: pick(["ケサハヤクフネヲダシテオキヘムカツタ", "ウミガシズカナノデヨアケマエニシユツコウシタ"]),
-    details: [
-      pick(["アジトサバガオモツタヨリタクサントレタ", "アミニオオキナタイガカカツテミンナオドロイタ"]),
-      "アミニスコシキズガアルガシユウリデキル",
-      "ヒルマエニミナトヘモドルヨテイダ",
-      "サカナハスグニイチバヘハコブテハズダ",
-      "ネダンガヨケレバコトシイチバンノリヨウニナル",
-      "ゴゴハアミトエンジンヲテンケンスル",
-      "アスハカゼガツヨクナルノデフネヲダサナイ",
-      "ミンナツカレタガケガハナイ",
-      "ヨルハハヤクヤスンデカラダヲヤスメル",
-    ],
-    endings: ["サカナハアスノアサソチラニトドケル", "テンキガヨクナツタラマタオキヘデル"],
-  }),
-  () => {
-    const place = pick(dicts.placesJa);
-    const time = pick(JA_TIMES);
-    return {
-      opening: `ホンセンハアス${time}ニ${place}ヘニユウコウスル`,
-      details: [
-        "ミナトノイリグチデパイロツトヲマツ",
-        "ウゲンノパイロツトラダーハヨウイデキテイル",
-        "キカンモカジモチヨウシハヨイ",
-        "ニユウコウシヨルイハセンチヨウガカクニンシタ",
-        "チヤクガンゴスグニカモツヲオロシハジメル",
-        "サンバンセンソウニフタツノクレーンヲタノミタイ",
-        "ミズトネンリヨウノホキユウモヒツヨウダ",
-        "カモツガオワレバヨクジツノアサシユツコウスル",
-        "テンコウガワルイトキハオキデタイキスル",
-      ],
-      endings: ["ダイリテンハテハイヲカクニンシテクレ", "ヘンコウガアレバムセンデシラセテクレ"],
-    };
-  },
-  () => {
-    const waterTrouble = rng() < 0.5;
-    return {
-      opening: waterTrouble
-        ? "キノウカラダイドコロノスイドウガモレテイル"
-        : "ユウベカラデンキノチヨウシガワルイ",
-      details: waterTrouble
-        ? [
-            "モトセンヲトメタノデオオキナヒガイハナイ",
-            "アサイチバンニスイドウヤヘデンワシタ",
-            "ギヨウシヤハヒルスギニミニクルトイツテイル",
-            "フルイパイプヲトリカエルヒツヨウガアルソウダ",
-            "シユウリダイハミツモリヲミテカラキメル",
-            "ナオルマデフロトセンタクハツカエナイ",
-            "キンジヨノイエカラミズヲワケテモラツタ",
-            "コンヤマデニナオレバセイカツニコマラナイ",
-            "オワツタラダイドコロノソウジモシテオク",
-          ]
-        : [
-            "ブレーカーヲキツテアブナクナイヨウニシタ",
-            "アサイチバンニデンキヤヘデンワシタ",
-            "ギヨウシヤハヒルスギニミニクルトイツテイル",
-            "フルイハイセンヲトリカエルヒツヨウガアルソウダ",
-            "シユウリダイハミツモリヲミテカラキメル",
-            "ナオルマデダイドコロノデンキハツカエナイ",
-            "レイゾウコノナカミハキンジヨニアズケタ",
-            "コンヤマデニナオレバセイカツニコマラナイ",
-            "オワツタラヘヤノソウジモシテオク",
-          ],
-      endings: ["シユウリガオワツタラスグレンラクスル", "イソイデカエツテコナクテモダイジヨウブダ"],
-    };
-  },
-  () => ({
-    opening: pick(["ケサエキデサイフヲオトシタラシイ", "デンシヤノナカニカバンヲワスレテシマツタ"]),
-    details: [
-      pick(["キツプヲカツタトキマデハモツテイタ", "オリルマエニアミダナヘノセタノヲオボエテイル"]),
-      "エキノジムシヨトケイサツニトドケヲダシタ",
-      "ナカニハゲンキントツウチヨウガハイツテイル",
-      "ギンコウニデンワシテカードヲトメテモラツタ",
-      "ミブンシヨノサイハツコウモタノンデアル",
-      "ユウガタエキカラニタモノガアルトデンワガキタ",
-      "アスアサイチバンニカクニンニイク",
-      "ミツカレバスグニソチラヘシラセル",
-      "イマノトコロホカニコマツタコトハナイ",
-    ],
-    endings: ["シンパイヲカケタガオカネハオクラナクテヨイ", "ケツカガワカルマデスコシマツテクレ"],
-  }),
-  () => {
-    const date = pick(JA_DATES);
-    return {
-      opening: `ケツコンシキハライゲツ${date}ニキマツタ`,
-      details: [
-        "シキジヨウハエキノチカクノホテルダ",
-        "ゴゼンジユウイチジマデニキテホシイ",
-        "シンゾクハヒカエシツニアツマルコトニナツテイル",
-        "フクソウハヘイフクデカマワナイ",
-        "トオクカラクルヒトノヘヤハヨヤクシテアル",
-        "シキノアトニミジカイヒロウエンヲオコナウ",
-        "シヨクジノツゴウガワルイヒトハシラセテクレ",
-        "シヨウタイジヨウハアスユウビンデオクル",
-        "カゾクミンナデアエルノヲタノシミニシテイル",
-      ],
-      endings: ["シユツセキデキルカハヤメニヘンジヲクレ", "ツゴウガツカナケレバエンリヨナクシラセテクレ"],
-    };
-  },
-  () => ({
-    opening: pick(["マチノナツマツリガライシユウヒラカレル", "チヨウナイノウンドウカイガニチヨウビニアル"]),
-    details: [
-      pick(["コトシハワタシモジユンビヲテツダツテイル", "アサカラミンナデカイジヨウヲセイビシテイル"]),
-      "コドモタチハマイニチオドリヲレンシユウシテイル",
-      "カイジヨニハミセガタクサンデルトキイタ",
-      "ヒルカラタイコトフエノエンソウガアル",
-      "アメノトキハヨクジツニエンキスル",
-      "オベントウトノミモノハコチラデヨウイスル",
-      "チユウシヤジヨウガスクナイノデバスデキテクレ",
-      "オワツタアトハミンナデカタヅケヲスル",
-      "ヒサシブリニアエルノヲタノシミニシテイル",
-    ],
-    endings: ["ツゴウガヨケレバカゾクデキテクレ", "サンカデキルカコンヤマデニヘンジヲクレ"],
-  }),
-  () => {
-    const dog = rng() < 0.5;
-    return {
-      opening: dog ? "アタラシイコイヌヲカウコトニナツタ" : "マイゴノネコヲイエデアズカツテイル",
-      details: [
-        dog ? "ナマエハカゾクデポチトキメタ" : "クビワニハナマエガカイテナカツタ",
-        "ハジメハオビエテイタガイマハオチツイテイル",
-        dog ? "アサトユウガタニサンポヘツレテイク" : "ヒルハマドギワデヒナタボツコシテイル",
-        "エサハペツトノミセデカツテキタ",
-        "キノウジユウイニミテモラツタガゲンキダ",
-        "ヨルハゲンカンノヨコデシズカニネテイル",
-        "コドモタチガセワノトウバンヲキメタ",
-        "シヤシンヲトツタノデアトデオクル",
-        dog ? "コレカラカゾクノイチイントシテタイセツニスル" : "モトノカイヌシガミツカルマデタイセツニスル",
-      ],
-      endings: ["コンヤデンワデクワシクハナス", "ツギニクルトキハタノシミニシテイテクレ"],
-    };
-  },
-];
+/** 数字入りの通の割合。数字は和文の数字符号（フル）で送り、額表には漢数字で印字 */
+const JA_NUMERIC_RATE = 0.1;
+/** 本題と結びの間を段落「」」で区切る通の割合 */
+const JA_PARAGRAPH_RATE = 0.1;
+let jaNumericMode = false;
+/** シナリオ内の数量。数字入りの通だけ算用数字、それ以外はカナ */
+const num = (digits, kana) => (jaNumericMode ? digits : kana);
 
-/** 文節を切らず、ページ数を守りながら目標字数に最も近い本文を作る。 */
-const composeJaBody = (targetChars) => {
+// 一通の中では同じ話題を保ち、導入から結論まで順に並べる。ネタは scripts/exam/jaScenarios.mjs
+const JA_SCENARIOS = createJaScenarios({ pick, rng, dicts, dates: JA_DATES, times: JA_TIMES, num });
+const jaScenarioUseCounts = Array.from({ length: JA_SCENARIOS.length }, () => 0);
+
+/**
+ * 文節を切らず、ページ数を守りながら目標字数に最も近い本文を作る。
+ * 話題は使用回数の少ない順に試し、同じセットの別の通と同じ話題は避ける。
+ * 数字入りの通は数字を含む候補だけ採り、数字を出せない話題は飛ばす。
+ */
+const composeJaBody = (targetChars, avoidScenario = -1) => {
   const threePages = targetChars > 120;
   const minChars = threePages ? 121 : 61;
   const maxChars = threePages ? 180 : 120;
-  let best;
+  jaNumericMode = rng() < JA_NUMERIC_RATE;
+  const closingSeparator = rng() < JA_PARAGRAPH_RATE ? "」" : "、";
+  const scenarioOrder = JA_SCENARIOS.map((_, index) => ({ index, tie: rng() }))
+    .filter(({ index }) => index !== avoidScenario)
+    .sort(
+      (left, right) =>
+        jaScenarioUseCounts[left.index] - jaScenarioUseCounts[right.index] ||
+        left.tie - right.tie,
+    );
 
-  for (let attempt = 0; attempt < 280; attempt += 1) {
-    const story = pick(JA_SCENARIOS)();
-    const ending = pick(story.endings);
-    const signature = pick(JA_CLOSING);
-    for (let detailCount = 2; detailCount <= story.details.length; detailCount += 1) {
-      const candidate = [
-        story.opening,
-        ...pickOrderedSubset(story.details, detailCount),
-        ending,
-        signature,
-      ].join("、");
-      const chars = compactLen(candidate);
-      if (chars < minChars || chars > maxChars || usedJaBodies.has(candidate)) continue;
-      const score = Math.abs(chars - targetChars);
-      if (!best || score < best.score) best = { candidate, score };
-      if (score <= 3) {
-        usedJaBodies.add(candidate);
-        return candidate;
+  for (const { index } of scenarioOrder) {
+    let best;
+    for (let attempt = 0; attempt < 120 && !(best?.score <= 3); attempt += 1) {
+      const story = JA_SCENARIOS[index]();
+      const ending = pick(story.endings);
+      const signature = pick(story.signatures ?? JA_CLOSING);
+      for (let detailCount = 2; detailCount <= story.details.length; detailCount += 1) {
+        const candidate = [
+          [story.opening, ...pickOrderedSubset(story.details, detailCount)].join("、"),
+          [ending, signature].join("、"),
+        ].join(closingSeparator);
+        const chars = compactLen(candidate);
+        if (chars < minChars || chars > maxChars || usedJaBodies.has(candidate)) continue;
+        if (jaNumericMode && !/[0-9]/.test(candidate)) continue;
+        const score = Math.abs(chars - targetChars);
+        if (!best || score < best.score) best = { candidate, score };
+        if (score <= 3) break;
       }
     }
+    if (!best) continue;
+    jaScenarioUseCounts[index] += 1;
+    usedJaBodies.add(best.candidate);
+    return { body: best.candidate, scenario: index };
   }
 
-  if (!best) throw new Error("unable to compose a unique Japanese body");
-  usedJaBodies.add(best.candidate);
-  return best.candidate;
+  throw new Error("unable to compose a unique Japanese body");
 };
 
 const addressJa = () => {
@@ -941,22 +726,19 @@ const makeCodesSet = (index) => {
 const makeWabunSet = (index) => {
   const firstPages = rng() < 0.5 ? 2 : 3;
   const secondPages = 5 - firstPages;
+  let previousScenario = -1;
   const mk = (pages) => {
     const officeNumeric = rng() < 0.45;
     const number = String(1 + Math.floor(rng() * 80));
     const office = officeNumeric
       ? String(1 + Math.floor(rng() * 80))
       : pick(dicts.coastJa);
-    return {
-      office,
-      officeNumeric,
-      number,
-      hour: Math.floor(rng() * 24),
-      minute: Math.floor(rng() * 60),
-      address: addressJa(),
-      body: composeJaBody(pagesToChars(pages)),
-      pages,
-    };
+    const hour = Math.floor(rng() * 24);
+    const minute = Math.floor(rng() * 60);
+    const address = addressJa();
+    const { body, scenario } = composeJaBody(pagesToChars(pages), previousScenario);
+    previousScenario = scenario;
+    return { office, officeNumeric, number, hour, minute, address, body, pages };
   };
   return {
     id: `wabun-${String(index + 1).padStart(4, "0")}`,
@@ -1000,6 +782,33 @@ const validateDicts = () => {
   }
 };
 
+/** 電信の慣例で拗音・促音は大書き。本文に小書きが混ざったら作文ミス */
+const JA_SMALL_KANA = /[ァィゥェォッャュョヮ]/;
+/** 括弧入りの本文がこの割合を下回ったらネタ側の括弧が足りない */
+const JA_MIN_BRACKET_SHARE = 0.5;
+/** 同じ書き出しがこの割合を超えたら先が読める */
+const JA_MAX_OPENING_SHARE = 0.02;
+
+const jaOpeningCounts = (bodies) => {
+  const counts = new Map();
+  for (const body of bodies) {
+    const opening = body.split("、")[0];
+    counts.set(opening, (counts.get(opening) ?? 0) + 1);
+  }
+  return counts;
+};
+
+/** （ ）は対で入れ子なし、中身は2〜16字のカナ。文頭・文節頭・括弧の連続は不可 */
+const validateJaBrackets = (body) => {
+  const pairs = [...body.matchAll(/（([^（）]*)）/g)];
+  const stripped = body.replace(/（[^（）]*）/g, "");
+  assertValid(!/[（）]/.test(stripped), `unbalanced or nested brackets: ${body}`);
+  for (const [, inner] of pairs) {
+    assertValid(/^[ァ-ヶー]{2,16}$/.test(inner), `invalid bracket content: ${inner}`);
+  }
+  assertValid(!/(^（|、（|）（)/.test(body), `misplaced bracket: ${body}`);
+};
+
 const validateGeneratedData = () => {
   validateDicts();
   assertValid(plain.length === COUNT, "plain set count");
@@ -1033,13 +842,31 @@ const validateGeneratedData = () => {
   for (const set of wabun) {
     assertValid(set.telegrams.reduce((sum, telegram) => sum + telegram.pages, 0) === 5, "wabun page total");
     for (const telegram of set.telegrams) {
-      assertValid(/^[ァ-ヶー、]+$/.test(telegram.body), `invalid Japanese body: ${telegram.body}`);
-      assertValid(!/(^、|、、|、$)/.test(telegram.body), "invalid Japanese separator");
-      assertValid(Math.ceil(compactLen(telegram.body) / PAGE) === telegram.pages, "wabun page count");
-      const parts = telegram.body.split("、");
+      const { body } = telegram;
+      assertValid(/^[ァ-ヶー、（）」0-9]+$/.test(body), `invalid Japanese body: ${body}`);
+      assertValid(!JA_SMALL_KANA.test(body), `small kana in Japanese body: ${body}`);
+      assertValid(!/(^[、」]|[、」]{2}|[、」]$)/.test(body), `invalid Japanese separator: ${body}`);
+      assertValid((body.match(/」/g) ?? []).length <= 1, `too many paragraph marks: ${body}`);
+      assertValid(!/(^0|[^0-9]0)/.test(body), `number with leading zero: ${body}`);
+      validateJaBrackets(body);
+      assertValid(Math.ceil(compactLen(body) / PAGE) === telegram.pages, "wabun page count");
+      const parts = body.split(/[、」]/);
       assertValid(new Set(parts).size === parts.length, "repeated phrase in Japanese body");
     }
   }
+
+  const share = (pattern) => wabunBodies.filter((body) => pattern.test(body)).length / wabunBodies.length;
+  const bracketShare = share(/（/);
+  assertValid(bracketShare >= JA_MIN_BRACKET_SHARE, `too few bracketed Japanese bodies ${bracketShare.toFixed(2)}`);
+  for (const [label, pattern, rate] of [
+    ["numeric", /[0-9]/, JA_NUMERIC_RATE],
+    ["paragraph", /」/, JA_PARAGRAPH_RATE],
+  ]) {
+    const actual = share(pattern);
+    assertValid(Math.abs(actual - rate) <= rate / 2, `${label} Japanese bodies ${actual.toFixed(3)} (target ${rate})`);
+  }
+  const topOpeningShare = Math.max(...jaOpeningCounts(wabunBodies).values()) / wabunBodies.length;
+  assertValid(topOpeningShare <= JA_MAX_OPENING_SHARE, `one Japanese opening is overused ${topOpeningShare.toFixed(3)}`);
 };
 
 validateGeneratedData();
@@ -1048,7 +875,7 @@ const path = join(outDir, "sets.json");
 // 1ファイルに全科目。手編集より再生成前提なのでコンパクト出力
 writeFileSync(
   path,
-  `${JSON.stringify({ version: 1, count: COUNT, plain, codes, wabun })}\n`,
+  `${JSON.stringify({ version: SETS_VERSION, count: COUNT, plain, codes, wabun })}\n`,
 );
 console.log(`wrote ${path}`);
 console.log(
@@ -1075,3 +902,15 @@ console.log(
   `wabun=${Math.min(...wabunCharCounts)}-${Math.max(...wabunCharCounts)} chars`,
   `plain-max=${Math.max(...plainDurations).toFixed(1)} sec`,
 );
+const wabunBodies = wabun.flatMap((set) => set.telegrams.map((telegram) => telegram.body));
+const wabunOpenings = jaOpeningCounts(wabunBodies);
+console.log(
+  `  wabun topics=${JA_SCENARIOS.length} uses=${Math.min(...jaScenarioUseCounts)}-${Math.max(...jaScenarioUseCounts)}`,
+  `openings=${wabunOpenings.size} top=${Math.max(...wabunOpenings.values())}`,
+  `bracketed=${wabunBodies.filter((body) => body.includes("（")).length}`,
+  `numeric=${wabunBodies.filter((body) => /[0-9]/.test(body)).length}`,
+  `paragraph=${wabunBodies.filter((body) => body.includes("」")).length}`,
+  `/${wabunBodies.length}`,
+);
+
+writeExamShards({ version: SETS_VERSION, plain, codes, wabun });

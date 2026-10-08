@@ -324,7 +324,7 @@ function WabunBodyGrid({
             className={`gaku-cell${current ? ' listen-now' : heard ? ' listen-heard' : ' listen-wait'}`}
             style={{ gridColumn: gridCol, gridRow }}
           >
-            {ch}
+            {horizontal ? toKanjiDigits(ch) : (VERTICAL_GLYPH[ch] ?? toKanjiDigits(ch))}
           </span>
         );
       })}
@@ -333,6 +333,9 @@ function WabunBodyGrid({
     </div>
   );
 }
+
+/** 縦書きの額表では括弧・段落を縦組み用の字形で描く（本文データは （ ）」 のまま） */
+const VERTICAL_GLYPH: Record<string, string> = { '（': '︵', '）': '︶', '」': '﹂' };
 
 const KANJI_DIGITS = '〇一二三四五六七八九';
 const toKanjiDigits = (value: string) => value.replace(/[0-9]/g, (digit) => KANJI_DIGITS[Number(digit)]);

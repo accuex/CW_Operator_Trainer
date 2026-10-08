@@ -9,6 +9,8 @@ export interface ExamUiPrefs {
   listenMode: boolean;
   /** 視聴: 1セット終わったら次の出題を自動再生（BGM用） */
   autoContinueListen: boolean;
+  /** 和文額表の本文をランダムにする（練習専用・本試験には無い形式） */
+  randomWabunBody: boolean;
 }
 
 export const DEFAULT_EXAM_PREFS: ExamUiPrefs = {
@@ -17,6 +19,7 @@ export const DEFAULT_EXAM_PREFS: ExamUiPrefs = {
   includeWiWe: false,
   listenMode: false,
   autoContinueListen: false,
+  randomWabunBody: false,
 };
 
 const isSubjectId = (value: unknown): value is ExamSubjectId =>
@@ -35,6 +38,8 @@ export function loadExamPrefs(): ExamUiPrefs {
         typeof raw.autoContinueListen === 'boolean'
           ? raw.autoContinueListen
           : DEFAULT_EXAM_PREFS.autoContinueListen,
+      randomWabunBody:
+        typeof raw.randomWabunBody === 'boolean' ? raw.randomWabunBody : DEFAULT_EXAM_PREFS.randomWabunBody,
     };
   } catch {
     return { ...DEFAULT_EXAM_PREFS };
