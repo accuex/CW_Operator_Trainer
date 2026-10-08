@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "builtFilesScanned": 1213,
+  "privateMaterialMatches": [],
+  "reviewEndpointsInProduction": "404 (HTTP live server checks)",
+  "SSRPrivateBodyMatches": 0,
+  "publicDTOChanged": false,
+  "serviceWorkerReviewCaching": false,
+  "evidence": "private/final_http_checks.json"
+}

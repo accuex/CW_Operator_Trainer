@@ -1,3 +1,4 @@
+import './checkHoukiPrivateTracking.mjs';
 import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
 import {generateRelease} from '../lib/houki/trainer/release-validator.mjs';
 const dto=generateRelease(JSON.parse(readFileSync('data/houki/original-samples.authoring.json','utf8')));

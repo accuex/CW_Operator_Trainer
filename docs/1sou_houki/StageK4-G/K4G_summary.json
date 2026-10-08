@@ -1,0 +1,17 @@
+{
+  "stage": "K4-G",
+  "decision": "REVIEW",
+  "implementation": "PASS",
+  "humanReview": "pending",
+  "additionalThemes": 5,
+  "totalThemes": 6,
+  "originalPracticeQuestions": 19,
+  "blankPositions": 38,
+  "pendingThemes": 0,
+  "asOf": "2026-10-07",
+  "releaseApproved": false,
+  "publishedAt": null,
+  "push": false,
+  "deploy": false,
+  "privateGitTracked": false
+}

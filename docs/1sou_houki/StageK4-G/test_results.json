@@ -1,0 +1,43 @@
+{
+  "productionBuild": "PASS",
+  "productionTypes": "PASS",
+  "suite": {
+    "files": 63,
+    "tests": 740,
+    "result": "PASS"
+  },
+  "rootTypes": {
+    "result": "PRE_EXISTING_FAIL",
+    "file": "StageK4-B/preview/main.tsx",
+    "code": "TS2345",
+    "protectedHashUnchanged": true
+  },
+  "schema": "PASS",
+  "backupRestore": "PASS",
+  "authenticatedReviewer": "200",
+  "authenticatedObserver": "403",
+  "unauthenticatedData": "401",
+  "productionReviewRoutes": "404",
+  "browser": {
+    "desktop": "PASS: 1280x900",
+    "mobile": "PASS: representative 375x812 flows, width=scrollWidth=375",
+    "themeDetails": "6/6 visible; 4+3*5 practice sections",
+    "revealAllHideAll": "PASS",
+    "EnterSpace": "PASS",
+    "returnSheetState": "PASS: 2/2 restored",
+    "fieldFilter": "PASS: equipment 6 questions",
+    "random": "PASS",
+    "sourceLinks": "PASS: visible URLs",
+    "legacy28": "PASS: display smoke",
+    "VoiceOver": "NOT_RUN",
+    "completeKeyboardAudit": "NOT_RUN"
+  },
+  "privateEvidence": [
+    "private/dev_http_results.json",
+    "private/final_http_checks.json",
+    "private/content_audit.json",
+    "private/browser_theme_results.json",
+    "private/review-captures/desktop-book.jpg",
+    "private/review-captures/mobile-sheet.jpg"
+  ]
+}
