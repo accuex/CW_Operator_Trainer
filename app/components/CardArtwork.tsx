@@ -26,7 +26,6 @@ export function CardArtwork({ src, fallbackSrc, fallback, onAvailability, classN
   useEffect(() => {
     let active = true;
     if (!src) {
-      setLoadedSource(null);
       onAvailability?.(false);
       return () => { active = false; };
     }

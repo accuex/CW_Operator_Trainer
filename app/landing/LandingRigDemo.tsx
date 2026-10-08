@@ -60,7 +60,7 @@ export function LandingRigDemo() {
         if (!live || waiting) return;
         if (!demoQuiet(live.stations, live.now())) return;
         waiting = true;
-        rest = window.setTimeout(load, 900);
+        rest = setTimeout(load, 900);
       }, 700);
     };
     place();

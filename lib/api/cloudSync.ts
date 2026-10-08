@@ -151,7 +151,7 @@ export async function syncPreferCloud(): Promise<CloudSnapshot | null> {
     };
   }
 
-  const profile = normalizeProfile(remoteProfile as TrainerProfile);
+  const profile = normalizeProfile(remoteProfile as Partial<TrainerProfile>);
   const settings = { ...DEFAULT_SETTINGS, ...remoteSettings } as AudioSettings;
   return applyCloudToLocal(profile, settings, remoteAnswers, remoteSessions, remote.revision);
 }

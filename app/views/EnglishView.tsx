@@ -17,6 +17,7 @@ export default function EnglishView({ onBack }: { onBack: () => void }) {
   const [previewId, setPreviewId] = useState('');
   useEffect(() => {
     let active = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount (SSR markup must match)
     try { const saved = readProgress(window.localStorage); setProgress(saved.progress); setWritable(saved.writable); setNotice(saved.notice); }
     catch { setNotice('ブラウザに保存できません。この画面の間だけ記録します。'); }
     setLoaded(true);
@@ -30,7 +31,11 @@ export default function EnglishView({ onBack }: { onBack: () => void }) {
   const item = master?.items.find(i => i.learningEntityId === previewId) ?? readingItem;
   const isPreview = !!previewId && !!item;
   const index = items.findIndex(i => i === item);
-  useEffect(() => { setShowMeaning(true); }, [item?.learningEntityId]);
+  const [meaningFor, setMeaningFor] = useState(item?.learningEntityId);
+  if (meaningFor !== item?.learningEntityId) {
+    setMeaningFor(item?.learningEntityId);
+    setShowMeaning(true);
+  }
   function update(next: EnglishProgress) {
     setProgress(next);
     if (!loaded || !writable) return;

@@ -181,7 +181,6 @@ export class PileupBot {
 
   protected work(partner: Partner, sense: BotSense): BotAction | null {
     const heard = this.inbox;
-    const tolerance = this.profile.pitchTolerance;
     const fromPartner = heard.filter((item) => this.fromPartner(item, partner));
     const elsewhere = heard.filter((item) => !fromPartner.includes(item));
     const report = fromPartner.flatMap((item) => item.words).find((word) => RST.test(word));

@@ -1,8 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { applyAchievements, achievementById } from '@/lib/achievements';
-import { readExamMaterial, rememberExamMaterial, type ExamMaterial } from '@/lib/examMaterial';
+import { examMaterialOf, readExamMaterial, rememberExamMaterial, type ExamMaterial } from '@/lib/examMaterial';
 import { APP_VERSION } from '@/lib/appMeta';
 import { loadAuthSession } from '@/lib/api/authSession';
 import {
@@ -63,14 +64,19 @@ const AUDIO_STATUS_LABEL: Record<string, string> = {
 
 export default function CWTrainer({ initialView = 'home' }: { initialView?: View }) {
   const [view, setView] = useState<View>(initialView);
-  const [lastExamMaterial, setLastExamMaterial] = useState<ExamMaterial>('exam');
-  useEffect(() => { setLastExamMaterial(readExamMaterial()); }, []);
+  const initialExam = examMaterialOf(initialView);
+  const [lastExamMaterial, setLastExamMaterial] = useState<ExamMaterial>(initialExam ?? 'exam');
   useEffect(() => {
-    if (view === 'communication' || view === 'geography' || view === 'english' || view === 'houki') {
-      setLastExamMaterial(view === 'communication' ? 'exam' : view);
-      rememberExamMaterial(view);
-    }
-  }, [view]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount (SSR markup must match)
+    if (!initialExam) setLastExamMaterial(readExamMaterial());
+  }, [initialExam]);
+  const examMaterial = examMaterialOf(view);
+  const [examMaterialSeen, setExamMaterialSeen] = useState(examMaterial);
+  if (examMaterial !== examMaterialSeen) {
+    setExamMaterialSeen(examMaterial);
+    if (examMaterial) setLastExamMaterial(examMaterial);
+  }
+  useEffect(() => { rememberExamMaterial(view); }, [view]);
   const [settings, setSettings] = useState<AudioSettings>(DEFAULT_SETTINGS);
   const [profile, setProfile] = useState<TrainerProfile>(DEFAULT_PROFILE);
   const [answers, setAnswers] = useState<AnswerLog[]>([]);
@@ -115,6 +121,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   }, [announce, applyCloudSnapshot]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the auth session lives in localStorage, only readable after mount
     setSignedIn(Boolean(loadAuthSession()));
     Promise.all([getProfile(), getAnswers(), getSessions()]).then(async ([savedProfile, savedAnswers, savedSessions]) => {
       const next = normalizeProfile(savedProfile);
@@ -294,9 +301,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   return (
     <div className={`app-frame view-${view}`}>
       <aside className="sidebar" aria-label="メインナビゲーション">
-        <a
+        <Link
           className="brand"
           href="/"
+          prefetch={false}
           aria-label="サイトトップへ"
           onClick={(event) => {
             event.preventDefault();
@@ -314,7 +322,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <span className="brand-ver">v{APP_VERSION}</span>
             </small>
           </span>
-        </a>
+        </Link>
         <nav className="nav">
           {views.map((item) => (
             <button
@@ -358,9 +366,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <small><Icon name="flame" size={13} /> {stats.streakDays}日連続</small>
             </div>
           </div>
-          <a
+          <Link
             className="sidebar-site"
             href="/"
+            prefetch={false}
             onClick={(event) => {
               event.preventDefault();
               audioEngine.stop();
@@ -369,7 +378,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             }}
           >
             サイトトップ
-          </a>
+          </Link>
           <p className="app-credit">(C) 2026 Int Design LLC.</p>
         </div>
       </aside>

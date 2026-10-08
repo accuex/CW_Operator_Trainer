@@ -30,7 +30,7 @@ export const DEFAULT_PROFILE: TrainerProfile = {
   version: 1, goal: null, learnCourse: null, unlockedKinds: [], cards: {}, achievements: {}, totalTrainingMs: 0, lastMode: 'home',
 };
 
-export function normalizeProfile(profile: TrainerProfile | null | undefined): TrainerProfile {
+export function normalizeProfile(profile: Partial<TrainerProfile> | null | undefined): TrainerProfile {
   const merged = {
     ...DEFAULT_PROFILE,
     ...profile,

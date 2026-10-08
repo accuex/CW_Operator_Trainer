@@ -79,11 +79,7 @@ export function AccountView({
 
   const hydrate = useCallback(async () => {
     const local = loadAuthSession();
-    if (!local) {
-      setSession(null);
-      setPasskeys([]);
-      return;
-    }
+    if (!local) return;
     try {
       const me = await fetchMe();
       const next = { ...local, user: me.user };
@@ -97,12 +93,14 @@ export function AccountView({
   }, [refreshPasskeys]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the auth session lives in localStorage, only readable after mount
     void hydrate();
   }, [hydrate]);
 
   useEffect(() => {
     const query = readAccountQuery();
     if (query.reset) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL is only readable after mount (SSR markup must match)
       setResetToken(query.reset);
       setAuthMode('reset');
       setSession(null);

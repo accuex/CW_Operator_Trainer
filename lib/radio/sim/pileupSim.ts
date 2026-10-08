@@ -112,7 +112,6 @@ export function runPileupSim({ seed, level = 'intermediate', axes, params, bot: 
   const sessionParams = { ...pileupParamsOf({ ...pileupLevel(level).axes, ...axes }), ...params };
   const run = new PileupSession({ random, me: ME, params: sessionParams }, radio);
   const monitor = new CopyMonitor();
-  const bandRandom = seeded(seed + 7919);
   const profile = BOT_PROFILES[botId];
   const overlap: PileupSimReport['overlap'] = { '1': { chars: 0, copied: 0 }, '2-3': { chars: 0, copied: 0 }, '4+': { chars: 0, copied: 0 }, sub: { chars: 0, copied: 0 } };
   const probe = new SampledProbe(monitor);

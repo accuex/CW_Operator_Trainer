@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,12 +24,11 @@ function RigDemoPlaceholder() {
   );
 }
 
+const subscribeNever = () => () => {};
+
 /** dynamic(ssr:false) は戻るナビでモジュールキャッシュ済みだと即本体描画され、SSRプレースホルダと食い違う */
 function RigDemoSlot() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribeNever, () => true, () => false);
   if (!mounted) return <RigDemoPlaceholder />;
   return <LandingRigDemo />;
 }

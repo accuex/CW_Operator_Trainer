@@ -92,10 +92,6 @@ const ORIGIN_SHIPS = [
   { name: 'KISHIEMARU', call: 'JKEE' },
   { name: 'KANDAMARU', call: 'JKAN' },
 ];
-const COAST_VIA = [
-  'CHOSHIMUSEN', 'NAGASAKIMUSEN', 'HAKODATEMUSEN', 'NAPOLIRADIO',
-  'SYDNEYRADIO', 'DARWINRADIO', 'HAVANARADIO', 'ANDERADIO', 'TOKYO',
-];
 const COAST_STATIONS_JA = [
   'ヨコハマムセン', 'ナガサキムセン', 'コウベムセン', 'トウキヨウムセン', 'オオサカムセン',
   'シミズムセン', 'モジムセン', 'ニイガタムセン', 'クシロムセン', 'ナハムセン',
@@ -137,7 +133,6 @@ const SHIP_ADDR = [
 
 const pick = <T,>(pool: T[]) => pool[Math.floor(Math.random() * pool.length)];
 const pad2 = (value: number) => String(value).padStart(2, '0');
-const randomDigits = (length: number) => Array.from({ length }, () => Math.floor(Math.random() * 10)).join('');
 const compactLen = (text: string) => text.replace(/\s+/g, '').length;
 
 const trimToChars = (text: string, target: number) => {
@@ -208,8 +203,6 @@ export function applyWabunWiWe(body: string, enabled: boolean): string {
 
 const buildWabunBody = (targetChars: number, includeWiWe: boolean) =>
   applyWabunWiWe(buildPlainBody('wabun', targetChars), includeWiWe);
-
-const countTelegramWords = (text: string) => (text.trim() ? text.trim().split(/\s+/).length : 0);
 
 const formatCodeGroups = (groups: string[]) => {
   const lines: string[] = [];
