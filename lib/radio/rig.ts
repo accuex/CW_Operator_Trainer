@@ -1,12 +1,13 @@
-import { cutStation, enqueue, fadeAt, schedulePending, type Station, type Transmission } from './band';
+import { clickReach, cutStation, dirtScale, enqueue, fadeAt, schedulePending, type Station, type Transmission } from './band';
 import { keyText, type Keyed, type KeyingOptions, type Mark } from './keying';
 
 /**
  * Multi-voice receiver for the QSO simulator.
  *
- *   station osc ─ key ─ amp ┐
- *   band noise ─────────────┼─ bus ─ BPF ─ BPF ─ AGC ─ AF ─ out
- *   QRN crashes ────────────┘          └─ meter
+ *   station osc ─ key ─ (hum) ─ amp ┐
+ *   key clicks (noise ─ edge ─ level) ┤
+ *   band noise ───────────────────────┼─ bus ─ BPF ─ BPF ─ AGC ─ AF ─ out
+ *   QRN crashes ──────────────────────┘          └─ meter
  *
  * Audio pitch = BFO pitch + (station RF − VFO), so tuning sweeps the tone and the
  * IF filter really removes neighbours. Runs on a performance clock with no audio
@@ -18,7 +19,17 @@ export interface RigLevels { af: number; noise: number; qrn: number; qsb: number
 export const FILTERS = [250, 500, 2400] as const;
 export type FilterWidth = (typeof FILTERS)[number];
 
-interface Voice { osc: OscillatorNode; key: GainNode; amp: GainNode; chirp: GainNode | null; chirpSource: ConstantSourceNode | null }
+interface Voice {
+  osc: OscillatorNode;
+  key: GainNode;
+  amp: GainNode;
+  chirp: GainNode | null;
+  chirpSource: ConstantSourceNode | null;
+  /** AC hum: `body` gain swings with a 100 Hz LFO scaled by `depth`. */
+  hum: { lfo: OscillatorNode; depth: GainNode; body: GainNode } | null;
+  /** Key clicks: band noise gated by `edge` on every key edge, scaled by `level`. */
+  clicks: { source: AudioBufferSourceNode; edge: GainNode; level: GainNode } | null;
+}
 interface Rx {
   bus: GainNode;
   f1: BiquadFilterNode;
@@ -200,6 +211,10 @@ export class RigEngine {
     voice.key.gain.cancelScheduledValues(now);
     voice.key.gain.setValueAtTime(0, now);
     voice.chirp?.gain.cancelScheduledValues(now);
+    if (voice.clicks) {
+      voice.clicks.edge.gain.cancelScheduledValues(now);
+      voice.clicks.edge.gain.setValueAtTime(0, now);
+    }
   }
 
   /**
@@ -289,6 +304,15 @@ export class RigEngine {
         voice.chirp.gain.setTargetAtTime(0, start, 0.015);
       }
     }
+    if (voice.clicks) {
+      const edge = voice.clicks.edge.gain;
+      for (const mark of marks) {
+        for (const at of mark) {
+          edge.setValueAtTime(1, at);
+          edge.setTargetAtTime(0, at, 0.0015);
+        }
+      }
+    }
   }
 
   private crash(level: number) {
@@ -328,6 +352,18 @@ export class RigEngine {
     voice.osc.frequency.setValueAtTime(voice.osc.frequency.value, t);
     voice.osc.frequency.linearRampToValueAtTime(next, t + 0.045);
     voice.amp.gain.setTargetAtTime(audible ? station.strength * 0.5 * station.fade : 0, t, smoothing);
+    const dirt = station.dirt;
+    if (voice.hum && dirt) {
+      const depth = dirt.hum * dirtScale(this.levels.noise) * 0.6;
+      voice.hum.body.gain.setTargetAtTime(1 - depth / 2, t, smoothing);
+      voice.hum.depth.gain.setTargetAtTime(depth / 2, t, smoothing);
+    }
+    if (voice.clicks && dirt) {
+      // Splatter falls off with distance from the dial, so a clicky neighbour well outside the filter still ticks.
+      const reach = clickReach(station, this.levels.noise);
+      const leak = reach ? Math.exp(-Math.abs(station.rf - this.vfo) / reach) : 0;
+      voice.clicks.level.gain.setTargetAtTime(dirt.clicks * station.strength * station.fade * leak * 0.9, t, smoothing);
+    }
   }
 
   private resetClock(station: Station) {
@@ -345,7 +381,34 @@ export class RigEngine {
     const amp = ctx.createGain();
     key.gain.value = 0;
     amp.gain.value = 0;
-    osc.connect(key).connect(amp).connect(rx.bus);
+    let hum: Voice['hum'] = null;
+    if (station.dirt?.hum) {
+      const lfo = ctx.createOscillator();
+      const depth = ctx.createGain();
+      const body = ctx.createGain();
+      lfo.frequency.value = 100;
+      depth.gain.value = 0;
+      lfo.connect(depth).connect(body.gain);
+      lfo.start();
+      osc.connect(key).connect(body).connect(amp);
+      hum = { lfo, depth, body };
+    } else {
+      osc.connect(key).connect(amp);
+    }
+    amp.connect(rx.bus);
+    let clicks: Voice['clicks'] = null;
+    if (station.dirt?.clicks) {
+      const source = ctx.createBufferSource();
+      source.buffer = rx.noiseBuffer;
+      source.loop = true;
+      const edge = ctx.createGain();
+      const level = ctx.createGain();
+      edge.gain.value = 0;
+      level.gain.value = 0;
+      source.connect(edge).connect(level).connect(rx.bus);
+      source.start(0, Math.random() * 2);
+      clicks = { source, edge, level };
+    }
     let chirp: GainNode | null = null;
     let chirpSource: ConstantSourceNode | null = null;
     if (station.chirp) {
@@ -357,7 +420,7 @@ export class RigEngine {
     }
     osc.frequency.value = Math.max(AUDIBLE[0], this.audioFrequency(station));
     osc.start();
-    this.voices.set(station.id, { osc, key, amp, chirp, chirpSource });
+    this.voices.set(station.id, { osc, key, amp, chirp, chirpSource, hum, clicks });
   }
 
   private detach(station: Station) {
@@ -367,6 +430,9 @@ export class RigEngine {
     try {
       voice.osc.stop();
       voice.chirpSource?.stop();
+      voice.hum?.lfo.stop();
+      voice.clicks?.source.stop();
+      voice.clicks?.level.disconnect();
       voice.amp.disconnect();
     } catch { /* torn down */ }
   }

@@ -1,4 +1,4 @@
-import { isKeyed, type Station } from './band';
+import { clickReach, dirtScale, keyDownAt, nearKeyEdge, type Station } from './band';
 import type { Crash } from './rig';
 
 /**
@@ -41,6 +41,20 @@ export const hzAtRatio = (ratio: number, vfo: number, span: number) => vfo + (ra
 
 const PALETTE = Array.from({ length: 256 }, (_, index) => heatColor(index / 255));
 
+function carrier(col: Float32Array, x0: number, amp: number, w: number) {
+  const from = Math.max(0, Math.floor(x0 - w * 4));
+  const to = Math.min(col.length, Math.ceil(x0 + w * 4));
+  for (let x = from; x < to; x += 1) col[x] = Math.max(col[x], col[x] * 0.5 + amp * Math.exp(-((x - x0) ** 2) / (2 * w * w)));
+}
+
+/** Ragged exponential skirt riding on the noise (phase noise, click splatter). */
+function splatter(col: Float32Array, x0: number, level: number, width: number) {
+  if (level < 0.005 || width < 0.5) return;
+  const from = Math.max(0, Math.floor(x0 - width * 5));
+  const to = Math.min(col.length, Math.ceil(x0 + width * 5));
+  for (let x = from; x < to; x += 1) col[x] += level * Math.exp(-Math.abs(x - x0) / width) * (0.5 + Math.random());
+}
+
 export class ScopeRenderer {
   private sc: CanvasRenderingContext2D;
   private fc: CanvasRenderingContext2D;
@@ -82,14 +96,23 @@ export class ScopeRenderer {
     // Noise floor: exponential speckle (Rayleigh-like) with the odd spike.
     for (let x = 0; x < W; x += 1) col[x] = 0.1 + noise * 0.14 + Math.min(0.5, -Math.log(Math.random() + 1e-6) * (0.03 + noise * 0.06));
 
+    const dirtK = dirtScale(noise);
     for (const station of frame.stations) {
-      if (!isKeyed(station, t)) continue;
-      const x0 = (station.rf - vfo + span) / hzPerPx;
+      const center = (station.rf - vfo + span) / hzPerPx;
       const amp = (0.25 + 0.75 * station.strength ** 0.45) * station.fade;
+      const dirt = station.dirt;
+      // Key clicks: a short broadband streak on each edge, key up or down.
+      const reach = clickReach(station, noise);
+      if (dirt && reach && nearKeyEdge(station, t, 0.03)) splatter(col, center, amp * dirt.clicks * dirtK * 0.55, reach / 3 / hzPerPx);
+      const since = keyDownAt(station, t);
+      if (since === null) continue;
+      // Chirp: the carrier starts low and settles, a small hook at the start of each element.
+      const x0 = center - (station.chirp * Math.exp(-(t - since) / 0.015)) / hzPerPx;
       const w = Math.max(1.2, 18 / hzPerPx);
-      const from = Math.max(0, Math.floor(x0 - w * 4));
-      const to = Math.min(W, Math.ceil(x0 + w * 4));
-      for (let x = from; x < to; x += 1) col[x] = Math.max(col[x], col[x] * 0.5 + amp * Math.exp(-((x - x0) ** 2) / (2 * w * w)));
+      carrier(col, x0, amp, w);
+      if (!dirt || !dirtK) continue;
+      if (dirt.skirt) splatter(col, x0, amp * dirt.skirt * dirtK * 0.35, ((60 + dirt.skirt * 240) * dirtK) / hzPerPx);
+      if (dirt.hum) for (const side of [-100, 100]) carrier(col, x0 + side / hzPerPx, amp * dirt.hum * dirtK * 0.4, w);
     }
     // Our own carrier while transmitting.
     if (frame.transmitting) {

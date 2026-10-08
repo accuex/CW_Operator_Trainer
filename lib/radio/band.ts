@@ -37,7 +37,12 @@ export interface Station {
   busyUntil: number;
   /** How this station turns text into keying (absent: Latin `keyText`; a wabun station keys segments). */
   keyer?: (text: string, options: KeyingOptions) => Keyed;
+  /** Transmitter defects. Only background QRM carries them; stations you copy stay clean. */
+  dirt?: SignalDirt;
 }
+
+/** 0–1 per defect: phase-noise skirt, key clicks, AC hum on the carrier. */
+export interface SignalDirt { skirt: number; clicks: number; hum: number }
 
 /** One message on the air. Times are absolute on the scheduler clock. */
 export interface Transmission { text: string; start: number; marks: Mark[]; length: number; chars: CharSpan[] }
@@ -85,6 +90,7 @@ export function makeStation(random: () => number, init: Partial<Station> & { rf:
     busyUntil: 0,
     ...init,
   };
+  if (station.role === 'qrm' && !('dirt' in init)) station.dirt = dirtFor(call, station.rf);
   if (!init.loop && station.role === 'qrm') {
     let text = qrmMessage(call, random);
     station.loop = () => {
@@ -94,6 +100,27 @@ export function makeStation(random: () => number, init: Partial<Station> & { rf:
   }
   return station;
 }
+
+/** Seeded from call + rf rather than the session random, so simulations stay reproducible. */
+function dirtFor(call: string, rf: number): SignalDirt | undefined {
+  let h = 2166136261;
+  for (const ch of `${call}@${rf}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  const next = () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+  const trait = (chance: number) => (next() < chance ? 0.35 + next() * 0.65 : 0);
+  const dirt = { skirt: trait(0.3), clicks: trait(0.25), hum: trait(0.12) };
+  return dirt.skirt || dirt.clicks || dirt.hum ? dirt : undefined;
+}
+
+/** How much transmitter dirt shows at a band noise level: a quiet band is nearly clean. */
+export const dirtScale = (noise: number) => Math.max(0, Math.min(1, (noise - 0.1) * 2.5));
+
+/** Hz either side of the carrier that a station's key clicks splatter (0 = clean). */
+export const clickReach = (station: Station, noise: number) => (station.dirt?.clicks ? (250 + station.dirt.clicks * 650) * dirtScale(noise) : 0);
 
 /** QRM stations spread over ±span around center, kept clear of the given frequencies. */
 export function makeQrm(random: () => number, count: number, center: number, keepClear: number[] = [], clearance = 150) {
@@ -145,6 +172,16 @@ export function cutStation(station: Station, now: number) {
 }
 
 export const isKeyed = (station: Station, t: number) => station.marks.some(([start, end]) => t >= start && t <= end);
+
+/** Start of the key-down covering t, or null when the key is up. */
+export function keyDownAt(station: Station, t: number) {
+  for (const [start, end] of station.marks) if (t >= start && t <= end) return start;
+  return null;
+}
+
+/** A key-down or key-up edge lies within `window` seconds of t. */
+export const nearKeyEdge = (station: Station, t: number, window: number) =>
+  station.marks.some(([start, end]) => Math.abs(t - start) < window || Math.abs(t - end) < window);
 
 /** QSB: slow sinusoidal fading, depth 0–1. */
 export const fadeAt = (station: Station, t: number, depth: number) =>

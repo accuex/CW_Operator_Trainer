@@ -1,5 +1,5 @@
 import type { CopyCondition, CopySituation, QsoCharEnv, QsoOverlapEnv } from '../types';
-import { isKeyed, type Station, type Transmission } from './band';
+import { clickReach, isKeyed, type Station, type Transmission } from './band';
 import type { CharSpan } from './keying';
 
 /**
@@ -80,10 +80,14 @@ export function sampleBand({ t, epoch, listening, vfo, filter, noise, target, st
   let qrmCaller = false;
   let overlap: SampleOverlap | undefined;
   for (const station of stations) {
-    if (station === target || Math.abs(station.rf - vfo) > half || !isKeyed(station, t)) continue;
+    const away = Math.abs(station.rf - vfo);
+    const reach = clickReach(station, noise);
+    if (station === target || away > half + reach || !isKeyed(station, t)) continue;
     // Closer in tone is harder to separate by ear.
     const near = Math.abs(station.rf - target.rf) < 200 ? 1 : 0.6;
-    const ratio = (station.strength * station.fade * near) / Math.max(level, 1e-3);
+    // Outside the filter only its key clicks get through.
+    const spill = away > half ? (station.dirt?.clicks ?? 0) * Math.exp(-away / reach) * 0.5 : 1;
+    const ratio = (station.strength * station.fade * near * spill) / Math.max(level, 1e-3);
     if (ratio > qrm) {
       qrm = ratio;
       qrmCaller = station.role === 'caller';

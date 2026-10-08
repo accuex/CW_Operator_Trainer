@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cutStation, enqueue, formatFrequency, isKeyed, makeQrm, makeStation, nearestStation, schedulePending } from './band';
+import { clickReach, cutStation, dirtScale, enqueue, formatFrequency, isKeyed, makeQrm, makeStation, nearestStation, schedulePending } from './band';
 import { keyText } from './keying';
 import { TUNE_TOLERANCE_HZ, cqText, finalText, isCallsign, makeTarget, normalizeRst, reportText, respond, scoreLog } from './qso';
 import { heatColor, hzAtRatio } from './scope';
@@ -46,6 +46,30 @@ describe('band scheduler', () => {
     expect(first[0].start).toBe(10);
     expect(isKeyed(station, first[0].marks[0][0] + 0.01)).toBe(true);
     expect(station.nextAt).toBeCloseTo(station.busyUntil + 1, 6);
+  });
+
+  it('gives only background QRM transmitter dirt, without touching the session random', () => {
+    const qrm = makeQrm(seeded(3), 40, 7_012_000);
+    expect(makeQrm(seeded(3), 40, 7_012_000).map((station) => station.dirt)).toEqual(qrm.map((station) => station.dirt));
+    const random = seeded(3);
+    const plain = seeded(3);
+    for (let index = 0; index < 40; index += 1) {
+      makeStation(random, { rf: 7_000_000 + index * 137 });
+      makeStation(plain, { rf: 7_000_000 + index * 137, dirt: undefined });
+    }
+    expect(random()).toBe(plain());
+    const dirty = qrm.filter((station) => station.dirt);
+    expect(dirty.length).toBeGreaterThan(5);
+    expect(dirty.length).toBeLessThan(35);
+    expect(makeStation(seeded(4), { rf: 7_010_000, role: 'target' }).dirt).toBeUndefined();
+  });
+
+  it('shows dirt by band noise and lets clicks reach past the filter', () => {
+    const station = makeStation(seeded(5), { rf: 7_012_000, dirt: { skirt: 0, clicks: 1, hum: 0 } });
+    expect(dirtScale(0.1)).toBe(0);
+    expect(dirtScale(0.5)).toBe(1);
+    expect(clickReach(station, 0.1)).toBe(0);
+    expect(clickReach(station, 0.5)).toBe(900);
   });
 
   it('sends queued replies once, then falls silent without a loop', () => {
