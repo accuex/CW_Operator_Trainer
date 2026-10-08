@@ -7,6 +7,7 @@ import { EXAM_SHEET_GAP_SEC, EXAM_SUBJECTS, buildExamSession, examSheetGapSec, t
 import { pickStoredExamSet, prefetchStoredExamSet } from '@/lib/examSets';
 import { wabunWeakness } from '@/lib/wabunRandom';
 import { EXAM_PENALTY, scoreExamCopy, stripExamProcedureMarks, type ExamScore } from '@/lib/examScore';
+import type { PlaybackHandle } from '@/lib/audio';
 import type { AnswerLog, AudioSettings } from '@/lib/types';
 import { audioEngine, nowId, pct } from '@/app/trainer/shared';
 import { AudioControls, ProgressBar, Ring } from '@/app/components/ui';
@@ -117,6 +118,7 @@ export function ExamView({
   const activeRef = useRef(false);
   const pausedRef = useRef(false);
   const runIdRef = useRef(0);
+  const playbackRef = useRef<PlaybackHandle | null>(null);
   const sessionRef = useRef<ExamSession | null>(null);
   const sourceTextRef = useRef('');
   const revealedRef = useRef(false);
@@ -144,6 +146,27 @@ export function ExamView({
       timer.current = null;
     }
   };
+
+  /** 再生ループ・エンジン・タイマーを同期で殺す（遷移・戻る・アンマウント用） */
+  const killPlaybackEngine = useCallback(() => {
+    runIdRef.current += 1;
+    pausedRef.current = false;
+    activeRef.current = false;
+    playbackRef.current?.stop();
+    playbackRef.current = null;
+    audioEngine.stop();
+    if (timer.current) {
+      clearInterval(timer.current);
+      timer.current = null;
+    }
+  }, []);
+
+  const haltPlayback = useCallback(() => {
+    killPlaybackEngine();
+    setAnnounceCountdown(null);
+    setIsPreparing(false);
+  }, [killPlaybackEngine]);
+
   /** 本試験時計。呼称・心構えでは動かさず、第1通 HRHR から開始する */
   const startTimer = () => {
     clearTimer();
@@ -168,7 +191,8 @@ export function ExamView({
     }, 1000);
   };
 
-  useEffect(() => () => { clearTimer(); audioEngine.stop(); }, []);
+  // アンマウント時も runId を上げる。play() 待ちの非同期が stop 後に音を立て直さないようにする
+  useEffect(() => () => { killPlaybackEngine(); }, [killPlaybackEngine]);
 
   // 再生中に YouTube 等へ行くと AudioContext が死ぬ。ループを止め、スタート待ちに戻す。
   useEffect(() => {
@@ -180,6 +204,8 @@ export function ExamView({
       runIdRef.current += 1;
       activeRef.current = false;
       pausedRef.current = false;
+      playbackRef.current?.stop();
+      playbackRef.current = null;
       clearTimer();
       audioEngine.stop();
       setAnnounceCountdown(null);
@@ -249,6 +275,8 @@ export function ExamView({
   /** 視聴: 再生を止めて額表を全開示したまま答え合わせ（セットアップ／ログへは戻さない） */
   const enterListenReview = useCallback(() => {
     pausedRef.current = false;
+    playbackRef.current?.stop();
+    playbackRef.current = null;
     audioEngine.stop();
     clearTimer();
     activeRef.current = false;
@@ -269,6 +297,8 @@ export function ExamView({
   const finish = useCallback((text = sourceTextRef.current || sourceText) => {
     pausedRef.current = false;
     runIdRef.current += 1;
+    playbackRef.current?.stop();
+    playbackRef.current = null;
     audioEngine.stop();
     clearTimer();
     activeRef.current = false;
@@ -362,8 +392,10 @@ export function ExamView({
         setSheetIndex(-1);
         setAudioStatus('ANNOUNCE');
         const announceHandle = await audioEngine.play(next.announcement, 'wabun', examSettings);
+        playbackRef.current = announceHandle;
         if (runIdRef.current !== runId) {
           announceHandle.stop();
+          playbackRef.current = null;
           return;
         }
         if (pausedRef.current) await audioEngine.pause();
@@ -373,6 +405,7 @@ export function ExamView({
         }, 40);
         await announceHandle.finished;
         window.clearInterval(announceMonitor);
+        if (playbackRef.current === announceHandle) playbackRef.current = null;
         heardBase = announceHandle.timeline.characters.length;
         setHeardCount(heardBase);
         if (!activeRef.current || runIdRef.current !== runId) return;
@@ -407,8 +440,10 @@ export function ExamView({
         if (index === 0) startTimer();
         setSheetIndex(index);
         const handle = await audioEngine.play(next.sheets[index].playText, preset.alphabet, examSettings);
+        playbackRef.current = handle;
         if (runIdRef.current !== runId) {
           handle.stop();
+          playbackRef.current = null;
           return;
         }
         if (pausedRef.current) await audioEngine.pause();
@@ -418,6 +453,7 @@ export function ExamView({
         }, 40);
         await handle.finished;
         window.clearInterval(monitor);
+        if (playbackRef.current === handle) playbackRef.current = null;
         heardBase += handle.timeline.characters.length;
         setHeardCount(heardBase);
         if (!activeRef.current || runIdRef.current !== runId) return;
@@ -471,6 +507,8 @@ export function ExamView({
   const prepareListenDesk = (next: ExamSession) => {
     runIdRef.current += 1;
     pausedRef.current = false;
+    playbackRef.current?.stop();
+    playbackRef.current = null;
     audioEngine.stop();
     clearTimer();
     activeRef.current = false;
@@ -522,6 +560,8 @@ export function ExamView({
     activeRef.current = true;
     const runId = runIdRef.current + 1;
     runIdRef.current = runId;
+    playbackRef.current?.stop();
+    playbackRef.current = null;
     audioEngine.stop();
     clearTimer();
     setPhase('playing');
@@ -533,6 +573,8 @@ export function ExamView({
   const prepareInputDesk = (next: ExamSession) => {
     runIdRef.current += 1;
     pausedRef.current = false;
+    playbackRef.current?.stop();
+    playbackRef.current = null;
     audioEngine.stop();
     clearTimer();
     activeRef.current = false;
@@ -611,17 +653,11 @@ export function ExamView({
 
   /** デスクを閉じて科目選択へ（視聴ログは出さない） */
   const exitToSetup = useCallback((options?: { listenMode?: boolean }) => {
-    runIdRef.current += 1;
-    pausedRef.current = false;
-    audioEngine.stop();
-    clearTimer();
-    activeRef.current = false;
+    haltPlayback();
     sessionRef.current = null;
     setSession(null);
     setSessionListenMode(false);
     setHeardCount(0);
-    setAnnounceCountdown(null);
-    setIsPreparing(false);
     setExamScore(null);
     setCopy('');
     setCorrectedChars(0);
@@ -633,9 +669,16 @@ export function ExamView({
     setPhase('setup');
     setAudioStatus('READY');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [setAudioStatus]);
+  }, [haltPlayback, setAudioStatus]);
 
   const exitListenDesk = () => exitToSetup();
+
+  /** 教材メニューへ戻る前に再生を止める（navigate の stop だけでは play() 待ちが生き残る） */
+  const leaveToExamMenu = () => {
+    haltPlayback();
+    setAudioStatus('READY');
+    onBack?.();
+  };
 
   /** ステータスの「視聴」チップ: オフにして科目選択へ戻る */
   const toggleListenChip = () => {
@@ -728,7 +771,7 @@ export function ExamView({
     : `第${sheetIndex + 1}/${session?.sheets.length ?? '—'}枚`;
   const passing = Boolean(examScore && examScore.accuracy >= 0.9);
   return <section className="exam-page page-pad">
-    {onBack && <button id="communication-back" className="btn btn-secondary exam-menu-return" onClick={onBack}>一総通の教材メニューへ</button>}
+    {onBack && <button id="communication-back" className="btn btn-secondary exam-menu-return" onClick={leaveToExamMenu}>一総通の教材メニューへ</button>}
     {!inSession ? (
       <div className="exam-setup">
         <div className="page-title">

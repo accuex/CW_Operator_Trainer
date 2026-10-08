@@ -52,7 +52,7 @@ const FEATURE_CARDS: {
   {
     src: '/landing/wabun_qso.png',
     alt: '和文受信用紙を書きながらCWを体験する',
-    label: '和文CWを体験する',
+    label: 'CW交信を体験する',
     href: viewToPath('qso'),
     tone: 'wabun',
   },

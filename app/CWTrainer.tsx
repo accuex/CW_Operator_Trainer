@@ -196,7 +196,15 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     schedulePushState(profile, settings);
   }, [settings, profile, ready]);
   useEffect(() => {
-    const onPop = () => setView(pathToView(location.pathname));
+    const onPop = () => {
+      // ブラウザ戻るも navigate と同様に音を止める（再生ループが残ると止まらない）
+      audioEngine.stop();
+      if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+      setStopEpoch((value) => value + 1);
+      setAudioStatus('READY');
+      setView(pathToView(location.pathname));
+      setSpeedOpen(false);
+    };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);

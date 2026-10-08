@@ -26,6 +26,18 @@ type ContextState = AudioContextState | 'interrupted';
 
 const contextState = (context: AudioContext) => context.state as ContextState;
 
+/** stop() 後に schedule の await が戻っても音を出さないための空ハンドル */
+function idleHandle(timeline: MorseTimeline): PlaybackHandle {
+  return {
+    timeline,
+    startedAt: 0,
+    currentTime: () => 0,
+    receivedCount: () => 0,
+    stop: () => undefined,
+    finished: Promise.resolve(),
+  };
+}
+
 export class MorseAudioEngine {
   private context: AudioContext | null = null;
   private active: ActiveVoice | null = null;
@@ -37,6 +49,11 @@ export class MorseAudioEngine {
    */
   private needsHardUnlock = false;
   private stateListener: ((event: Event) => void) | null = null;
+  /**
+   * stop() / markBackground() のたびに増える。
+   * play() が getContext 待ちのあいだに stop されると、await 後にオシレータを立てない。
+   */
+  private stopEpoch = 0;
 
   private createContext() {
     const context = new AudioContext({ latencyHint: 'interactive' });
@@ -90,6 +107,7 @@ export class MorseAudioEngine {
    * Drop the session so the next user gesture builds a fresh context.
    */
   markBackground() {
+    this.stopEpoch += 1;
     this.holdSuspended = false;
     this.needsHardUnlock = true;
     this.silenceActive();
@@ -209,9 +227,17 @@ export class MorseAudioEngine {
     active.resolveFinished();
   }
 
-  private async schedule(timeline: MorseTimeline, settings: AudioSettings): Promise<PlaybackHandle> {
+  private async schedule(
+    timeline: MorseTimeline,
+    settings: AudioSettings,
+    /** 再試行時も「この play 開始時点の stopEpoch」を引き継ぐ */
+    playEpoch = this.stopEpoch,
+  ): Promise<PlaybackHandle> {
     this.silenceActive();
+    if (this.stopEpoch !== playEpoch) return idleHandle(timeline);
+
     const context = await this.getContext();
+    if (this.stopEpoch !== playEpoch) return idleHandle(timeline);
     this.silenceActive();
 
     if (contextState(context) !== 'running') {
@@ -220,14 +246,16 @@ export class MorseAudioEngine {
         await this.prime(context);
       } catch { /* ignore */ }
     }
+    if (this.stopEpoch !== playEpoch) return idleHandle(timeline);
     if (contextState(context) !== 'running') {
       // Still dead — force one more hard recreate (gesture chain may still be warm).
       this.needsHardUnlock = true;
       const retry = await this.getContext();
+      if (this.stopEpoch !== playEpoch) return idleHandle(timeline);
       if (contextState(retry) !== 'running') {
         throw new Error('AudioContext not running');
       }
-      return this.schedule(timeline, settings);
+      return this.schedule(timeline, settings, playEpoch);
     }
 
     const oscillator = context.createOscillator();
@@ -330,6 +358,7 @@ export class MorseAudioEngine {
   }
 
   stop() {
+    this.stopEpoch += 1;
     this.holdSuspended = false;
     this.silenceActive();
   }
