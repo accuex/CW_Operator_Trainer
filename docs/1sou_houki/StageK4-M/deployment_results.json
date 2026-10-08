@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "productionURL": "https://cw.conagi.jp/app/houki",
+  "publicationObservedAt": "2026-10-08T12:54:59.658396+00:00",
+  "productionReleaseDigest": "294710bb80d5c5b4ee8370c007af7f74545782d4b9e22998c3aee7fd1a41128c",
+  "counts": {
+    "themes": 41,
+    "questions": 140,
+    "blanks": 279,
+    "cards": 2
+  },
+  "httpSmoke": [
+    {
+      "path": "/houki/trainer/active.json",
+      "status": 200,
+      "bytes": 98
+    },
+    {
+      "path": "/houki/trainer/lessons-v6.json",
+      "status": 200,
+      "bytes": 1463838
+    },
+    {
+      "path": "/app/houki",
+      "status": 200,
+      "bytes": 23939
+    },
+    {
+      "path": "/app/english",
+      "status": 200,
+      "bytes": 23977
+    },
+    {
+      "path": "/app/geography",
+      "status": 200,
+      "bytes": 24001
+    },
+    {
+      "path": "/app",
+      "status": 200,
+      "bytes": 36052
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 21871
+    },
+    {
+      "path": "/api/v1/health",
+      "status": 200,
+      "bytes": 32
+    },
+    {
+      "path": "/__houki-review/data",
+      "status": 404,
+      "bytes": 9362
+    },
+    {
+      "path": "/docs/1sou_houki/StageK4-L/private/release_candidate_dto.json",
+      "status": 404,
+      "bytes": 9485
+    }
+  ],
+  "privateEndpointsUnavailable": true,
+  "releaseCommit": "fac0349f8fd092db53fb4d00e5745370ef005759",
+  "push": "origin/main PASS",
+  "deploy": "existing deploy.sh --with-build PASS",
+  "rollbackSnapshot": "/home/cw/k4m-rollback-20261008T123134Z",
+  "officialLinkChecks": [
+    {
+      "url": "https://laws.e-gov.go.jp/law/325AC0000000131",
+      "status": 200
+    },
+    {
+      "url": "https://laws.e-gov.go.jp/law/325M50080000014",
+      "status": 200
+    },
+    {
+      "url": "https://laws.e-gov.go.jp/law/325M50080000017",
+      "status": 200
+    },
+    {
+      "url": "https://laws.e-gov.go.jp/law/325M50080000018",
+      "status": 200
+    },
+    {
+      "url": "https://public-comment.e-gov.go.jp/pcm/download?seqNo=0000285095",
+      "status": 200
+    }
+  ],
+  "liveBrowser": {
+    "desktop1280x900": "PASS home41/140, textbook, official source link",
+    "mobile375x812": "PASS individual/all/hide, book return preserving2/2, width375/scrollWidth375",
+    "HFinal28": "PASS loaded28 and 25point entrance",
+    "CWReceive": "PASS training screen available; auditory quality NOT_RUN",
+    "deepURLAndSeed": "PASS local; live seed/filter covered by automated tests",
+    "VoiceOver": "NOT_RUN",
+    "english": "PASS rendered32/74/101 ranges and coast-station illustration",
+    "geography": "PASS rendered32-point initial learning range and list",
+    "examNavigation": "PASS one-sou menu and last-material entry"
+  }
+}

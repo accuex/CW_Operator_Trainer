@@ -15,3 +15,17 @@
 - 本番成果物のrollbackコピーをdeploy前に非公開ディレクトリへ保存。deploy失敗時はコピーしたdistを戻して既存PM2をreloadする。旧教材static配信もsnapshotから回復可能。ユーザー教材原本は変更・削除しない。
 
 公開確認・commit/push/deploy結果はdeployment_results.jsonに記録する。更新は新versionの編集・根拠照合・用途別公開承認・validateRelease・新release/active切替を経る。今回承認を将来版に流用しない。
+
+## 本番公開結果
+
+- Stage判定：PASS。承認対象の候補版6のみを公開。
+- release commit：`fac0349f8fd092db53fb4d00e5745370ef005759`、origin/main push成功。既存deploy.shによる本番build/PM2 reload成功。
+- 公開確認日時：2026-10-08T12:54:59.658396+00:00（実際に本番DTOを取得して確認した時刻）。
+- 本番URL：https://cw.conagi.jp/app/houki
+- 本番release digest：`294710bb80d5c5b4ee8370c007af7f74545782d4b9e22998c3aee7fd1a41128c`。ローカルDTOとbytes完全一致。41/140/279/2カードを確認。
+- 本番desktop/mobileの参考書・公式リンク・赤シート表示/非表示・参考書往復/復元PASS。既存28句/25点セット及びCW受信訓練画面の表示PASS。公式出典5 URL HTTP200、英語/地理/TOP/Dashboard/API health HTTP200。
+- 非公開review dataとprivate DTO URLは404。過去のprivate証拠・credentialをdeploy転送しない。実VoiceOver、音響品質、アカウント間同期の実機検査はNOT_RUN。既存同期/progress実装は不変。
+- 残課題は将来の新scope・法改正の再確認。今回の限定公開を全範囲網羅/得点保証とは扱わない。
+- 本番公開後の証拠追補commitは記録のみで、教材/本番コードの追加変更は行わない。
+
+本番ブラウザでも専門英語（32/74/101と海岸局イラスト）、地理（初期32地点一覧）、一総通メニューの読み込みを確認した。

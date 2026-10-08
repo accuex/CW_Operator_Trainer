@@ -13,5 +13,7 @@
   "mobile375x812": "PASS redsheet/reveal/hide/explanation/return restore/filter/random/width375",
   "VoiceOver": "NOT_RUN",
   "auditoryQuality": "NOT_RUN",
-  "deployment": "PENDING"
+  "deployment": "PASS",
+  "productionHTTP": "PASS",
+  "officialSourceLinks": "5/5 HTTP200"
 }

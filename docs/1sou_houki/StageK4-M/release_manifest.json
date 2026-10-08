@@ -1,6 +1,6 @@
 {
   "stage": "K4-M",
-  "status": "approved_for_release",
+  "status": "published",
   "editionId": "cwot-houki-v1",
   "contentVersion": 6,
   "candidateSha256": "299eefc848e8f35f3fee12d0cfda9a0e4d4f9d445d93d62d57ec50f0bde332e4",
@@ -28,5 +28,5 @@
     "改正理由の推測"
   ],
   "lawVerificationAsOf": "2026-10-07",
-  "publicationObservedAt": null
+  "publicationObservedAt": "2026-10-08T12:54:59.658396+00:00"
 }
