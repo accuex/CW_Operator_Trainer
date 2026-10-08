@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "outputFilesScanned": 697,
+  "needleCount": 25,
+  "hits": [],
+  "productionReferencesToStaging": [],
+  "publicDataset": "original-samples-v1.json",
+  "historicalDatasetIncluded": false,
+  "actualLawContentIncluded": false,
+  "legalHumanPublicApprovals": 0,
+  "note": "既存の公開H-Final28は維持。新規一般配信は明示依頼に基づく完全オリジナルの架空サンプルのみ。"
+}

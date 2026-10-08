@@ -1,0 +1,23 @@
+{
+  "result": "PASS",
+  "protectedHashCount": 1372,
+  "changedProtectedFiles": [],
+  "historicalCounts": [
+    615,
+    486,
+    2161
+  ],
+  "priority1Effective": [
+    41,
+    22
+  ],
+  "K3K": "K3-N有効台帳を不変保存",
+  "HFinal28": "master・原画面・progressロジック不変",
+  "baselineHEAD": "c04a0bdf24d72d4b4e62d86221561c6467245496",
+  "baselineStatus": "",
+  "externalChangesAtStart": [],
+  "packageVersion": "1.1.1",
+  "productionChangesAuthorized": true,
+  "publicApprovalActualLegalMaterials": 0,
+  "pushDeploy": false
+}

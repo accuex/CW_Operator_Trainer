@@ -1,0 +1,34 @@
+{
+  "productionTypeCheck": "PASS",
+  "productionTypeConfig": "production_tsconfig.json",
+  "allFileTypeCheck": "PRE_EXISTING_FAIL",
+  "baselineHEADReproduction": "same TS2345 at StageK4-B/preview/main.tsx(4,172)",
+  "unrelatedProtectedFileNotFixed": true,
+  "relatedTests": {
+    "files": 4,
+    "tests": 22,
+    "result": "PASS"
+  },
+  "broadRegression": {
+    "files": 59,
+    "tests": 714,
+    "result": "PASS",
+    "note": "歴史参照配列の最終追加前に実行。変更範囲の関連22件は追加後再実行PASS。"
+  },
+  "productionBuild": "PASS",
+  "buildMethod": "現在ソースとpublicの一時コピー。docsを参照可能にしたまま正式vinext build。元作業ツリーの生成物は変更しない。",
+  "diffCheck": "PASS",
+  "browserActualKeyboard": "NOT_RUN_POLICY_BLOCK",
+  "mobile375pxActual": "NOT_RUN_POLICY_BLOCK",
+  "VoiceOver": "NOT_RUN",
+  "deepURL": "state parse/roundtrip unit PASS; browser reload/back NOT_RUN",
+  "revealHide": "printed-position state unit PASS; actual click NOT_RUN",
+  "layout": "single-column mobile CSS implemented; visual NOT_RUN",
+  "missingData": "HTTP/malformed loader tests PASS; empty filter unit PASS",
+  "buildWarnings": "既存vinext route static classification warnings",
+  "devServer": {
+    "url": "http://127.0.0.1:5187/app/houki",
+    "deepURLHTTP": 200,
+    "browserFlow": "NOT_RUN"
+  }
+}

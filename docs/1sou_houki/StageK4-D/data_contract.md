@@ -1,0 +1,12 @@
+# K4-D 公開表示DTOの契約
+
+新規datasetは完全オリジナルの架空サンプルのみ。実法規の公開承認は0のまま。
+
+- schemaVersion1。idとversionをContentRefで分離。未来の教材は新versionとして投入し、historical原問と過去verificationを上書きしない。
+- HistoricalCanonical→HistoricalQuestion→HistoricalBlankは独立registry。サンプルでは3registryとも空。実問題に移る際は審査済み原問refに属する印刷blankだけをtokensへ指定する。
+- LearningNote→LegalRule→LegalCondition。AND/OR、主体、行為、例外を別に保持。sourcesは公式URL・条項label・確認日等の表示情報のみ。private原文・hash/pointer/rangeを格納しない。
+- TriviaCard→AmendmentEvent。before/after、公布日・施行日・理由・未確認事項を分離。設定・確認がない項目はnull。今回は実法令ではなく架空の表示サンプル。
+- ContentReviewは対象id/versionと用途を指定。effectiveStatus/publicEligibilityと人間の用途別公開承認は独立。approved_releaseにはcleared権利・human approved・releaseApproved及び用途一致が必要。verified単独では配信できない。
+- original_sampleではoriginal_author・not_applicable_sample、法令確認日null、historicalなし。releaseApproved=falseは実法令の公開承認がないことを表す。今回のサンプル配信はユーザーの明示的な実装依頼に基づく。
+- runtime validateだけに頼らず、配信assetとbundleには承認済みデータだけを置く。K4-A stagingはproductionから一切importしない。承認前データをimportしてからfilterする方式は使わない。
+- 将来の承認済みrelease投入には別工程のsource/rights/human reviewとbuild混入検査が必要。今回、実releaseを生成していない。
