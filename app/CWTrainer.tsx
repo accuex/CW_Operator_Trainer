@@ -1,5 +1,6 @@
 'use client';
 
+import GeographyLoading from './views/geography/GeographyLoading';
 import Link from 'next/link';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { applyAchievements, achievementById } from '@/lib/achievements';
@@ -290,7 +291,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     communication: <ExamView settings={settings} setSettings={setSettings} record={record} answers={answers} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onBack={() => navigate('exam')} />,
     english: ready ? <Suspense fallback={<p className="page-pad" role="status">専門英語教材を読み込んでいます…</p>}><EnglishView onBack={() => navigate('exam')} /></Suspense> : null,
     houki: ready ? <Suspense fallback={<p className="page-pad" role="status">法規の教材を読み込んでいます…</p>}><HoukiView onBack={() => navigate('exam')} /></Suspense> : null,
-    geography: ready ? <Suspense fallback={<p className="page-pad" role="status">地理教材を読み込んでいます…</p>}><GeographyView onBack={() => navigate('exam')} /></Suspense> : null,
+    geography: ready ? <Suspense fallback={<GeographyLoading onBack={() => navigate('exam')} />}><GeographyView onBack={() => navigate('exam')} /></Suspense> : null,
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,

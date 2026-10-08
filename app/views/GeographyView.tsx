@@ -1,7 +1,8 @@
 'use client';
 import {validConfig} from '@/lib/geography/config';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { loadGeography } from '@/lib/geography/data';
+import { loadGeography, GEOGRAPHY_FILE_COUNT, type GeographyLoadProgress } from '@/lib/geography/data';
+import GeographyLoading from './geography/GeographyLoading';
 import { materialize } from '@/lib/geography/engine/stage13-core.js';
 import { SCOPES, selectedEntities, sortEntities, drillPool, nameMatches, toleranceFor, judge, createSession, nextSession, recordSession, sessionSummary } from '@/lib/geography/engine/stage14-core.js';
 import { openStore, status, choose, record, result, validActive, validate } from '@/lib/geography/engine/stage15-core.js';
@@ -23,10 +24,11 @@ const frequency = (e: Entity) => e.choiceCount === null ? `OCR参考 ${e.provisi
 export default function GeographyView({ onBack }: {
     onBack: () => void;
 }) {
+    const [loadProgress, setLoadProgress] = useState<GeographyLoadProgress>({ completed: 0, total: GEOGRAPHY_FILE_COUNT });
     const [mode, setMode] = useState<'learn' | 'map'>('learn');
     const [data, setData] = useState<Dataset | null>(null), [error, setError] = useState(''), [config, setConfig] = useState<Config>(initial), [selected, setSelected] = useState<string | null>(null), [sort, setSort] = useState('priority'), [labels, setLabels] = useState('on'), [running, setRunning] = useState<Running | null>(null), [answer, setAnswer] = useState(''), [revision, setRevision] = useState(0), [notice, setNotice] = useState(''), [confirm, setConfirm] = useState<'area' | 'all' | 'import' | null>(null);
     const store = useRef<Store | null>(null), pendingImport = useRef<Progress | null>(null), dialog = useRef<HTMLDialogElement>(null), cancel = useRef<HTMLButtonElement>(null), input = useRef<HTMLInputElement>(null), next = useRef<HTMLButtonElement>(null), summary = useRef<HTMLElement>(null), list = useRef<HTMLDivElement>(null), periodCache = useRef(new Map<string, Entity[]>());
-    useEffect(() => { let alive = true; loadGeography().then(d => { if (!alive)
+    useEffect(() => { let alive = true; loadGeography(progress => { if (alive) setLoadProgress(progress); }).then(d => { if (!alive)
         return; let storage: Pick<Storage, 'getItem' | 'setItem'>; try {
         storage = localStorage;
     }
@@ -100,7 +102,7 @@ export default function GeographyView({ onBack }: {
     if (error)
         return <section className="page-pad geography-page"><button className="btn" onClick={onBack}>一総通へ戻る</button><p role="alert">{error}</p></section>;
     if (!data || !store.current)
-        return <section className="page-pad geography-page"><p role="status">地理教材を読み込んでいます…</p></section>;
+        return <GeographyLoading {...loadProgress} onBack={onBack} />;
     const progress = store.current.data, area = data.master.areas.find(a => a.areaId === config.area) ?? data.master.areas[0], e = rows.find(e => e.learningEntityId === selected), current = running?.pool.find(e => e.learningEntityId === running.currentID) ?? null, done = running && !running.currentID, stats: Outcome | null = done ? result(running.session) : null, practiced = rows.filter(e => progress.entities[e.learningEntityId]?.attempts).length, recent = progress.recent.filter(r => r.area === config.area && rows.some(e => e.learningEntityId === r.learningEntityId)).slice(-10), weak = choose(pool, progress, 'all', true), invalid = Boolean(config.period === 'custom' && config.from && config.to && config.from > config.to), last = validConfig(progress.last, data.master) ? progress.last : null, s = running ? sessionSummary(running.session) : null;
     const modeTabs = <nav className="geo-mode-tabs" aria-label="地理の表示モード"><button id="geo-mode-learn" className="btn" aria-pressed={mode === 'learn'} onClick={() => setMode('learn')}>学習</button><button id="geo-mode-map" className="btn" aria-pressed={mode === 'map'} onClick={() => setMode('map')}>マップ</button></nav>;
     if (mode === 'map') return <section className="page-pad geography-page geo-explorer-page"><div className="page-title"><div><p className="section-kicker">Geography · Map Explorer</p><h1>一総通 地理 · マップ</h1><p>全体を眺める · 位置関係を理解する · 頻度を見る</p></div><button id="geo-back" className="btn btn-ghost" onClick={onBack}>一総通へ戻る</button></div>{modeTabs}<GeographyExplorer data={data} periodRows={periodRows} config={config} onPeriodChange={(key, value) => change(key, value)} /></section>;
