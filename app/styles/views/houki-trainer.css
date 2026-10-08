@@ -2,3 +2,6 @@
 
 /* Keep the destination heading visible below the fixed app header. */
 .ht-trainer [data-trainer-focus],.ht-trainer h1{scroll-margin-top:96px}
+
+/* Keep authored paragraph breaks in explanatory blocks. */
+.ht-lesson [data-block-type="explanation"]>p{white-space:pre-line}

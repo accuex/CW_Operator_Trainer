@@ -1,0 +1,72 @@
+{
+  "schemaReviewValidator": "PASS",
+  "pendingPublicValidatorRejection": "PASS",
+  "oldAnswersBlanks": "PASS",
+  "sourceHashRevisionLocator": "PASS",
+  "newScopedOfficialUnits": 19,
+  "relatedTests": {
+    "result": "PASS",
+    "files": 6,
+    "tests": 43
+  },
+  "productionTypeScript": "PASS",
+  "formalBuild": "PASS",
+  "productionExclusion": {
+    "result": "PASS",
+    "files": 1213,
+    "hits": 0
+  },
+  "browser": {
+    "result": "PASS",
+    "desktop": {
+      "viewport": [
+        1280,
+        900
+      ],
+      "horizontalOverflow": false,
+      "paragraphBreaks": "preserved",
+      "note": "通常通信電波の新規教材、章順・テーマ一覧を確認"
+    },
+    "mobile": {
+      "viewport": [
+        375,
+        812
+      ],
+      "horizontalOverflow": false,
+      "note": "予備免許承継の本文・比較・確認問題を確認"
+    },
+    "operations": {
+      "individualRevealEnter": "PASS",
+      "showAllSpace": "PASS",
+      "hideAll": "PASS",
+      "explanation": "PASS",
+      "bookSheetReturnState": "PASS",
+      "chapterFilter": "PASS",
+      "randomSeedReturn": "PASS",
+      "officialSources": "PASS",
+      "deepURL": "PASS",
+      "consoleErrors": [],
+      "viewportChangeReturnClick": "NOT_REPRODUCED"
+    },
+    "notRun": [
+      "実VoiceOver音声",
+      "全41テーマの全操作",
+      "CW音響品質"
+    ],
+    "captures": [
+      "review-captures/desktop-final.png",
+      "review-captures/mobile-note.png",
+      "review-captures/mobile-sheet.png"
+    ],
+    "humanReview": false
+  },
+  "notRun": [
+    "全プロジェクトroot TypeScript（保護された旧試作を含む）",
+    "実VoiceOver音声",
+    "全テーマ全操作",
+    "backup復元による実上書き",
+    "queue27 ITU表の新規詳細監査"
+  ],
+  "evidenceLocation": "private/*.log, private/*results.json, private/review-captures/",
+  "notHumanAudit": true
+}

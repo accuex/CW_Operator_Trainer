@@ -1,0 +1,27 @@
+{
+  "stage": "K4-K",
+  "asOf": "2026-10-07 JST",
+  "before": {
+    "covered": 33,
+    "partially_covered": 6,
+    "not_covered": 0,
+    "blocked": 2
+  },
+  "after": {
+    "covered": 38,
+    "partially_covered": 1,
+    "not_covered": 0,
+    "blocked": 2
+  },
+  "unresolved": 22,
+  "remainingPartialQueues": [
+    27
+  ],
+  "blockedQueues": [
+    36,
+    54
+  ],
+  "canonicalLegalStatusesUnchanged": true,
+  "coverageIsNotExamScoreOrFullLawCoverage": true,
+  "publicApproved": 0
+}

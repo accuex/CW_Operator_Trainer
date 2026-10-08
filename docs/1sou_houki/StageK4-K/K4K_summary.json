@@ -1,0 +1,36 @@
+{
+  "stage": "K4-K",
+  "executionVerdict": "PASS",
+  "ver1ReleaseVerdict": "REVIEW",
+  "asOf": "2026-10-07 JST",
+  "added": {
+    "themes": 4,
+    "questions": 16,
+    "blanks": 32
+  },
+  "total": {
+    "themes": 41,
+    "questions": 140,
+    "blanks": 279
+  },
+  "previousEditionPreserved": true,
+  "existingAudit": {
+    "themes": 37,
+    "questions": 124,
+    "correctionCases": 6,
+    "answerChanges": 0,
+    "oldBlanksRetained": 247,
+    "explanatoryBridges": 3,
+    "introGoalShortenings": 1
+  },
+  "coverage": {
+    "covered": 38,
+    "partial": 1,
+    "blocked": 2,
+    "unresolved": 22
+  },
+  "releaseApproved": false,
+  "humanApproval": "pending",
+  "push": false,
+  "deploy": false
+}

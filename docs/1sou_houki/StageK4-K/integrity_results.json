@@ -1,0 +1,31 @@
+{
+  "result": "PASS",
+  "protectedFiles": 1539,
+  "changedProtectedFiles": 0,
+  "historical": [
+    615,
+    486,
+    2161
+  ],
+  "priority1": {
+    "verified": 41,
+    "unresolved": 22
+  },
+  "HFinal": 28,
+  "previousStagesUnchanged": true,
+  "methodologyUnchanged": true,
+  "publicDTOUnchanged": true,
+  "credentialsProgressAuthUnchanged": true,
+  "packageVersion": "1.1.1",
+  "privateProductionHits": 0,
+  "publicApproval": 0,
+  "implementationChanges": [
+    "app/styles/views/houki-trainer.css",
+    "scripts/checkHoukiReviewBatch.mjs",
+    "scripts/houkiReviewTransfer.mjs",
+    "tooling/houki/dev-review.mjs"
+  ],
+  "commitScope": "listed code plus safe K4-K reports only",
+  "push": false,
+  "deploy": false
+}

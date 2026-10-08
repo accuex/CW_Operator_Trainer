@@ -1,0 +1,139 @@
+{
+  "stage": "K4-K",
+  "asOf": "2026-10-07 JST",
+  "baselineThemes": 37,
+  "baselineQuestions": 124,
+  "baselineBlanks": 247,
+  "protectedCanonicalStatus": {
+    "verified": 41,
+    "unresolved": 22
+  },
+  "partialQueues": [
+    27,
+    31,
+    38,
+    41,
+    49,
+    62
+  ],
+  "scopePolicy": "Only saved official evidence and independently completed dependency/context scope; full-article existence is not scope verification; previous status unchanged.",
+  "blockedQueues": [
+    36,
+    54
+  ],
+  "releaseApproved": false,
+  "noPush": true,
+  "agents": [
+    {
+      "task": "partial-scope and authoring",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low"
+    },
+    {
+      "task": "existing37/124 legal audit and independent content crosscheck",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low"
+    },
+    {
+      "task": "learner editorial review and order",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low"
+    }
+  ],
+  "selected": [
+    {
+      "themeId": "k4k-ship-phone-response-not-received",
+      "canonicalIds": [
+        "k1-ead01c447b73b23c6860",
+        "k1-70913cc652ad4997f30d"
+      ],
+      "queues": [
+        31,
+        41
+      ],
+      "scope": "81条の8第2項の電話応答をした船舶局。電話応答が受信されなかった場合にDSCで警報又は中継を受信した旨を送信する",
+      "dependencies": [
+        {
+          "lawId": "325M50080000017",
+          "article": "81_8"
+        }
+      ]
+    },
+    {
+      "themeId": "k4k-medical-safety-report-working-wave",
+      "canonicalIds": [
+        "k1-8885b33734e72b3e6589",
+        "k1-231cbf6872f134ea1bfa"
+      ],
+      "queues": [
+        38,
+        49
+      ],
+      "scope": "海上移動業務で第2項又は第3項の通報を送信する局。各項の条件に応じ通常通信電波で送信し、安全呼出し後の許容例外を区別する",
+      "dependencies": [
+        {
+          "lawId": "325M50080000017",
+          "article": "70_2"
+        },
+        {
+          "lawId": "325M50080000017",
+          "article": "2"
+        },
+        {
+          "lawId": "325AC0000000131",
+          "article": "52"
+        }
+      ]
+    },
+    {
+      "themeId": "k4k-preliminary-license-succession",
+      "canonicalIds": [
+        "k1-a9c59e6a4f0117f76e92"
+      ],
+      "queues": [
+        62
+      ],
+      "scope": "電波法8条の予備免許を受けた者。20条1〜9項の規定を各項の条件を保持して準用する",
+      "dependencies": [
+        {
+          "lawId": "325AC0000000131",
+          "article": "20"
+        },
+        {
+          "lawId": "325AC0000000131",
+          "article": "8"
+        }
+      ]
+    },
+    {
+      "themeId": "k4k-ship-aircraft-two-way-phone-wave",
+      "canonicalIds": [
+        "k1-8885b33734e72b3e6589",
+        "k1-231cbf6872f134ea1bfa"
+      ],
+      "queues": [
+        38,
+        49
+      ],
+      "scope": "海上移動業務で船舶航空機間双方向無線電話を使う局。遭難・緊急の場合に第3号のA3E121.5MHzを選ぶ",
+      "dependencies": [
+        {
+          "lawId": "325M50080000017",
+          "article": "70_2"
+        },
+        {
+          "lawId": "325M50080000017",
+          "article": "2"
+        },
+        {
+          "lawId": "325AC0000000131",
+          "article": "52"
+        },
+        {
+          "lawId": "325M50080000017",
+          "article": "58"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "ver1Candidate": "限定確認scopeの内部完成候補",
+  "release": "REVIEW 人間の権利・公開承認待ち",
+  "recommendedOrder": [
+    "devで41テーマの内容・読みやすさを人間レビュー",
+    "自作解説・独自問題・引用・改正カードの用途別権利審査",
+    "承認対象versionと範囲を明示して公開判断",
+    "queue27の保存済みITU表の詳細監査を独立工程で実施",
+    "unresolved22件の資料調査は教材公開審査と分離"
+  ],
+  "notMandatoryForLimitedV1": "63 canonicalの全網羅",
+  "automaticNextStage": false
+}
