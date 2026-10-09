@@ -42,6 +42,7 @@ import { markSfxBackground, unlockSfx, wakeSfx } from '@/app/trainer/sfx';
 const ExamMenuView = lazy(() => import('@/app/views/ExamMenuView'));
 const EnglishView = lazy(() => import('@/app/views/EnglishView'));
 const HoukiView = lazy(() => import('@/app/views/HoukiTrainerView'));
+const HoukiKakomonView = lazy(() => import('@/app/dev/houki-kakomon/KakomonPrototype').then((mod) => ({ default: mod.KakomonPrototype })));
 const GeographyView = lazy(() => import('@/app/views/GeographyView'));
 
 // The geography view has an in-memory fallback. A blocked browser store must
@@ -298,7 +299,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     exam: <Suspense fallback={<p className="page-pad" role="status">教材メニューを読み込んでいます…</p>}><ExamMenuView lastMaterial={lastExamMaterial} onNavigate={navigate} /></Suspense>,
     communication: <ExamView settings={settings} setSettings={setSettings} record={record} answers={answers} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onBack={() => navigate('exam')} />,
     english: ready ? <Suspense fallback={<p className="page-pad" role="status">専門英語教材を読み込んでいます…</p>}><EnglishView onBack={() => navigate('exam')} /></Suspense> : null,
-    houki: ready ? <Suspense fallback={<p className="page-pad" role="status">法規の教材を読み込んでいます…</p>}><HoukiView onBack={() => navigate('exam')} /></Suspense> : null,
+    houki: ready ? <Suspense fallback={<p className="page-pad" role="status">法規の教材を読み込んでいます…</p>}><HoukiView onBack={() => navigate('exam')} onOpenKakomon={() => navigate('houki-kakomon')} /></Suspense> : null,
+    'houki-kakomon': ready ? <Suspense fallback={<p className="page-pad" role="status">法規過去問を読み込んでいます…</p>}><HoukiKakomonView onBack={() => navigate('exam')} onOpenHouki={() => navigate('houki')} /></Suspense> : null,
     geography: ready ? <Suspense fallback={<GeographyLoading onBack={() => navigate('exam')} />}><GeographyView onBack={() => navigate('exam')} /></Suspense> : null,
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
@@ -333,19 +335,23 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
           </span>
         </Link>
         <nav className="nav">
-          {views.map((item) => (
+          {views.map((item) => {
+            const examOpen = view === 'communication' || view === 'geography' || view === 'english' || view === 'houki' || view === 'houki-kakomon';
+            const current = view === item.id || (examOpen && item.id === 'exam');
+            return (
             <button
               key={item.id}
               type="button"
-              className={`nav-item ${(view === item.id || (view === 'communication' || view === 'geography' || view === 'english' || view === 'houki') && item.id === 'exam') ? 'active' : ''} ${item.primary ? 'primary' : 'secondary'}`}
+              className={`nav-item ${current ? 'active' : ''} ${item.primary ? 'primary' : 'secondary'}`}
               onClick={() => navigate(item.id)}
-              aria-current={(view === item.id || (view === 'communication' || view === 'geography' || view === 'english' || view === 'houki') && item.id === 'exam') ? 'page' : undefined}
+              aria-current={current ? 'page' : undefined}
               title={item.title}
             >
               <Icon name={item.icon} size={22} />
               <span className="nav-label">{item.title}</span>
             </button>
-          ))}
+            );
+          })}
           {signedIn && (
             <button
               type="button"

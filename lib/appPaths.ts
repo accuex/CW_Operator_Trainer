@@ -14,6 +14,7 @@ export const APP_VIEWS = [
   'geography',
   'english',
   'houki',
+  'houki-kakomon',
   'qso',
   'collection',
   'settings',

@@ -15,4 +15,11 @@
 .exam-menu-card small {color:var(--muted);line-height:1.7;}
 .exam-menu-open {color:var(--gold);margin-top:auto;padding-top:18px;}
 .exam-menu-return {margin-bottom:20px;}
-@media(max-width:800px) {.exam-menu-grid {grid-template-columns:1fr;}.exam-menu-card {padding:22px;}.exam-menu-continue {padding:18px;}}
+.exam-menu-past {display:flex;align-items:center;gap:18px;width:100%;margin-top:20px;padding:22px 28px;text-align:left;color:var(--text);cursor:pointer;transition:border-color .15s,background .15s;}
+.exam-menu-past:hover,.exam-menu-past:focus-visible {border-color:var(--gold);background:var(--surface-2);}
+.exam-menu-past>svg {flex:none;color:var(--gold);}
+.exam-menu-past>span:nth-child(2) {flex:1;min-width:0;}
+.exam-menu-past strong {display:block;font-size:19px;margin:4px 0;}
+.exam-menu-past small {display:block;color:var(--muted);line-height:1.7;}
+.exam-menu-past .exam-menu-open {margin:0;padding:0;flex:none;}
+@media(max-width:800px) {.exam-menu-grid {grid-template-columns:1fr;}.exam-menu-past {flex-wrap:wrap;padding:20px 22px;}.exam-menu-past .exam-menu-open {flex-basis:100%;}.exam-menu-card {padding:22px;}.exam-menu-continue {padding:18px;}}

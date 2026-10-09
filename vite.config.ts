@@ -2,6 +2,7 @@ import { sites } from '@openai/sites-vite-plugin';
 import tailwindcss from '@tailwindcss/postcss';
 import vinext from 'vinext';
 import { defineConfig } from 'vite';
+import { houkiKakomonPlugin } from './tooling/houki/dev-kakomon.mjs';
 import { houkiReviewPlugin } from './tooling/houki/dev-review.mjs';
 import hostingConfig from './.openai/hosting.json';
 
@@ -52,6 +53,7 @@ export default defineConfig(async () => {
       : undefined,
     plugins: [
       houkiReviewPlugin(),
+      houkiKakomonPlugin(),
       vinext(),
       sites(),
       cloudflare({

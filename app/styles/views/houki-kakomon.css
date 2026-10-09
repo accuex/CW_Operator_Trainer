@@ -1,0 +1,338 @@
+/* 法規 過去問周回 */
+.kakomon {
+  --rank-0: var(--coral);
+  --rank-1: #c4824a;
+  --rank-2: #b6bec8;
+  --rank-3: var(--gold);
+  --rank-4: #5ec8ff;
+  --rank-5: #2ee6c7;
+  --rank-6: #b07cff;
+  --rank-7: #ffe08a;
+  --rank-fresh: var(--surface-3);
+  max-width: 1040px;
+  margin: auto;
+  scroll-margin-top: calc(var(--header) + 16px);
+}
+.kakomon button { font: inherit; }
+.kakomon h2, .kakomon h3 { line-height: 1.5; }
+
+/* Heading */
+.kakomon-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin: 4px 0 22px; }
+.kakomon-head h1 { margin: 8px 0; font-size: clamp(26px, 4vw, 40px); }
+.kakomon-head h1:focus { outline: none; }
+.kakomon-head p { margin: 0; color: var(--text-2); line-height: 1.8; }
+.kakomon-head .btn { flex: none; }
+.kakomon-warn { padding: 12px 16px; border-left: 3px solid var(--coral); border-radius: 6px; background: var(--coral-soft); }
+.kakomon-ack { padding: clamp(18px, 3vw, 26px); margin-bottom: 20px; border-color: rgb(246 196 83 / 40%); }
+.kakomon-ack h2 { margin: 0 0 8px; font-size: 18px; }
+.kakomon-ack p { margin: 0 0 10px; color: var(--text-2); line-height: 1.85; }
+.kakomon-ack .btn { margin-top: 6px; }
+.kakomon-draft-note { font-size: 14px; color: var(--muted) !important; }
+
+/* Resume */
+.kakomon-resume { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 18px 22px; margin-bottom: 20px; border-color: rgb(246 196 83 / 35%); }
+.kakomon-resume > div:first-child { flex: 1; min-width: 0; }
+.kakomon-resume h2 { margin: 4px 0 2px; font-size: 19px; }
+.kakomon-resume p { margin: 0 0 10px; color: var(--text-2); }
+.kakomon-resume-actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; flex: none; }
+
+/* Scope form */
+.kakomon-scope { padding: 0; overflow: hidden; }
+.kakomon-step { padding: clamp(18px, 3vw, 26px); border-bottom: 1px solid var(--line); }
+.kakomon-step-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.kakomon-step-head h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 18px; }
+.kakomon-step-head h2 span { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--gold-soft); color: var(--gold); font: 800 13px/1 var(--font-mono); }
+.kakomon-step-head small { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+.kakomon-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.kakomon-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 38px; padding: 0 14px;
+  border: 1px solid var(--line-2); border-radius: var(--r-pill);
+  background: var(--surface); color: var(--text-2);
+  font-weight: 700; font-size: 14px; cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast);
+}
+.kakomon-chip small { color: var(--muted); font-weight: 600; }
+.kakomon-chip:hover:not(:disabled) { border-color: var(--line-3); color: var(--text); }
+.kakomon-chip[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
+.kakomon-chip:disabled { opacity: .45; cursor: default; }
+
+.kakomon-years { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px 18px; margin-top: 16px; }
+.kakomon-year { display: grid; grid-template-columns: 74px 1fr 1fr; gap: 8px; align-items: stretch; }
+.kakomon-year-label { display: flex; flex-direction: column; justify-content: center; line-height: 1.25; }
+.kakomon-year-label b { font: 800 15px/1.2 var(--font-mono); }
+.kakomon-year-label small { color: var(--muted); font-size: 11px; }
+.kakomon-sitting {
+  display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  min-height: 52px; padding: 7px 10px;
+  border: 1px solid var(--line-2); border-radius: var(--r-xs);
+  background: var(--surface); color: var(--text-2); text-align: left; cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+.kakomon-sitting:hover { border-color: var(--line-3); }
+.kakomon-sitting[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); color: var(--text); box-shadow: inset 0 0 0 1px var(--gold); }
+.kakomon-sitting-top { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
+.kakomon-sitting-top em { font-style: normal; color: var(--gold); font: 700 11px/1 var(--font-mono); }
+.kakomon-sitting.is-missing { border-style: dashed; border-color: var(--line); background: none; color: var(--faint); cursor: default; font-size: 13px; }
+.kakomon-sitting.is-missing small { font-size: 11px; }
+
+.kakomon-options { display: grid; gap: 16px; }
+.kakomon-option { display: grid; grid-template-columns: 74px 1fr; gap: 12px; align-items: start; }
+.kakomon-option-label { padding-top: 9px; font-weight: 700; color: var(--text-2); }
+.kakomon-option .segmented button { min-height: 36px; font-size: 14px; }
+.kakomon-hint { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.kakomon-toggle { grid-template-columns: auto 1fr; align-items: center; cursor: pointer; min-height: 40px; }
+.kakomon-toggle input { width: 20px; height: 20px; accent-color: var(--gold); margin: 0; }
+.kakomon-toggle span { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.kakomon-toggle .kakomon-medal { width: 24px; height: 24px; }
+
+.kakomon-start { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: clamp(18px, 3vw, 26px); background: var(--surface-sunken); }
+.kakomon-start-summary { flex: 1; min-width: 0; }
+.kakomon-start-summary > strong { display: block; font-size: 18px; }
+.kakomon-start-summary > small { display: block; margin: 2px 0 10px; color: var(--muted); }
+.kakomon-start-action { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; max-width: 280px; text-align: right; }
+.kakomon-start-action small { color: var(--muted); font-size: 12px; line-height: 1.6; }
+
+/* Rank stack */
+.kakomon-stack-bar { display: flex; height: 10px; overflow: hidden; border-radius: var(--r-pill); background: var(--rank-fresh); }
+.kakomon-stack.is-thin .kakomon-stack-bar { height: 5px; }
+.kakomon-stack-bar i { display: block; height: 100%; }
+.kakomon-stack-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--text-2); }
+.kakomon-stack-legend li { display: inline-flex; align-items: center; gap: 5px; }
+.kakomon-stack-legend i { width: 9px; height: 9px; border-radius: 2px; }
+.kakomon-stack-legend b { font-family: var(--font-mono); color: var(--text); }
+.kakomon .is-fresh > i, .kakomon-stack-bar i.is-fresh { background: var(--rank-fresh); }
+.kakomon-stack-legend .is-fresh i { background: var(--line-3); }
+.kakomon-stack-bar .is-rank-0, .kakomon-stack-legend .is-rank-0 i { background: var(--rank-0); }
+.kakomon-stack-bar .is-rank-1, .kakomon-stack-legend .is-rank-1 i { background: var(--rank-1); }
+.kakomon-stack-bar .is-rank-2, .kakomon-stack-legend .is-rank-2 i { background: var(--rank-2); }
+.kakomon-stack-bar .is-rank-3, .kakomon-stack-legend .is-rank-3 i { background: var(--rank-3); }
+.kakomon-stack-bar .is-rank-4, .kakomon-stack-legend .is-rank-4 i { background: var(--rank-4); }
+.kakomon-stack-bar .is-rank-5, .kakomon-stack-legend .is-rank-5 i { background: var(--rank-5); }
+.kakomon-stack-bar .is-rank-6, .kakomon-stack-legend .is-rank-6 i { background: var(--rank-6); }
+.kakomon-stack-bar .is-rank-7, .kakomon-stack-legend .is-rank-7 i { background: var(--rank-7); }
+
+/* Medal */
+.kakomon-medal { width: 28px; height: 28px; flex: none; object-fit: contain; filter: drop-shadow(0 1px 1px rgb(0 0 0 / 35%)); }
+.kakomon-medal.is-empty, .kakomon-medal.is-fallen { display: inline-grid; place-items: center; box-sizing: border-box; border-radius: 50%; filter: none; }
+.kakomon-medal.is-empty { border: 1.5px dashed var(--line-3); }
+.kakomon-medal.is-fallen { border: 1.5px solid var(--coral); color: var(--coral); font: 800 14px/1 sans-serif; }
+.kakomon-medal.is-fallen::before { content: "×"; }
+
+/* Drill */
+.kakomon-drillbar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.kakomon-drillbar-title { flex: 1; min-width: 0; text-align: center; }
+.kakomon-drillbar-title strong { display: block; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kakomon-drillbar-title small { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+.kakomon-quit { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.kakomon-quit small { color: var(--muted); font-size: 12px; }
+.kakomon-nav { margin: 12px 0 16px; }
+.kakomon-nav ol { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.kakomon-nav button {
+  width: 34px; height: 34px; padding: 0;
+  border: 1px solid var(--line-2); border-radius: 8px;
+  background: var(--surface); color: var(--text-2);
+  font: 700 12px/1 var(--font-mono); cursor: pointer;
+}
+.kakomon-nav button:disabled { opacity: .35; cursor: default; }
+.kakomon-nav button.is-ok { border-color: rgb(67 224 166 / 55%); background: var(--mint-soft); color: var(--mint); }
+.kakomon-nav button.is-ng { border-color: rgb(255 111 127 / 55%); background: var(--coral-soft); color: var(--coral); }
+.kakomon-nav button.is-current { outline: 2px solid var(--gold); outline-offset: 1px; color: var(--gold); }
+
+.kakomon-question { padding: clamp(16px, 3vw, 28px); line-height: 1.9; }
+.kakomon-question-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 10px; }
+.kakomon-question-head h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 0; font: 800 24px/1.3 var(--font-mono); }
+.kakomon-question-head h2:focus { outline: none; }
+.kakomon-question-head h2 span { font: 700 14px/1.4 var(--font-body); color: var(--text-2); }
+.kakomon-standing { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+.kakomon-rank { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px 3px 3px; border: 1px solid var(--line-2); border-radius: var(--r-pill); background: var(--surface); font-size: 13px; font-weight: 700; }
+.kakomon-rank.is-rank-0 { border-color: var(--line-2); }
+.kakomon-rank.is-rank-1 { border-color: var(--rank-1); }
+.kakomon-rank.is-rank-2 { border-color: var(--rank-2); }
+.kakomon-rank.is-rank-3 { border-color: var(--rank-3); }
+.kakomon-rank.is-rank-4 { border-color: var(--rank-4); }
+.kakomon-rank.is-rank-5 { border-color: var(--rank-5); }
+.kakomon-rank.is-rank-6 { border-color: var(--rank-6); }
+.kakomon-rank.is-rank-7 { border-color: var(--rank-7); }
+.kakomon-marks { display: inline-flex; gap: 2px; font: 800 13px/1 sans-serif; }
+.kakomon-marks .is-ok { color: var(--mint); }
+.kakomon-marks .is-ng { color: var(--coral); }
+
+.kakomon-lead { margin: 6px 0 10px; font-size: 16.5px; }
+.kakomon-body { display: block; }
+.kakomon-p { display: block; margin: 0 0 8px; }
+.kakomon-item { display: grid; grid-template-columns: 2.2em 1fr; gap: 6px; margin: 6px 0; }
+.kakomon-note { display: block; color: var(--text-2); font-size: 14.5px; }
+.kakomon-blank { display: inline-block; min-width: 1.7em; margin: 0 .15em; padding: 0 .35em; border: 1px solid var(--gold); border-radius: 4px; color: var(--gold); text-align: center; font-weight: 700; line-height: 1.6; }
+
+/* Choices */
+.kakomon-choices { display: grid; gap: 8px; margin: 18px 0; }
+.kakomon-choice {
+  display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: start;
+  width: 100%; padding: 12px 14px;
+  border: 1px solid var(--line-2); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--text); text-align: left; line-height: 1.8; cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+.kakomon-choice:hover:not(:disabled) { border-color: var(--line-3); background: var(--surface-2); }
+.kakomon-choice:disabled { cursor: default; }
+.kakomon-choice-no {
+  display: inline-grid; place-items: center; width: 30px; height: 30px; margin-top: 1px;
+  border: 1px solid var(--line-3); border-radius: 50%;
+  background: var(--surface-sunken); color: var(--text-2); font: 800 14px/1 var(--font-mono);
+}
+.kakomon-choice[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); }
+.kakomon-choice[aria-pressed="true"] .kakomon-choice-no, button.kakomon-choice-no[aria-pressed="true"] { border-color: var(--gold); background: var(--gold); color: #1b1503; }
+.kakomon-choice.is-answer { border-color: var(--mint); background: var(--mint-soft); }
+.kakomon-choice.is-answer .kakomon-choice-no { border-color: var(--mint); background: var(--mint); color: #062018; }
+.kakomon-choice.is-wrong { border-color: var(--coral); background: var(--coral-soft); }
+.kakomon-choice.is-wrong .kakomon-choice-no { border-color: var(--coral); background: var(--coral); color: #2a0509; }
+.kakomon-choice.is-dim { opacity: .55; }
+.kakomon-choice-tag { align-self: center; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-sunken); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.kakomon-choice.is-answer .kakomon-choice-tag { color: var(--mint); }
+.kakomon-choice.is-wrong .kakomon-choice-tag { color: var(--coral); }
+
+.kakomon-table-wrap { overflow-x: auto; margin: 18px 0; border: 1px solid var(--line-2); border-radius: var(--r-sm); }
+.kakomon-table { width: 100%; border-collapse: collapse; }
+.kakomon-table th, .kakomon-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; line-height: 1.6; }
+.kakomon-table thead th { background: var(--surface-sunken); color: var(--text-2); font-size: 13px; white-space: nowrap; }
+.kakomon-table tbody tr { cursor: pointer; transition: background var(--t-fast); }
+.kakomon-table tbody tr:last-child th, .kakomon-table tbody tr:last-child td { border-bottom: 0; }
+.kakomon-table tbody tr:hover { background: var(--surface-2); }
+.kakomon-table tbody th { width: 52px; }
+.kakomon-table button.kakomon-choice-no { cursor: pointer; }
+.kakomon-table tr.is-picked { background: var(--gold-soft); }
+.kakomon-table tr.is-answer { background: var(--mint-soft); }
+.kakomon-table tr.is-answer .kakomon-choice-no { border-color: var(--mint); background: var(--mint); color: #062018; }
+.kakomon-table tr.is-wrong { background: var(--coral-soft); }
+.kakomon-table tr.is-wrong .kakomon-choice-no { border-color: var(--coral); background: var(--coral); color: #2a0509; }
+.kakomon-table tr.is-dim { opacity: .55; }
+.kakomon-table tr.is-answer, .kakomon-table tr.is-wrong, .kakomon-table tr.is-dim { cursor: default; }
+
+.kakomon-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 16px 0 0; padding: 10px 14px; border: 1px dashed var(--line-2); border-radius: var(--r-sm); background: var(--surface-sunken); font-size: 14px; line-height: 1.6; }
+.kakomon-legend span { display: inline-flex; gap: 8px; }
+.kakomon-legend b { color: var(--gold); font-family: var(--font-mono); }
+.kakomon-legend + .kakomon-items, .kakomon-bank + .kakomon-items { margin-top: 10px; }
+.kakomon-items { display: grid; gap: 8px; margin: 18px 0; padding: 0; list-style: none; }
+.kakomon-items li { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 10px 14px; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: var(--surface); }
+.kakomon-items li.is-hit { border-color: var(--mint); }
+.kakomon-items li.is-miss { border-color: var(--coral); background: var(--coral-soft); }
+.kakomon-item-text { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+.kakomon-item-text > b { flex: none; color: var(--gold); }
+.kakomon-item-text small { flex-basis: 100%; color: var(--coral); font-weight: 700; }
+.kakomon-pair, .kakomon-numbers { display: flex; flex-wrap: wrap; gap: 6px; flex: none; }
+.kakomon-numbers { justify-content: flex-end; }
+.kakomon-numbers button { min-width: 40px; }
+.kakomon-item-text { flex-wrap: wrap; }
+.kakomon-picked { color: var(--text); }
+.kakomon-unpicked { color: var(--faint); font-size: 13px; }
+.kakomon-pair button, .kakomon-numbers button {
+  min-width: 44px; min-height: 44px; padding: 0 12px;
+  border: 1px solid var(--line-2); border-radius: var(--r-xs);
+  background: var(--surface-sunken); color: var(--text-2); font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.kakomon-numbers button { padding: 0; font-family: var(--font-mono); }
+.kakomon-pair button:hover:not(:disabled), .kakomon-numbers button:hover:not(:disabled) { border-color: var(--line-3); color: var(--text); }
+.kakomon-pair button[aria-pressed="true"], .kakomon-numbers button[aria-pressed="true"] { border-color: var(--gold); background: var(--gold); color: #1b1503; }
+.kakomon-pair button:disabled, .kakomon-numbers button:disabled { cursor: default; }
+.kakomon-pair button:disabled:not([aria-pressed="true"]):not(.is-answer), .kakomon-numbers button:disabled:not([aria-pressed="true"]):not(.is-answer) { opacity: .4; }
+.kakomon-items li.is-miss button[aria-pressed="true"] { border-color: var(--coral); background: var(--coral); color: #2a0509; }
+.kakomon-pair button.is-answer, .kakomon-numbers button.is-answer { border-color: var(--mint); background: var(--mint); color: #062018; opacity: 1; }
+.kakomon-bank { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 18px; margin: 16px 0 0; padding: 12px 14px; list-style: none; border: 1px dashed var(--line-2); border-radius: var(--r-sm); background: var(--surface-sunken); }
+.kakomon-bank li { display: flex; gap: 10px; line-height: 1.6; }
+.kakomon-bank b { flex: none; width: 1.6em; color: var(--gold); font-family: var(--font-mono); }
+
+/* Verdict and answer bar */
+.kakomon-verdict { scroll-margin: 90px 0 96px; margin: 18px 0 0; padding: 14px 18px; border-radius: var(--r-sm); border: 1px solid; line-height: 1.7; }
+.kakomon-verdict.is-ok { border-color: rgb(67 224 166 / 50%); background: var(--mint-soft); }
+.kakomon-verdict.is-ng { border-color: rgb(255 111 127 / 50%); background: var(--coral-soft); }
+.kakomon-verdict p { margin: 0 0 4px; }
+.kakomon-verdict-title { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; }
+.kakomon-verdict-title b { font-size: 26px; line-height: 1; }
+.kakomon-verdict.is-ok .kakomon-verdict-title { color: var(--mint); }
+.kakomon-verdict.is-ng .kakomon-verdict-title { color: var(--coral); }
+.kakomon-move { display: flex; align-items: center; gap: 8px; margin-top: 8px !important; font-weight: 700; }
+.kakomon-move > span { color: var(--muted); }
+.kakomon-bar {
+  position: sticky; bottom: 0; z-index: 2;
+  display: flex; align-items: center; gap: 12px;
+  margin: 18px calc(-1 * clamp(16px, 3vw, 28px)) calc(-1 * clamp(16px, 3vw, 28px));
+  padding: 14px clamp(16px, 3vw, 28px);
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+.kakomon-bar .btn-primary { margin-left: auto; min-width: 150px; }
+.kakomon-keys { color: var(--muted); font-size: 12px; }
+.kakomon-keys .kbd { margin: 0 2px; }
+.kakomon-source { margin: 12px 4px 0; color: var(--muted); font-size: 12px; }
+
+/* Lap result */
+.kakomon-result { padding: clamp(18px, 3vw, 28px); }
+.kakomon-result h2 { margin: 4px 0 14px; font-size: 22px; }
+.kakomon-result h2:focus { outline: none; }
+.kakomon-result h3 { margin: 22px 0 8px; font-size: 16px; }
+.kakomon-result-score { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.kakomon-result-score p { display: flex; align-items: baseline; gap: 8px; margin: 0; }
+.kakomon-result-score strong { font: 800 48px/1 var(--font-mono); color: var(--gold); }
+.kakomon-result-score span { color: var(--text-2); }
+.kakomon-result-score ul { display: flex; gap: 16px; margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.kakomon-result-score b { font-family: var(--font-mono); font-size: 18px; margin-left: 4px; }
+.kakomon-misses { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.kakomon-misses li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r-xs); background: var(--surface); }
+.kakomon-misses li > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kakomon-misses b { font-family: var(--font-mono); margin-right: 6px; }
+.kakomon-miss-lead { color: var(--text-2); font-size: 14px; }
+.kakomon-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+
+/* Footer */
+.kakomon-foot { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.8; }
+.kakomon-foot details { margin-bottom: 10px; }
+.kakomon-foot summary { min-height: 40px; display: flex; align-items: center; cursor: pointer; color: var(--text-2); font-weight: 700; }
+.kakomon-foot details p { margin: 0 0 8px; }
+.kakomon-attribution { margin: 0 0 8px; white-space: pre-wrap; }
+.kakomon-link { padding: 0; border: 0; background: none; color: var(--gold); cursor: pointer; min-height: 40px; }
+.kakomon-ok { color: var(--mint); }
+.kakomon-ng { color: var(--coral); }
+
+@media (max-width: 700px) {
+  .kakomon-head { flex-direction: column; gap: 12px; }
+  .kakomon-resume, .kakomon-start { flex-direction: column; align-items: stretch; }
+  .kakomon-resume-actions { flex-direction: row; flex-wrap: wrap; }
+  .kakomon-resume-actions .btn-primary { flex: 1; }
+  .kakomon-start-action { align-items: stretch; max-width: none; text-align: left; }
+  .kakomon-years { grid-template-columns: 1fr; }
+  .kakomon-year { grid-template-columns: 62px 1fr 1fr; }
+  .kakomon-option { grid-template-columns: 1fr; gap: 6px; }
+  .kakomon-option-label { padding-top: 0; }
+  .kakomon-toggle { grid-template-columns: auto 1fr; }
+  .kakomon-drillbar { flex-wrap: wrap; }
+  .kakomon-drillbar-title { order: -1; flex-basis: 100%; text-align: left; }
+  .kakomon-drillbar > :last-child { margin-left: auto; }
+  .kakomon-nav ol { flex-wrap: nowrap; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; }
+  .kakomon-nav li { flex: none; }
+  .kakomon-question-head { flex-direction: column; gap: 8px; }
+  .kakomon-standing { flex-direction: row; align-items: center; }
+  .kakomon-choice { grid-template-columns: 30px 1fr; gap: 10px; padding: 11px 12px; }
+  .kakomon-choice-tag { grid-column: 2; justify-self: start; }
+  .kakomon-items li { flex-direction: column; align-items: stretch; gap: 8px; }
+  .kakomon-table, .kakomon-table tbody { display: block; }
+  .kakomon-table thead { display: none; }
+  .kakomon-table tbody tr { display: grid; grid-template-columns: 46px 1fr; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .kakomon-table tbody tr:last-child { border-bottom: 0; }
+  .kakomon-table tbody th { grid-row: 1 / span 8; width: auto; padding: 4px 0 0 10px; border: 0; }
+  .kakomon-table tbody td { grid-column: 2; display: flex; gap: 10px; padding: 3px 12px 3px 0; border: 0; }
+  .kakomon-table tbody td::before { content: attr(data-label); flex: none; min-width: 1.2em; color: var(--gold); font-weight: 700; }
+  .kakomon-numbers { display: grid; grid-template-columns: repeat(5, 1fr); }
+  .kakomon-bank { grid-template-columns: 1fr; }
+  .kakomon-keys { display: none; }
+  .kakomon-bar .btn { flex: 1; min-width: 0; }
+  .kakomon-misses li { grid-template-columns: 28px 1fr; }
+  .kakomon-misses li > .kakomon-marks { grid-column: 2; }
+}
+/* The app's bottom tab bar appears at 760px and below. */
+@media (max-width: 760px) {
+  .kakomon-bar { bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .kakomon-verdict { scroll-margin-bottom: calc(160px + env(safe-area-inset-bottom)); }
+}
