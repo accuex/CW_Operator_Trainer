@@ -17,6 +17,7 @@ export const APP_VIEWS = [
   'houki-kakomon',
   'qso',
   'collection',
+  'resources',
   'settings',
   'account',
 ] as const;

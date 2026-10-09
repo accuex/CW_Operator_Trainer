@@ -6,6 +6,8 @@ describe('app paths', () => {
     expect(viewToPath('home')).toBe(APP_BASE);
     expect(viewToPath('learn')).toBe('/app/learn');
     expect(viewToPath('qso')).toBe('/app/qso');
+    expect(viewToPath('resources')).toBe('/app/resources');
+    expect(pathToView('/app/resources')).toBe('resources');
     expect(viewToPath('communication')).toBe('/app/communication');
   });
 

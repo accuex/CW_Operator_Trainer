@@ -27,6 +27,7 @@ export const views: ViewMeta[] = [
   { id: 'qso', label: 'QSO', title: 'QSO 交信', icon: 'radio', primary: false },
   { id: 'collection', label: 'COLLECTION', title: 'カード図鑑', icon: 'collection', primary: true },
   { id: 'analysis', label: 'ANALYSIS', title: '苦手分析', icon: 'analysis', primary: false },
+  { id: 'resources', label: 'REFERENCE', title: '資料', icon: 'learn', primary: false },
   { id: 'settings', label: 'SETTINGS', title: '設定', icon: 'settings', primary: false },
   { id: 'account', label: 'ACCOUNT', title: 'マイページ', icon: 'account', primary: false },
 ];

@@ -36,6 +36,7 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
     { view: 'train', icon: 'train', title: '聴きとる', body: '符号を見ずに音だけで即答。コンボを伸ばそう。', meta: totals.answers ? `正答率 ${pct(totals.accuracy)}` : 'まずは10問', tone: 'sky' },
     { view: 'queue', icon: 'queue', title: '遅れ受信', body: '聴きながら覚えて、古い順に書く。実戦の頭を作る。', meta: lastQueue ? `安定深度 ${lastQueue.stableDepth.toFixed(1)}` : '目標 Queue 3', tone: 'violet' },
     { view: 'exam', icon: 'exam', title: '一総通', body: '電気通信術・地理・専門英語・法規。取り組みたい教材を選ぶ。', meta: '4つの教材', tone: 'coral' },
+    { view: 'resources', icon: 'learn', title: '資料', body: '符号表・フォネティック・略語と、お役立ちリンク。', meta: '練習のおともに', tone: 'sky' },
     { view: 'analysis', icon: 'analysis', title: '苦手分析', body: pairs[0] ? `${pairs[0].a} と ${pairs[0].b} を取り違えがち。` : '取り違えの「方向」を見つけます。', meta: pairs.length ? `${pairs.length} ペア検出` : 'データ待ち', tone: 'mint' },
     { view: 'collection', icon: 'collection', title: 'カード図鑑', body: '習得した文字がカードになって集まる。', meta: `${masteredInPool.length} / ${collectionPool.length}`, tone: 'gold' },
   ];
