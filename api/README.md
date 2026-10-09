@@ -75,7 +75,20 @@ curl -s http://127.0.0.1:8080/api/v1/health
 
 ```bash
 # リポジトリ直下 .env.local
-NEXT_PUBLIC_API_BASE_URL=https://cw.conagi.jp
+NEXT_PUBLIC_API_BASE_URL=https://cwot.jp
 ```
 
-ローカル origin から叩く場合、本番 `CORS_ORIGIN` にその origin を含める（例: `https://cw.conagi.jp,http://localhost:3020`）。
+ローカル origin から叩く場合、本番 `CORS_ORIGIN` にその origin を含める（例: `https://cwot.jp,http://localhost:3020`）。
+
+### 本番ドメイン
+
+公開先は `https://cwot.jp`。本番の環境設定は次を使用します。
+
+```dotenv
+CORS_ORIGIN=https://cwot.jp,http://localhost:3020
+WEBAUTHN_RP_ID=cwot.jp
+WEBAUTHN_ORIGIN=https://cwot.jp
+FRONTEND_URL=https://cwot.jp
+```
+
+`NEXT_PUBLIC_API_BASE_URL` と `SITE_URL` も `https://cwot.jp` に合わせて再ビルドしてください。旧ドメインで登録したパスキーは新しいRP IDでは使えないため、別のログイン手段で入り、新ドメインで登録し直します。ブラウザ内の学習記録もドメインごとに保存され、移行時に自動では引き継がれません。

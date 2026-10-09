@@ -1,7 +1,12 @@
 import { CARDS } from './morse';
-import { isKochComplete, normalizeKoch } from './koch';
-import type { AchievementProgress, AnswerLog, CardProgress, CardRarityOwned, SessionRecord, TrainerProfile } from './types';
+import { isKochComplete, kochProgressOf, normalizeKoch } from './koch';
+import { ownedCardRarity, rarityRank } from './cardRarity';
+import { EXAM_PASS_ACCURACY } from './examScore';
+import { BADGES, badgeTier } from './radio/badges';
+import type { AchievementProgress, AnswerLog, CardRarityOwned, ExamSessionSummary, SessionRecord, TrainerProfile } from './types';
 import type { CardRarity } from './cardArtwork';
+
+export { ownedCardRarity } from './cardRarity';
 
 /** Must match `DAILY_GOAL` in app/trainer/progress. */
 const DAILY_GOAL = 40;
@@ -21,7 +26,33 @@ export type AchievementId =
   | 'exam-debut'
   | 'streak-3'
   | 'streak-7'
-  | 'daily-habit';
+  | 'daily-habit'
+  | 'first-sr'
+  | 'first-ssr'
+  | 'wabun-speed-star'
+  | 'wabun-issoutsu-pace'
+  | 'digit-master'
+  | 'kigo-master'
+  | 'grand-archive'
+  | 'wabun-koch-awakening'
+  | 'wabun-koch-complete'
+  | 'koch-double-crown'
+  | 'queue-depth-5'
+  | 'exam-pass-latin'
+  | 'exam-pass-wabun'
+  | 'exam-triple-crown'
+  | 'qso-debut'
+  | 'qso-100'
+  | 'pileup-debut'
+  | 'contest-debut'
+  | 'qso-gold-badge'
+  | 'answers-1000'
+  | 'answers-10000'
+  | 'perfect-50'
+  | 'speed-25'
+  | 'streak-30'
+  | 'night-owl'
+  | 'early-bird';
 
 export interface AchievementDef {
   id: AchievementId;
@@ -44,149 +75,88 @@ export interface AchievementContext {
 
 const LATIN_LETTERS = CARDS.filter((card) => card.kind === 'latinLetter');
 const WABUN_CHARS = CARDS.filter((card) => card.kind === 'wabun');
+const LATIN_DIGITS = CARDS.filter((card) => card.kind === 'digit' && card.alphabet === 'international');
+const KIGO_CARDS = CARDS.filter((card) => card.kind === 'punctuation' || card.kind === 'prosign');
+
+/** Volume and habit thresholds (shared by condition copy and predicates). */
+const ANSWERS_BRONZE = 1_000;
+const ANSWERS_SILVER = 10_000;
+const PERFECT_RUN = 50;
+const FAST_WPM = 25;
+const FAST_CORRECT = 500;
+const QSO_CONTACTS = 100;
+const HOUR_ANSWERS = 100;
+const QUEUE_DEEP = 5;
 
 const rarityFolder = (rarity: CardRarity) => rarity.toLowerCase();
 
 const art = (id: AchievementId, rarity: CardRarity) =>
   `/cards/achievements/${rarityFolder(rarity)}/${id}.webp`;
 
+const def = (id: AchievementId, rarity: CardRarity, title: string, description: string, condition: string): AchievementDef => ({
+  id, title, description, condition, rarity, artwork: art(id, rarity),
+});
+
 export const ACHIEVEMENTS: AchievementDef[] = [
-  {
-    id: 'latin-starter',
-    title: '欧文入門',
-    description: '欧文カードを集めはじめた証。',
-    condition: '欧文 A–Z を 10 枚 GET',
-    rarity: 'R',
-    artwork: art('latin-starter', 'R'),
-  },
-  {
-    id: 'latin-master',
-    title: '欧文マスター',
-    description: 'A–Z をコンプリートしたオペレーター。',
-    condition: '欧文 A–Z 全 26 枚を GET（R 以上）',
-    rarity: 'SR',
-    artwork: art('latin-master', 'SR'),
-  },
-  {
-    id: 'latin-speed-star',
-    title: '欧文スピードスター',
-    description: '実戦速度帯で欧文をそろえた証。',
-    condition: '欧文 A–Z 全枚を SR 以上（コッホ実効 ≥ 18）',
-    rarity: 'SR',
-    artwork: art('latin-speed-star', 'SR'),
-  },
-  {
-    id: 'latin-issoutsu-pace',
-    title: '一総通ペース',
-    description: '一総通速度帯で欧文を極めた勲章。',
-    condition: '欧文 A–Z 全枚を SSR（コッホ実効 ≥ 22）',
-    rarity: 'SSR',
-    artwork: art('latin-issoutsu-pace', 'SSR'),
-  },
-  {
-    id: 'wabun-starter',
-    title: '和文入門',
-    description: '和文カードを集めはじめた証。',
-    condition: '和文カードを 10 枚 GET',
-    rarity: 'R',
-    artwork: art('wabun-starter', 'R'),
-  },
-  {
-    id: 'wabun-master',
-    title: '和文マスター',
-    description: '和文カードをコンプリートしたオペレーター。',
-    condition: `和文カード全 ${WABUN_CHARS.length} 枚を GET（R 以上）`,
-    rarity: 'SR',
-    artwork: art('wabun-master', 'SR'),
-  },
-  {
-    id: 'koch-awakening',
-    title: 'コッホ開眼',
-    description: 'レベル試験で文字を広げはじめた。',
-    condition: 'コッホ Lv.5 に到達',
-    rarity: 'R',
-    artwork: art('koch-awakening', 'R'),
-  },
-  {
-    id: 'koch-complete',
-    title: 'コッホ完走',
-    description: 'コッホ法の全昇級をクリアした。',
-    condition: 'コッホ全レベル（昇級試験）クリア',
-    rarity: 'SR',
-    artwork: art('koch-complete', 'SR'),
-  },
-  {
-    id: 'queue-debut',
-    title: '遅れ受信デビュー',
-    description: '頭の中にキューを作りはじめた。',
-    condition: '遅れ受信を 1 セッション完走',
-    rarity: 'R',
-    artwork: art('queue-debut', 'R'),
-  },
-  {
-    id: 'queue-depth-3',
-    title: 'Queue 3 安定',
-    description: '深さ 3 を安定して回せた証。',
-    condition: '遅れ受信で安定深度 3 以上を記録',
-    rarity: 'SR',
-    artwork: art('queue-depth-3', 'SR'),
-  },
-  {
-    id: 'exam-debut',
-    title: '一総通初受験',
-    description: '試験机に座った記念カード。',
-    condition: '一総通試験を 1 回完走（科目は問わない）',
-    rarity: 'R',
-    artwork: art('exam-debut', 'R'),
-  },
-  {
-    id: 'streak-3',
-    title: '3日連続',
-    description: '三日坊主を超えた。',
-    condition: '連続学習日数 3 日',
-    rarity: 'R',
-    artwork: art('streak-3', 'R'),
-  },
-  {
-    id: 'streak-7',
-    title: '7日連続',
-    description: '一週間、キーを握り続けた。',
-    condition: '連続学習日数 7 日',
-    rarity: 'SR',
-    artwork: art('streak-7', 'SR'),
-  },
-  {
-    id: 'daily-habit',
-    title: '日課のオペレーター',
-    description: '毎日の目標を積み重ねた証。',
-    condition: `1 日 ${DAILY_GOAL} 問達成を累計 10 回`,
-    rarity: 'SR',
-    artwork: art('daily-habit', 'SR'),
-  },
+  def('latin-starter', 'R', '欧文入門', '欧文カードを集めはじめた証。', '欧文 A–Z を 10 枚 GET'),
+  def('latin-master', 'SR', '欧文マスター', 'A–Z をコンプリートしたオペレーター。', '欧文 A–Z 全 26 枚を GET（R 以上）'),
+  def('latin-speed-star', 'SR', '欧文スピードスター', '実戦速度帯で欧文をそろえた証。', '欧文 A–Z 全枚を SR 以上（コッホ実効 ≥ 18）'),
+  def('latin-issoutsu-pace', 'SSR', '一総通ペース', '一総通速度帯で欧文を極めた勲章。', '欧文 A–Z 全枚を SSR（コッホ実効 ≥ 22）'),
+  def('wabun-starter', 'R', '和文入門', '和文カードを集めはじめた証。', '和文カードを 10 枚 GET'),
+  def('wabun-master', 'SR', '和文マスター', '和文カードをコンプリートしたオペレーター。', `和文カード全 ${WABUN_CHARS.length} 枚を GET（R 以上）`),
+  def('koch-awakening', 'R', 'コッホ開眼', 'レベル試験で文字を広げはじめた。', '欧文コッホ Lv.5 に到達'),
+  def('koch-complete', 'SR', 'コッホ完走', 'コッホ法の全昇級をクリアした。', '欧文コッホ全レベル（昇級試験）クリア'),
+  def('queue-debut', 'R', '遅れ受信デビュー', '頭の中にキューを作りはじめた。', '遅れ受信を 1 セッション完走'),
+  def('queue-depth-3', 'SR', 'Queue 3 安定', '深さ 3 を安定して回せた証。', '遅れ受信で安定深度 3 以上を記録'),
+  def('exam-debut', 'R', '一総通初受験', '試験机に座った記念カード。', '一総通試験を 1 回完走（科目は問わない）'),
+  def('streak-3', 'R', '3日連続', '三日坊主を超えた。', '連続学習日数 3 日'),
+  def('streak-7', 'SR', '7日連続', '一週間、キーを握り続けた。', '連続学習日数 7 日'),
+  def('daily-habit', 'SR', '日課のオペレーター', '毎日の目標を積み重ねた証。', `1 日 ${DAILY_GOAL} 問達成を累計 10 回`),
+
+  def('first-sr', 'R', 'はじめての SR', '実戦速度の扉を開けた一枚。', '文字カードを 1 枚でも SR 以上に昇格（コッホ実効 ≥ 18）'),
+  def('first-ssr', 'SR', 'はじめての SSR', '虹色の一枚を手にした。', '文字カードを 1 枚でも SSR に昇格（コッホ実効 ≥ 22）'),
+  def('wabun-speed-star', 'SR', '和文スピードスター', '実戦速度帯で和文をそろえた証。', `和文カード全 ${WABUN_CHARS.length} 枚を SR 以上（和文コッホ実効 ≥ 18）`),
+  def('wabun-issoutsu-pace', 'SSR', '和文一総通ペース', '75 字/分の和文を体に入れた勲章。', `和文カード全 ${WABUN_CHARS.length} 枚を SSR（和文コッホ実効 ≥ 22）`),
+  def('digit-master', 'R', '数字マスター', 'RST もシリアルも怖くない。', '数字 0–9 の 10 枚を GET'),
+  def('kigo-master', 'SR', '記号・手続マスター', '/ も = も AR も、迷わず取れる。', `記号・手続符号カード全 ${KIGO_CARDS.length} 枚を GET（欧文・和文とも）`),
+  def('grand-archive', 'SSR', '図鑑コンプリート', 'すべての符号を手にした電信の収集家。', `文字カード全 ${CARDS.length} 枚を GET`),
+  def('wabun-koch-awakening', 'R', '和文コッホ開眼', 'イロハの音が耳に入りはじめた。', '和文コッホ Lv.5 に到達'),
+  def('wabun-koch-complete', 'SR', '和文コッホ完走', '和文コッホの全昇級をクリアした。', '和文コッホ全レベル（昇級試験）クリア'),
+  def('koch-double-crown', 'SSR', '欧和コッホ二冠', '欧文も和文も、コッホを走り切った。', '欧文・和文コッホの全レベルをクリア'),
+  def('queue-depth-5', 'SSR', 'Queue 5 の境地', '5 字遅れで書ける、ベテランの頭の中。', `遅れ受信で安定深度 ${QUEUE_DEEP} 以上を記録`),
+  def('exam-pass-latin', 'SR', '欧文 合格圏', '本番速度の欧文を書き切った。', `一総通 欧文（普通語・暗語どちらか）を本番速度以上・${EXAM_PASS_ACCURACY * 100}% 以上で採点`),
+  def('exam-pass-wabun', 'SR', '和文 合格圏', '本番速度の和文電報を書き切った。', `一総通 和文を本番速度（22 WPM）以上・${EXAM_PASS_ACCURACY * 100}% 以上で採点`),
+  def('exam-triple-crown', 'SSR', '電気通信術 三冠', '欧文普通語・暗語・和文、すべて合格圏。', `一総通の 3 科目すべてを本番速度以上・${EXAM_PASS_ACCURACY * 100}% 以上で採点`),
+  def('qso-debut', 'R', '初交信', 'はじめて電波の向こうと話した。', 'QSO シミュレーターで 1 セッション完了'),
+  def('qso-100', 'SR', '百局交信', 'ログ帳が 100 局で埋まった。', `QSO シミュレーターで交信成立（complete）累計 ${QSO_CONTACTS} 局`),
+  def('pileup-debut', 'R', 'パイルアップ初陣', '呼ばれる側の景色を知った。', 'パイルアップを 1 回運用'),
+  def('contest-debut', 'R', 'コンテスト初参戦', 'TEST の声に飛び込んだ。', 'コンテストを 1 回運用'),
+  def('qso-gold-badge', 'SSR', '金バッジ保持者', '実戦習熟バッジで頂点に立った。', 'QSO バッジのどれか 1 つを金まで育てる'),
+  def('answers-1000', 'R', '千本ノック', '1,000 字ぶんキーを叩いた。', `累計回答 ${ANSWERS_BRONZE.toLocaleString('en-US')} 字`),
+  def('answers-10000', 'SR', '一万字の鍵', '1 万字の符号が指に染みついた。', `累計回答 ${ANSWERS_SILVER.toLocaleString('en-US')} 字`),
+  def('perfect-50', 'SR', 'パーフェクト 50', '一度も落とさず 50 字。', `1 セッション内で ${PERFECT_RUN} 字連続正解`),
+  def('speed-25', 'SR', '25 WPM の壁', '一総通ペースの、さらにその先へ。', `実効 ${FAST_WPM} WPM 以上で正解 ${FAST_CORRECT} 字`),
+  def('streak-30', 'SSR', '30日連続', 'ひと月、一日も欠かさず電鍵へ。', '連続学習日数 30 日'),
+  def('night-owl', 'R', '深夜オペ', '静かなバンドは夜に開く。', `0〜3 時台に累計 ${HOUR_ANSWERS} 字回答`),
+  def('early-bird', 'R', '朝練オペ', '出勤前のワッチは三文の得。', `5〜7 時台に累計 ${HOUR_ANSWERS} 字回答`),
 ];
 
 export const achievementById = (id: string) => ACHIEVEMENTS.find((item) => item.id === id);
 
-/** Effective owned rarity: explicit rarityOwned, else mastered → R. */
-export function ownedCardRarity(progress?: CardProgress): CardRarityOwned | null {
-  if (progress?.rarityOwned) return progress.rarityOwned;
-  if (progress?.mastered) return 'R';
-  return null;
-}
-
-const rarityRank = (rarity: CardRarityOwned | null) => {
-  if (rarity === 'SSR') return 3;
-  if (rarity === 'SR') return 2;
-  if (rarity === 'R') return 1;
-  return 0;
-};
+const cardRarityOf = (card: (typeof CARDS)[number], profile: TrainerProfile) =>
+  ownedCardRarity(profile.cards[`${card.alphabet}:${card.symbol}`]);
 
 const masteredCount = (cards: typeof CARDS, profile: TrainerProfile) =>
-  cards.filter((card) => ownedCardRarity(profile.cards[`${card.alphabet}:${card.symbol}`])).length;
+  cards.filter((card) => cardRarityOf(card, profile)).length;
 
 const allAtLeast = (cards: typeof CARDS, profile: TrainerProfile, min: CardRarityOwned) => {
   const need = rarityRank(min);
-  return cards.every((card) => rarityRank(ownedCardRarity(profile.cards[`${card.alphabet}:${card.symbol}`])) >= need);
+  return cards.every((card) => rarityRank(cardRarityOf(card, profile)) >= need);
+};
+
+const anyAtLeast = (profile: TrainerProfile, min: CardRarityOwned) => {
+  const need = rarityRank(min);
+  return Object.values(profile.cards).some((progress) => rarityRank(ownedCardRarity(progress)) >= need);
 };
 
 const dayKey = (timestamp: number) => {
@@ -220,6 +190,54 @@ export function dailyGoalClears(answers: AnswerLog[]) {
   return clears;
 }
 
+/** Longest run of correct answers inside one session (answers kept in log order). */
+export function longestCorrectRun(answers: AnswerLog[]) {
+  const runs = new Map<string, number>();
+  let best = 0;
+  for (const answer of answers) {
+    const run = answer.isCorrect ? (runs.get(answer.sessionId) ?? 0) + 1 : 0;
+    runs.set(answer.sessionId, run);
+    if (run > best) best = run;
+  }
+  return best;
+}
+
+const answersInHours = (answers: AnswerLog[], from: number, to: number) =>
+  answers.filter((answer) => {
+    const hour = new Date(answer.timestamp).getHours();
+    return hour >= from && hour <= to;
+  }).length;
+
+const fastCorrect = (answers: AnswerLog[]) =>
+  answers.filter((answer) => answer.isCorrect && Math.min(answer.effectiveSpeed, answer.characterSpeed) >= FAST_WPM).length;
+
+/** Exam subjects scored at the real exam's speed or faster, at the pass line or better. */
+export function passedExamSubjects(sessions: SessionRecord[]) {
+  const passed = new Set<ExamSessionSummary['subject']>();
+  for (const session of sessions) {
+    if (session.mode !== 'exam' || !session.exam) continue;
+    if (session.accuracy < EXAM_PASS_ACCURACY) continue;
+    if (session.exam.wpm < session.exam.officialWpm) continue;
+    passed.add(session.exam.subject);
+  }
+  return passed;
+}
+
+/** Contacts completed in the QSO simulator (a rag-chew is one; a run lists its contacts). */
+export function completedQsoContacts(sessions: SessionRecord[]) {
+  let total = 0;
+  for (const session of sessions) {
+    const qso = session.qso;
+    if (session.mode !== 'qso' || !qso) continue;
+    if (qso.contacts) total += qso.contacts.filter((contact) => contact.outcome === 'complete').length;
+    else if (qso.outcome === 'complete') total += 1;
+  }
+  return total;
+}
+
+const kochDone = (profile: TrainerProfile, alphabet: 'international' | 'wabun') =>
+  isKochComplete(kochProgressOf(profile, alphabet), alphabet);
+
 type Predicate = (ctx: AchievementContext) => boolean;
 
 const PREDICATES: Record<AchievementId, Predicate> = {
@@ -230,7 +248,7 @@ const PREDICATES: Record<AchievementId, Predicate> = {
   'wabun-starter': ({ profile }) => masteredCount(WABUN_CHARS, profile) >= 10,
   'wabun-master': ({ profile }) => allAtLeast(WABUN_CHARS, profile, 'R'),
   'koch-awakening': ({ profile }) => normalizeKoch(profile.koch).level >= 5,
-  'koch-complete': ({ profile }) => isKochComplete(normalizeKoch(profile.koch)),
+  'koch-complete': ({ profile }) => kochDone(profile, 'international'),
   'queue-debut': ({ sessions }) => sessions.some((session) => session.mode === 'queue'),
   'queue-depth-3': ({ sessions }) => sessions.some((session) => (session.queue?.stableDepth ?? 0) >= 3),
   'exam-debut': ({ sessions, answers }) => (
@@ -240,6 +258,36 @@ const PREDICATES: Record<AchievementId, Predicate> = {
   'streak-3': ({ answers, now }) => streakDaysFromAnswers(answers, now) >= 3,
   'streak-7': ({ answers, now }) => streakDaysFromAnswers(answers, now) >= 7,
   'daily-habit': ({ answers }) => dailyGoalClears(answers) >= 10,
+
+  'first-sr': ({ profile }) => anyAtLeast(profile, 'SR'),
+  'first-ssr': ({ profile }) => anyAtLeast(profile, 'SSR'),
+  'wabun-speed-star': ({ profile }) => allAtLeast(WABUN_CHARS, profile, 'SR'),
+  'wabun-issoutsu-pace': ({ profile }) => allAtLeast(WABUN_CHARS, profile, 'SSR'),
+  'digit-master': ({ profile }) => allAtLeast(LATIN_DIGITS, profile, 'R'),
+  'kigo-master': ({ profile }) => allAtLeast(KIGO_CARDS, profile, 'R'),
+  'grand-archive': ({ profile }) => allAtLeast(CARDS, profile, 'R'),
+  'wabun-koch-awakening': ({ profile }) => kochProgressOf(profile, 'wabun').level >= 5,
+  'wabun-koch-complete': ({ profile }) => kochDone(profile, 'wabun'),
+  'koch-double-crown': ({ profile }) => kochDone(profile, 'international') && kochDone(profile, 'wabun'),
+  'queue-depth-5': ({ sessions }) => sessions.some((session) => (session.queue?.stableDepth ?? 0) >= QUEUE_DEEP),
+  'exam-pass-latin': ({ sessions }) => {
+    const passed = passedExamSubjects(sessions);
+    return passed.has('plain') || passed.has('codes');
+  },
+  'exam-pass-wabun': ({ sessions }) => passedExamSubjects(sessions).has('wabun'),
+  'exam-triple-crown': ({ sessions }) => passedExamSubjects(sessions).size >= 3,
+  'qso-debut': ({ sessions }) => sessions.some((session) => session.mode === 'qso'),
+  'qso-100': ({ sessions }) => completedQsoContacts(sessions) >= QSO_CONTACTS,
+  'pileup-debut': ({ sessions }) => sessions.some((session) => Boolean(session.qso?.pileup)),
+  'contest-debut': ({ sessions }) => sessions.some((session) => Boolean(session.qso?.contest)),
+  'qso-gold-badge': ({ profile }) => BADGES.some((badge) => badgeTier(badge, profile.qso) === 3),
+  'answers-1000': ({ answers }) => answers.length >= ANSWERS_BRONZE,
+  'answers-10000': ({ answers }) => answers.length >= ANSWERS_SILVER,
+  'perfect-50': ({ answers }) => longestCorrectRun(answers) >= PERFECT_RUN,
+  'speed-25': ({ answers }) => fastCorrect(answers) >= FAST_CORRECT,
+  'streak-30': ({ answers, now }) => streakDaysFromAnswers(answers, now) >= 30,
+  'night-owl': ({ answers }) => answersInHours(answers, 0, 3) >= HOUR_ANSWERS,
+  'early-bird': ({ answers }) => answersInHours(answers, 5, 7) >= HOUR_ANSWERS,
 };
 
 export function isAchievementUnlocked(id: AchievementId, ctx: AchievementContext) {

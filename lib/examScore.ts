@@ -14,6 +14,9 @@ export type ExamAlignCell = {
  * - 脱字・書体不明りょう: 1字につき 1点
  * - 抹消・訂正: 3字までごとに 1点
  */
+/** 合格圏（減点込みの正答率）。 */
+export const EXAM_PASS_ACCURACY = 0.9;
+
 export const EXAM_PENALTY = {
   /** 誤字 */
   sub: 3,

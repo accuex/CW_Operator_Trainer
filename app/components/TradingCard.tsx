@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { CardArtwork } from '@/app/components/CardArtwork';
-import { ownedCardRarity } from '@/lib/achievements';
+import { ownedCardRarity } from '@/lib/cardRarity';
 import { artworkUrlForRarity } from '@/lib/cardArtwork';
 import type { MorseCard } from '@/lib/morse';
 import { KIND_LABEL } from '@/lib/course';

@@ -27,7 +27,7 @@ type TokenResponse = {
 };
 
 /** API is production-only; local PHP is not used in normal development. */
-const DEFAULT_BASE = 'https://cw.conagi.jp';
+const DEFAULT_BASE = 'https://cwot.jp';
 
 export function apiBaseUrl() {
   return (process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_BASE).replace(/\/$/, '');

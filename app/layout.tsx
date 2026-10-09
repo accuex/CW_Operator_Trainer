@@ -3,7 +3,7 @@ import { GoogleAnalytics } from '@/app/components/GoogleAnalytics';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL ?? 'https://cw.conagi.jp'),
+  metadataBase: new URL(process.env.SITE_URL ?? 'https://cwot.jp'),
   title: 'CW Operator Trainer — 聞こえる、溜められる、書ける。',
   description: '欧文・和文モールスを、音感法・遅れ受信・試験形式まで訓練できるブラウザアプリ。',
   applicationName: 'CW Operator Trainer',

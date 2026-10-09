@@ -6,9 +6,9 @@ import { DEFAULT_EXAM_PREFS, loadExamPrefs, saveExamPrefs } from '@/lib/examPref
 import { EXAM_SHEET_GAP_SEC, EXAM_SUBJECTS, buildExamSession, examSheetGapSec, type ExamSession, type ExamSubjectId } from '@/lib/training';
 import { pickStoredExamSet, prefetchStoredExamSet } from '@/lib/examSets';
 import { wabunWeakness } from '@/lib/wabunRandom';
-import { EXAM_PENALTY, scoreExamCopy, stripExamProcedureMarks, type ExamScore } from '@/lib/examScore';
+import { EXAM_PASS_ACCURACY, EXAM_PENALTY, scoreExamCopy, stripExamProcedureMarks, type ExamScore } from '@/lib/examScore';
 import type { PlaybackHandle } from '@/lib/audio';
-import type { AnswerLog, AudioSettings } from '@/lib/types';
+import type { AnswerLog, AudioSettings, SessionRecord } from '@/lib/types';
 import { audioEngine, nowId, pct } from '@/app/trainer/shared';
 import { AudioControls, ProgressBar, Ring } from '@/app/components/ui';
 import { Icon } from '@/app/components/icons';
@@ -33,6 +33,7 @@ export function ExamView({
   settings,
   setSettings,
   record,
+  onSession,
   answers,
   setAudioStatus,
   stopEpoch,
@@ -42,6 +43,7 @@ export function ExamView({
   settings: AudioSettings;
   setSettings: (settings: AudioSettings) => void;
   record: (answer: AnswerLog) => void;
+  onSession: (session: SessionRecord) => void;
   /** 和文ランダム本文で苦手な字を多めに出すための回答記録 */
   answers: AnswerLog[];
   setAudioStatus: (status: string) => void;
@@ -116,6 +118,7 @@ export function ExamView({
   }, [prefsReady, selected, telegram, includeWiWe, listenMode, autoContinueListen, randomWabunBody]);
   const timer = useRef<number | null>(null);
   const activeRef = useRef(false);
+  const startedAtRef = useRef(0);
   const pausedRef = useRef(false);
   const runIdRef = useRef(0);
   const playbackRef = useRef<PlaybackHandle | null>(null);
@@ -336,7 +339,17 @@ export function ExamView({
         isCorrect: cell.op === 'match', isEarly: false, sessionId,
       });
     });
-  }, [copy, enterListenReview, preset.alphabet, record, setAudioStatus, settings.characterSpeed, settings.effectiveSpeed, settings.volume, sourceText]);
+    const endedAt = wallTime();
+    onSession({
+      id: sessionId, startedAt: startedAtRef.current || endedAt, endedAt, mode: 'exam', alphabetType: preset.alphabet,
+      answers: scored.expected.length, accuracy: scored.accuracy,
+      exam: {
+        subject: preset.id,
+        wpm: Math.min(settings.effectiveSpeed, settings.characterSpeed),
+        officialWpm: preset.wpm,
+      },
+    });
+  }, [copy, enterListenReview, onSession, preset.alphabet, preset.id, preset.wpm, record, setAudioStatus, settings.characterSpeed, settings.effectiveSpeed, settings.volume, sourceText]);
   const finishRef = useRef(finish);
   useLayoutEffect(() => {
     finishRef.current = finish;
@@ -558,6 +571,7 @@ export function ExamView({
     setRemaining(preset.durationSec);
     pausedRef.current = false;
     activeRef.current = true;
+    startedAtRef.current = wallTime();
     const runId = runIdRef.current + 1;
     runIdRef.current = runId;
     playbackRef.current?.stop();
@@ -769,7 +783,7 @@ export function ExamView({
   const sheetProgress = sheetIndex < 0
     ? 'シケン'
     : `第${sheetIndex + 1}/${session?.sheets.length ?? '—'}枚`;
-  const passing = Boolean(examScore && examScore.accuracy >= 0.9);
+  const passing = Boolean(examScore && examScore.accuracy >= EXAM_PASS_ACCURACY);
   return <section className="exam-page page-pad">
     {onBack && <button id="communication-back" className="btn btn-secondary exam-menu-return" onClick={leaveToExamMenu}>一総通の教材メニューへ</button>}
     {!inSession ? (

@@ -227,6 +227,20 @@
 .koch-result-copy > p { margin: 0; color: var(--text-2); }
 .koch-result-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
+.koch-promoted { display: grid; gap: 8px; }
+.koch-promoted-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.koch-promoted-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 64px;
+  padding: 8px 12px;
+  border: 1px solid rgb(246 196 83 / 38%);
+  border-radius: var(--r-sm);
+  background: var(--gold-soft);
+}
+.koch-promoted-card b { font: 900 22px/1 var(--font-mono); color: var(--gold); }
+
 .koch-miss { display: grid; gap: 8px; }
 .koch-miss-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .koch-miss-char {

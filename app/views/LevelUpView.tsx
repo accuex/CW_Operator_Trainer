@@ -7,6 +7,7 @@ import {
   kochBest, kochChars, kochMaxLesson, kochNewChars, kochOrder, kochProgressKey, kochProgressOf, scoreKochCopy,
   type KochDuration, type KochScore,
 } from '@/lib/koch';
+import { SR_EFFECTIVE_WPM, SSR_EFFECTIVE_WPM, promoteCardsForKochPass, type CardPromotion } from '@/lib/cardRarity';
 import { morseFor } from '@/lib/morse';
 import { romajiToWabun } from '@/lib/wabunInput';
 import type { AlphabetType, AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from '@/lib/types';
@@ -19,7 +20,15 @@ import { LevelUpReveal } from '@/app/components/LevelUpReveal';
 
 type Mode = 'practice' | 'test';
 type Phase = 'setup' | 'running' | 'result';
-type ResultMeta = { lesson: number; isTest: boolean; leveledUp: boolean; minutes: number; alphabet: AlphabetType };
+type ResultMeta = {
+  lesson: number;
+  isTest: boolean;
+  leveledUp: boolean;
+  minutes: number;
+  alphabet: AlphabetType;
+  promoted: CardPromotion[];
+  effectiveWpm: number;
+};
 type Reveal = { from: number; to: number; unlocked: string[]; complete: boolean };
 
 /** Event-handler clock; keeps Date.now out of the component body for the purity lint. */
@@ -164,14 +173,24 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     const before = koch.level;
     const key = kochProgressKey(alphabet);
     const result = { lesson, accuracy: scored.accuracy, isTest };
-    const applied = applyKochResult(profile[key], result, clock(), alphabet);
-    setProfile((old) => ({ ...old, [key]: applyKochResult(old[key], result, clock(), alphabet).progress }));
+    const now = clock();
+    const pool = kochChars(lesson, alphabet);
+    const effectiveWpm = Math.min(settings.effectiveSpeed, settings.characterSpeed);
+    const applied = applyKochResult(profile[key], result, now, alphabet);
+    const promoted = applied.cleared
+      ? promoteCardsForKochPass(profile.cards, pool, alphabet, effectiveWpm, now).promoted
+      : [];
+    setProfile((old) => {
+      const next = applyKochResult(old[key], result, now, alphabet);
+      if (!next.cleared) return { ...old, [key]: next.progress };
+      const { cards } = promoteCardsForKochPass(old.cards, pool, alphabet, effectiveWpm, now);
+      return { ...old, [key]: next.progress, cards };
+    });
     setScore(scored);
-    setResultMeta({ lesson, isTest, leveledUp: applied.leveledUp, minutes, alphabet });
+    setResultMeta({ lesson, isTest, leveledUp: applied.leveledUp, minutes, alphabet, promoted, effectiveWpm });
     setPhase('result');
 
     const sessionId = `koch-${nowId()}`;
-    const now = clock();
     scored.cells.forEach((cell) => {
       if (cell.op === 'ins') return;
       record({
@@ -298,6 +317,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
               <p className="koch-test-note">
                 <Icon name="trophy" size={16} />
                 {allCleared ? '全レベル合格済み。腕試しにもう一度どうぞ。' : `Lv.${koch.level} の昇級試験。${passLine}% 以上で「${lessonLabel(koch.level + 1, alphabet)}」が解放されます。`}
+                {` 合格すると出題文字のカードが R に。実効 ${SR_EFFECTIVE_WPM} WPM 以上なら SR、${SSR_EFFECTIVE_WPM} WPM 以上なら SSR へ昇格（降格なし）。`}
               </p>
             )}
             <div className="koch-setup-row">
@@ -386,6 +406,20 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
                 </div>
               </div>
             </div>
+
+            {resultMeta.promoted.length > 0 && (
+              <div className="koch-promoted">
+                <span className="koch-field-label">カード昇格 · 実効 {resultMeta.effectiveWpm} WPM</span>
+                <div className="koch-promoted-list">
+                  {resultMeta.promoted.map((item) => (
+                    <span key={item.key} className="koch-promoted-card" title={`${item.from ?? '未取得'} → ${item.to}`}>
+                      <b>{item.symbol}</b>
+                      <span className={`rarity-badge ${item.to.toLowerCase()}`}>{item.to}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {missChars.length > 0 && (
               <div className="koch-miss">

@@ -1,4 +1,4 @@
-import { ownedCardRarity } from './achievements';
+import { ownedCardRarity } from './cardRarity';
 import type { CardProgress, CardRarityOwned } from './types';
 
 /** Display rarity in the archive. revealAll uses the chosen preview rarity (no progress write). */

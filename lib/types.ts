@@ -443,6 +443,16 @@ export interface SessionRecord {
   accuracy: number;
   queue?: QueueMetrics;
   qso?: QsoSessionSummary;
+  exam?: ExamSessionSummary;
+}
+
+/** A scored 一総通 telegraphy exam (input mode, not the random practice body). `accuracy` is the penalty-based score. */
+export interface ExamSessionSummary {
+  subject: 'wabun' | 'codes' | 'plain';
+  /** Effective speed it was played at. */
+  wpm: number;
+  /** The real exam's speed for this subject. */
+  officialWpm: number;
 }
 
 /** EWMA estimate with its evidence count. */

@@ -266,7 +266,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     });
     // 進捗系だけ再評価（ナビの lastMode では回さない）
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, answers, sessions, profile.cards, profile.koch, profile.achievements]);
+  }, [ready, answers, sessions, profile.cards, profile.koch, profile.kochWabun, profile.qso, profile.achievements]);
 
   const stopAudio = () => {
     audioEngine.stop();
@@ -297,7 +297,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     queue: <QueueView settings={settings} setSettings={setSettings} record={record} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} onSession={onSession} />,
     analysis: <AnalysisView answers={answers} sessions={sessions} onNavigate={navigate} />,
     exam: <Suspense fallback={<p className="page-pad" role="status">教材メニューを読み込んでいます…</p>}><ExamMenuView lastMaterial={lastExamMaterial} onNavigate={navigate} /></Suspense>,
-    communication: <ExamView settings={settings} setSettings={setSettings} record={record} answers={answers} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onBack={() => navigate('exam')} />,
+    communication: <ExamView settings={settings} setSettings={setSettings} record={record} onSession={onSession} answers={answers} setAudioStatus={setAudioStatus} stopEpoch={stopEpoch} announce={announce} onBack={() => navigate('exam')} />,
     english: ready ? <Suspense fallback={<p className="page-pad" role="status">専門英語教材を読み込んでいます…</p>}><EnglishView onBack={() => navigate('exam')} /></Suspense> : null,
     houki: ready ? <Suspense fallback={<p className="page-pad" role="status">法規の教材を読み込んでいます…</p>}><HoukiView onBack={() => navigate('exam')} onOpenKakomon={() => navigate('houki-kakomon')} /></Suspense> : null,
     'houki-kakomon': ready ? <Suspense fallback={<p className="page-pad" role="status">法規過去問を読み込んでいます…</p>}><HoukiKakomonView onBack={() => navigate('exam')} onOpenHouki={() => navigate('houki')} /></Suspense> : null,

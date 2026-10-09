@@ -3,7 +3,7 @@
 # Next.js app をリモートサーバーへ rsync デプロイ
 #
 # 接続情報（api/.vscode/sftp.json と同一ホスト・ユーザー・鍵）:
-#   host: cw.conagi.jp
+#   host: cwot.jp
 #   user: cw
 #   path: /home/cw/app
 #   key:  ~/.ssh/id_rsa
@@ -19,7 +19,7 @@
 #
 # Environment overrides:
 #   DEPLOY_USER       (default: cw)
-#   DEPLOY_HOST       (default: cw.conagi.jp)
+#   DEPLOY_HOST       (default: cwot.jp)
 #   DEPLOY_PATH       (default: /home/cw/app)
 #   DEPLOY_SSH_KEY    (default: ~/.ssh/id_rsa)
 #   DEPLOY_NPM        (default: npm)
@@ -35,7 +35,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 DEPLOY_USER="${DEPLOY_USER:-cw}"
-DEPLOY_HOST="${DEPLOY_HOST:-cw.conagi.jp}"
+DEPLOY_HOST="${DEPLOY_HOST:-cwot.jp}"
 DEPLOY_PATH="${DEPLOY_PATH:-/home/cw/app}"
 DEPLOY_SSH_KEY="${DEPLOY_SSH_KEY:-$HOME/.ssh/id_rsa}"
 DEPLOY_NPM="${DEPLOY_NPM:-npm}"
@@ -143,6 +143,26 @@ blocked=("docs/", ".openai/", ".claude/", ".wrangler/", "work/", "outputs/", "tm
 paths=sys.stdin.buffer.read().split(b"\0")
 sys.stdout.buffer.write(b"\0".join(p for p in paths if p and not p.decode().startswith(blocked))+b"\0")
 ' > "$TRANSFER_LIST"
+# Past-paper player files are untracked, and the sitting JSON is gitignored.
+# The remote build imports both, so git ls-files alone never delivers them.
+python3 -c '
+import pathlib, sys
+root = pathlib.Path(sys.argv[1])
+extras = [
+    "app/styles/views/houki-kakomon.css",
+    "tooling/houki/dev-kakomon.mjs",
+    "lib/cardRarity.ts",
+]
+extras += [str(path.relative_to(root)) for path in (root / "app/dev/houki-kakomon").glob("*") if path.is_file()]
+extras += [str(path.relative_to(root)) for path in (root / "lib/houki/kakomon").glob("*") if path.is_file()]
+extras += [str(path.relative_to(root)) for path in (root / "public/assets/achievement_level").glob("R*.png") if path.is_file()]
+extras += [str(path.relative_to(root)) for path in (root / "private/houki-kakomon/sets").glob("1sou-houki-*.json") if path.is_file()]
+missing = [item for item in extras if not (root / item).is_file()]
+if missing:
+    sys.stderr.write("deploy source missing:\n" + "\n".join(missing) + "\n")
+    sys.exit(1)
+sys.stdout.buffer.write(("\0".join(extras) + "\0").encode())
+' "$ROOT" >> "$TRANSFER_LIST"
 printf 'ecosystem.config.cjs\0.openai/hosting.json\0' >> "$TRANSFER_LIST"
 
 # shellcheck disable=SC2086
