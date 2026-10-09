@@ -645,3 +645,6 @@
   .koch-ladder { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); }
   .koch-char { width: auto; aspect-ratio: 1; height: auto; }
 }
+
+.koch-mp3 { margin:20px 0; }
+.koch-mp3 p { color:var(--muted); font-size:13px; line-height:1.7; margin-top:8px; }

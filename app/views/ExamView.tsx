@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Mp3Download } from '@/app/components/Mp3Download';
 import { ExamGakuForm, countPlaySymbols, highlightPlayText } from '@/app/components/ExamGakuForm';
 import { DEFAULT_EXAM_PREFS, loadExamPrefs, saveExamPrefs } from '@/lib/examPrefs';
 import { EXAM_SHEET_GAP_SEC, EXAM_SUBJECTS, buildExamSession, examSheetGapSec, type ExamSession, type ExamSubjectId } from '@/lib/training';
@@ -711,7 +712,7 @@ export function ExamView({
     }
     const previousTitle = document.title;
     const stamp = new Date().toISOString().slice(0, 10);
-    const kind = sessionListenMode || listenModeRef.current ? '視聴' : '試験';
+    const kind = '電報';
     document.title = `CWOT-額表-${preset.title}-${kind}-${stamp}`;
     document.body.classList.add('print-gaku');
     const restore = () => {
@@ -1025,6 +1026,11 @@ export function ExamView({
               <strong className={`exam-clock${clockUrgent ? ' is-urgent' : ''}`} aria-label={`残り ${clock}`}>{clock}</strong>
             )}
             <div className="exam-transport">
+              {session && <Mp3Download settings={settings} filename={`CWOT-${preset.title}-${settings.effectiveSpeed}wpm`} segments={() => [
+                ...(session.announcement ? [{ text: session.announcement, alphabet: 'wabun' as const, silenceAfter: EXAM_SHEET_GAP_SEC }] : []),
+                ...session.sheets.map((sheet, index) => ({ text: sheet.playText, alphabet: preset.alphabet, silenceAfter: index < session.sheets.length - 1 ? examSheetGapSec(preset.alphabet) : 0 })),
+              ]} />}
+
               {phase === 'ready' || phase === 'review' ? (
                 <>
                   <button type="button" className="btn btn-primary btn-sm" onClick={startDeskPlayback} title={phase === 'ready' ? '試験呼称から再生開始' : '同じ出題を再生'}>
@@ -1038,7 +1044,7 @@ export function ExamView({
                       <Icon name="repeat" size={16} />もう一度
                     </button>
                   )}
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={saveGakuPdf} title="額表をPDF保存（印刷ダイアログ）">
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={saveGakuPdf} title="元の電報をPDF保存（印刷ダイアログ）">
                     <Icon name="printer" size={16} />PDF保存
                   </button>
                   <button type="button" className="btn btn-ghost btn-sm" onClick={exitListenDesk} title="科目選択画面に戻る">
@@ -1052,7 +1058,7 @@ export function ExamView({
                       <button type="button" className="btn btn-ghost btn-sm" onClick={renewProblem} title="新しい出題に差し替え（再生はスタート押し待ち）">
                         <Icon name="sparkle" size={16} />次の問題
                       </button>
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={saveGakuPdf} title="いまの額表をPDF保存（印刷ダイアログ）">
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={saveGakuPdf} title="元の電報をPDF保存（印刷ダイアログ）">
                         <Icon name="printer" size={16} />PDF保存
                       </button>
                     </>
@@ -1277,6 +1283,9 @@ export function ExamView({
             )}
           </>
         )}
+        {session && <div className="exam-print-root" aria-label="印刷用の元の電報">
+          <div className="gaku-stack">{session.sheets.map((sheet, index) => <ExamGakuForm key={`print-${index}`} ledger={sheet} alphabet={preset.alphabet} localHeard={1_000_000} active={false} plainOnly={!telegram} />)}</div>
+        </div>}
       </div>
     )}
   </section>;

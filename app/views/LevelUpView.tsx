@@ -16,6 +16,7 @@ import { audioEngine, formatCode, nowId, pct } from '@/app/trainer/shared';
 import { playSfx } from '@/app/trainer/sfx';
 import { AudioControls, ProgressBar, Ring, Segmented } from '@/app/components/ui';
 import { Icon } from '@/app/components/icons';
+import { Mp3Download } from '@/app/components/Mp3Download';
 import { LevelUpReveal } from '@/app/components/LevelUpReveal';
 
 type Mode = 'practice' | 'test';
@@ -76,6 +77,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
   const [minutes, setMinutes] = useState<KochDuration>(1);
   const [phase, setPhase] = useState<Phase>('setup');
   const [text, setText] = useState('');
+  const [practiceAudioSettings, setPracticeAudioSettings] = useState(settings);
   const [copy, setCopy] = useState('');
   const [playProgress, setPlayProgress] = useState(0);
   const [audioDone, setAudioDone] = useState(false);
@@ -120,6 +122,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
     audioEngine.stop();
     const nextText = buildKochText(lesson, minutes, settings, Math.random, alphabet);
     setText(nextText);
+    setPracticeAudioSettings({ ...settings });
     setCopy('');
     setScore(null);
     setResultMeta(null);
@@ -472,6 +475,10 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
       </aside>
     </div>
 
+    {mode === 'practice' && <div className="koch-mp3">
+      <Mp3Download label={phase === 'setup' ? '練習用MP3を作成' : 'この練習のMP3保存'} settings={phase === 'setup' ? settings : practiceAudioSettings} filename={`CWOT-Koch-${alphabet}-Lv${lesson}-${minutes}min-${(phase === 'setup' ? settings : practiceAudioSettings).effectiveSpeed}wpm`} segments={() => [{ text: phase === 'setup' ? buildKochText(lesson, minutes, settings, Math.random, alphabet) : text, alphabet }]} />
+      <p>選択した文字・時間・速度で保存します。練習前は新しい問題、練習後は同じ問題の音声です。</p>
+    </div>}
     {reveal && (
       <LevelUpReveal
         from={reveal.from}

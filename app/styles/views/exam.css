@@ -1511,3 +1511,11 @@
     print-color-adjust: exact;
   }
 }
+
+.exam-print-root { display:none; }
+.mp3-download { display:inline-flex; flex-direction:column; gap:6px; }
+.mp3-download-error { color:var(--coral); font-size:13px; max-width:260px; }
+@media print {
+  body.print-gaku .exam-terminal > :not(.exam-print-root) { display:none !important; }
+  body.print-gaku .exam-print-root { display:block !important; }
+}

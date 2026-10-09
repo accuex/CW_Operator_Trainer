@@ -9,6 +9,9 @@ const pdfDir = resolve(root, 'docs/全過去問_解答PDF');
 const outDir = resolve(root, 'private/houki-kakomon');
 const workDir = resolve(outDir, 'work');
 const SITTINGS = [
+  '2002-03', '2002-09', '2003-03', '2003-09', '2004-03', '2004-09', '2005-03', '2005-09',
+  '2006-03', '2006-09', '2007-03', '2007-09', '2008-03', '2008-09', '2009-03', '2009-09',
+  '2010-03', '2010-09',
   '2011-03', '2013-09', '2014-03', '2014-09',
   '2016-03', '2016-09', '2017-03', '2017-09', '2018-03', '2018-09', '2019-03', '2019-09', '2020-03',
   '2020-09', '2021-03', '2021-09', '2022-03', '2022-09', '2023-03', '2023-09', '2024-03', '2024-09',   '2025-03', '2025-09', '2026-03', '2026-09',
@@ -18,7 +21,7 @@ const LAWS = ['国際電気通信連合憲章', '国際電気通信連合条約'
 const SUB = { ア: 'a', イ: 'i', ウ: 'u', エ: 'e', オ: 'o' };
 const QUOTED_TERMS = 'これらの試験問題の著作権は、公益財団法人日本無線協会に帰属しています。 英語の科目の試験問題を除き、国家試験の受験など試験制度の意義に反しない場合に限り、公表されている過去の試験問題を無償で問題集等に使用することができます。この場合、当協会に許諾を求める必要もありません。 なお、公表しているPDF以外の電子データは提供できかねます。また、英語の科目については他の著作権との関係があり、転用は認めていません。';
 
-const questionHeader = /^[ \t\f]*([ＡＢ])[－―‐−-]\s*([0-9０-９]{1,2})(?![0-9０-９])/;
+const questionHeader = /^[ \t\f]*([ＡＢAB])\s*[－―‐−-]\s*([0-9０-９]{1,2})(?![0-9０-９])/;
 const fileHash = (path) => createHash('sha256').update(readFileSync(path)).digest('hex');
 const SENT = '\uE000';
 const fw = (value) => Number(String(value).replace(/[０-９]/g, (char) => String(char.charCodeAt(0) - 0xff10)));
@@ -28,6 +31,11 @@ const halfwidthPunct = { '｡': '。', '｢': '「', '｣': '」', '､': '、',
 const halfwidthKana = 'ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン';
 const RUBY_BASE = { ふく: '輻', きょう: '筐', だ: '舵', おそれ: '虞' };
 const tidy = (value) => value.replace(/[ \t]{2,}/g, '　').replace(/[ \t]+/g, '').replace(/([のに、])内に/g, '$1　内に');
+const widenBlankLetters = (value) => value.replace(/[A-E]/g, (char, index, source) => (
+  glue.test(source[index - 1] ?? '') || glue.test(source[index + 1] ?? '')
+    ? char
+    : String.fromCharCode(char.charCodeAt(0) + 0xfee0)
+));
 
 function repairBlankBoxes(value, blanks) {
   const collapsed = value.replace(/([Ａ-Ｅ])\1/g, (pair, char) => (blanks.has(char) ? char : pair));
@@ -37,7 +45,7 @@ function repairBlankBoxes(value, blanks) {
 function protectBlanks(value, blanks) {
   if (!blanks.size) return value;
   const sourceText = repairBlankBoxes(value, blanks);
-  return sourceText.replace(/[Ａ-Ｅア-オ]/gu, (char, index, source) => {
+  return sourceText.replace(/[Ａ-ＥA-Eア-オ]/gu, (char, index, source) => {
     if (!blanks.has(char)) return char;
     const prev = source[index - 1] ?? '';
     const next = source[index + 1] ?? '';
@@ -72,15 +80,43 @@ function versionOf(stderr) {
   return match ? match[1] : 'unknown';
 }
 
+const ANSWER_DASH = '[−－―‐−-]';
+
 function parseAnswers(raw) {
+  const bracketA = {};
+  for (const match of raw.matchAll(new RegExp(`〔\\s*Ａ\\s*${ANSWER_DASH}\\s*([0-9０-９]+)\\s*〕\\s*([0-9０-９])`, 'g'))) bracketA[fw(match[1])] = fw(match[2]);
+  const sectionA = Object.keys(bracketA).length === 20 ? bracketA : plainSectionA(raw);
+  const sectionB = Object.keys(bracketA).length === 20 ? bracketSectionB(raw) : plainSectionB(raw);
+  if (Object.keys(sectionA).length !== 20) throw new Error(`A の正答が ${Object.keys(sectionA).length} 件`);
+  for (let question = 1; question <= 5; question += 1) {
+    const item = sectionB[question] ?? {};
+    if ('アイウエオ'.split('').some((label) => item[label] == null)) throw new Error(`B-${question} の正答が揃っていない`);
+  }
+  const mode = raw.includes('小設問各') ? 'perSubItem' : 'unspecified';
+  const full = raw.match(/(?:満点|総得点)\s+([0-9０-９]+)\s*点/);
+  const pass = raw.match(/(?:合格点|合格基準)\s*([0-9０-９]+)\s*点/);
+  return {
+    sectionA,
+    sectionB,
+    mode,
+    fullMarks: full ? fw(full[1]) : null,
+    passMark: pass ? fw(pass[1]) : null,
+    note: raw.split('\n').filter((line) => /点（|点。/.test(line)).map((line) => line.replace(/配点内訳/g, '').replace(/\s+/g, '')).filter(Boolean).join('　'),
+  };
+}
+
+function plainSectionA(raw) {
   const sectionA = {};
-  for (const match of raw.matchAll(/〔\s*Ａ\s*-\s*([0-9０-９]+)\s*〕\s*([0-9０-９])/g)) sectionA[fw(match[1])] = fw(match[2]);
+  for (const match of raw.matchAll(new RegExp(`[ＡA]\\s*${ANSWER_DASH}\\s*([0-9０-９]{1,2})\\s+([0-9０-９]{1,2})`, 'g'))) sectionA[fw(match[1])] = fw(match[2]);
+  return sectionA;
+}
+
+function bracketSectionB(raw) {
   const pairs = [];
   for (const line of raw.split('\n')) {
     const match = line.match(/([アイウエオ])\s+([0-9０-９]+)/);
     if (match) pairs.push([match[1], fw(match[2])]);
   }
-  if (Object.keys(sectionA).length !== 20) throw new Error(`A の正答が ${Object.keys(sectionA).length} 件`);
   if (pairs.length !== 25) throw new Error(`B の正答が ${pairs.length} 件`);
   const sectionB = {};
   for (let question = 1; question <= 5; question += 1) {
@@ -90,17 +126,49 @@ function parseAnswers(raw) {
       sectionB[question][label] = answer;
     }
   }
-  const mode = raw.includes('小設問各') ? 'perSubItem' : 'unspecified';
-  const full = raw.match(/満点\s+([0-9０-９]+)点/);
-  const pass = raw.match(/合格点\s*([0-9０-９]+)点/);
-  return {
-    sectionA,
-    sectionB,
-    mode,
-    fullMarks: full ? fw(full[1]) : null,
-    passMark: pass ? fw(pass[1]) : null,
-    note: raw.split('\n').filter((line) => /点（/.test(line)).map((line) => line.replace(/配点内訳/g, '').replace(/\s+/g, '')).filter(Boolean).join('　'),
+  return sectionB;
+}
+
+function plainSectionB(raw) {
+  const blocks = [];
+  let block = [];
+  const flush = () => {
+    if (block.length) blocks.push(block);
+    block = [];
   };
+  for (const line of raw.split('\n')) {
+    const hasPair = /[アイウエオ]\s+[0-9０-９]/.test(line);
+    const hasMarker = new RegExp(`[ＢB]\\s*${ANSWER_DASH}\\s*[0-9０-９]`).test(line);
+    if (!hasPair && !hasMarker) {
+      flush();
+      continue;
+    }
+    if (/ア/.test(line) && block.some((item) => /ア/.test(item))) flush();
+    block.push(line);
+  }
+  flush();
+  const sectionB = {};
+  for (const rows of blocks) {
+    const left = [];
+    const right = [];
+    const markers = [];
+    for (const line of rows) {
+      const pairs = [...line.matchAll(/([アイウエオ])\s+([0-9０-９]{1,2})/g)];
+      if (pairs[0]) left.push([pairs[0][1], fw(pairs[0][2])]);
+      if (pairs[1]) right.push([pairs[1][1], fw(pairs[1][2])]);
+      for (const marker of line.matchAll(new RegExp(`[ＢB]\\s*${ANSWER_DASH}\\s*([0-9０-９]{1,2})`, 'g'))) markers.push({ n: fw(marker[1]), at: marker.index });
+    }
+    markers.sort((leftMark, rightMark) => leftMark.at - rightMark.at);
+    const assign = (pairs, number) => {
+      if (!number) return;
+      sectionB[number] = Object.fromEntries(pairs);
+    };
+    if (markers.length >= 2) {
+      assign(left, markers[0].n);
+      assign(right, markers[1].n);
+    } else if (markers.length === 1) assign(left.length >= right.length ? left : right, markers[0].n);
+  }
+  return sectionB;
 }
 
 function splitQuestions(raw) {
@@ -111,7 +179,7 @@ function splitQuestions(raw) {
     if (match) marks.push({ section: match[1], number: fw(match[2]), index });
   });
   return marks.map((mark, index) => ({
-    section: mark.section === 'Ａ' ? 'A' : 'B',
+    section: mark.section === 'Ａ' || mark.section === 'A' ? 'A' : 'B',
     number: mark.number,
     lines: lines.slice(mark.index, marks[index + 1]?.index ?? lines.length).map((line) => line.replace(/\f/g, '')),
   }));
@@ -133,9 +201,13 @@ function takeLead(lines) {
     if (!lines[index].trim()) continue;
     taken.push(lines[index].trim());
     const joined = tidy(taken.join(''));
-    const ready = /(?:一つ|１つ)選べ。|解答せよ。/.test(joined);
-    const noteOpen = joined.includes('なお、') && !joined.includes('入るものとする。');
-    if (ready && !noteOpen) {
+    const ready = /(?:一つ|１つ|番号から)選べ。|解答せよ。/.test(joined);
+    const noteTail = joined.split('なお、').pop() ?? '';
+    const noteOpen = joined.includes('なお、') && !joined.includes('入るものとする。') && !noteTail.includes('。');
+    const tail = joined.split(/(?:一つ|１つ|番号から)選べ。|解答せよ。/).pop() ?? '';
+    const provisoOpen = /ただし|なお/.test(tail) && !tail.includes('。');
+    const upcoming = lines.slice(index + 1).find((line) => line.trim())?.trim() ?? '';
+    if (ready && !noteOpen && !provisoOpen && !/^ただし|^なお/.test(upcoming)) {
       index += 1;
       break;
     }
@@ -221,10 +293,12 @@ function parseBlocks(lines, blanks) {
   return blocks;
 }
 
+const COLUMN_LETTERS = 'ＡＢＣＤＥABCDE';
+
 function isColumnHeader(line) {
   const stripped = Object.keys(RUBY_BASE).reduce((value, reading) => value.replaceAll(reading, ''), line);
-  const letters = [...stripped].filter((char) => 'ＡＢＣＤＥ'.includes(char));
-  return letters.length >= 2 && stripped.replace(/[ＡＢＣＤＥ\s]/g, '') === '';
+  const letters = [...stripped].filter((char) => COLUMN_LETTERS.includes(char));
+  return letters.length >= 2 && stripped.replace(/[ＡＢＣＤＥABCDE\s]/g, '') === '';
 }
 
 function cellText(slice) {
@@ -279,7 +353,7 @@ function parseTable(lines) {
       leadingRuby ??= trimmed;
       continue;
     }
-    if (/^[ＡＢＣＤＥ]$/.test(trimmed)) {
+    if (/^[ＡＢＣＤＥABCDE]$/.test(trimmed)) {
       start = index;
       continue;
     }
@@ -289,16 +363,16 @@ function parseTable(lines) {
   const columns = [];
   for (let index = start; index <= headerAt; index += 1) {
     const trimmed = lines[index].trim();
-    if (!isColumnHeader(lines[index]) && !/^[ＡＢＣＤＥ]$/.test(trimmed)) continue;
+    if (!isColumnHeader(lines[index]) && !/^[ＡＢＣＤＥABCDE]$/.test(trimmed)) continue;
     [...lines[index]].forEach((char, at) => {
-      if ('ＡＢＣＤＥ'.includes(char)) columns.push({ label: char, at });
+      if (COLUMN_LETTERS.includes(char)) columns.push({ label: char, at });
     });
   }
   let bodyAt = headerAt + 1;
   for (let index = headerAt + 1; index < lines.length; index += 1) {
     const trimmed = lines[index].trim();
     if (!trimmed) continue;
-    if (/^[ＡＢＣＤＥ]$/.test(trimmed) && !columns.some((column) => column.label === trimmed)) {
+    if (/^[ＡＢＣＤＥABCDE]$/.test(trimmed) && !columns.some((column) => column.label === trimmed)) {
       columns.push({ label: trimmed, at: lines[index].indexOf(trimmed) });
       bodyAt = index + 1;
       continue;
@@ -364,9 +438,23 @@ function parseBank(lines) {
     }
     const added = [];
     const marks = [...line.matchAll(/(?:^|\s)([0-9０-９]{1,2})(?=\s)/g)];
-    marks.forEach((match, index) => {
+    const kept = [];
+    const used = new Set(bank.map((entry) => entry.no));
+    let next = 1;
+    while (used.has(next)) next += 1;
+    marks.forEach((match) => {
+      const no = fw(match[1]);
+      const previous = kept.at(-1);
+      const gap = previous ? match.index - previous.index : 99;
+      if (no === next) {
+        kept.push(match);
+        next += 1;
+        while (used.has(next)) next += 1;
+      } else if (gap >= 8 && no > next && no <= 10 && !used.has(no)) kept.push(match);
+    });
+    kept.forEach((match, index) => {
       const start = match.index + match[0].length;
-      const end = marks[index + 1]?.index ?? line.length;
+      const end = kept[index + 1]?.index ?? line.length;
       const value = cellText(line.slice(start, end));
       if (!value) return;
       const entry = { no: fw(match[1]), body: text(value) };
@@ -393,6 +481,17 @@ function parseChoices(lines) {
     if (!line) continue;
     if (RUBY_BASE[line]) {
       held.push(rawLine);
+      continue;
+    }
+    const packed = line.match(/^(?:[1-5１-５]\s+.*\s{2,}[1-5１-５]\s+)/) ? [...line.matchAll(/(?:^|\s{2,})([1-5１-５])(?=\s)/g)] : [];
+    if (packed.length > 1 && fw(packed[0][1]) === (current?.no ?? 0) + 1) {
+      packed.forEach((mark, markIndex) => {
+        const start = mark.index + mark[0].length;
+        const end = packed[markIndex + 1]?.index ?? line.length;
+        current = { no: fw(mark[1]), lines: [line.slice(start, end).trim()] };
+        groups.push(current);
+      });
+      held = [];
       continue;
     }
     const choice = line.match(/^([1-5１-５])(?:\s+(.*))?$/);
@@ -445,9 +544,9 @@ function judgeLabels(lead) {
 }
 
 function classify(section, lead) {
-  if (section === 'B' && /１から１０|下の１から１０/.test(lead)) return 'wordBank';
+  if (section === 'B' && (/[1１]から\s*[1１][0０]/u.test(lead) || /下の番号から選べ/.test(lead))) return 'wordBank';
   if (section === 'B' && /を\s*[1１]\s*、/.test(lead)) return 'judge';
-  if (/字句の組合せ|字句の組み合わせ|字句の組み合せ/.test(lead)) return 'combination';
+  if (/字句の(?:正しい)?組合せ|字句の組み合わせ|字句の組み合せ/.test(lead)) return 'combination';
   return 'single';
 }
 
@@ -604,6 +703,16 @@ function codeOf(questionText, answerText) {
   return asciiCode(match[0]);
 }
 
+function sittingLabel(year, month, answerText) {
+  try {
+    return labelOf(answerText);
+  } catch (error) {
+    if (year > 2018) throw error;
+    const fwDigits = (value) => String(value).replace(/[0-9]/g, (digit) => String.fromCharCode(digit.charCodeAt(0) + 0xfee0));
+    return `平成${fwDigits(year - 1988)}年${fwDigits(month)}月期`;
+  }
+}
+
 function labelOf(answerText) {
   const line = answerText.split('\n').map((item) => item.trim()).find((item) => /令和|平成/.test(item) && item.length < 24);
   if (!line) throw new Error('期の見出しが読めない');
@@ -642,20 +751,19 @@ function extractSitting(sitting, version) {
     ? readFileSync(manualQuestionPath, 'utf8')
     : extractText(questionPath, resolve(workDir, `${slug}-question.txt`));
   const repaired = repairHalfwidth(rawQuestion);
-  const questionText = repaired.text;
+  const questionText = widenBlankLetters(repaired.text);
   const extractedAnswer = extractText(answerPath, resolve(workDir, `${slug}-answer.txt`));
   const manualPath = resolve(workDir, 'manual', `${slug}-answer.txt`);
-  const answerText = extractedAnswer.includes('小設問各') ? extractedAnswer : readFileSync(manualPath, 'utf8');
+  const answerText = /〔|Ａ\s*[−－―‐−-]/.test(extractedAnswer) ? extractedAnswer : readFileSync(manualPath, 'utf8');
   const punct = repaired.count ? `; halfwidth punct ${repaired.count}` : '';
   const questionSource = existsSync(manualQuestionPath)
     ? 'question: visual reading of the page images; OCR text layer was not used'
     : `question: pdftotext -layout (poppler ${version})${punct}`;
-  const answerSource = extractedAnswer.includes('小設問各')
+  const answerSource = /〔|Ａ\s*[−－―‐−-]/.test(extractedAnswer)
     ? `${questionSource}; answer: pdftotext -layout (poppler ${version})`
     : `${questionSource}; answer: visual transcription, no text layer`;
   const answers = parseAnswers(answerText);
   if (answers.fullMarks !== 125 || answers.passMark !== 75) throw new Error('満点または合格点が読み取れない');
-  if (answers.mode !== 'perSubItem') throw new Error('小設問各の配点でない');
   const setId = `1sou-houki-${slug}`;
   const chunks = splitQuestions(questionText);
   if (chunks.length !== 25) throw new Error(`問題が ${chunks.length} 件`);
@@ -668,7 +776,7 @@ function extractSitting(sitting, version) {
     contentVersion: 1,
     qualification: '1sou',
     subject: 'houki',
-    exam: { year, month, label: labelOf(answerText), code: codeOf(questionText, answerText), durationMin: 150 },
+    exam: { year, month, label: sittingLabel(year, month, answerText), code: codeOf(questionText, answerText), durationMin: 150 },
     scoring: {
       fullMarks: 125,
       passMark: 75,
