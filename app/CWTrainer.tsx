@@ -1,6 +1,7 @@
 'use client';
 
 import GeographyLoading from './views/geography/GeographyLoading';
+import Image from 'next/image';
 import Link from 'next/link';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { applyAchievements, achievementById } from '@/lib/achievements';
@@ -315,10 +316,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     <div className={`app-frame view-${view}`}>
       <aside className="sidebar" aria-label="メインナビゲーション">
         <Link
-          className="brand"
+          className="brand sidebar-brand"
           href="/"
           prefetch={false}
-          aria-label="サイトトップへ"
+          aria-label="CWOT Academy サイトトップへ"
           onClick={(event) => {
             event.preventDefault();
             audioEngine.stop();
@@ -327,14 +328,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
             window.location.assign('/');
           }}
         >
-          <span className="brand-mark" aria-hidden="true"><i /><i className="dah" /><i /><i className="dah" /></span>
-          <span className="brand-text">
-            <b>CW Operator</b>
-            <small className="brand-sub">
-              <span>TRAINER</span>
-              <span className="brand-ver">v{APP_VERSION}</span>
-            </small>
-          </span>
+          <Image className="sidebar-logo" src="/assets/side/side_logo.webp" alt="" width={640} height={215} sizes="220px" priority />
+          <Image className="sidebar-logo-mini" src="/assets/side/side_logo_mini.webp" alt="" width={200} height={184} sizes="60px" priority />
         </Link>
         <nav className="nav">
           {views.map((item) => {
@@ -383,20 +378,24 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <small><Icon name="flame" size={13} /> {stats.streakDays}日連続</small>
             </div>
           </div>
-          <Link
-            className="sidebar-site"
-            href="/"
-            prefetch={false}
-            onClick={(event) => {
-              event.preventDefault();
-              audioEngine.stop();
-              if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
-              window.location.assign('/');
-            }}
-          >
-            サイトトップ
-          </Link>
-          <p className="app-credit">(C) 2026 Int Design LLC.</p>
+          <div className="sidebar-scene">
+            <p className="sidebar-quote">続けることが、<br />いつか大きな交信につながる。</p>
+            <p className="sidebar-motto" lang="en">Same Waves,<br />A Brighter Tomorrow.</p>
+            <Link
+              className="sidebar-site"
+              href="/"
+              prefetch={false}
+              onClick={(event) => {
+                event.preventDefault();
+                audioEngine.stop();
+                if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+                window.location.assign('/');
+              }}
+            >
+              サイトトップ
+            </Link>
+            <p className="app-credit">(C) 2026 Int Design LLC. <span className="brand-ver">v{APP_VERSION}</span></p>
+          </div>
         </div>
       </aside>
 

@@ -15,10 +15,23 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 18px 14px;
+  --side-pad-x: 14px;
+  --side-pad-y: 18px;
+  padding: var(--side-pad-y) var(--side-pad-x);
   border-right: 1px solid var(--line);
-  background: linear-gradient(180deg, #0f1434, #0b0f28);
+  background: linear-gradient(180deg, #0d1638, #0b1330 60%, #0b1736);
+  /* Short windows scroll the rail instead of letting the footer overlap the nav. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 14%) transparent;
 }
+.sidebar-brand { justify-content: center; padding: 0 0 12px; }
+.sidebar-brand:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 10px; }
+.sidebar-logo { display: block; width: 100%; height: auto; }
+.sidebar-logo-mini { display: none; width: 56px; height: auto; }
+.sidebar .nav { gap: 2px; }
+.sidebar .nav-item { min-height: 44px; }
 .brand {
   display: flex;
   align-items: center;
@@ -107,10 +120,56 @@
 .sidebar-logout:hover { color: var(--coral); }
 
 .sidebar-foot {
-  margin-top: auto;
+  margin: auto calc(-1 * var(--side-pad-x)) calc(-1 * var(--side-pad-y));
+  padding-top: 16px;
   display: grid;
-  gap: 10px;
+  gap: 0;
 }
+.sidebar-foot > .sidebar-goal { margin: 0 var(--side-pad-x); }
+/* Night campus scene: text stays live HTML; the art fades up into the rail colour. */
+.sidebar-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Fills whatever the nav leaves; below ~950px tall the rail scrolls instead. */
+  min-height: clamp(170px, 100dvh - 800px, 380px);
+  padding: 22px 12px 12px;
+  background:
+    linear-gradient(180deg, #0b1736 0%, rgb(11 23 54 / 72%) 30%, rgb(11 23 54 / 10%) 62%, rgb(8 12 32 / 55%) 100%),
+    #0b1736 url('/assets/side/side_footer.webp') center bottom / cover no-repeat;
+}
+.sidebar-quote {
+  margin: 0;
+  color: #f5eafa;
+  font: 600 13.5px/1.7 'Klee One', 'Klee', 'YuKyokasho', 'Hiragino Maru Gothic ProN', var(--font-display);
+  letter-spacing: .02em;
+  white-space: nowrap;
+  text-shadow: 0 2px 10px rgb(8 12 40 / 90%);
+  transform: rotate(-4deg);
+  transform-origin: left center;
+}
+.sidebar-motto {
+  position: relative;
+  margin: 14px 0 0 10px;
+  padding-bottom: 6px;
+  color: #eef3ff;
+  font: 400 20px/1.15 'Caveat', 'Snell Roundhand', 'Segoe Script', 'Bradley Hand', cursive;
+  text-shadow: 0 2px 10px rgb(8 12 40 / 90%);
+  transform: rotate(-4deg);
+  transform-origin: left center;
+}
+.sidebar-motto::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 18px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgb(124 200 255 / 0%), #7cc8ff 40%, rgb(124 200 255 / 0%));
+}
+.sidebar-scene .sidebar-site { margin-top: auto; padding-top: 18px; color: rgb(226 232 248 / 78%); text-shadow: 0 1px 6px rgb(0 0 0 / 80%); }
+.sidebar-scene .app-credit { padding-top: 6px; color: rgb(214 222 242 / 80%); text-shadow: 0 1px 6px rgb(0 0 0 / 85%); }
 .sidebar-goal {
   display: flex;
   align-items: center;
@@ -321,8 +380,14 @@
   .header-speed-panel .speed-track { width: 100%; }
 }
 @media (max-width: 1180px) {
-  .sidebar { padding: 18px 12px; align-items: center; }
+  .sidebar { --side-pad-x: 12px; align-items: center; }
   .brand { padding: 4px 0 16px; }
+  .sidebar-logo { display: none; }
+  .sidebar-logo-mini { display: block; }
+  .sidebar-foot { align-self: stretch; }
+  .sidebar-foot > .sidebar-goal { justify-content: center; }
+  .sidebar-scene { min-height: 120px; padding: 0; }
+  .sidebar-scene > * { display: none; }
   .brand-text, .nav-label, .sidebar-goal-text { display: none; }
   .nav { width: 100%; }
   .nav-item { justify-content: center; padding: 0; min-height: 52px; }
