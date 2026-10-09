@@ -2,12 +2,12 @@
 import type { Metadata } from 'next';
 import { Icon } from '@/app/components/icons';
 import { SiteFooter } from '@/app/landing/SiteFooter';
+import { SubpageHeader } from '@/app/landing/SubpageHeader';
 import { SITE_GROUPS } from '@/app/landing/siteLinks';
-import { APP_BASE } from '@/lib/appPaths';
 
 export const metadata: Metadata = {
-  title: 'サイトマップ — CW Operator Trainer',
-  description: 'CW Operator Trainer のページ一覧です。',
+  title: 'サイトマップ — CWOT Academy',
+  description: 'CWOT Academy のページ一覧です。',
 };
 
 const PAGE_COUNT = SITE_GROUPS.reduce((sum, group) => sum + group.links.length, 0);
@@ -15,29 +15,7 @@ const PAGE_COUNT = SITE_GROUPS.reduce((sum, group) => sum + group.links.length, 
 export default function SitemapPage() {
   return (
     <div className="lp-frame">
-      <header className="lp-nav">
-        <a className="brand lp-brand" href="/" aria-label="CW Operator Trainer">
-          <span className="brand-mark" aria-hidden="true">
-            <i />
-            <i className="dah" />
-            <i />
-            <i className="dah" />
-          </span>
-          <span className="brand-text">
-            <b>CW Operator</b>
-            <small className="brand-sub">
-              <span>TRAINER</span>
-            </small>
-          </span>
-        </a>
-        <nav className="lp-nav-links" aria-label="ページ">
-          <a href="/">トップ</a>
-          <a href="/sitemap" aria-current="page">サイトマップ</a>
-        </nav>
-        <a className="btn btn-primary" href={APP_BASE}>
-          アプリを開く
-        </a>
-      </header>
+      <SubpageHeader />
 
       <main className="lp-sitemap">
         <nav className="lp-crumbs" aria-label="パンくずリスト">

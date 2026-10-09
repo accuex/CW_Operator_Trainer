@@ -381,19 +381,6 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
           <div className="sidebar-scene">
             <p className="sidebar-quote">続けることが、<br />いつか大きな交信につながる。</p>
             <p className="sidebar-motto" lang="en">Same Waves,<br />A Brighter Tomorrow.</p>
-            <Link
-              className="sidebar-site"
-              href="/"
-              prefetch={false}
-              onClick={(event) => {
-                event.preventDefault();
-                audioEngine.stop();
-                if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
-                window.location.assign('/');
-              }}
-            >
-              サイトトップ
-            </Link>
             <p className="app-credit">(C) 2026 Int Design LLC. <span className="brand-ver">v{APP_VERSION}</span></p>
           </div>
         </div>

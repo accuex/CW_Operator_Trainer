@@ -30,6 +30,7 @@ final class Config
         public readonly string $smtpUser,
         public readonly string $smtpPass,
         public readonly string $smtpEncryption,
+        public readonly string $contactTo,
     ) {
     }
 
@@ -59,6 +60,7 @@ final class Config
             smtpUser: self::envFirst(['SMTP_USER', 'MAIL_USERNAME'], ''),
             smtpPass: self::envFirst(['SMTP_PASS', 'MAIL_PASSWORD'], ''),
             smtpEncryption: strtolower(self::envFirst(['SMTP_ENCRYPTION', 'MAIL_ENCRYPTION'], 'tls')),
+            contactTo: self::env('CONTACT_TO', self::env('MAIL_FROM', '')),
         );
     }
 

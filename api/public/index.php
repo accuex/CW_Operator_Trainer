@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Cwot\Api\Config;
 use Cwot\Api\Controllers\AuthController;
 use Cwot\Api\Controllers\AuthMailController;
+use Cwot\Api\Controllers\ContactController;
 use Cwot\Api\Controllers\PasskeyController;
 use Cwot\Api\Controllers\SyncController;
 use Cwot\Api\Database;
@@ -33,6 +34,7 @@ $auth = static fn () => new AuthController($db(), $jwt);
 $authMail = static fn () => new AuthMailController($db(), $config, $mail, $jwt);
 $sync = static fn () => new SyncController($db());
 $passkey = static fn () => new PasskeyController($db(), $config, $jwt);
+$contact = static fn () => new ContactController($config, $mail);
 $jwtGuard = new JwtMiddleware($jwt);
 
 $app = AppFactory::create();
@@ -51,6 +53,10 @@ $errorMiddleware->setDefaultErrorHandler(
 
 $app->get('/api/v1/health', function (Request $request, Response $response) {
     return JsonResponse::write($response, ['ok' => true, 'service' => 'cwot-api']);
+});
+
+$app->post('/api/v1/contact', function (Request $request, Response $response) use ($contact) {
+    return $contact()->send($request, $response);
 });
 
 $app->post('/api/v1/auth/register', function (Request $request, Response $response) use ($auth) {

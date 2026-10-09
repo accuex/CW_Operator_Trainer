@@ -15,13 +15,16 @@ final class MailService
     {
     }
 
-    public function send(string $to, string $subject, string $textBody, ?string $htmlBody = null): void
+    public function send(string $to, string $subject, string $textBody, ?string $htmlBody = null, ?string $replyTo = null): void
     {
         $mail = new PHPMailer(true);
         try {
             $mail->CharSet = 'UTF-8';
             $mail->setFrom($this->config->mailFrom, $this->config->mailFromName);
             $mail->addAddress($to);
+            if ($replyTo !== null) {
+                $mail->addReplyTo($replyTo);
+            }
             $mail->Subject = $subject;
             $mail->Body = $htmlBody ?? $textBody;
             $mail->AltBody = $textBody;

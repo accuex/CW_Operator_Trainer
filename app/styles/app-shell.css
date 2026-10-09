@@ -168,8 +168,7 @@
   border-radius: 2px;
   background: linear-gradient(90deg, rgb(124 200 255 / 0%), #7cc8ff 40%, rgb(124 200 255 / 0%));
 }
-.sidebar-scene .sidebar-site { margin-top: auto; padding-top: 18px; color: rgb(226 232 248 / 78%); text-shadow: 0 1px 6px rgb(0 0 0 / 80%); }
-.sidebar-scene .app-credit { padding-top: 6px; color: rgb(214 222 242 / 80%); text-shadow: 0 1px 6px rgb(0 0 0 / 85%); }
+.sidebar-scene .app-credit { margin-top: auto; padding-top: 18px; color: rgb(214 222 242 / 80%); text-shadow: 0 1px 6px rgb(0 0 0 / 85%); }
 .sidebar-goal {
   display: flex;
   align-items: center;
@@ -192,15 +191,6 @@
   letter-spacing: .04em;
   text-align: center;
 }
-.sidebar-site {
-  display: block;
-  padding: 0 4px;
-  color: var(--muted);
-  font: 700 11px/1.3 var(--font-display);
-  text-align: center;
-  text-decoration: none;
-}
-.sidebar-site:hover { color: var(--gold); }
 
 /* ───────── Main + header ───────── */
 .app-main { min-height: 100vh; margin-left: var(--sidebar); }

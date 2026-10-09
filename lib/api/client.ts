@@ -191,3 +191,22 @@ export async function confirmEmailChange(token: string): Promise<AuthSession> {
   saveAuthSession(session);
   return session;
 }
+
+export type ContactCategory = 'question' | 'bug' | 'request' | 'account' | 'other';
+
+export type ContactInput = {
+  name: string;
+  email: string;
+  category: ContactCategory;
+  message: string;
+  /** Honeypot — left empty by people. */
+  website: string;
+};
+
+/** Sends the contact form to the admin mailbox. No copy is mailed to the sender. */
+export async function sendContact(input: ContactInput): Promise<void> {
+  await apiFetch('/api/v1/contact', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  }, { auth: false });
+}

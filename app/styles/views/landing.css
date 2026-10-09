@@ -914,3 +914,31 @@
     grid-template-areas: 'practice' 'exam' 'account' 'site';
   }
 }
+
+/* Sub pages (FAQ, contact, sitemap): same masthead, shorter banner. */
+.lp-masthead-sub { --banner-h: clamp(92px, 9vw, 150px); }
+@media (max-width: 760px) {
+  .lp-masthead-sub { --banner-h: clamp(84px, 24vw, 120px); }
+}
+.lp-sub-motto {
+  position: relative;
+  margin: 0;
+  padding-bottom: 6px;
+  color: #dfe7ff;
+  font: 400 22px/1.15 'Caveat', 'Snell Roundhand', 'Segoe Script', 'Bradley Hand', cursive;
+  text-align: right;
+  transform: rotate(-3deg);
+}
+.lp-sub-motto::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgb(124 200 255 / 0%), #7cc8ff 40%, rgb(124 200 255 / 0%));
+}
+@media (max-width: 760px) {
+  .lp-sub-motto { display: none; }
+}
