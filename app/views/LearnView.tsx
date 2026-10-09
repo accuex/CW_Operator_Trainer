@@ -37,6 +37,7 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
   const [masteredReveal, setMasteredReveal] = useState<{ card: MorseCard; progress: CardProgress } | null>(null);
   const playbackRef = useRef<PlaybackHandle | null>(null);
   const rafRef = useRef<number | null>(null);
+  const stripRef = useRef<HTMLDivElement | null>(null);
   const safeIndex = cards.length ? index % cards.length : 0;
   const card = cards[safeIndex];
   const progress = card ? profile.cards[cardKey(card)] ?? emptyProgress() : emptyProgress();
@@ -598,7 +599,7 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
         {steps.map((step, stepIndex) => (
           <li key={step.id} className={`${stepIndex === phaseIndex ? 'current' : ''} ${stepIndex < phaseIndex ? 'done' : ''}`}>
             <button type="button" onClick={() => goStep(step.id)} disabled={step.disabled} aria-current={stepIndex === phaseIndex ? 'step' : undefined}>
-              <span className="phase-dot"><Icon name={stepIndex < phaseIndex ? 'check' : step.icon} size={18} /></span>
+              <span className="phase-dot">{stepIndex < phaseIndex ? <Icon name="check" size={18} /> : stepIndex + 1}</span>
               <span className="phase-text"><b>{step.title}</b><small>{step.hint}</small></span>
             </button>
           </li>
@@ -653,7 +654,9 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
           {stage}
         </div>
 
-        <div className="card-strip" aria-label="カード一覧">
+        <div className="card-strip-wrap">
+        <button type="button" className="card-strip-nav prev" onClick={() => stripRef.current?.scrollBy({ left: -240, behavior: 'smooth' })} aria-label="カード一覧を左へ"><Icon name="chevron-left" size={18} /></button>
+        <div className="card-strip" ref={stripRef} aria-label="カード一覧">
           {cards.map((item, itemIndex) => {
             const itemProgress = profile.cards[cardKey(item)];
             const status = cardStatus(itemProgress);
@@ -671,6 +674,8 @@ export function LearnView({ settings, profile, setProfile, record, setAudioStatu
               </button>
             );
           })}
+        </div>
+        <button type="button" className="card-strip-nav next" onClick={() => stripRef.current?.scrollBy({ left: 240, behavior: 'smooth' })} aria-label="カード一覧を右へ"><Icon name="chevron-right" size={18} /></button>
         </div>
       </>
     )}

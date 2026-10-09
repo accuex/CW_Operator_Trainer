@@ -45,33 +45,25 @@
 .phase-stepper {
   display: flex;
   justify-content: center;
-  gap: 0;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .phase-stepper li { position: relative; display: flex; align-items: center; }
-.phase-stepper li + li::before {
-  content: '';
-  width: clamp(16px, 3vw, 48px);
-  height: 3px;
-  margin: 0 6px;
-  border-radius: 3px;
-  background: var(--surface-3);
-}
-.phase-stepper li.done + li::before, .phase-stepper li.current::before { background: linear-gradient(90deg, var(--mint), var(--gold)); }
 .phase-stepper button {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 14px 6px 6px;
-  border: 1px solid transparent;
+  min-width: 168px;
+  padding: 8px 18px 8px 8px;
+  border: 1.5px solid var(--line-2);
   border-radius: var(--r-pill);
-  background: transparent;
+  background: var(--surface);
   text-align: left;
   transition: background var(--t-fast), border-color var(--t-fast);
 }
-.phase-stepper button:hover:not(:disabled) { background: rgb(255 255 255 / 4%); }
+.phase-stepper button:hover:not(:disabled) { border-color: var(--line-3); background: var(--surface-2); }
 .phase-stepper button:disabled { opacity: .45; }
 .phase-dot {
   display: grid;
@@ -82,12 +74,13 @@
   background: var(--surface-2);
   border: 2px solid var(--line-2);
   color: var(--muted);
+  font: 900 17px var(--font-display);
   transition: all var(--t-med) var(--ease-spring);
 }
 .phase-text { display: grid; line-height: 1.2; }
 .phase-text b { font: 800 14px var(--font-display); color: var(--text-2); }
 .phase-text small { color: var(--muted); font-size: 11px; }
-.phase-stepper li.current button { background: var(--gold-soft); border-color: rgb(246 196 83 / 30%); }
+.phase-stepper li.current button { background: var(--gold-soft); border-color: rgb(246 196 83 / 70%); box-shadow: 0 0 18px rgb(246 196 83 / 14%); }
 .phase-stepper li.current .phase-dot { background: var(--gold); border-color: var(--gold); color: #2a1c00; transform: scale(1.06); box-shadow: 0 0 0 5px rgb(246 196 83 / 18%); }
 .phase-stepper li.current .phase-text b { color: var(--gold); }
 .phase-stepper li.done .phase-dot { background: var(--mint); border-color: var(--mint); color: #032417; }
@@ -97,7 +90,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   padding: 10px 14px;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
@@ -132,11 +125,11 @@
 /* ───────── Lesson layout ───────── */
 .lesson-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 400px) minmax(0, 1fr);
-  gap: clamp(20px, 3vw, 40px);
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 32px);
   align-items: start;
 }
-.lesson-card-col { position: sticky; top: calc(var(--header) + 20px); display: grid; gap: 16px; }
+.lesson-card-col { position: sticky; top: calc(var(--header) + 20px); display: grid; gap: 10px; }
 .lesson-card-wrap { position: relative; border-radius: var(--r-lg); transition: transform var(--t-med) var(--ease-out); }
 .lesson-card-wrap::before {
   content: '';
@@ -156,7 +149,7 @@
 .meter-row b { color: var(--gold); font: 800 14px var(--font-mono); }
 .stat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
-.lesson-panel { padding: clamp(20px, 3vw, 32px); }
+.lesson-panel { padding: clamp(18px, 2.4vw, 26px); }
 .lesson-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .lesson-head h2 { margin: 6px 0 0; font-size: clamp(22px, 2.4vw, 30px); }
 .lesson-lead { margin: 10px 0 0; color: var(--text-2); }
@@ -166,8 +159,8 @@
   display: flex;
   align-items: center;
   gap: clamp(16px, 3vw, 32px);
-  margin: 24px 0 18px;
-  padding: 18px 22px;
+  margin: 16px 0 14px;
+  padding: 16px 22px;
   border-radius: var(--r-lg);
   background: var(--surface-sunken);
   border: 1px solid var(--line);
@@ -213,8 +206,8 @@
   display: flex;
   align-items: center;
   gap: 22px;
-  margin: 20px 0;
-  padding: 18px;
+  margin: 14px 0 16px;
+  padding: 16px 18px;
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, rgb(108 188 255 / 10%), transparent 70%);
   border: 1px solid rgb(108 188 255 / 18%);
@@ -330,16 +323,38 @@
 .recall-meter b { color: var(--gold); font: 800 14px var(--font-mono); }
 
 /* Card strip */
-.card-strip {
-  display: flex;
-  gap: 6px;
-  margin-top: 28px;
-  padding: 12px;
-  overflow-x: auto;
+.card-strip-wrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 0 4px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--surface-sunken);
 }
+.card-strip {
+  display: flex;
+  gap: 6px;
+  padding: 12px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent);
+}
+.card-strip::-webkit-scrollbar { display: none; }
+.card-strip-nav {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 56px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  transition: color var(--t-fast), background var(--t-fast);
+}
+.card-strip-nav:hover { color: var(--text); background: rgb(255 255 255 / 5%); }
 .strip-item {
   position: relative;
   flex: 0 0 auto;
@@ -381,8 +396,9 @@
 @media (max-width: 760px) {
   .learn-top { gap: 12px; }
   .phase-text small { display: none; }
-  .phase-stepper button { padding: 4px 10px 4px 4px; }
-  .phase-stepper li + li::before { width: 12px; margin: 0 2px; }
+  .phase-stepper { gap: 6px; }
+  .phase-stepper li { flex: 1; }
+  .phase-stepper button { width: 100%; min-width: 0; padding: 4px 10px 4px 4px; }
   .phase-dot { width: 32px; height: 32px; }
   .lesson-grid { grid-template-columns: 1fr; }
   .lesson-card-col { position: static; grid-template-columns: 140px 1fr; align-items: start; }
