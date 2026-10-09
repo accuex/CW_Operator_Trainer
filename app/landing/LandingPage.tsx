@@ -44,14 +44,14 @@ const FEATURE_CARDS: {
 }[] = [
   {
     src: '/landing/wabun_qso.png',
-    alt: '和文受信用紙を書きながらCWを体験する',
+    alt: '和文受信用紙を書きながら和文CWの交信を体験する',
     label: 'CW交信を体験する',
     href: viewToPath('qso'),
     tone: 'wabun',
   },
   {
     src: '/landing/1sotu_tiri.png',
-    alt: '第一級総合無線通信士の試験対策の勉強机',
+    alt: '第一級総合無線通信士（1総通）の試験対策をする勉強机',
     label: '第一級総合無線通信士の試験対策',
     href: viewToPath('exam'),
     tone: 'exam',
@@ -102,6 +102,29 @@ const PATH_CARDS: {
     body: '覚えた符号がカードにコレクションで楽しく続ける',
     view: 'collection',
     tone: 'cards',
+  },
+];
+
+const ABOUT_ITEMS: { title: string; body: string; view: AppView }[] = [
+  {
+    title: '欧文・和文CWを覚える',
+    body: '欧文・数字・記号に加えて、和文モールス（和文CW）にも対応。音のかたまりで覚える音感法と、語呂で覚える合調法から選べます。',
+    view: 'learn',
+  },
+  {
+    title: 'コッホ法で聞き取る',
+    body: '聞き取る文字を少しずつ増やすコッホ法で受信力を育て、遅れ受信やレベル試験で実戦的なCW受信へつなげます。',
+    view: 'train',
+  },
+  {
+    title: '仮想バンドでQSO交信',
+    body: '7MHzの仮想バンドでCQを出し、相手局とのCW QSOを体験。ブラウザで動く受信機で信号を探して交信します。',
+    view: 'qso',
+  },
+  {
+    title: '1総通の試験対策',
+    body: '第一級総合無線通信士（1総通）の電気通信術を試験形式で練習。法規・地理・英語もまとめて学べます。',
+    view: 'exam',
   },
 ];
 
@@ -264,7 +287,7 @@ export function LandingPage() {
             <div>
               <p className="section-kicker">RIG</p>
 
-              <h1>ブラウザで動く無線機</h1>
+              <h2>ブラウザで動く無線機</h2>
 
               <p>
                 周波数を合わせ、信号を探し、フィルターを絞る。
@@ -282,7 +305,7 @@ export function LandingPage() {
               <div>
                 <p className="section-kicker">COURSE</p>
 
-                <h1>自分に合った覚え方から</h1>
+                <h2>自分に合った覚え方から</h2>
 
                 <p>
                   音そのものを覚える「音感法」と、
@@ -393,6 +416,32 @@ export function LandingPage() {
             </div>
           </section>
         )}
+
+        <section className="page-pad lp-section" aria-labelledby="lp-about-title">
+          <div className="page-title">
+            <div>
+              <p className="section-kicker">ABOUT</p>
+
+              <h2 id="lp-about-title">モールス符号（CW）を、覚えて・聞いて・交信する</h2>
+
+              <p>
+                CWOT Academy は、ブラウザだけで使えるモールス符号の練習サイトです。
+                はじめての符号から和文CW、QSO、1総通（第一級総合無線通信士）の試験対策まで、ひとつの場所で続けられます。
+              </p>
+            </div>
+          </div>
+
+          <ul className="lp-about">
+            {ABOUT_ITEMS.map((item) => (
+              <li key={item.view} className="panel panel-pad">
+                <h3>
+                  <a href={viewToPath(item.view)}>{item.title}</a>
+                </h3>
+                <p>{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <section className="lp-features-wrap" aria-label="体験と試験対策">
           <div className="lp-features">

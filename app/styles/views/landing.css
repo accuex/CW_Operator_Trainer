@@ -426,6 +426,27 @@
 .lp-feature:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 .lp-section { padding-top: 12px; }
+/* Section headings are h2 under the hero h1; keep the shared .page-title h1 look. */
+.lp-section .page-title h2 {
+  margin: 6px 0 8px;
+  font-size: clamp(26px, 3.2vw, 40px);
+  font-weight: 800;
+}
+.lp-about {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-about h3 { margin: 0 0 8px; font-size: 18px; }
+.lp-about h3 a { color: var(--text); text-decoration: none; }
+.lp-about h3 a::after { content: ' →'; color: var(--gold); }
+.lp-about h3 a:hover { color: var(--gold); }
+.lp-about p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.75; }
+@media (max-width: 1100px) { .lp-about { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .lp-about { grid-template-columns: 1fr; } }
 .lp-rig-placeholder {
   min-height: 280px;
   display: grid;
