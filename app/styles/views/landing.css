@@ -38,134 +38,228 @@
 .lp-nav-links a:hover,
 .lp-nav-links a[aria-current='page'] { color: var(--text); }
 
-.lp-hero {
-  padding: 0;
+/* Masthead: the banner scrolls away and the menu row stays (negative sticky top). */
+.lp-masthead {
+  --banner-h: clamp(120px, 14vw, 250px);
+  position: sticky;
+  top: calc(-1 * var(--banner-h));
+  z-index: 30;
+  color: #15285e;
+  background: #8fb8ec url('/landing/academy_header_right.webp') right 38% / cover no-repeat;
+  box-shadow: 0 8px 24px rgb(20 50 120 / 18%);
 }
-.lp-hero-stage {
+.lp-banner {
   position: relative;
   isolation: isolate;
-  min-height: min(78vh, 760px);
+  display: flex;
+  align-items: center;
+  height: var(--banner-h);
+  padding: 0 clamp(12px, 2.4vw, 44px);
   overflow: hidden;
+}
+.lp-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(60% 120% at 22% 50%, rgb(255 255 255 / 42%), transparent 70%);
+}
+.lp-banner-logo {
+  display: block;
+  height: 82%;
+}
+.lp-banner-logo img {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
+.lp-menu {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 32px);
+  padding: 8px clamp(16px, 2.4vw, 44px);
+  border-top: 1px solid rgb(255 255 255 / 70%);
+  border-bottom: 1px solid rgb(255 255 255 / 45%);
+  background: rgb(246 249 255 / 80%);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+.lp-menu-links {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.lp-menu-links a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 clamp(14px, 2.6vw, 48px);
+  color: #15285e;
+  font: 700 clamp(15px, 1.2vw, 19px) var(--font-display);
+  letter-spacing: .04em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .15s;
+}
+.lp-menu-links a + a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 30%;
+  height: 40%;
+  width: 1px;
+  background: #d3dcee;
+}
+.lp-menu-links a:hover,
+.lp-menu-links a:focus-visible { color: #1d5fd6; }
+.lp-menu-home { color: #1d55c8 !important; }
+.lp-menu-home[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -8px;
+  height: 3px;
+  border-radius: 2px;
+  background: #1d5fd6;
+}
+.lp-menu-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex: none;
+  padding: 13px 30px;
+  border-radius: 999px;
+  color: #2a1c00;
+  background: linear-gradient(180deg, #ffe592, #f4c752 58%, #e6ad33);
+  box-shadow: 0 3px 0 #c8902a, 0 10px 22px rgb(214 150 40 / 26%);
+  font: 800 clamp(15px, 1.2vw, 19px) var(--font-display);
+  letter-spacing: .04em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform .15s, box-shadow .15s;
+}
+.lp-menu-cta span { font-size: 1.15em; transition: transform .15s; }
+.lp-menu-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 0 #c8902a, 0 14px 26px rgb(214 150 40 / 32%); }
+.lp-menu-cta:hover span { transform: translateX(3px); }
+.lp-menu-cta:focus-visible { outline: 3px solid #1d5fd6; outline-offset: 3px; }
+
+/* Hero: the picture carries its own lettering at top left; the dark side panel covers it. */
+.lp-hero {
+  --hero-ink: 42 86 184;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  min-height: clamp(540px, 52vw, 860px);
+  overflow: hidden;
+  background: rgb(var(--hero-ink));
+  color: #fff;
 }
 .lp-hero-visual {
   position: absolute;
   inset: 0;
+  z-index: -1;
   margin: 0;
-  z-index: 0;
 }
 .lp-hero-visual img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  object-position: 68% 42%;
+  object-position: 100% 30%;
 }
-.lp-hero-stage::after {
+.lp-hero-visual::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    rgb(0 0 0 / 92%) 0%,
-    rgb(0 0 0 / 78%) 28%,
-    rgb(0 0 0 / 42%) 52%,
-    rgb(0 0 0 / 12%) 72%,
-    transparent 88%
-  );
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 10%) 0%, transparent 18%, transparent 78%, rgb(var(--hero-ink) / 45%) 100%),
+    linear-gradient(
+      90deg,
+      rgb(var(--hero-ink) / 84%) 0%,
+      rgb(var(--hero-ink) / 74%) 26%,
+      rgb(var(--hero-ink) / 48%) 38%,
+      rgb(var(--hero-ink) / 14%) 50%,
+      transparent 60%
+    );
+}
+/* Blurs the lettering baked into the picture so only the page copy reads. */
+.lp-hero-visual::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 100%;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  /* Full strength behind the copy; above the picture's own lettering it reaches further right. */
+  -webkit-mask-image: linear-gradient(90deg, #000 64%, transparent 86%), linear-gradient(90deg, #000 70%, transparent), linear-gradient(180deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(90deg, #000 64%, transparent 86%), linear-gradient(90deg, #000 70%, transparent), linear-gradient(180deg, #000 45%, transparent 55%);
+  -webkit-mask-composite: source-over, source-in;
+  mask-composite: add, intersect;
 }
 .lp-hero-copy {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  align-content: center;
-  max-width: min(720px, 58%);
-  min-height: min(78vh, 760px);
-  padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 40px);
+  width: min(560px, 40%);
+  padding: clamp(40px, 6vw, 96px) 0 clamp(40px, 6vw, 96px) clamp(20px, 4vw, 72px);
+  box-sizing: content-box;
+}
+.lp-hero-kicker {
+  margin: 0 0 clamp(18px, 2vw, 30px);
+  color: rgb(255 255 255 / 92%);
+  text-shadow: 0 1px 8px rgb(10 30 90 / 45%);
+  font: 600 clamp(11px, .9vw, 14px) var(--font-display);
+  letter-spacing: .32em;
+  white-space: nowrap;
 }
 .lp-hero-copy h1 {
-  margin: 10px 0 12px;
-  font-size: clamp(32px, 4.4vw, 56px);
-  font-weight: 900;
-  line-height: 1.12;
+  margin: 0;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', serif;
+  font-size: clamp(40px, 5.2vw, 92px);
+  font-weight: 700;
+  line-height: 1.24;
+  letter-spacing: .02em;
   word-break: keep-all;
+  text-shadow: 0 2px 20px rgb(10 30 90 / 55%);
 }
 .lp-hero-copy h1 em {
   font-style: normal;
-  background: linear-gradient(90deg, var(--gold), #ffe7a3);
+  background: linear-gradient(180deg, #fff1c4 0%, #f2cf74 45%, #c9953a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 10px rgb(10 30 90 / 45%));
 }
-.lp-hero-copy > p:not(.section-kicker) {
-  margin: 0 0 16px;
-  color: rgb(220 226 238 / 88%);
-  font-size: 15.5px;
-  max-width: 42ch;
+.lp-hero-lead {
+  margin: clamp(20px, 2.2vw, 34px) 0 0;
+  padding-top: clamp(20px, 2.2vw, 34px);
+  border-top: 1px solid rgb(255 255 255 / 45%);
+  color: #fff;
+  text-shadow: 0 1px 10px rgb(10 30 90 / 50%);
+  font-size: clamp(15px, 1.25vw, 20px);
+  line-height: 1.9;
+  letter-spacing: .06em;
 }
-.lp-hero-pills {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin: 0 0 18px;
-  padding: 0;
-  list-style: none;
+.lp-hero-motto {
+  margin: clamp(18px, 2vw, 30px) 0 0;
+  color: rgb(255 255 255 / 88%);
+  text-shadow: 0 1px 8px rgb(10 30 90 / 45%);
+  font: 400 clamp(14px, 1.1vw, 18px)/1.7 var(--font-display);
+  letter-spacing: .06em;
 }
-.lp-hero-pills li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
-  align-items: start;
-  padding: 12px 12px 12px 10px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: rgb(0 0 0 / 42%);
-  border-color: rgb(255 255 255 / 12%);
-}
-.lp-hero-pill-icon {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: rgb(246 196 83 / 12%);
-  color: var(--gold);
-}
-.lp-hero-pills strong {
+.lp-hero-motto::before {
+  content: '';
   display: block;
-  font-size: 13px;
-  font-weight: 800;
-  word-break: keep-all;
+  width: 48px;
+  height: 1px;
+  margin-bottom: clamp(16px, 1.8vw, 26px);
+  background: rgb(255 255 255 / 70%);
 }
-.lp-hero-pills small {
-  display: block;
-  margin-top: 3px;
-  color: rgb(200 208 224 / 78%);
-  font-size: 11.5px;
-  line-height: 1.45;
-}
-.lp-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.lp-hero-cta {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2px;
-  min-height: 62px;
-  padding: 10px 22px;
-  line-height: 1.15;
-}
-.lp-hero-cta small {
-  font: 700 11px/1.2 var(--font-display);
-  letter-spacing: .02em;
-}
-.lp-hero-cta.btn-ghost {
-  background: rgb(0 0 0 / 38%);
-  border-color: rgb(255 255 255 / 22%);
-}
-.lp-hero-cta.btn-primary small { color: rgb(42 28 0 / 62%); }
-.lp-hero-cta.btn-ghost small { color: rgb(255 255 255 / 70%); }
 
 .lp-paths-wrap {
   position: relative;
@@ -399,100 +493,136 @@
 .lp-extra-note { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
 .lp-start { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
 
+/* Footer: the night scene fills the stage; links sit in its open sky. */
 .lp-foot {
-  position: relative;
   margin-top: 64px;
-  padding: 0 clamp(16px, 4vw, 40px);
-  border-top: 1px solid var(--line);
+  color: #e6ecfa;
+  background: #070c20;
+}
+.lp-foot-stage {
+  --foot-pad: max(clamp(16px, 4vw, 40px), calc((100% - var(--content-max)) / 2));
+  position: relative;
+  min-height: clamp(480px, 38vw, 660px);
+  padding: 0 var(--foot-pad);
   background:
-    radial-gradient(640px 220px at 12% 0%, rgb(246 196 83 / 7%), transparent 70%),
-    linear-gradient(180deg, var(--surface-sunken), #070a1a);
+    linear-gradient(180deg, var(--bg) 0%, rgb(12 16 36 / 0%) 24%),
+    #0d1638 url('/landing/academy_footer_bg.webp') 50% 100% / cover no-repeat;
 }
-.lp-foot::before {
+.lp-foot-motto {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 3vw, 36px);
+  margin: 0;
+  padding-top: clamp(36px, 4vw, 56px);
+  color: rgb(206 214 240 / 78%);
+  font: italic 400 clamp(11px, .95vw, 14px)/1 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  letter-spacing: .5em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.lp-foot-motto::before,
+.lp-foot-motto::after {
   content: '';
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  width: min(280px, 60%);
-  height: 3px;
-  transform: translateX(-50%);
-  background: repeating-linear-gradient(
-    90deg,
-    var(--gold) 0 4px,
-    transparent 4px 10px,
-    var(--gold) 10px 24px,
-    transparent 24px 30px,
-    var(--gold) 30px 34px,
-    transparent 34px 46px
-  );
-  opacity: .6;
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(120 160 230 / 10%), rgb(242 200 110 / 55%));
 }
+.lp-foot-motto::after { background: linear-gradient(90deg, rgb(242 200 110 / 55%), rgb(120 160 230 / 10%)); }
 .lp-foot-inner {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
-  gap: 32px 56px;
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding: 48px 0 36px;
+  grid-template-columns: minmax(260px, 1fr) minmax(0, 2fr);
+  gap: 32px clamp(32px, 5vw, 80px);
+  padding: clamp(32px, 3.4vw, 52px) 0 clamp(140px, 13vw, 210px);
 }
 .lp-foot-brand {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: 14px;
+  display: block;
+  width: min(400px, 100%);
+  border-radius: 8px;
 }
-.lp-foot-brand p {
-  margin: 0;
-  color: var(--text-2);
-  font-size: 13.5px;
-  line-height: 1.75;
-}
+.lp-foot-brand img { display: block; width: 100%; height: auto; }
 .lp-foot-nav {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 28px 24px;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  justify-content: start;
+  gap: 28px clamp(32px, 6vw, 112px);
 }
 .lp-foot-nav h2 {
-  margin: 0 0 14px;
-  color: var(--gold);
-  font: 800 12px/1.3 var(--font-display);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 0 14px 12px 0;
+  border-bottom: 2px solid currentColor;
+  color: #7cc8ff;
+  font: 800 clamp(14px, 1.1vw, 17px)/1.2 var(--font-display);
   letter-spacing: .08em;
+  white-space: nowrap;
 }
+.lp-foot-nav .tone-gold h2 { color: #f4c95d; }
+.lp-foot-nav h2 img { width: auto; height: 28px; }
 .lp-foot-nav ul {
   display: grid;
-  gap: 10px;
+  gap: 14px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .lp-foot-nav a {
-  color: var(--muted);
-  font: 700 13px/1.4 var(--font-display);
+  color: rgb(226 232 248 / 86%);
+  font: 500 clamp(14px, 1.05vw, 16px)/1.4 var(--font-display);
+  letter-spacing: .04em;
   text-decoration: none;
+  text-shadow: 0 1px 8px rgb(5 10 30 / 70%);
   transition: color var(--t-fast);
 }
-.lp-foot-nav a:hover { color: var(--text); }
+.lp-foot-nav a:hover { color: #fff; }
 .lp-foot-nav a:focus-visible,
-.lp-foot-brand a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+.lp-foot-brand:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+.lp-foot-whisper {
+  position: absolute;
+  right: var(--foot-pad);
+  bottom: clamp(28px, 3vw, 48px);
+  margin: 0;
+  color: #fff;
+  font: 600 clamp(13px, 1.1vw, 17px)/1.8 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', serif;
+  letter-spacing: .14em;
+  text-shadow: 0 0 2px rgb(40 20 70 / 90%), 0 1px 6px rgb(40 20 70 / 85%), 0 0 18px rgb(30 15 60 / 80%);
+  transform: rotate(-7deg);
+  transform-origin: right bottom;
+}
+.lp-foot-whisper::after {
+  content: '';
+  display: inline-block;
+  width: 48px;
+  height: 1px;
+  margin-left: 10px;
+  vertical-align: middle;
+  background: #fff;
+  box-shadow: 0 0 4px rgb(40 20 70 / 90%);
+}
 .lp-foot-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px 24px;
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding: 16px 0 28px;
-  border-top: 1px solid var(--line);
+  padding: 18px max(clamp(16px, 4vw, 40px), calc((100% - var(--content-max)) / 2)) 22px;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background: #070c20;
 }
-.lp-foot .app-credit { padding: 0; text-align: left; }
+.lp-foot-copy {
+  margin: 0;
+  color: rgb(196 206 232 / 72%);
+  font: 500 12px var(--font-mono);
+  letter-spacing: .06em;
+}
 .lp-foot-sign {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   margin: 0;
-  color: var(--faint);
-  font: 700 11px var(--font-mono);
+  color: rgb(196 206 232 / 72%);
+  font: 700 12px var(--font-mono);
   letter-spacing: .12em;
 }
 .lp-foot-morse { display: inline-flex; align-items: center; gap: 3px; }
@@ -501,7 +631,7 @@
   height: 4px;
   border-radius: 2px;
   background: var(--gold);
-  opacity: .7;
+  opacity: .8;
 }
 .lp-foot-morse i.dah { width: 11px; }
 .lp-foot-morse b { width: 6px; }
@@ -672,12 +802,39 @@
 }
 
 @media (max-width: 960px) {
-  .lp-hero-pills { grid-template-columns: 1fr; }
-  .lp-hero-copy { max-width: min(640px, 72%); }
   .lp-paths { grid-template-columns: 1fr 1fr; }
   .lp-features { grid-template-columns: 1fr; }
   .lp-feature { min-height: 280px; }
   .lp-foot-inner { grid-template-columns: 1fr; }
+  .lp-foot-brand { width: min(360px, 70%); }
+  /* Stacked layout: keep the scene in the bottom band so links stay on plain sky. */
+  .lp-foot-stage { background-size: 100% 100%, auto 420px; background-position: 0 0, 60% 100%; }
+  .lp-foot-inner { padding-bottom: 300px; }
+}
+
+/* Below the side-by-side width the picture goes on top so no face sits under the copy. */
+@media (max-width: 960px) {
+  .lp-hero { display: block; min-height: 0; }
+  /* These crops leave the lettering baked into the picture's left third out of frame. */
+  .lp-hero-visual { position: relative; aspect-ratio: 8 / 7; }
+  .lp-hero-visual img { object-position: 100% 40%; }
+  .lp-hero-visual::after {
+    background: linear-gradient(180deg, transparent 52%, rgb(var(--hero-ink) / 72%) 80%, rgb(var(--hero-ink)) 100%);
+  }
+  .lp-hero-visual::before { display: none; }
+  .lp-hero { background: linear-gradient(180deg, rgb(var(--hero-ink)) 40%, #1d3f8c); }
+  .lp-hero-copy {
+    width: auto;
+    margin-top: -88px;
+    padding: 0 clamp(16px, 4vw, 40px) 24px;
+    position: relative;
+  }
+  .lp-hero-kicker { margin-bottom: 8px; letter-spacing: .2em; font-size: 11px; }
+  .lp-hero-copy h1 { font-size: clamp(29px, 8.4vw, 40px); line-height: 1.3; }
+  .lp-hero-lead { margin-top: 14px; padding-top: 12px; font-size: 14px; line-height: 1.75; letter-spacing: .04em; }
+  .lp-hero-motto { margin-top: 10px; font-size: 13px; }
+  .lp-hero-motto::before { display: none; }
+  .lp-hero-motto br { display: none; }
 }
 
 @media (max-width: 760px) {
@@ -689,26 +846,46 @@
     width: min(92%, 340px);
     font-size: 14px;
   }
-  .lp-hero-stage,
-  .lp-hero-copy { min-height: min(88vh, 820px); }
-  .lp-hero-copy {
-    max-width: none;
-    padding: 28px 16px 32px;
-    align-content: end;
+  /* Phones show only the brand half of the logo image; its tagline half is clipped off. */
+  .lp-masthead { --banner-h: clamp(104px, 30vw, 150px); }
+  .lp-banner { padding: 0 16px; }
+  .lp-banner-logo { height: auto; width: min(76vw, 380px); overflow: hidden; }
+  .lp-banner-logo img { width: calc(100% / .665); max-width: none; height: auto; }
+  .lp-banner::before {
+    background: linear-gradient(90deg, rgb(255 255 255 / 55%), rgb(255 255 255 / 25%) 70%, transparent);
   }
-  .lp-hero-stage::after {
-    background: linear-gradient(
-      180deg,
-      rgb(0 0 0 / 35%) 0%,
-      rgb(0 0 0 / 55%) 28%,
-      rgb(0 0 0 / 88%) 72%,
-      rgb(0 0 0 / 94%) 100%
-    );
+  .lp-menu { gap: 6px; padding: 4px 0 4px 4px; }
+  /* The fading right edge tells that the row scrolls on. */
+  .lp-menu-links {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
   }
-  .lp-hero-actions .btn { flex: 1; }
+  .lp-menu-links a:last-child { margin-right: 24px; }
+  .lp-menu-links::-webkit-scrollbar { display: none; }
+  .lp-menu-links a { min-height: 44px; padding: 0 12px; font-size: 14px; letter-spacing: .02em; }
+  .lp-menu-home[aria-current='page']::after { bottom: -6px; }
+  .lp-menu-cta { margin-right: 12px; padding: 9px 14px; gap: 6px; font-size: 14px; letter-spacing: 0; }
+
+  .lp-hero-visual { aspect-ratio: 1; }
+  .lp-hero-visual img { object-position: 78% 40%; }
   .lp-nav > .btn { margin-left: auto; }
   .lp-foot { margin-top: 48px; }
-  .lp-foot-inner { padding: 40px 0 28px; }
+  /* Scene kept to the bottom band so the links sit on plain night sky. */
+  .lp-foot-stage { background-size: 100% 100%, auto 340px; background-position: 0 0, 74% 100%; }
+  .lp-foot-motto { letter-spacing: .3em; }
+  .lp-foot-inner { padding: 28px 0 250px; }
+  .lp-foot-brand { width: min(320px, 86%); margin: 0 auto; }
+  .lp-foot-nav { grid-template-columns: 1fr 1fr; justify-content: stretch; gap: 28px 20px; }
+  .lp-foot-nav > :nth-child(2) { grid-column: 2; grid-row: 1 / span 2; }
+  .lp-foot-nav h2 { padding-right: 6px; gap: 8px; }
+  .lp-foot-nav h2 img { height: 24px; }
+  .lp-foot-nav ul { gap: 4px; }
+  .lp-foot-nav a { display: block; padding: 6px 0; }
+  .lp-foot-whisper { bottom: 24px; }
+  .lp-foot-bar { justify-content: center; text-align: center; }
   .lp-sitemap-head { align-items: flex-start; }
   .lp-sitemap-count b { font-size: 32px; }
   .lp-sitemap-grid {

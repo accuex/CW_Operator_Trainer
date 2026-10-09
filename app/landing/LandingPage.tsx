@@ -8,7 +8,7 @@ import { APP_BASE, APP_VIEWS, viewToPath, type AppView } from '@/lib/appPaths';
 import { DEFAULT_UNLOCK } from '@/lib/course';
 import { getProfile, isLandingReturning, markTrainerStarted, normalizeProfile, saveProfile } from '@/lib/storage';
 import type { TrainerProfile } from '@/lib/types';
-import { Icon, type IconName } from '@/app/components/icons';
+import { Icon } from '@/app/components/icons';
 import { SiteFooter } from '@/app/landing/SiteFooter';
 
 const LandingRigDemo = dynamic(
@@ -32,13 +32,6 @@ function RigDemoSlot() {
   if (!mounted) return <RigDemoPlaceholder />;
   return <LandingRigDemo />;
 }
-
-const HERO_PILLS: { icon: IconName; title: string; body: string }[] = [
-  { icon: 'learn', title: '基礎から実践まで', body: 'コッホ法・聞き取り・QSOを、ブラウザだけで通して練習できます' },
-  { icon: 'radio', title: 'リアルな無線の体験', body: 'ウォーターフォールとリグ操作。7MHz帯の仮想バンドです' },
-  { icon: 'collection', title: '楽しみながら続ける', body: '符号を覚えるほどカードが増え、学習の記録が残ります' },
-  { icon: 'exam', title: '国家試験対策まで', body: '第一級総合無線通信士の試験形式まで、同じアプリで進められます' },
-];
 
 const FRESH_START = 'さっそく始める';
 
@@ -175,97 +168,77 @@ export function LandingPage() {
 
   return (
     <div className="lp-frame">
-      <header className="lp-nav">
-        <Link
-          className="brand lp-brand"
-          href="/"
-          aria-label="CW Operator Trainer"
-        >
-          <span className="brand-mark" aria-hidden="true">
-            <i />
-            <i className="dah" />
-            <i />
-            <i className="dah" />
-          </span>
+      <header className="lp-masthead">
+        <div className="lp-banner">
+          <Link className="lp-banner-logo" href="/">
+            <Image
+              src="/landing/academy_header_logo.webp"
+              alt="CWOT Academy CWOT通信アカデミー — 符号でつながる、もっと広い世界へ。"
+              width={1600}
+              height={376}
+              sizes="(max-width: 760px) 92vw, 760px"
+              priority
+            />
+          </Link>
+        </div>
 
-          <span className="brand-text">
-            <b>CW Operator</b>
-            <small className="brand-sub">
-              <span>TRAINER</span>
-            </small>
-          </span>
-        </Link>
+        <div className="lp-menu">
+          <nav className="lp-menu-links" aria-label="サイト">
+            <Link className="lp-menu-home" href="/" aria-current="page">
+              <Icon name="home" size={22} />
+              <span className="sr-only">トップ</span>
+            </Link>
+            <a href={viewToPath('learn')}>学ぶ</a>
+            <a href={viewToPath('levelup')}>練習する</a>
+            <a href={viewToPath('qso')}>交信する</a>
+            <a href="#demo">受信機</a>
+            <a href={ready && returning ? APP_BASE : '#method'}>アプリへ</a>
+          </nav>
 
-        <nav className="lp-nav-links" aria-label="ページ内">
-          <a href="#demo">受信機</a>
-          {ready && !returning && <a href="#method">学習法</a>}
-          <a href={ready && returning ? APP_BASE : '#method'}>アプリへ</a>
-        </nav>
-
-        {ready && primaryHref && (
-          <a className="btn btn-primary" href={primaryHref}>
-            {primaryLabel}
-          </a>
-        )}
+          {ready && primaryHref && (
+            <a className="lp-menu-cta" href={primaryHref}>
+              {primaryLabel}
+              <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </div>
       </header>
 
       <main>
-        <section className="lp-hero">
-          <div className="lp-hero-stage">
-            <figure className="lp-hero-visual">
-              <Image
-                src="/landing/night-desk.png"
-                alt="夜のアマチュア無線デスク。モニターにCW受信機、手前に電鍵"
-                fill
-                priority
-                sizes="100vw"
-              />
-            </figure>
+        <section className="lp-hero" aria-labelledby="lp-hero-title">
+          <figure className="lp-hero-visual">
+            <Image
+              src="/landing/hero_bg.webp"
+              alt="桜と富士山が見える窓辺で、ヘッドホンをつけた5人の生徒が無線機と電鍵を囲んでいる"
+              width={1677}
+              height={938}
+              sizes="100vw"
+              priority
+            />
+          </figure>
 
-            <div className="lp-hero-copy">
-              <p className="section-kicker">
-                LISTEN · LEARN · KEY · QSO
-              </p>
+          <div className="lp-hero-copy">
+            <p className="lp-hero-kicker">CW × RADIO × PEOPLE × TOMORROW</p>
 
-              <h1>
-                耳で読む。
-                <br />
-                <em>モールスの世界へ。</em>
-              </h1>
+            <h1 id="lp-hero-title">
+              電波で、
+              <br />
+              もっとつながる
+              <br />
+              <em>世界へ。</em>
+            </h1>
 
-              <p>
-                聞いて、覚えて、打って、交信する。
-                ブラウザだけで始められる、本格的なCWトレーナーです。
-              </p>
+            <p className="lp-hero-lead">
+              聞いて、覚えて、打って、交信する。
+              <br />
+              ここから広がる、無線の世界。
+            </p>
 
-              <ul className="lp-hero-pills">
-                {HERO_PILLS.map((pill) => (
-                  <li key={pill.title}>
-                    <span className="lp-hero-pill-icon" aria-hidden="true">
-                      <Icon name={pill.icon} size={18} />
-                    </span>
-                    <div>
-                      <strong>{pill.title}</strong>
-                      <small>{pill.body}</small>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="lp-hero-actions">
-                {ready && primaryHref && (
-                  <a className="btn btn-primary btn-lg lp-hero-cta" href={primaryHref}>
-                    {returning ? '続きから始める' : FRESH_START}
-                    <small>{returning ? 'ホームを開く' : 'コースを選ぶ'}</small>
-                  </a>
-                )}
-
-                <a className="btn btn-ghost btn-lg lp-hero-cta" href="#demo">
-                  まずは見てみる
-                  <small>受信機デモへ</small>
-                </a>
-              </div>
-            </div>
+            <p className="lp-hero-motto" lang="en">
+              Same Waves,{' '}
+              <br />
+              A Brighter Tomorrow.
+            </p>
           </div>
         </section>
 
