@@ -942,3 +942,9 @@
 @media (max-width: 760px) {
   .lp-sub-motto { display: none; }
 }
+
+.lp-menu-login { flex-shrink: 0; color: #20477c; font-weight: 700; font-size: 14px; padding: 12px 4px; text-decoration: none; }
+.lp-menu-login:hover { text-decoration: underline; text-underline-offset: 4px; }
+.lp-menu-login:focus-visible { outline: 3px solid #1d5fd6; outline-offset: 3px; }
+.lp-free-note { margin: 0; padding: 8px 16px; text-align: center; font-size: 12px; line-height: 1.6; color: #35547a; background: #f2f6ff; }
+@media (max-width: 760px) { .lp-menu-login { font-size: 13px; padding: 12px 2px; } }

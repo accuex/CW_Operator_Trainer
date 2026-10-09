@@ -59,7 +59,7 @@ export const SITE_GROUPS: SiteGroup[] = [
     tone: 'violet',
     links: [
       { href: viewToPath('settings'), label: '設定', note: '学習法と表示', icon: 'settings' },
-      { href: viewToPath('account'), label: 'マイページ', note: 'ログインと同期', icon: 'account', footer: true },
+      { href: viewToPath('account'), label: 'マイページ・ログイン', note: 'ログインと同期', icon: 'account', footer: true },
     ],
   },
   {

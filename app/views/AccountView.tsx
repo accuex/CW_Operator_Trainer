@@ -67,7 +67,8 @@ export function AccountView({
   const [busy, setBusy] = useState(false);
   const [passkeys, setPasskeys] = useState<PasskeyItem[]>([]);
   const [passkeyName, setPasskeyName] = useState('この端末');
-  const supportsPasskey = passkeySupported();
+  const [supportsPasskey, setSupportsPasskey] = useState(false);
+  useEffect(() => { setSupportsPasskey(passkeySupported()); }, []);
   const isRegister = authMode === 'register';
   const isForgot = authMode === 'forgot';
   const isReset = authMode === 'reset';
@@ -177,12 +178,28 @@ export function AccountView({
 
     return (
       <section className="page-pad account-page account-page--auth">
-        <div className="panel panel-pad account-auth-card">
+        <div className={`panel panel-pad account-auth-card${!isForgot && !isReset ? ' account-auth-card--wide' : ''}`}>
           <header className="account-auth-head">
             <p className="section-kicker">MEMBER</p>
             <h1>{title}</h1>
           </header>
 
+          {!isForgot && !isReset && <div className="account-auth-info"><section className="account-benefits" aria-label="無料利用と記録の保存について">
+            <p className="account-benefits-lead">CWOTはすべて無料。ログインなしでも学べます。</p>
+            <dl>
+              <div><dt>ログインなし</dt><dd>学習記録は、このブラウザに保存されます。</dd></div>
+              <div><dt>ログインすると</dt><dd>学習状況などをサーバーに保存し、別の端末でも続きを学べます。</dd></div>
+            </dl>
+            <p className="account-note">ブラウザのデータを消すと、ブラウザだけに保存した記録は失われます。</p>
+            {onNavigate && <button type="button" className="account-switch-link" onClick={() => onNavigate('home')}>ログインせずに学習を続ける →</button>}
+          </section>
+              <aside className="account-coming-soon" aria-label="今後の予定">
+                <span className="account-coming-soon-label">今後の予定</span>
+                <p>アバターやニックネームを登録して、仲間の頑張りが見える学習ログを準備しています。進捗の公開は、希望する方だけが選べる形を予定しています。</p>
+              </aside>
+          </div>}
+
+          <div className="account-auth-form">
           {isForgot ? (
             <>
               <p className="account-note">登録メールに再設定リンクを送ります。届かない場合は迷惑メールも確認してください。</p>
@@ -370,6 +387,8 @@ export function AccountView({
                 </>
               )}
 
+
+
               <p className="account-switch">
                 {isRegister ? (
                   <>
@@ -389,7 +408,16 @@ export function AccountView({
               </p>
             </>
           )}
+          </div>
         </div>
+        <footer className="account-site-footer">
+          <nav aria-label="サイト案内">
+            <a href="/">サイトトップ</a>
+            <a href="/faq">よくある質問</a>
+            <a href="/contact">お問い合わせ</a>
+          </nav>
+          <small>© 2026 Int Design LLC.</small>
+        </footer>
       </section>
     );
   }

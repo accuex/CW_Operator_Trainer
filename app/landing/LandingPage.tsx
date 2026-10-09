@@ -218,6 +218,7 @@ export function LandingPage() {
             <a href={ready && returning ? APP_BASE : '#method'}>アプリへ</a>
           </nav>
 
+          <a className="lp-menu-login" href={viewToPath('account')}>ログイン</a>
           {ready && primaryHref && (
             <a className="lp-menu-cta" href={primaryHref}>
               {primaryLabel}
@@ -225,6 +226,7 @@ export function LandingPage() {
             </a>
           )}
         </div>
+        <p className="lp-free-note">すべて無料・登録なしで始められます。ログインすると学習記録を引き継げます。</p>
       </header>
 
       <main>
