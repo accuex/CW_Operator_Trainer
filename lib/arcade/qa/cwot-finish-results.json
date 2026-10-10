@@ -1,0 +1,134 @@
+{
+  "stage": "CW迎撃隊 完成度向上",
+  "start_head": "d63c003b3934b8e12608f882a86258ca6dd17ecc",
+  "checked_at": "2026-10-10T20:24:24.496160+09:00",
+  "automated": {
+    "suite_files": 84,
+    "suite_tests": 915,
+    "arcade_files": 10,
+    "arcade_tests": 115,
+    "suite": "PASS",
+    "production_types": "PASS",
+    "build": "PASS",
+    "changed_implementation_eslint": "PASS",
+    "campaign_presets": [
+      "letters",
+      "alphanumeric",
+      "symbols",
+      "wabun"
+    ],
+    "campaign_wpm": [
+      8,
+      40
+    ],
+    "hits_per_complete_campaign": 245,
+    "last_tone_unlock_wpm": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40
+    ]
+  },
+  "browser": {
+    "desktop_dev": [
+      1280,
+      900
+    ],
+    "desktop_production": [
+      1280,
+      900
+    ],
+    "mobile": [
+      375,
+      812
+    ],
+    "normal_hits_confirmed": 6,
+    "squad_transition": "PASS",
+    "fixed_choices": "PASS",
+    "wabun_40wpm": "PASS",
+    "boss_hp": "100→98",
+    "boss_no_input_city_destruction": "PASS (CITY 0/27, 0/9 buildings; MISSION END)",
+    "music_loop_property": true,
+    "music_pause_resume": "PASS",
+    "new_game_music_reset_seconds": 0.188869,
+    "choice_buttons_mobile": [
+      73.25,
+      56
+    ],
+    "horizontal_overflow": false,
+    "production_dev_button": false
+  },
+  "not_run": [
+    "human CW recognition/learning efficacy",
+    "human long-term game balance",
+    "VoiceOver",
+    "60fps measurement",
+    "auditory seamless-loop inspection"
+  ],
+  "preservation": {
+    "external_tracked_files": 19,
+    "sha256_unchanged": true,
+    "audio_engine": "unchanged",
+    "morse_tables": "unchanged",
+    "shared_achievements": "unchanged",
+    "version": "1.1.1",
+    "push": false,
+    "deploy": false
+  },
+  "boss_reachability": {
+    "normal_old_center_range": [
+      145,
+      455
+    ],
+    "normal_old_spread_range": [
+      81,
+      519
+    ],
+    "all_forms_new_center_range": [
+      110,
+      490
+    ],
+    "all_forms_new_spread_range": [
+      46,
+      554
+    ],
+    "left_building_footprint": [
+      22,
+      70
+    ],
+    "right_building_footprint": [
+      494,
+      558
+    ]
+  },
+  "bgm_sha256": "e1f6f74a18df55e702aa32bab7e065ce6bc81dc4a98800e902c4663f98f900f8"
+}

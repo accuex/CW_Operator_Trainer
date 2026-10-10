@@ -18,8 +18,8 @@ describe('city reachability and last-tone input',()=>{
  it('has substantial reachable footprints at both edges and all nine buildings, even with reduced motion',()=>{
   const g=ready();
   for(const reduced of [false,true]){
-   const xs=Array.from({length:1000},(_,i)=>g.drones.slice(12).map(d=>enemyPosition(g,d,i*.05,reduced).x)).flat();
-   expect(Math.min(...xs)).toBeCloseTo(60,1);expect(Math.max(...xs)).toBeCloseTo(536,1);
+   const xs=Array.from({length:1000},(_,i)=>g.drones.filter(d=>d.row===g.squadRow).map(d=>enemyPosition(g,d,i*.05,reduced).x)).flat();
+   expect(Math.min(...xs)).toBeCloseTo(60,1);expect(Math.max(...xs)).toBeCloseTo(540,1);
    for(const b of g.buildings)expect(xs.filter(x=>buildingAt(g.buildings,x)?.id===b.id).length).toBeGreaterThan(10);
   }
   expect(buildingAt(g.buildings,65)?.id).toBe(0);expect(buildingAt(g.buildings,520)?.id).toBe(8);expect(buildingAt(g.buildings,71)).toBeUndefined();
@@ -90,7 +90,7 @@ describe('city reachability and last-tone input',()=>{
  it('last bullet clearing a wave permits next-wave supply, while total city destruction takes priority',()=>{
   let g=emit(ready(),'E',20),a=oldestAttack(g)!;
   g={...g,ammo:1,drones:g.drones.map(d=>({...d,alive:d.id===a.enemy,hp:d.id===a.enemy?1:0}))};
-  g=answerAttack(g,a.id,'E',a.answerAt!);expect(g.phase).not.toBe('over');expect(advanceGame(g,g.time+1.1).phase).toBe('clear');
+  g=answerAttack(g,a.id,'E',a.answerAt!);expect(g.phase).not.toBe('over');expect(advanceGame(g,g.time+1.1).phase).toBe('intermission');
   expect(nextAttack({...g,buildings:g.buildings.map(b=>({...b,hp:0}))}).phase).toBe('over');
  });
  it('last bullet at HP50 earns awakening supply after safe CW completion; unreachable future supply cannot keep play alive',()=>{

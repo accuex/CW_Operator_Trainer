@@ -17,23 +17,23 @@ function step(g:GuardGame):GuardGame{
  return advanceGame(g,Math.max(g.time+.31,g.nextFireAt));
 }
 describe('enemy endurance and SIGNAL MASTER',()=>{
- it('uses difficulty HP and supplies enough normal ammunition for every required hit',()=>{
+ it('uses stage HP independently of CW speed and supplies enough normal ammunition for every required hit',()=>{
   for(const mode of ['beginner','standard','expert'] as const){
-   const g=createGame(mode,true,73),range=mode==='beginner'?[1]:mode==='standard'?[1,2]:[2,3];
+   const g=createGame(mode,true,73),range=[1];
    expect([...new Set(g.drones.map(d=>d.maxHp))]).toEqual(range);
    expect(g.ammo).toBe(g.drones.reduce((n,d)=>n+d.hp,0)+8);
    expect(nextStage({...g,phase:'clear'}).ammo).toBe(nextStage({...g,phase:'clear'}).drones.reduce((n,d)=>n+d.hp,0)+8);
   }
  });
  it('correct hits cancel a beam but retain HP enemies, wrong answers cause no enemy damage',()=>{
-  let g=nextAttack(createGame('expert',true,73));g=advanceGame(g,g.arrivalUntil);g=flying(g);
+  let g=nextAttack(nextStage({...createGame('expert',true,73),phase:'clear'}));g=advanceGame(g,g.arrivalUntil);g=flying(g);
   const a=oldestAttack(g)!,enemy=g.drones.find(d=>d.id===a.enemy)!;
   const wrong=answerAttack(g,a.id,g.squadChoices.find(c=>c!==a.symbol)!,g.time);
   expect(wrong.drones).toEqual(g.drones);expect(wrong.attacks.some(b=>b.id===a.id)).toBe(true);
   g=hit(g);expect(g.drones.find(d=>d.id===enemy.id)).toMatchObject({hp:enemy.hp-1,alive:true});expect(g.combo).toBe(1);expect(g.attacks.some(b=>b.id===a.id)).toBe(false);
  });
  it('chooses letters per attack from fixed keys, including repeat attacks by a survivor',()=>{
-  let g=nextAttack(createGame('expert',true,73));g=advanceGame(g,g.arrivalUntil);
+  let g=nextAttack(nextStage({...createGame('expert',true,73),phase:'clear'}));g=advanceGame(g,g.arrivalUntil);
   const sender=oldestAttack(g)!.enemy;g={...g,drones:g.drones.map(d=>d.row===g.squadRow&&d.id!==sender?{...d,alive:false,hp:0}:d)};
   const keys=[...g.squadChoices],symbols=[];
   while(g.drones.find(d=>d.id===sender)!.alive){g=flying(g);const a=oldestAttack(g)!;symbols.push(a.symbol);expect(keys).toContain(a.symbol);g=hit(g);expect(g.squadChoices).toEqual(keys);g=advanceGame(g,Math.max(g.time+.31,g.nextFireAt));}
@@ -94,15 +94,23 @@ describe('enemy endurance and SIGNAL MASTER',()=>{
   g=hit(g);expect(g.phase).toBe('rekeying');expect(g.squadChoices).toEqual(keys);expect(g.attacks).toEqual([]);
   g=advanceGame(g,g.boss!.transitionUntil!);expect(g.squadChoices).not.toEqual(keys);expect(g.boss?.keyTier).toBe(1);
  });
- it('can threaten every building from legitimate moving wing emitters without cropping the boss',()=>{
-  const g=boss(),awake={...g,boss:{...g.boss!,form:'awakened' as const}};
+ it.each(['normal','awakened','final'] as const)('%s can threaten every building from moving wing emitters without cropping the boss',form=>{
+  const g=boss(),awake={...g,boss:{...g.boss!,form}};
   const xs=Array.from({length:1000},(_,i)=>enemyPosition(awake,bossDrone(awake)!,i*.1).x);
   expect(Math.min(...xs)).toBeGreaterThan(100);expect(Math.max(...xs)).toBeLessThan(500);
   for(const b of g.buildings)expect(xs.some(x=>[-64,0,64].some(dx=>x+dx>=b.x&&x+dx<b.x+b.width))).toBe(true);
  });
+ it('no-input PHASE1 can destroy all buildings and terminates with no invulnerable final building',()=>{
+  let g=createBossGame('expert',73,{wpm:40});
+  for(let i=0;i<30000&&g.phase!=='over';i++){
+    g=advanceGame(g,g.time+.05);
+    const a=transmittingAttack(g);if(a?.status==='preparing'&&g.time>=a.readyAt)g=tx(g);
+  }
+  expect(g.boss?.form).toBe('normal');expect(g.phase).toBe('over');expect(cityHp(g)).toBe(0);expect(g.buildings.every(b=>b.hp===0)).toBe(true);
+ });
  it('separates boss-practice highscores from existing normal records',()=>{
   let raw='{}';vi.stubGlobal('localStorage',{getItem:()=>raw,setItem:(_:string,s:string)=>raw=s});
   const normal=createGame('beginner',false,73),practice=createBossGame('beginner',73);
-  saveBest({...normal,score:900});saveBest({...practice,score:4000});expect(readBest('beginner',false)).toBe(900);expect(readBest('beginner',false,true)).toBe(4000);vi.unstubAllGlobals();
+  saveBest({...normal,score:900});saveBest({...practice,score:4000});expect(readBest('beginner',false,false,{wpm:8,preset:'letters'})).toBe(900);expect(readBest('beginner',false,true,{wpm:8,preset:'letters'})).toBe(4000);vi.unstubAllGlobals();
  });
 });

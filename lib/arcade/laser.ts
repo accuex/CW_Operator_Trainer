@@ -1,11 +1,11 @@
-import { INTERNATIONAL_MORSE } from '../morse';
-import type { MorseTimeline } from '../types';
+import { morseFor } from '../morse';
+import type { AlphabetType, MorseTimeline } from '../types';
 
 /** Same window for every symbol in a difficulty pool; no visual length/timing oracle. */
-export function transmissionWindow(pool: string, wpm: number): number {
+export function transmissionWindow(pool: string | readonly string[], wpm: number, alphabet: AlphabetType='international'): number {
   const dit = 1.2 / Math.max(5,wpm);
   return Math.max(...[...pool].map(symbol => {
-    const code=INTERNATIONAL_MORSE[symbol];
+    const code=morseFor(symbol,alphabet)??'';
     return [...code].reduce((sum,element)=>sum+(element==='-'?3:1),Math.max(0,code.length-1));
   })) * dit;
 }
