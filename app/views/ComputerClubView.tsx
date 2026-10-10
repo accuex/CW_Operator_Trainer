@@ -6,6 +6,7 @@ import { BossWarning } from './BossWarning';
 import { BossEnemy, BOSS_MUZZLE_Y } from './BossEnemy';
 import { RobotEnemy, ROBOT_MUZZLE_Y, type RobotPose } from './RobotEnemy';
 import { PRESETS, type Preset } from '@/lib/arcade/presets';
+import { GameSE, SoundEvents, readMix, saveMix } from '@/lib/arcade/se';
 import { GameMusic } from '@/lib/arcade/music';
 import { recordGameTransition } from '@/lib/arcade/gameAchievements';
 import { LASER_IMPACT_Y } from '@/lib/arcade/laser';
@@ -27,13 +28,21 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
   const [wpm,setWpm]=useState(8),[preset,setPreset]=useState<Preset>('letters'),[hints,setHints]=useState(true);
   const mode:Difficulty=wpm<15?'beginner':wpm<22?'standard':'expert';
   const [cwVolume,setCwVolume]=useState(1),[musicVolume,setMusicVolume]=useState(.35);
+  const [seVolume,setSeVolume]=useState(.65),[mixLoaded,setMixLoaded]=useState(false);
+  const se=useMemo(()=>new GameSE(),[]),soundEvents=useMemo(()=>new SoundEvents(),[]);
+  useEffect(()=>{const frame=requestAnimationFrame(()=>{const mix=readMix();setCwVolume(mix.cw);setMusicVolume(mix.bgm);setSeVolume(mix.se);setMixLoaded(true);});return()=>cancelAnimationFrame(frame);},[]);
+  useEffect(()=>{se.setVolume(seVolume);if(mixLoaded)saveMix({cw:cwVolume,bgm:musicVolume,se:seVolume});},[se,seVolume,cwVolume,musicVolume,mixLoaded]);
+  useEffect(()=>()=>se.dispose(),[se]);
   const audioElement=useRef<HTMLAudioElement>(null);
   const music=useMemo(()=>new GameMusic(),[]);
   const [game,setGame]=useState<GuardGame|null>(null),[best,setBest]=useState(0),[message,setMessage]=useState('');
   useEffect(()=>{music.attach(audioElement.current);},[music]);
   const previousGame=useRef<GuardGame|null>(null);
   useEffect(()=>{recordGameTransition(previousGame.current,game);previousGame.current=game;},[game]);
-  useEffect(()=>{if(game?.phase==='warning')music.warning();},[game?.phase,music]);
+  useEffect(()=>{
+    if(!game||game.phase==='paused'||game.phase==='over')se.stop();
+    for(const sound of soundEvents.update(game))se.play(sound);
+  },[game,se,soundEvents]);
   const musicPaused=game?.phase==='paused';
   const musicPlaying=Boolean(game&&(game.boss||game.phase==='warning')&&livePhase(game.phase)&&game.phase!=='defeating');
   useEffect(()=>{
@@ -68,9 +77,9 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
     frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame);
   },[live,currentTime,engine]);
   const pause=useCallback(()=>{
-    const now=currentTime();engine.stop();playback.current=null;clock.current={time:now,wall:performance.now()};
+    const now=currentTime();se.stop();engine.stop();playback.current=null;clock.current={time:now,wall:performance.now()};
     setGame(g=>g?pauseGame(advanceGame(g,now)):g);
-  },[engine,currentTime]);
+  },[engine,currentTime,se]);
   useEffect(()=>{
     const hidden=()=>{if(document.hidden) pause();};
     document.addEventListener('visibilitychange',hidden);window.addEventListener('blur',pause);
@@ -111,7 +120,8 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
     try{
       // Prime the element within the actual start gesture; failure never blocks CW.
       if(!resume)void music.unlock().catch(()=>{});
-      await engine.unlock();
+      se.stop();
+      await Promise.all([engine.unlock(),se.unlock().catch(()=>setMessage('SEを再生できませんでした。CWのみでプレイできます。'))]);
       const next=resume&&state.current?resumeAttack(state.current):bossOnly?{...createGame(mode,hints,undefined,{wpm,preset}),stage:3,phase:'warning' as const,transitionUntil:WARNING_SECONDS,bossOnly:true,drones:[],attacks:[]}:nextAttack(createGame(mode,hints,undefined,{wpm,preset}));
       clock.current={time:next.time,wall:performance.now()};setGame(next);
     }catch{setMessage('音声を有効にして、開始をもう一度押してください。');}
@@ -212,8 +222,8 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
         <label>CW速度<input aria-label="CW速度 WPM" type="number" min="8" max="40" value={wpm} disabled={live||game?.phase==='paused'} onChange={e=>{setWpm(Math.max(8,Math.min(40,Number(e.target.value)||8)));setGame(null);}}/> WPM</label>
         <label>文字範囲<select aria-label="文字範囲" value={preset} disabled={live||game?.phase==='paused'} onChange={e=>{setPreset(e.target.value as Preset);setGame(null);}}>{Object.entries(PRESETS).map(([id,p])=><option key={id} value={id}>{p.label}</option>)}</select></label>
         <label className="guard-toggle"><input type="checkbox" checked={hints} disabled={live||game?.phase==='paused'} onChange={e=>{setHints(e.target.checked);setGame(null);}}/>符号ヒント（通常敵）</label>
-        <span>BEST {best.toLocaleString()}</span>{live&&<button type="button" className="btn btn-secondary" onClick={pause}>一時停止</button>}{game&&<button type="button" className="btn btn-secondary" onClick={()=>{engine.stop();music.stop();playback.current=null;saveBest(game);setGame(null);setMessage('ゲームを終了しました。');}}>終了</button>}
-        <details className="guard-audio"><summary>音量</summary><label>CW<input aria-label="CW音量" type="range" min="0" max="1" step=".05" value={cwVolume} onChange={e=>setCwVolume(Number(e.target.value))}/></label><label>BGM<input aria-label="BGM音量" type="range" min="0" max="1" step=".01" value={musicVolume} onChange={e=>setMusicVolume(Number(e.target.value))}/></label>{musicPlaying&&<button className="btn btn-secondary" onClick={()=>void music.play(musicVolume).then(()=>setMessage('')).catch(()=>setMessage('BGMを再生できませんでした。'))}>BGM再生</button>}</details>
+        <span>BEST {best.toLocaleString()}</span>{live&&<button type="button" className="btn btn-secondary" onClick={pause}>一時停止</button>}{game&&<button type="button" className="btn btn-secondary" onClick={()=>{se.stop();engine.stop();music.stop();playback.current=null;saveBest(game);setGame(null);setMessage('ゲームを終了しました。');}}>終了</button>}
+        <details className="guard-audio"><summary>音量</summary><label>CW<input aria-label="CW音量" type="range" min="0" max="1" step=".05" value={cwVolume} onChange={e=>setCwVolume(Number(e.target.value))}/></label><label>SE<input aria-label="SE音量" type="range" min="0" max="1" step=".01" value={seVolume} onChange={e=>setSeVolume(Number(e.target.value))}/></label><label>BGM<input aria-label="BGM音量" type="range" min="0" max="1" step=".01" value={musicVolume} onChange={e=>setMusicVolume(Number(e.target.value))}/></label>{musicPlaying&&<button className="btn btn-secondary" onClick={()=>void music.play(musicVolume).then(()=>setMessage('')).catch(()=>setMessage('BGMを再生できませんでした。'))}>BGM再生</button>}</details>
         <audio ref={audioElement} src="/assets/pcclub/robot/boss_bgm.mp3" loop preload="none" aria-hidden="true"/>
       </div>
     </div>

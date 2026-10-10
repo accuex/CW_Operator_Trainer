@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "synthesis": "Original Web Audio synthesis; separate CW context; 32 voice cap; master compressor; low-pass filters",
+  "events": 19,
+  "initial_mix": {
+    "cw": 1,
+    "bgm": 0.35,
+    "se": 0.65
+  },
+  "timing": {
+    "missile_arrival_seconds": 0.55,
+    "squad_jingle_seconds_after_last_shot": 0.72,
+    "clock": "game time; frozen on pause"
+  },
+  "automated": {
+    "tests": 928,
+    "files": 86,
+    "eslint": "PASS",
+    "production_typescript": "PASS",
+    "build": "PASS",
+    "campaigns": "8 and 40 WPM; 245 launches/hits each; all boss transitions and combo 10/25/50/100"
+  },
+  "browser": {
+    "desktop": "1280x900; normal hit/kill, boss HP100→99, wrong/retry, physical city impacts, warning/arrival, pause/resume/end",
+    "mobile": "375x812; no overflow (scrollWidth375); pause/resume/end; all three volume sliders",
+    "persistence": "SE 0.65→0.64, reload retains0.64; restored0.65",
+    "console_errors": 0
+  },
+  "not_run": [
+    "Human listening and subjective tonal/volume evaluation",
+    "Physical iOS/Android audio devices",
+    "60fps acoustic latency measurements",
+    "Full boss defeat/awakening through manual browser play (covered by game-clock tests)"
+  ],
+  "protected": "19 pre-existing tracked changes unchanged; CW engine, Morse data, game rules and BGM file unchanged",
+  "deployment": "No push or deploy"
+}

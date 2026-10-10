@@ -237,3 +237,13 @@ CWインベーダーは既存有名作品との混同を避けて不採用。Sig
 - IAB: PC/mobileで各攻撃IDごとのlaser group1個を観測。mobileで先頭#18への誤答（HP100/弾139）→再回答成功（HP99/弾138/COMBO1）、後続#19は継続。一時停止WARNINGのelapsed=0.2752が経過後も不変、再開後の文字送りとボスへの移行を確認。
 - 変更前後画像はqa/cwot-boss-before.png、cwot-boss-after.png、cwot-boss-mobile-after.png、cwot-warning-typed.png。機体フレーム/移動位置の差はあるためpixel一致比較ではなく、画面構成・ボス拡大・操作欄を比較。音声認識能力・VoiceOver・実OS reduced motion・60fps測定はNOT_RUN。AI/人間による聴覚の学習効果判定と称していない。
 - push・deployなし。元版は開始HEADで参照可能。
+
+## ゲームSE（2026-10-10）
+
+`se.ts`で19種のオリジナルWeb Audio SEを生成。外部素材・追加ライブラリなし。CWエンジンとは独立したAudioContextを使用し、低域ノイズと音程スイープ・短い和音で発射、命中、損傷、爆発、COMBO、部隊/STAGEクリア、WARNING、ボス登場/覚醒/最終局面/撃破、最終クリア、敗北を表現する。
+
+発射は新しいShot、命中・被弾/撃破はShot時刻+0.55秒（ミサイル到達）、街への衝撃はResolutionの着弾時刻、各フェーズ音は状態遷移に接続。ゲーム時刻を基準とする待機キューは一時停止中に進まず、再開でWARNING/覚醒を二重発火しない。停止・終了・アンマウントではSEの発音中/予約済み音源を停止。ゲーム終了時に未来の命中予約を破棄する。
+
+最大32音源、マスターコンプレッサー、ノイズ低域フィルターで連続迎撃の負荷・ピークを抑制。SE初期65%、CW100%、BGM35%。独立スライダー（0〜100%）を `cwot:arcade:guard:mix:v1` に保存し、読込不可・不正値でも既定値で動作する。SE初期化失敗はCWプレイを阻害しない。
+
+928テスト/86ファイル、production TypeScript、変更ファイルESLint、正式build PASS。8/40WPMの全キャンペーンで245発射/命中と全節目SEを照合。PC・375pxブラウザで通常敵撃破/ボスHP100→99、着弾、一時停止/再開/終了、音量保存、横はみ出しなしを確認。実際のCW音声の認識能力とは別の動作検証。音色の人間による試聴評価、実機iOS/Android、音響遅延計測はNOT_RUN。詳細は `qa/se-results.json`。既存19ファイルの無関係差分を保全し、CW/符号/ゲームルール/BGMファイルを変更していない。push/deployなし。
