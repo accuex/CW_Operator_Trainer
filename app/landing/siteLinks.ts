@@ -70,6 +70,7 @@ export const SITE_GROUPS: SiteGroup[] = [
     tone: 'mint',
     links: [
       { href: '/', label: 'トップ', note: 'ランディング', icon: 'home', footer: true },
+      { href: '/about', label: 'CWOTアカデミー 学園案内', note: '世界観と3つの学科', icon: 'learn', footer: true },
       { href: '/sitemap', label: 'サイトマップ', note: 'このページ', icon: 'queue', footer: true },
       { href: '/faq', label: 'よくある質問', note: '使い方のQ&A', icon: 'sparkle', footer: true },
       { href: '/contact', label: 'お問い合わせ', note: '質問・不具合・要望', icon: 'radio', footer: true },

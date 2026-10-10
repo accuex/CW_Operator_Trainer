@@ -215,6 +215,9 @@ export function LandingPage() {
             <a href={viewToPath('levelup')}>練習する</a>
             <a href={viewToPath('qso')}>交信する</a>
             <a href="#demo">受信機</a>
+            {/* vinextでは静的ページへのクライアント遷移が失敗するため通常のリンクを使う。 */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            <a href="/about">学園案内</a>
             <a href={ready && returning ? APP_BASE : '#method'}>アプリへ</a>
           </nav>
 
