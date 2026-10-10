@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Cwot\Api\Controllers\ActivityController;
+use Cwot\Api\Services\ActivityService;
 use Cwot\Api\Config;
 use Cwot\Api\Controllers\AuthController;
 use Cwot\Api\Controllers\AuthMailController;
@@ -39,6 +41,7 @@ $jwtGuard = new JwtMiddleware($jwt);
 
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
+$app->add(new \Cwot\Api\Middleware\ActivityBodyLimitMiddleware());
 $app->addRoutingMiddleware();
 $app->add(new CorsMiddleware($config));
 
@@ -120,5 +123,12 @@ $app->group('/api/v1/sync', function ($group) use ($sync) {
         return $sync()->postSessions($request, $response);
     });
 })->add($jwtGuard);
+
+$activity = static fn () => new ActivityController(new ActivityService($db(), json_decode(file_get_contents($root . '/data/activity-catalog.json'), true, 512, JSON_THROW_ON_ERROR)));
+$app->get('/api/v1/activity', function (Request $request, Response $response) use ($activity) { return $activity()->handle($request, $response, 'feed'); });
+$app->get('/api/v1/activity/settings', function (Request $request, Response $response) use ($activity) { return $activity()->handle($request, $response, 'consent'); });
+$app->put('/api/v1/activity/profile', function (Request $request, Response $response) use ($activity) { return $activity()->handle($request, $response, 'profile'); });
+$app->put('/api/v1/activity/settings', function (Request $request, Response $response) use ($activity) { return $activity()->handle($request, $response, 'settings'); });
+$app->post('/api/v1/activity/events', function (Request $request, Response $response) use ($activity) { return $activity()->handle($request, $response, 'events'); });
 
 $app->run();

@@ -1,5 +1,7 @@
 'use client';
 
+import { watchSharingWithdrawal } from '@/lib/activity';
+
 import GeographyLoading from './views/geography/GeographyLoading';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -269,6 +271,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     // 進捗系だけ再評価（ナビの lastMode では回さない）
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, answers, sessions, profile.cards, profile.koch, profile.kochWabun, profile.qso, profile.achievements]);
+
+  useEffect(() => watchSharingWithdrawal(), []);
 
   const stopAudio = () => {
     audioEngine.stop();

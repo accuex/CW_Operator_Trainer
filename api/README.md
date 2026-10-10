@@ -92,3 +92,7 @@ FRONTEND_URL=https://cwot.jp
 ```
 
 `NEXT_PUBLIC_API_BASE_URL` と `SITE_URL` も `https://cwot.jp` に合わせて再ビルドしてください。旧ドメインで登録したパスキーは新しいRP IDでは使えないため、別のログイン手段で入り、新ドメインで登録し直します。ブラウザ内の学習記録もドメインごとに保存され、移行時に自動では引き継がれません。
+
+## 学習ログ共有の安全性
+
+詳細・APIの更新仕様・保存期限・検証結果は [改善記録](docs/activity-sharing-safety.md) を参照。公開IDでは操作できません。ONは専用トークンで取得したrevisionが必須、OFFは版番号にかかわらず優先します。名前・アバター更新は共有設定とは別APIです。既存schemaを変更するmigrationはありません。
