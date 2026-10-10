@@ -14,12 +14,16 @@ export const LASER_WAIT_Y = 287;
 export const LASER_IMPACT_Y = 318;
 export function laserSegments(timeline: MorseTimeline, elapsed: number, hints: boolean, window: number, originY: number): LaserSegment[] {
   const distance=Math.max(0,LASER_WAIT_Y-originY);
-  const t=Math.max(0,elapsed);
+  const t=Math.min(window,Math.max(0,elapsed));
   if (!hints) return [{y:originY,length:distance*Math.min(1,t/window)}];
-  // Start and end positions both use the audio time axis. Dash:dot and gaps stay 3:1:1.
+  // Each tone starts at the emitter. Its head travels while sounding; after
+  // tone-off its tail follows downward. Earlier tones are lower, never appended.
+  // Audio elapsed time preserves dash:dot and inter-element gaps at 3:1:1.
   const scale=distance/Math.max(window,timeline.dit);
   return timeline.tones.flatMap(tone => {
-    const length=Math.min(tone.duration,Math.max(0,t-tone.start))*scale;
-    return length>0 ? [{y:originY+tone.start*scale,length}] : [];
+    const age=Math.max(0,t-tone.start);
+    const length=Math.min(tone.duration,age)*scale;
+    const tail=Math.max(0,age-tone.duration)*scale;
+    return length>0 ? [{y:originY+tail,length}] : [];
   });
 }

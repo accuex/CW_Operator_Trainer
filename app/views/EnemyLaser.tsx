@@ -9,7 +9,7 @@ export const EnemyLaser = memo(function EnemyLaser({ x,y,timeline,elapsed,window
 }) {
   if (phase==='feedback' && correct && impactProgress>=1) return null;
   const segments=laserSegments(timeline,phase==='sending'?elapsed:window,hints,window,y);
-  const tip=segments.length ? segments[segments.length-1].y+segments[segments.length-1].length : y;
+  const tip=segments.length ? Math.max(...segments.map(segment=>segment.y+segment.length)) : y;
   const impact=phase==='feedback'&&!correct ? Math.min(1,impactProgress) : 0;
   return <g className="guard-enemy-laser" data-laser-x={x} data-laser-origin-y={y}>
     {segments.map((segment,i)=><g key={i}>

@@ -76,3 +76,14 @@ CWインベーダーは既存有名作品との混同を避けて不採用。Sig
 - 819テスト / 76ファイル PASS、本番コード型検査 PASS、正式npm run build PASS。8〜30WPMの同期・比率と全poolのOFF形状同一性を機械検証。実VoiceOver・実耳による同期確認・60fps実測はNOT_RUN。
 - 証拠: qa/beam-A/N/S/O.jpg、beam-OFF.jpg、beam-mobile-OFF.jpg、beam-browser.json。
 - 敵/街/砲台の図形、正誤/残弾/COMBO/スコア/損傷/報酬は変更なし。音声エンジン本体、既存学習進捗、外部未commit差分は変更しない。push/deployなし。
+
+## 各音を発射口から独立照射（2026-10-10追補）
+
+- 開始HEAD 953f213。前節の「根元側から残る」積み重ね表示を訂正。
+- 各toneの開始からの経過時間で先端を下へ進め、tone終了までは末尾を発射口に固定。終了後は末尾も下へ進める。後続toneは常に発射口から新しく伸長する。
+- 先発セグメントが下、後発が上。短点/長点の長さは1:3、空白は1。送信枠の終端で表示を保持し、範囲外へ進めない。
+- 誤答時の街への伸長起点は、配列末尾ではなく全セグメントの最下端。ON/OFFのゲーム判定・回答時間・音声・固定X・編隊・街・ミサイルは変更なし。
+- A/N/S/Oの単体テストで、各音の途中は末尾が発射口、先発が下方へ移動することを確認。速度8〜30WPMの時間比・境界・OFF同一形状も維持。
+- 実ブラウザ375pxでA/Nの最終path・画面を確認。Aは短点が下、長点がその後方。OFFは一本の連続path。目視可能なヒントを使う自動操作であり、実耳による音声認識検証ではない。
+- 証拠: qa/direction-A.jpg、direction-N.jpg、direction-OFF.jpg、direction-browser.json。
+- 819テスト/76ファイル、production対象TypeScript、正式build PASS。実VoiceOver・人間の聴覚による同期・60fps実測はNOT_RUN。その他の既存未commit差分は保全。push/deployなし。

@@ -13,12 +13,15 @@ describe('CW beam growth',()=>{
     const unit=(LASER_WAIT_Y-origin)/window*t.dit;
     complete.forEach((segment,i)=>{
       expect(segment.length).toBeCloseTo(unit*(t.tones[i].element==='-'?3:1));
-      if(i) expect(segment.y-complete[i-1].y-complete[i-1].length).toBeCloseTo(unit);
+      if(i) expect(complete[i-1].y-segment.y-segment.length).toBeCloseTo(unit);
       const halfway=laserSegments(t,t.tones[i].start+t.tones[i].duration/2,true,window,origin);
       expect(halfway).toHaveLength(i+1);
       expect(halfway[i].length).toBeCloseTo(segment.length/2);
+      expect(halfway[i].y).toBe(origin);
+      if(i) expect(halfway[0].y).toBeGreaterThan(origin);
     });
-    expect(complete.at(-1)!.y+complete.at(-1)!.length).toBeCloseTo(origin+(LASER_WAIT_Y-origin)*t.duration/window);
+    expect(complete[0].y+complete[0].length).toBeCloseTo(LASER_WAIT_Y);
+    expect(laserSegments(t,window*4,true,window,origin)).toEqual(complete);
   });
   it('OFF has identical geometry and duration for every symbol, with no gaps or flashes',()=>{
     for(const mode of Object.values(MODES)){
