@@ -1,0 +1,266 @@
+{
+  "reviewedAt": "2026-10-10T09:46:18.313848+00:00",
+  "baseHead": "8a381928fd835d1988a53f861a8c92b4b86457c4",
+  "branch": "main",
+  "scope": "FIFO concurrent lasers and independent logical city; no push/deploy",
+  "automated": {
+    "relatedTests": {
+      "status": "PASS",
+      "count": 32
+    },
+    "fullSuite": {
+      "status": "PASS",
+      "files": 78,
+      "tests": 832
+    },
+    "productionTargetTypeScript": "PASS",
+    "formalBuild": "PASS",
+    "numericLaserRegression": {
+      "status": "PASS",
+      "wpm": [
+        8,
+        12,
+        16,
+        20,
+        22,
+        30,
+        40
+      ],
+      "symbols": [
+        "A",
+        "N",
+        "S",
+        "O"
+      ],
+      "speedWorldUnitsPerSecond": 36
+    }
+  },
+  "browser": {
+    "method": "Existing Codex browser, actual rendered DOM and screen captures; visible hints used, not acoustic recognition",
+    "desktop": {
+      "viewport": [
+        1280,
+        900
+      ],
+      "concurrentLasers": 4,
+      "attackIds": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "individualBuildingDamage": "PASS",
+      "cityHpObserved": 9,
+      "cityMaxHp": 18
+    },
+    "fifoRetry": {
+      "status": "PASS",
+      "headSymbol": "F",
+      "laterSymbol": "1",
+      "laterLetterShot": "Head remains unresolved, no kill, ammo 24 -> 23, score 0",
+      "retryAfterSeconds": 0.35,
+      "correctHeadShot": "Head #1 removed; #2/#3 remain, ammo 22, score 158, actual sender destroyed, city 18/18"
+    },
+    "mobile": {
+      "viewport": [
+        375,
+        812
+      ],
+      "scrollWidth": 375,
+      "buttonSize": [
+        73.25,
+        56
+      ],
+      "pausedResize": "Queue and HP retained; only X projection changes, Y geometry unchanged",
+      "resume": "Older beams #2/#3 retained, next transmission can proceed"
+    },
+    "evidence": [
+      "queue-defense-desktop.png",
+      "queue-defense-fifo-hit.png",
+      "queue-defense-mobile.png"
+    ]
+  },
+  "notRun": [
+    "VoiceOver actual speech",
+    "Human acoustic CW recognition",
+    "Physical held-key stress test (repeat blocked in code)",
+    "60fps performance measurement",
+    "Full three-stage browser completion (56 kills covered by unit test)"
+  ],
+  "balance": {
+    "buildings": 9,
+    "hpPerBuilding": 2,
+    "cityHp": 18,
+    "logicalWidth": 600,
+    "retryCooldownSeconds": 0.3,
+    "postSendIntervalSeconds": {
+      "beginner": 1.8,
+      "standard": 0.7,
+      "expert": 0.18
+    },
+    "maxUnresolvedPerEnemy": 1,
+    "difficultyModes": 3,
+    "ultraMode": "Not added; future work"
+  },
+  "integrity": {
+    "existingTrackedDirtyFiles": {
+      "api/README.md": {
+        "baseline": "da81394730c4852497de9545410a4a4cca955bc5279aaf9d5a49cb5d68307f83",
+        "current": "da81394730c4852497de9545410a4a4cca955bc5279aaf9d5a49cb5d68307f83",
+        "unchanged": true
+      },
+      "app/CWTrainer.tsx": {
+        "baseline": "edee962eab6a1aa81dd4bf1ffff87c9cb6cc2a2100ab3c5ca08cb551d46615fd",
+        "current": "edee962eab6a1aa81dd4bf1ffff87c9cb6cc2a2100ab3c5ca08cb551d46615fd",
+        "unchanged": true
+      },
+      "app/styles/components.css": {
+        "baseline": "d1674c25f3aad4a378528dc5cff8a8b6de1023afbf99d8aee6e757e73d11becd",
+        "current": "d1674c25f3aad4a378528dc5cff8a8b6de1023afbf99d8aee6e757e73d11becd",
+        "unchanged": true
+      },
+      "app/styles/views/account.css": {
+        "baseline": "980bf8b2b356717999ad59f31ebd7dabec84e8f07e6d44cecd989fa38e21d8d5",
+        "current": "980bf8b2b356717999ad59f31ebd7dabec84e8f07e6d44cecd989fa38e21d8d5",
+        "unchanged": true
+      },
+      "app/styles/views/english.css": {
+        "baseline": "f58792609cb7f3ed7297249a5b0a3da3d1a089782237328c9ef58a53a0c69dd6",
+        "current": "f58792609cb7f3ed7297249a5b0a3da3d1a089782237328c9ef58a53a0c69dd6",
+        "unchanged": true
+      },
+      "app/styles/views/houki-trainer.css": {
+        "baseline": "6fc6533d236d6b89b0c5d7e7ffb9af2e90539b07ae365f04fb5a9ad0a080ec0e",
+        "current": "6fc6533d236d6b89b0c5d7e7ffb9af2e90539b07ae365f04fb5a9ad0a080ec0e",
+        "unchanged": true
+      },
+      "app/styles/views/koch.css": {
+        "baseline": "52666a675896a552003c05d7cb2a7efb09ce13237ff3bd8ed24eaa6cff47a9be",
+        "current": "52666a675896a552003c05d7cb2a7efb09ce13237ff3bd8ed24eaa6cff47a9be",
+        "unchanged": true
+      },
+      "app/styles/views/learn.css": {
+        "baseline": "7f1546163257e58e50fa9bcb743fb1415344c9100ec2b984e07bfbea8263c417",
+        "current": "7f1546163257e58e50fa9bcb743fb1415344c9100ec2b984e07bfbea8263c417",
+        "unchanged": true
+      },
+      "app/styles/views/queue.css": {
+        "baseline": "244469cc7d0d4a1fa2918f0cf5db20312e4afa0c21c93172c280ea6681ea60f5",
+        "current": "244469cc7d0d4a1fa2918f0cf5db20312e4afa0c21c93172c280ea6681ea60f5",
+        "unchanged": true
+      },
+      "app/styles/views/train.css": {
+        "baseline": "e2b53f8a2d5812fa24e73d4b093e7ed00ca9b2823e6882ad48150a9f4dd526ac",
+        "current": "e2b53f8a2d5812fa24e73d4b093e7ed00ca9b2823e6882ad48150a9f4dd526ac",
+        "unchanged": true
+      },
+      "app/trainer/shared.ts": {
+        "baseline": "8279d238aa30dd74507b350b65b8ee301e19cbfa9f9aaab4762790daf5f69dcd",
+        "current": "8279d238aa30dd74507b350b65b8ee301e19cbfa9f9aaab4762790daf5f69dcd",
+        "unchanged": true
+      },
+      "app/views/AccountView.tsx": {
+        "baseline": "f7348bb90da10b5e90c594338c01a1fb5aeb1de92dac8427b7364f46c71d01ed",
+        "current": "f7348bb90da10b5e90c594338c01a1fb5aeb1de92dac8427b7364f46c71d01ed",
+        "unchanged": true
+      },
+      "app/views/HoukiTrainerView.tsx": {
+        "baseline": "cc7a7e5ccd8572f8cdb5ade22786a92e8c1705fae8391b38b7cfe072885d7e50",
+        "current": "cc7a7e5ccd8572f8cdb5ade22786a92e8c1705fae8391b38b7cfe072885d7e50",
+        "unchanged": true
+      },
+      "app/views/LevelUpView.tsx": {
+        "baseline": "58074fa1d6abcb89165c5585e6ad1a8c331903ba4c355853f965e7b690084df2",
+        "current": "58074fa1d6abcb89165c5585e6ad1a8c331903ba4c355853f965e7b690084df2",
+        "unchanged": true
+      },
+      "app/views/QueueView.tsx": {
+        "baseline": "b0438eba45133de66ccdf81869d8ac620d9f80c806d2de75acbc6ac109678a62",
+        "current": "b0438eba45133de66ccdf81869d8ac620d9f80c806d2de75acbc6ac109678a62",
+        "unchanged": true
+      },
+      "bin/deploy.sh": {
+        "baseline": "0903c18b8df61037b7795e9e96c928655445ac4b9252d02a0c08176e86439bd3",
+        "current": "0903c18b8df61037b7795e9e96c928655445ac4b9252d02a0c08176e86439bd3",
+        "unchanged": true
+      },
+      "lib/appPaths.ts": {
+        "baseline": "c2027e158aea128655ae2e7e58d7c092cf72e118a28ad94a8546c4f970416f87",
+        "current": "c2027e158aea128655ae2e7e58d7c092cf72e118a28ad94a8546c4f970416f87",
+        "unchanged": true
+      },
+      "lib/storage.ts": {
+        "baseline": "1c2f3902649164d9891cc6352a258fbd97e44455104a534727ba1be839c49117",
+        "current": "1c2f3902649164d9891cc6352a258fbd97e44455104a534727ba1be839c49117",
+        "unchanged": true
+      },
+      "lib/types.ts": {
+        "baseline": "b5b1e55e8be390b4ddeb1f96994325a5c46469ab2fd55b4ad33ae8ab887c8773",
+        "current": "b5b1e55e8be390b4ddeb1f96994325a5c46469ab2fd55b4ad33ae8ab887c8773",
+        "unchanged": true
+      }
+    },
+    "protectedFiles": {
+      "lib/audio.ts": {
+        "sha256": "ca05bcd87cb26de0bdfa053cfb6d63be543b695e481dba99f8b507208d2a5c04",
+        "unchangedFromHead": true
+      },
+      "lib/timing.ts": {
+        "sha256": "efef9d90556e604673bf86b6f74b71104142e0493c4414404929539443615773",
+        "unchangedFromHead": true
+      },
+      "lib/morse.ts": {
+        "sha256": "4106563e49e6573ac1ac84cc5dce06cfd6042432e1e5088c9975e839a34016f6",
+        "unchangedFromHead": true
+      },
+      "lib/arcade/laser.ts": {
+        "sha256": "dcbda167d18a72a5e0652fd406bcc777991ccfdbbbe74f46cf0968a23b108c83",
+        "unchangedFromHead": true
+      },
+      "app/views/EnemyLaser.tsx": {
+        "sha256": "5cc66648ce2adb5758f157af1c4fce10d69e2bb93d23a2909af2f07b6f8e9873",
+        "unchangedFromHead": true
+      },
+      "app/views/RobotEnemy.tsx": {
+        "sha256": "ae27ef86a1f16c773efad337c20c11db4a094471994966190b1f2620deaa21ac",
+        "unchangedFromHead": true
+      },
+      "package.json": {
+        "sha256": "8c5af72471e86b5c62629b22eb4df8770d281ee79c69d76b45b8f039b3ff568d",
+        "unchangedFromHead": true
+      },
+      "public/houki/trainer/active.json": {
+        "sha256": "34459ad6d9a49a7b669856877573ee9b65159d54d3efb26d10918a0efe49de4b",
+        "unchangedFromHead": true
+      },
+      "public/houki/trainer/lessons-v6.json": {
+        "sha256": "294710bb80d5c5b4ee8370c007af7f74545782d4b9e22998c3aee7fd1a41128c",
+        "unchangedFromHead": true
+      },
+      "public/houki/trainer/lessons-v1.json": {
+        "sha256": "6a4f83cd3896d73b3b25b09231d4da5c99606e1f5f2176e041379680609bce88",
+        "unchangedFromHead": true
+      },
+      "public/houki/data/houki-phrases-v2.json": {
+        "sha256": "1aa282a3afa90057fd22e78cea880463369840399ee86b946f58269ae3c59458",
+        "unchangedFromHead": true
+      },
+      "public/geography/data/learning-master-stage13.json": {
+        "sha256": "5d46b928c76c34369fb69cff07acb92235df75fd6cd6573e379b7add4be94905",
+        "unchangedFromHead": true
+      },
+      "public/english/data/english-learning-master-v1.json": {
+        "sha256": "0742bb407f6b3f6ef353b3a675bb54faaf60c92a45171f94cb545b4e090af403",
+        "unchangedFromHead": true
+      }
+    },
+    "existingDifferencesPreserved": true,
+    "protectedHashesMatch": true,
+    "historicalAndVerification": "No files edited; status or corpus counts not recalculated",
+    "packageVersion": "1.1.1",
+    "publicAssetsAdded": 0,
+    "audioEngineChanged": false,
+    "push": false,
+    "deploy": false
+  }
+}

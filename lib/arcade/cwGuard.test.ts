@@ -1,227 +1,163 @@
-import { describe, expect, it, vi } from 'vitest';
-import { answerAttack, expireAttack, RETRY_SECONDS, createGame, MODES, nextAttack as queueAttack, completeArrival, beginTransmission, squadDrones, squadNumber, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, movementPose, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
+import { describe,expect,it,vi } from 'vitest';
+import { advanceGame,answerAttack,beginTransmission,buildingAt,canAnswer,cityHp,cityMaxHp,createCity,createGame,MODES,nextAttack,nextStage,oldestAttack,pauseGame,readBest,resumeAttack,saveBest,signalCode,squadDrones,squadNumber,transmittingAttack,formationOffset,movementPose,dronePosition,batteryPosition,missilePosition,RETRY_SECONDS,type GuardGame,type Difficulty } from './cwGuard';
 import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
+import { LASER_SPEED,laserSegments } from './laser';
+const timeline=(symbol:string,wpm:number)=>buildMorseTimeline(symbol,'international',{...DEFAULT_SETTINGS,characterSpeed:wpm,effectiveSpeed:wpm});
+function start(){const g=nextAttack(createGame('expert',true,73));return advanceGame(g,g.arrivalUntil);}
+function emit(game:GuardGame,x=110,y=109){
+  const tx=transmittingAttack(game)!;
+  const g=advanceGame(game,Math.max(game.time,tx.readyAt));
+  return beginTransmission(g,tx.id,timeline(tx.symbol,tx.wpm),g.time,x,y);
+}
+function flown(game=start(),x=110){const g=emit(game,x);return advanceGame(g,transmittingAttack(g)!.sendEndsAt!);}
+function add(game:GuardGame,x=250){return flown(advanceGame(game,Math.max(game.time,game.nextFireAt)),x);}
+const hit=(g:GuardGame)=>answerAttack(g,oldestAttack(g)!.id,oldestAttack(g)!.symbol,g.time);
 
-// Existing scoring tests advance presentation phases explicitly.
-const nextAttack=(game: ReturnType<typeof createGame>)=>{
-  let next=queueAttack(game);
-  if(next.phase==='entering') next=completeArrival(next);
-  return next.phase==='charging' ? beginTransmission(next,next.attack!.id) : next;
-};
-describe('CW guard rules', () => {
-  it('creates four rows/columns with four distinct hidden letters per row', () => {
-    const game=createGame('beginner',true,73);
-    expect(game.drones).toHaveLength(16);
-    for(let row=0;row<4;row++) expect(new Set(game.drones.filter((d)=>d.row===row).map((d)=>d.symbol)).size).toBe(4);
-    expect(createGame('beginner',true,73)).toEqual(game);
+describe('city and FIFO multi-laser defence',()=>{
+  it('keeps buildings independent of enemy count, columns, stage and viewport',()=>{
+    const g=createGame('beginner',true,73),city=createCity();
+    expect(g.drones).toHaveLength(16);expect(city).toHaveLength(9);expect(cityHp(g)).toBe(18);expect(cityMaxHp(g)).toBe(18);
+    expect(nextStage({...g,phase:'clear'}).drones).toHaveLength(20);
+    expect(nextStage({...g,phase:'clear'}).buildings).toEqual(city);
+    expect(new Set(city.map(b=>b.height)).size).toBeGreaterThan(4);
+    expect(city.every((b,i)=>!i||b.x>city[i-1].x+city[i-1].width)).toBe(true);
   });
-  it('gates all four-robot arrivals and preparations before audio, including pause/resume',()=>{
-    let g=queueAttack(createGame('beginner',true,73));
-    expect(g.phase).toBe('entering'); expect(g.attack).toBeNull();
-    expect(squadDrones(g)).toHaveLength(4); expect(squadNumber(g)).toBe(1);
-    expect(openAnswer(g,1)).toBe(g); expect(queueAttack(g)).toBe(g);
-    expect(resumeAttack(pauseGame(g)).phase).toBe('entering');
-    g=completeArrival(g); expect(g.phase).toBe('charging');
-    expect(openAnswer(g,g.attack!.id)).toBe(g);
-    expect(beginTransmission(g,999)).toBe(g);
-    expect(resumeAttack(pauseGame(g)).phase).toBe('charging');
-    g=beginTransmission(g,g.attack!.id); expect(g.phase).toBe('sending');
-    const firstSet=[...g.attack!.choices].sort();
-    for(let i=0;i<4;i++){
-      const symbol=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol;
-      g=queueAttack(answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,symbol));
-      if(i<3){expect(g.phase).toBe('charging');g=beginTransmission(g,g.attack!.id);}
-    }
-    expect(g.phase).toBe('entering'); expect(squadNumber(g)).toBe(2);
-    expect(squadDrones(g).every(d=>d.alive)).toBe(true);
-    g=completeArrival(g);expect([...g.attack!.choices].sort()).not.toEqual(firstSet);
-    expect(squadDrones(g).every(d=>dronePosition(d,0).y===77)).toBe(true);
+  it('uses half-open building footprints and never redirects hits in gaps or ruins',()=>{
+    const city=createCity();for(const b of city){expect(buildingAt(city,b.x)?.id).toBe(b.id);expect(buildingAt(city,b.x+b.width)).toBeUndefined();}
+    let g=flown(start(),100);const a=oldestAttack(g)!;
+    g=advanceGame(g,a.impactAt!);expect(g.buildings[1].hp).toBe(1);expect(cityHp(g)).toBe(17);
+    expect(g.resolved.find(r=>r.attack.id===a.id)).toMatchObject({status:'impacted',buildingId:1});
+    expect(g.buildings.filter(b=>b.hp!==2).map(b=>b.id)).toEqual([1]);
+    let gap=flown(start(),65),gapAttack=oldestAttack(gap)!;gap=advanceGame(gap,gapAttack.impactAt!);
+    expect(cityHp(gap)).toBe(18);expect(gap.resolved.find(r=>r.attack.id===gapAttack.id)?.buildingId).toBeNull();
+    let ruin=flown(start(),100);ruin={...ruin,buildings:ruin.buildings.map(b=>b.id===1?{...b,hp:0}:b)};
+    const before=cityHp(ruin);ruin=advanceGame(ruin,oldestAttack(ruin)!.impactAt!);expect(cityHp(ruin)).toBe(before);
   });
-  it('offers four unique shuffled choices including the real sender', () => {
-    const positions=new Set<number>();
-    for(let seed=0;seed<80;seed++) {
-      const game=nextAttack(createGame('standard',false,seed));
-      const correct=game.drones.find((d)=>d.id===game.attack!.enemy)!.symbol;
-      expect(new Set(game.attack!.choices).size).toBe(4);
-      positions.add(game.attack!.choices.indexOf(correct));
-      expect(answerAttack(game,game.attack!.id,correct)).toBe(game);
-    }
-    expect(positions.size).toBe(4);
+  it('binds firing coordinates once even when the sender moves or is rebound',()=>{
+    const g=emit(start(),135,109),a=oldestAttack(g)!;
+    const later=advanceGame(g,g.time+.1);expect(oldestAttack(later)?.x).toBe(135);
+    expect(dronePosition(g.drones.find(d=>d.id===a.enemy)!,formationOffset(10)).x).not.toBe(135);
+    expect(beginTransmission(later,a.id,a.timeline!,later.time,999,222)).toBe(later);
+    expect(a.impactAt!-a.startedAt!).toBeCloseTo((318-109)/LASER_SPEED);
   });
-  it('accepts one answer only after the entire transmission and rejects stale callbacks', () => {
-    const sending=nextAttack(createGame('beginner',true,1));
-    expect(openAnswer(sending,999)).toBe(sending);
-    const game=openAnswer(sending,sending.attack!.id);
-    const symbol=game.drones.find((d)=>d.id===game.attack!.enemy)!.symbol;
-    const hit=answerAttack(game,game.attack!.id,symbol);
-    expect(hit.correct).toBe(1); expect(hit.ammo).toBe(game.ammo-1);
-    expect(hit.drones.filter((d)=>d.alive)).toHaveLength(15);
-    expect(answerAttack(hit,game.attack!.id,symbol)).toBe(hit);
-    expect(answerAttack(game,999,symbol)).toBe(game);
-    expect(answerAttack(game,game.attack!.id,'NOT_A_CHOICE')).toBe(game);
+  it('gates arrival and preparation before a transmission, rejects bad/stale binds',()=>{
+    const g=nextAttack(createGame('beginner',true,73));expect(g.phase).toBe('entering');expect(g.attacks).toEqual([]);expect(canAnswer(g)).toBe(false);
+    const prep=advanceGame(g,g.arrivalUntil),a=oldestAttack(prep)!;
+    expect(a.status).toBe('preparing');expect(canAnswer(prep)).toBe(false);
+    expect(beginTransmission(prep,a.id,timeline(a.symbol,a.wpm),prep.time,100,109)).toBe(prep);
+    const ready=advanceGame(prep,a.readyAt);
+    expect(beginTransmission(ready,999,timeline(a.symbol,a.wpm),ready.time,100,109)).toBe(ready);
+    expect(beginTransmission(ready,a.id,timeline(a.symbol,a.wpm),ready.time,Infinity,109)).toBe(ready);
   });
-  it('only transmits from the lowest surviving row and changes its four-letter set after clearing it', () => {
-    let g=nextAttack(createGame('beginner',true,22));
-    const firstSet=[...g.attack!.choices].sort();
-    for(let i=0;i<4;i++) {
-      const target=g.drones.find((d)=>d.id===g.attack!.enemy)!; expect(target.row).toBe(3);
-      g=nextAttack(answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,target.symbol));
-    }
-    expect(g.drones.find((d)=>d.id===g.attack!.enemy)!.row).toBe(2);
-    expect([...g.attack!.choices].sort()).not.toEqual(firstSet);
-  });
-  it('resets combo on a wrong answer or timeout and stops before an unwinnable state', () => {
-    let g=nextAttack(createGame('beginner',true,3));
-    g={...g,combo:5};
-    for(let i=0;i<8;i++) {
-      expect(g.drones.find((d)=>d.id===g.attack!.enemy)!.row).toBe(3);
-      g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,null);
-      expect(g.combo).toBe(0); g=nextAttack(g);
-    }
-    expect(g.cityDamage).toEqual([2,2,2,2]);
-    expect(g.phase).toBe('over'); expect(g.correct).toBe(0);
+  it('keeps multiple beams flying and one serial CW transmission at a time',()=>{
+    let g=flown();const a=oldestAttack(g)!;expect(canAnswer(g)).toBe(true);
+    g=advanceGame(g,g.nextFireAt);expect(g.attacks).toHaveLength(2);expect(transmittingAttack(g)?.status).toBe('preparing');
+    g=emit(g,250);const b=transmittingAttack(g)!;
+    expect(b.startedAt!).toBeGreaterThanOrEqual(a.sendEndsAt!);expect(g.attacks.filter(a=>a.status==='sending')).toHaveLength(1);
     expect(nextAttack(g)).toBe(g);
+    const hitWhileSending=hit(g);expect(transmittingAttack(hitWhileSending)?.id).toBe(b.id);expect(transmittingAttack(hitWhileSending)?.status).toBe('sending');
+    expect(hitWhileSending.drones.find(d=>d.id===b.enemy)?.alive).toBe(true);
+    g=advanceGame(g,b.sendEndsAt!);g=add(g,430);expect(g.attacks.filter(a=>a.status==='flying')).toHaveLength(3);
+    const sources=g.attacks.map(a=>a.x);expect(sources).toEqual([110,250,430]);
+    const t=g.time;for(const attack of g.attacks){const segments=laserSegments(attack.timeline!,t-attack.startedAt!,true,attack.window,attack.y);expect(segments.length).toBeGreaterThan(0);}
   });
-  it('reaches all three stages with valid play and score increases with combo', () => {
-    let g=nextAttack(createGame('standard',false,73)); let previous=0;
-    for(let wave=1;wave<=3;wave++) {
-      const squads=new Set<number>();
-      while(g.phase==='sending') {
-        const target=g.drones.find((d)=>d.id===g.attack!.enemy)!;
-        squads.add(squadNumber(g));expect(squadDrones(g)).toHaveLength(4);
-        expect(target.alive).toBe(true);
-        expect(target.row).toBe(Math.max(...g.drones.filter(d=>d.alive).map(d=>d.row)));
-        g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,target.symbol);
-        expect(g.score).toBeGreaterThan(previous); previous=g.score;
-        g=nextAttack(g);
-      }
-      expect(g.phase).toBe('clear'); expect(g.stage).toBe(wave);
-      expect(squads.size).toBe(wave===1?4:5);
-      if(wave<3) g=nextAttack(nextStage(g));
-    }
-    expect(g.correct).toBe(56); expect(g.maxCombo).toBe(56);
-    expect(nextStage(g)).toBe(g);
+  it('accepts only the oldest attack, even if a later signal matches the selected key',()=>{
+    let g=add(flown());const [a,b]=g.attacks;
+    expect(a.symbol).not.toBe(b.symbol);
+    const before=g.ammo;const wrong=answerAttack(g,a.id,b.symbol,g.time);
+    expect(wrong.ammo).toBe(before-1);expect(wrong.combo).toBe(0);expect(wrong.correct).toBe(0);expect(wrong.attacks.map(a=>a.id)).toEqual([a.id,b.id]);
+    expect(wrong.result?.answer).toBe('');expect(oldestAttack(wrong)?.id).toBe(a.id);
+    const skipped=answerAttack(g,b.id,b.symbol,g.time);expect(skipped.ammo).toBe(before);expect(skipped.correct).toBe(0);
+    const resolved=hit(g);expect(oldestAttack(resolved)?.id).toBe(b.id);
+    expect(resolved.shots.at(-1)?.enemy).toBe(a.enemy);expect(resolved.drones.filter(d=>!d.alive).map(d=>d.id)).toEqual([a.enemy]);
   });
-  it('has higher scores for speed/difficulty, a hint penalty and varied expert speed', () => {
-    const score=(mode:Difficulty,hints:boolean) => {
-      let g=nextAttack(createGame(mode,hints,73));g=openAnswer(g,g.attack!.id);
-      return answerAttack(g,g.attack!.id,g.drones.find((d)=>d.id===g.attack!.enemy)!.symbol).score;
-    };
-    expect(score('expert',false)).toBeGreaterThan(score('standard',false));
-    expect(score('standard',false)).toBeGreaterThan(score('beginner',false));
-    expect(score('beginner',true)).toBeLessThan(score('beginner',false));
-    const paused={...nextAttack(createGame('expert',false,1)),phase:'paused' as const,combo:8};
-    const resumed=resumeAttack(paused); expect(resumed.phase).toBe('sending'); expect(resumed.combo).toBe(0); expect(resumed.ammo).toBe(paused.ammo);
+  it('permits retry after a miss with a shared cooldown and no timeout ammunition charge',()=>{
+    let g={...flown(),combo:5};const a=oldestAttack(g)!,wrong=g.squadChoices.find(c=>c!==a.symbol)!;
+    const ammo=g.ammo;g=answerAttack(g,a.id,wrong,g.time);
+    expect(g.ammo).toBe(ammo-1);expect(g.combo).toBe(0);expect(cityHp(g)).toBe(18);
+    const spam=answerAttack(g,a.id,a.symbol,g.time);expect(spam.ammo).toBe(g.ammo);expect(spam.correct).toBe(0);
+    const early=answerAttack(g,a.id,a.symbol,g.time+RETRY_SECONDS-.001);expect(early.correct).toBe(0);
+    g=answerAttack(g,a.id,a.symbol,g.time+RETRY_SECONDS);expect(g.correct).toBe(1);expect(g.ammo).toBe(ammo-2);expect(g.combo).toBe(1);
+    expect(g.attacks.some(b=>b.id===a.id)).toBe(false);expect(cityHp(g)).toBe(18);
+    expect(answerAttack(g,a.id,a.symbol,g.time+.5).correct).toBe(1);
   });
-  it('pausing during hit feedback cannot replay and score an already destroyed enemy', () => {
-    let g=nextAttack(createGame('standard',false,73));
-    const target=g.drones.find((d)=>d.id===g.attack!.enemy)!;
-    g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,target.symbol);
-    const paused=pauseGame(g); expect(paused.phase).toBe('paused');
-    expect(paused.attack!.enemy).not.toBe(target.id);
-    expect(paused.drones.find((d)=>d.id===paused.attack!.enemy)!.alive).toBe(true);
-    expect(paused.score).toBe(g.score); expect(paused.correct).toBe(1);
-    expect(answerAttack(resumeAttack(paused),paused.attack!.id,target.symbol)).toMatchObject({correct:1});
+  it('resolves physical impacts independently, removes only their attacks and never double-damages',()=>{
+    let g=add(flown());const [a,b]=g.attacks;
+    const ammo=g.ammo;g=advanceGame(g,a.impactAt!);
+    expect(g.attacks.some(x=>x.id===a.id)).toBe(false);expect(g.attacks.some(x=>x.id===b.id)).toBe(true);
+    const hp=cityHp(g);expect(hp).toBe(17);expect(g.ammo).toBe(ammo);
+    g=advanceGame(g,g.time);expect(cityHp(g)).toBe(hp);expect(g.resolved.filter(r=>r.attack.id===a.id)).toHaveLength(1);
+    expect(oldestAttack(g)?.id).toBe(b.id);
   });
-  it('keeps city intact on hits, damages one building on misses, and repairs one level per wave', () => {
-    let g=nextAttack(createGame('beginner',true,19));
-    const original=g;
-    g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,g.drones.find(d=>d.id===g.attack!.enemy)!.symbol);
-    expect(g.cityDamage).toEqual([0,0,0,0]);
-    g=nextAttack(g);
-    const sender=g.drones.find(d=>d.id===g.attack!.enemy)!;
-    const beforeAmmo=g.ammo;
-    g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,g.attack!.choices.find(c=>c!==sender.symbol)!);
-    expect(g.combo).toBe(0); expect(g.ammo).toBe(beforeAmmo-1);
-    expect(g.cityDamage[sender.column]).toBe(0);
-    g=expireAttack(g,g.attack!.id);
-    expect(g.cityDamage[sender.column]).toBe(1);
-    expect(g.drones.find(d=>d.id===sender.id)!.alive).toBe(true);
-    expect(g.cityDamage.reduce((a,b)=>a+b,0)).toBe(1);
-    expect(original.cityDamage).toEqual([0,0,0,0]);
-    expect(nextStage({...g,phase:'clear',cityDamage:[2,1,0,2]}).cityDamage).toEqual([1,0,0,1]);
-    expect(nextAttack({...g,ammo:0}).phase).toBe('over');
+  it('accepts a just-before-impact hit but rejects at-impact or stale input without retargeting',()=>{
+    const g=add(flown()),a=oldestAttack(g)!;
+    const near=answerAttack(g,a.id,a.symbol,a.impactAt!-.001);expect(near.correct).toBe(1);
+    const past=advanceGame(near,a.impactAt!);expect(past.resolved.some(r=>r.attack.id===a.id&&r.status==='impacted')).toBe(false);
+    for(const offset of [0,.001]){const late=answerAttack(g,a.id,a.symbol,a.impactAt!+offset);expect(late.correct).toBe(0);expect(late.ammo).toBe(g.ammo);}
   });
-  it('allows a miss then correct retry, suppresses spam, spends one round per shot, and hides the answer',()=>{
-    let g=nextAttack(createGame('beginner',true,73));g=openAnswer(g,g.attack!.id);
-    const id=g.attack!.id, answer=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol, wrong=g.attack!.choices.find(c=>c!==answer)!;
-    g={...g,combo:5}; const ammo=g.ammo;
-    g=answerAttack(g,id,wrong,2);
-    expect(g.phase).toBe('answer');expect(g.combo).toBe(0);expect(g.result!.answer).toBe('');expect(g.cityDamage).toEqual([0,0,0,0]);
-    expect(answerAttack(g,id,answer,2)).toBe(g);expect(answerAttack(g,id,answer,2+RETRY_SECONDS-.001)).toBe(g);
-    g=answerAttack(g,id,answer,2+RETRY_SECONDS);
-    expect(g.phase).toBe('feedback');expect(g.ammo).toBe(ammo-2);expect(g.correct).toBe(1);expect(g.combo).toBe(1);expect(g.cityDamage).toEqual([0,0,0,0]);
-    expect(expireAttack(g,id)).toBe(g);expect(answerAttack(g,id,answer,9)).toBe(g);
+  it('stops at ammunition zero or total city loss and cannot posthumously shoot',()=>{
+    let g=flown();const a=oldestAttack(g)!;g={...g,ammo:1};const out=answerAttack(g,a.id,g.squadChoices.find(c=>c!==a.symbol)!,g.time);
+    expect(out.phase).toBe('over');expect(out.ammo).toBe(0);expect(out.attacks).toEqual([]);expect(out.transmittingId).toBeNull();
+    expect(answerAttack(out,a.id,a.symbol,out.time)).toBe(out);
+    let last=flown(start(),100);last={...last,buildings:last.buildings.map(b=>({...b,hp:b.id===1?1:0}))};
+    expect(advanceGame(last,oldestAttack(last)!.impactAt!).phase).toBe('over');
   });
-  it('ends at ammo zero or impact, damages town exactly once, and spends nothing on timeout',()=>{
-    let g=nextAttack(createGame('beginner',true,73));g=openAnswer(g,g.attack!.id);
-    const id=g.attack!.id, answer=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol, wrong=g.attack!.choices.find(c=>c!==answer)!;
-    const out=answerAttack({...g,ammo:1},id,wrong,3);
-    expect(out.ammo).toBe(0);expect(out.phase).toBe('feedback');expect(out.cityDamage.reduce((a,b)=>a+b)).toBe(1);
-    expect(answerAttack(out,id,answer,4)).toBe(out);expect(expireAttack(out,id)).toBe(out);
-    const expired=expireAttack(g,id);expect(expired.ammo).toBe(g.ammo);expect(expired.cityDamage.reduce((a,b)=>a+b)).toBe(1);
-    const lateHit=answerAttack(g,id,answer,5.79,5.8);expect(expireAttack(lateHit,id)).toBe(lateHit);
-    expect(answerAttack(g,id,answer,5.8,5.8).correct).toBe(0);
-    expect(answerAttack(g,id,answer,5.81,5.8).phase).toBe('feedback');
+  it('retains flight times, FIFO, ammo and keys through pause, replays only the interrupted CW',()=>{
+    let g=flown();g=emit(advanceGame(g,g.nextFireAt),250);const [a,b]=g.attacks;
+    const paused=pauseGame(g);expect(advanceGame(paused,999)).toBe(paused);expect(answerAttack(paused,a.id,a.symbol,999)).toBe(paused);
+    const resumed=resumeAttack(paused);expect(resumed.phase).toBe('active');expect(resumed.time).toBe(g.time);expect(resumed.ammo).toBe(g.ammo);expect(resumed.squadChoices).toEqual(g.squadChoices);
+    expect(resumed.attacks[0]).toEqual(a);expect(resumed.attacks[1]).toMatchObject({id:b.id,status:'preparing',startedAt:null});
+    const replay=emit(resumed,250);expect(replay.attacks[0]).toEqual(a);expect(replay.attacks.map(a=>a.id)).toEqual([a.id,b.id]);
+    const arriving=nextAttack(createGame('beginner',true,73));expect(resumeAttack(pauseGame(arriving)).phase).toBe('entering');
   });
-  it('fixes four battery keys across misses, hits, pause/resume and duplicate-letter enemies',()=>{
-    let g=nextAttack(createGame('beginner',true,73));const choices=[...g.squadChoices];
+  it('holds the squad keys for all attacks, waits for pending attacks, then changes keys',()=>{
+    let g=flown(),keys=[...g.squadChoices];const row=g.squadRow;
+    // Even an externally changed formation cannot advance while a beam remains unresolved.
+    const pending={...g,drones:g.drones.map(d=>d.row===row?{...d,alive:false}:d)};
+    expect(nextAttack(pending).squadRow).toBe(row);
     for(let i=0;i<4;i++){
-      expect(g.attack!.choices).toEqual(choices);
-      g=resumeAttack(pauseGame(g));expect(g.squadChoices).toEqual(choices);
-      g=openAnswer(g,g.attack!.id);const answer=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol;
-      g=answerAttack(g,g.attack!.id,g.attack!.choices.find(c=>c!==answer)!,1);
-      expect(g.squadChoices).toEqual(choices);g=answerAttack(g,g.attack!.id,answer,1.3);
-      g=nextAttack(g);
+      expect(g.squadChoices).toEqual(keys);g=hit(g);
+      g=advanceGame(g,g.time+1.2);
+      if(i<3){g=advanceGame(g,Math.max(g.time,g.nextFireAt));g=flown(g);}
     }
-    expect(g.squadChoices).not.toEqual(choices);
-    let extra=createGame('beginner',true,73);
-    extra={...extra,drones:[...extra.drones,{...extra.drones[12],id:99,column:4}]};
-    extra=nextAttack(extra);expect(extra.squadChoices).toHaveLength(4);
-    const sender=extra.drones.find(d=>d.id===extra.attack!.enemy)!;
-    const hit=answerAttack(openAnswer(extra,extra.attack!.id),extra.attack!.id,sender.symbol);
-    expect(hit.drones.filter(d=>!d.alive).map(d=>d.id)).toEqual([sender.id]);
+    expect(g.phase).toBe('entering');expect(squadNumber(g)).toBe(2);expect(g.squadChoices).not.toEqual(keys);
   });
-  it('moves formation both ways and missiles follow straight paths to a moving target', () => {
-    expect(formationOffset(0)).toBe(0);
-    expect(movementPose(0)).toBe('right');expect(movementPose(Math.PI/.32)).toBe('left');
-    expect(movementPose(Math.PI/2/.32)).toBe('idle');
-    expect(formationOffset(5)).toBeGreaterThan(0);
-    expect(formationOffset(15)).toBeLessThan(0);
-    const drone=createGame('beginner',true,73).drones[12];
-    const from=batteryPosition(2), to=dronePosition(drone,formationOffset(5));
-    expect(missilePosition(from,to,0)).toEqual(from);
-    expect(missilePosition(from,to,1)).toEqual(to);
-    expect(missilePosition(from,to,.5)).toEqual({x:(from.x+to.x)/2,y:(from.y+to.y)/2});
-    expect(missilePosition(from,dronePosition(drone,20),1).x).toBe(135);
+  it('supports more enemies sharing four keys while killing only the actual sender',()=>{
+    let g=createGame('beginner',true,73);g={...g,drones:[...g.drones,...g.drones.slice(12).map(d=>({...d,id:d.id+100}))]};
+    g=nextAttack(g);g=advanceGame(g,g.arrivalUntil);g=flown(g);
+    expect(g.squadChoices).toHaveLength(4);expect(squadDrones(g)).toHaveLength(8);
+    const a=oldestAttack(g)!;g=hit(g);expect(g.drones.filter(d=>!d.alive).map(d=>d.id)).toEqual([a.enemy]);
   });
-  it('can render a cleared wave with retained feedback and no active attack', () => {
-    let game=nextAttack(createGame('beginner',true,73));
-    const answer=game.drones.find(d=>d.id===game.attack!.enemy)!.symbol;
-    game=answerAttack(openAnswer(game,game.attack!.id),game.attack!.id,answer);
-    expect(selectedBattery(game)).toBe(game.attack!.choices.indexOf(answer));
-    const clear=nextAttack({...game,drones:game.drones.map(d=>({...d,alive:false}))});
-    expect(clear.phase).toBe('clear'); expect(clear.attack).toBeNull();
-    expect(clear.result?.selected).toBe(answer);
-    expect(selectedBattery(clear)).toBe(-1); expect(selectedBattery(null)).toBe(-1);
-  });
-  it('reuses the canonical Morse timeline with 1:3 tones and one-unit element gaps', () => {
-    for(const mode of Object.keys(MODES) as Difficulty[]) for(const letter of MODES[mode].pool) {
-      const timeline=buildMorseTimeline(letter,'international',{...DEFAULT_SETTINGS,characterSpeed:MODES[mode].wpm,effectiveSpeed:MODES[mode].wpm});
-      expect(timeline.tones.map((t)=>t.element).join('')).toBe(signalCode(letter));
-      timeline.tones.forEach((t,i)=>{
-        expect(t.duration).toBeCloseTo(timeline.dit*(t.element==='-'?3:1));
-        if(i) expect(t.start-timeline.tones[i-1].start-timeline.tones[i-1].duration).toBeCloseTo(timeline.dit);
-      });
+  it('completes three stages with every real sender destroyed, repairs city and never repeats IDs',()=>{
+    let g=nextAttack(createGame('standard',false,73)),previousScore=0;const ids=new Set<number>();
+    for(let stage=1;stage<=3;stage++){
+      let safety=0;
+      while(g.phase!=='clear'&&safety++<200){
+        if(g.phase==='entering'){g=advanceGame(g,g.arrivalUntil);continue;}
+        if(transmittingAttack(g)?.status==='preparing'){g=flown(g);continue;}
+        if(canAnswer(g)){const a=oldestAttack(g)!;expect(ids.has(a.id)).toBe(false);ids.add(a.id);g=hit(g);expect(g.score).toBeGreaterThan(previousScore);previousScore=g.score;}
+        g=advanceGame(g,g.time+1.2);
+      }
+      expect(g.phase).toBe('clear');expect(g.stage).toBe(stage);if(stage<3) g=nextAttack(nextStage({...g,buildings:g.buildings.map(b=>({...b,hp:1}))}));
     }
+    expect(g.correct).toBe(56);expect(g.maxCombo).toBe(56);expect(nextStage(g)).toBe(g);
   });
-  it('stores only separate local scores and survives denied or corrupt storage', () => {
+  it('preserves the score formula, combo multiplier, hints penalty and local-only storage',()=>{
+    const score=(mode:Difficulty,hints:boolean)=>{
+      let g=nextAttack(createGame(mode,hints,73));g=advanceGame(g,g.arrivalUntil);g=flown(g);return hit(g).score;
+    };
+    expect(score('expert',false)).toBeGreaterThan(score('standard',false));expect(score('standard',false)).toBeGreaterThan(score('beginner',false));
+    expect(score('beginner',true)).toBeLessThan(score('beginner',false));
     let raw='broken';vi.stubGlobal('localStorage',{getItem:()=>raw,setItem:(_:string,s:string)=>{raw=s;}});
-    expect(readBest('beginner',true)).toBe(0);
-    expect(saveBest({...createGame('beginner',true),score:900})).toBe(900);
-    expect(readBest('expert',false)).toBe(0);expect(readBest('beginner',true)).toBe(900);
-    vi.stubGlobal('localStorage',{getItem:()=>{throw Error('denied');},setItem:()=>{throw Error('denied');}});
-    expect(saveBest(createGame('standard',false))).toBe(0);vi.unstubAllGlobals();
+    expect(readBest('beginner',true)).toBe(0);expect(saveBest({...createGame('beginner',true),score:900})).toBe(900);expect(readBest('expert',false)).toBe(0);
+    vi.stubGlobal('localStorage',{getItem:()=>{throw Error('denied');},setItem:()=>{throw Error('denied');}});expect(saveBest(createGame('standard',false))).toBe(0);vi.unstubAllGlobals();
+  });
+  it('reuses exact CW timing and movement/missile geometry without viewport-dependent difficulty',()=>{
+    for(const mode of Object.keys(MODES) as Difficulty[]) for(const letter of MODES[mode].pool){const t=timeline(letter,MODES[mode].wpm);
+      expect(t.tones.map(t=>t.element).join('')).toBe(signalCode(letter));t.tones.forEach((tone,i)=>{expect(tone.duration).toBeCloseTo(t.dit*(tone.element==='-'?3:1));if(i) expect(tone.start-t.tones[i-1].start-t.tones[i-1].duration).toBeCloseTo(t.dit);});}
+    expect(formationOffset(5)).toBeGreaterThan(0);expect(formationOffset(15)).toBeLessThan(0);expect(movementPose(0)).toBe('right');expect(movementPose(Math.PI/.32)).toBe('left');
+    const from=batteryPosition(2),to=dronePosition(createGame('beginner').drones[12],20);
+    expect(missilePosition(from,to,1)).toEqual(to);expect(missilePosition(from,to,.5)).toEqual({x:(from.x+to.x)/2,y:(from.y+to.y)/2});
   });
 });
