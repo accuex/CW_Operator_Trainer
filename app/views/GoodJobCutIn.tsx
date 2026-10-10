@@ -21,7 +21,7 @@ export function GoodJobCutIn({children}:{children:ReactNode}){
   return <div className="guard-goodjob" role="dialog" aria-modal="true" aria-label="Good Job!! ミッションクリア" onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();setDone(true);}if(e.key==='Tab'){e.preventDefault();button.current?.focus();}}}>
     {/* Keep all lettering and the character visible; never crop the supplied art. */}
     {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img src="/assets/pcclub/laser/goodjob.png" alt="Good Job!! シグナル・マスター撃破。仲間が笑顔で健闘をたたえています。" width="1536" height="1024" onLoad={()=>setLoaded(true)} onError={()=>setDone(true)}/>
+    <img src="/assets/pcclub/robot/goodjob.png" alt="Good Job!! シグナル・マスター撃破。仲間が笑顔で健闘をたたえています。" width="1536" height="1024" onLoad={()=>setLoaded(true)} onError={()=>setDone(true)}/>
     <button ref={button} type="button" className="btn btn-primary" onClick={()=>setDone(true)}>スコアを見る →</button>
   </div>;
 }

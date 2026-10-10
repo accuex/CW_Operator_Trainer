@@ -250,6 +250,6 @@ CWインベーダーは既存有名作品との混同を避けて不採用。Sig
 
 ## Good Job!! クリアカットイン（2026-10-10）
 
-最終clear時は `GoodJobCutIn` が `/assets/pcclub/laser/goodjob.png` 全体を表示し、画像読込後2.8秒で結果画面へ切り替える。表示のみの変更でスコア保存・クリア判定・CW・SEは維持。結果にSCOREを明示。スコアを見るボタンまたはEscでスキップ可能、キーボードフォーカスを結果のボタンへ戻す。非表示タブでは表示時間を進めず、画像読込失敗時は結果に進む。reduced-motionでは入場アニメーションなし。devのみのGood Jobプレビューはゲーム記録を変更しない。
+最終clear時は `GoodJobCutIn` が `/assets/pcclub/robot/goodjob.png` 全体を表示し、画像読込後2.8秒で結果画面へ切り替える。表示のみの変更でスコア保存・クリア判定・CW・SEは維持。結果にSCOREを明示。スコアを見るボタンまたはEscでスキップ可能、キーボードフォーカスを結果のボタンへ戻す。非表示タブでは表示時間を進めず、画像読込失敗時は結果に進む。reduced-motionでは入場アニメーションなし。devのみのGood Jobプレビューはゲーム記録を変更しない。
 
 関連campaign/SE/bossテスト、production TypeScript、変更ファイルESLint、正式build PASS。PC1280×900とmobile375×812で画像全体・ボタン表示、自動結果切替、フォーカスを確認。スクリーンショットはqa/cwot-goodjob-*.png。実戦での最終ボス撃破ブラウザ再完走はNOT_RUN（既存campaignテストでクリア判定を検証、今回のブラウザは同じ表示コンポーネントのdevプレビュー）。元画像を加工していない。19ファイルの既存差分を保全。push/deployなし。
