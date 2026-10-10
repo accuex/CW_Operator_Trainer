@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useLayoutEffect, useRef, useState } from 'react';
 import { MorseAudioEngine, type PlaybackHandle } from '@/lib/audio';
 import { EnemyLaser } from './EnemyLaser';
+import { BossWarning } from './BossWarning';
 import { BossEnemy, BOSS_MUZZLE_Y } from './BossEnemy';
 import { RobotEnemy, ROBOT_MUZZLE_Y, type RobotPose } from './RobotEnemy';
 import { PRESETS, type Preset } from '@/lib/arcade/presets';
@@ -9,7 +10,7 @@ import { GameMusic } from '@/lib/arcade/music';
 import { recordGameTransition } from '@/lib/arcade/gameAchievements';
 import { LASER_IMPACT_Y } from '@/lib/arcade/laser';
 import type { AudioSettings } from '@/lib/types';
-import { BOSS_BONUS, bossDrone, enemyPosition, livePhase, answerAttack, advanceGame, beginTransmission, canAnswer, cityHp, cityMaxHp, createGame, nextAttack, oldestAttack, pauseGame, readBest, resumeAttack, saveBest, signalCode, movementPose, batteryPosition, missilePosition, squadDrones, squadNumber, transmittingAttack, ARRIVAL_MS, type Difficulty, type GuardGame } from '@/lib/arcade/cwGuard';
+import { WARNING_SECONDS, BOSS_BONUS, bossDrone, enemyPosition, livePhase, answerAttack, advanceGame, beginTransmission, canAnswer, cityHp, cityMaxHp, createGame, nextAttack, oldestAttack, pauseGame, readBest, resumeAttack, saveBest, signalCode, movementPose, batteryPosition, missilePosition, squadDrones, squadNumber, transmittingAttack, ARRIVAL_MS, type Difficulty, type GuardGame } from '@/lib/arcade/cwGuard';
 
 const robotScale=(count:number)=>Math.min(.8,(400/(count-1)-12)/112);
 export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:AudioSettings;stopEpoch:number;setAudioStatus:(status:string)=>void}) {
@@ -20,12 +21,12 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
     const observer=new ResizeObserver(update);if(boardRef.current) observer.observe(boardRef.current);
     window.addEventListener('resize',update);update();return()=>{observer.disconnect();window.removeEventListener('resize',update);};
   },[]);
-  const fieldWidth=layout.wide?Math.max(960,layout.width*390/Math.max(260,Math.min(440,layout.height-450))):600;
+  const fieldWidth=layout.wide?Math.max(960,layout.width*435/Math.max(280,Math.min(420,layout.height-405))):600;
   const screenX=(x:number)=>x*fieldWidth/600;
   const engine=useMemo(()=>new MorseAudioEngine(),[]);
   const [wpm,setWpm]=useState(8),[preset,setPreset]=useState<Preset>('letters'),[hints,setHints]=useState(true);
   const mode:Difficulty=wpm<15?'beginner':wpm<22?'standard':'expert';
-  const [cwVolume,setCwVolume]=useState(1),[musicVolume,setMusicVolume]=useState(.08);
+  const [cwVolume,setCwVolume]=useState(1),[musicVolume,setMusicVolume]=useState(.35);
   const audioElement=useRef<HTMLAudioElement>(null);
   const music=useMemo(()=>new GameMusic(),[]);
   const [game,setGame]=useState<GuardGame|null>(null),[best,setBest]=useState(0),[message,setMessage]=useState('');
@@ -111,7 +112,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
       // Prime the element within the actual start gesture; failure never blocks CW.
       if(!resume)void music.unlock().catch(()=>{});
       await engine.unlock();
-      const next=resume&&state.current?resumeAttack(state.current):bossOnly?{...createGame(mode,hints,undefined,{wpm,preset}),stage:3,phase:'warning' as const,transitionUntil:2.6,bossOnly:true,drones:[],attacks:[]}:nextAttack(createGame(mode,hints,undefined,{wpm,preset}));
+      const next=resume&&state.current?resumeAttack(state.current):bossOnly?{...createGame(mode,hints,undefined,{wpm,preset}),stage:3,phase:'warning' as const,transitionUntil:WARNING_SECONDS,bossOnly:true,drones:[],attacks:[]}:nextAttack(createGame(mode,hints,undefined,{wpm,preset}));
       clock.current={time:next.time,wall:performance.now()};setGame(next);
     }catch{setMessage('音声を有効にして、開始をもう一度押してください。');}
   }
@@ -133,7 +134,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
     window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
   },[choose,pause]);
   const preview=game??createGame(mode,hints,73,{wpm,preset}),time=preview.time;
-  const patternLabel={single:'単発',double:'2連送',triple:'3連送',spread:'拡散（1回答）',charge:'チャージ',rapid:'高速3連送'};
+  const patternLabel={single:'単発',double:'2連送',triple:'3連送',pulse:'高出力（1文字）',charge:'チャージ',rapid:'高速3連送'};
   const reduced=typeof window!=='undefined'&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const drones=squadDrones(preview),squad=squadNumber(preview),squads=preview.stage===1?4:5;
   const remaining=preview.drones.filter(d=>d.alive).length,boss=preview.boss,bossUnit=boss?bossDrone(preview)!:null;
@@ -143,34 +144,33 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
   const label=game?.phase==='warning'?'WARNING · BOSS APPROACHING':game?.phase==='intermission'?`STAGE ${game.stage} CLEAR · 次のSTAGEへ`:game?.phase==='awakening'?'SIGNAL OVERDRIVE · 弾薬補給 +10':game?.phase==='rekeying'?'新しい4文字へ切替中…':game?.phase==='defeating'?'BOSS DEFEATED · +5,000':game?.phase==='entering'?(boss?'大型ボス接近中…4文字を確認！':'新部隊が降下中…砲台の4文字を確認！'):canAnswer(game)?`迎撃せよ！ #${head!.id} · 1–4 / タップ`:game?.phase==='active'?(time<game.retryUntil?'再装填中…':tx?.status==='sending'?'CW受信中…発射順を覚えよう':head?'次のCW送信を待とう':'次の攻撃を待とう'):'音で守る、放課後の防衛線。';
   return <section className="page-pad computer-club">
     <header className="club-heading"><div><p className="section-kicker">AFTER SCHOOL COMPUTER CLUB / GAME 01</p><h1>放課後パソコン部</h1><p>聞き取れた、その一音が迎撃になる。</p></div><span className="club-label">CW迎撃隊 <small>都市防衛 / {PRESETS[preset].label}</small></span></header>
-    <div className="guard-console">
+    <div className={`guard-console ${boss?'guard-boss-console':''}`}>
       <div className="guard-hud" aria-label="ゲーム状況"><span>SCORE<b>{preview.score.toLocaleString()}</b></span><span>COMBO<b className={preview.combo>=4?'guard-hot':''}>{preview.combo}<small> ×{(1+Math.min(4,Math.floor(preview.combo/4))*.25).toFixed(2)}</small></b></span><span>AMMO<b>{game?.ammo??'—'}<small> / 残敵{remaining}</small></b></span><span>{boss?'BOSS':'STAGE'}<b>{boss?bossUnit!.hp:preview.stage}<small>{boss?' / 100':` / 3 · 部隊 ${squad}/${squads}`}</small></b></span></div>
       <div ref={boardRef} className={`guard-board ${result?.correct?'guard-hit':result?.answer?'guard-miss':''}`}>
-        <svg viewBox={`0 0 ${fieldWidth} 390`} role="img" aria-label="CWOTロボット部隊、独立した街並みと4基の迎撃砲台。発射順にレーザーを迎撃します。">
+        <svg viewBox={`0 -50 ${fieldWidth} 435`} role="img" aria-label="CWOTロボット部隊、独立した街並みと4基の迎撃砲台。発射順にレーザーを迎撃します。">
           <defs><linearGradient id="guard-sky" x2="0" y2="1"><stop stopColor="#122953"/><stop offset="1" stopColor="#071427"/></linearGradient><pattern id="guard-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#537cbc" strokeOpacity=".14"/></pattern></defs>
-          <rect width={fieldWidth} height="390" fill="url(#guard-sky)"/><rect width={fieldWidth} height="390" fill="url(#guard-grid)"/>
+          <rect y="-50" width={fieldWidth} height="435" fill="url(#guard-sky)"/><rect y="-50" width={fieldWidth} height="435" fill="url(#guard-grid)"/>
           <g className="guard-formation" data-squad={squad} data-squad-count={boss?1:squads} data-arriving={game?.phase==='entering'}>{drones.map(d=>{
             const hit=preview.resolved.findLast(r=>r.attack.enemy===d.id&&r.status==='intercepted'),age=hit?time-hit.at:0;
             if(!d.alive&&!hit&&!(boss&&game?.phase==='defeating')) return null;
             const p=enemyPosition(preview,d,time,reduced),drop=-150*Math.pow(1-arrival,3);
             const pose:RobotPose=hit&&age>=.55?(d.alive?'hit':age<.75?'hit':'defeat'):tx?.enemy===d.id?tx.status==='preparing'?'charge':'send':game?.phase==='entering'?'enter':movementPose(time);
             return <g key={`${preview.stage}:${d.id}`} data-enemy-id={d.id} data-enemy-alive={d.alive} data-enemy-hp={d.hp} data-enemy-max-hp={d.maxHp} transform={`translate(${screenX(p.x)} ${p.y+drop})`}>
-              {boss?<BossEnemy form={boss.form} frame={Math.floor(time*6)} pose={game?.phase==='defeating'?'defeat':game?.phase==='awakening'?'awakening':hit&&age>=.55?'hit':tx?.enemy===d.id?tx.status==='preparing'?'charge':'send':'idle'} age={game?.phase==='defeating'?defeatAge:age}/>:<g transform={hit&&d.alive&&age>=.55?`translate(${Math.sin(age*60)*3} 0)`:undefined}><g transform={`scale(${robotScale(preview.enemiesPerSquad)})`}><RobotEnemy pose={pose} frame={Math.floor(time*8)+d.column} progress={hit?Math.min(1,Math.max(0,(age-.75)/.35)):0}/></g></g>}
+              {boss?<g transform={`translate(0 ${BOSS_MUZZLE_Y}) scale(${layout.wide?1.35:1.12}) translate(0 ${-BOSS_MUZZLE_Y})`}><BossEnemy form={boss.form} frame={Math.floor(time*6)} pose={game?.phase==='defeating'?'defeat':game?.phase==='awakening'?'awakening':hit&&age>=.55?'hit':tx?.enemy===d.id?tx.status==='preparing'?'charge':'send':'idle'} age={game?.phase==='defeating'?defeatAge:age}/></g>:<g transform={hit&&d.alive&&age>=.55?`translate(${Math.sin(age*60)*3} 0)`:undefined}><g transform={`scale(${robotScale(preview.enemiesPerSquad)})`}><RobotEnemy pose={pose} frame={Math.floor(time*8)+d.column} progress={hit?Math.min(1,Math.max(0,(age-.75)/.35)):0}/></g></g>}
               {!boss&&d.alive&&d.hp<d.maxHp&&<g aria-hidden="true" opacity=".35"><ellipse cx="-16" cy="-38" rx="6" ry="9" fill="#b5bfd4"/><ellipse cx="-19" cy="-51" rx="8" ry="6" fill="#9eacc2"/></g>}
               {!boss&&d.maxHp>1&&<g className={hit?'guard-hp-hit':''} transform="translate(-24 -52)" aria-label={`敵HP ${d.hp}/${d.maxHp}`}><rect width="48" height="5" rx="2" fill="#071427" stroke="#91bddd"/><rect width={48*d.hp/d.maxHp} height="5" rx="2" fill={d.hp/d.maxHp>.5?'#7be5e1':'#ffbf68'}/></g>}
               {!boss&&head?.enemy===d.id&&<circle className="guard-fifo-target" cy="8" r={53*robotScale(preview.enemiesPerSquad)} fill="none" stroke="#ffd56f" strokeWidth="1.5" strokeDasharray="6 6"/>}
             </g>;
           })}</g>
           {boss&&<g className="guard-boss-health" role="img" aria-label={`ボスHP ${bossUnit!.hp}/100、${boss.form==='normal'?'第1形態':boss.form==='final'?'最終局面':'覚醒形態'}`}>
-            <text x="20" y="15" fill="#ffbcb2" fontSize="11">SIGNAL MASTER · {boss.form==='normal'?'PHASE 1':boss.form==='final'?'FINAL':'OVERDRIVE'} · {bossUnit!.hp}/100</text>
-            <rect x="20" y="21" width={fieldWidth-40} height="6" rx="2" fill="#3c283d"/>
-            <rect x="20" y="21" width={(fieldWidth-40)*bossUnit!.hp/100} height="6" rx="2" fill={boss.form==='normal'?'#82d7ff':'#ff6654'}/>
+            <text x="20" y="-35" fill="#ffbcb2" fontSize="11">SIGNAL MASTER · {boss.form==='normal'?'PHASE 1':boss.form==='final'?'FINAL':'OVERDRIVE'} · {bossUnit!.hp}/100</text>
+            <rect x="20" y="-28" width={fieldWidth-40} height="6" rx="2" fill="#3c283d"/>
+            <rect x="20" y="-28" width={(fieldWidth-40)*bossUnit!.hp/100} height="6" rx="2" fill={boss.form==='normal'?'#82d7ff':'#ff6654'}/>
           </g>}
           {preview.attacks.filter(a=>a.timeline&&a.startedAt!==null).map(a=><g key={a.id} data-attack-id={a.id} data-attack-state={a.status} data-head={a.id===head?.id}>
-            {a.beamOffsets.map((dx,i)=><EnemyLaser key={i} x={screenX(a.x+dx)} y={a.y} timeline={a.timeline!} elapsed={Math.max(0,time-a.startedAt!)} window={a.window} hints={boss?false:preview.hints} tone={boss?'red':'gold'} phase={a.status==='sending'?'sending':'answer'} correct={false} impactProgress={0}/>)}
+            {a.beamOffsets.map((dx,i)=><EnemyLaser key={i} x={screenX(a.x+dx)} y={a.y} timeline={a.timeline!} elapsed={Math.max(0,time-a.startedAt!)} window={a.window} hints={boss?false:preview.hints} tone={boss?'red':'gold'} power={boss&&(a.pattern==='pulse'||a.pattern==='charge')?1.7:1} phase={a.status==='sending'?'sending':'answer'} correct={false} impactProgress={0}/>)}
             <text x={screenX(a.x)+8} y={a.y+8} fill={a.id===head?.id?'#ffe18d':'#a9bed8'} fontSize="10">#{a.id}{a.id===head?.id?' 迎撃対象':''}</text>
           </g>)}
-          {game?.phase==='warning'&&<g className="guard-warning"><rect width={fieldWidth} height="390" fill="#170814" opacity=".85"/><path d={`M0 165H${fieldWidth}M0 244H${fieldWidth}`} stroke="#ff6257" strokeWidth="3"/><text x={fieldWidth/2} y="195" textAnchor="middle" fill="#ff8075" fontSize="30" fontWeight="900">WARNING</text><text x={fieldWidth/2} y="224" textAnchor="middle" fill="#fff2ed" fontSize="16">BOSS APPROACHING</text></g>}
           {game?.phase==='intermission'&&<text x={fieldWidth/2} y="220" textAnchor="middle" fill="#a7e9ff" fontSize="26">STAGE {game.stage} CLEAR</text>}
           {game?.phase==='awakening'&&<g className="guard-overdrive"><rect width={fieldWidth} height="390" fill="#090a22" opacity=".5"/><text x={fieldWidth/2} y="205" textAnchor="middle" fill="#ff8c82" fontSize="24" fontWeight="800">SIGNAL OVERDRIVE</text><text x={fieldWidth/2} y="226" textAnchor="middle" fill="#ffffff" fontSize="13">装甲展開中 · 弾薬 +10</text></g>}
           {game?.phase==='rekeying'&&<text x={fieldWidth/2} y="220" textAnchor="middle" fill="#ffe18d" fontSize="20">KEY SET UPDATE</text>}
@@ -191,6 +191,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
             const p=missilePosition(from,{x:target.x+(shot.correct?0:42),y:target.y},Math.min(1,age/.55));
             return age<.55?<g key={shot.id} className="guard-missile" data-battery={index+1} data-shot-attack={shot.attackId}><path d={`M${screenX(from.x)} ${from.y}L${screenX(p.x)} ${p.y}`} stroke="#7cf4ff" strokeWidth="2" opacity=".6"/><circle cx={screenX(p.x)} cy={p.y} r="5" fill="#e7ffff"/></g>:shot.correct&&age<.8?<circle key={shot.id} className="guard-impact" cx={screenX(target.x)} cy={target.y} r="25" fill="none" stroke="#fff2a5" strokeWidth="3"/>:null;
           })}
+          {(game?.phase==='warning'||game?.phase==='paused'&&game.pausedFrom==='warning')&&<BossWarning width={fieldWidth} elapsed={WARNING_SECONDS-(game.transitionUntil-time)} reduced={reduced}/>}
         </svg>
         {(!game||['paused','clear','over'].includes(game.phase))&&<div className="guard-overlay">
           <p className="guard-overlay-kicker">{game?.phase==='clear'?'MISSION COMPLETE':game?.phase==='over'?'MISSION END':game?.phase==='paused'?'PAUSED':'CW迎撃隊'}</p>
@@ -212,7 +213,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
         <label>文字範囲<select aria-label="文字範囲" value={preset} disabled={live||game?.phase==='paused'} onChange={e=>{setPreset(e.target.value as Preset);setGame(null);}}>{Object.entries(PRESETS).map(([id,p])=><option key={id} value={id}>{p.label}</option>)}</select></label>
         <label className="guard-toggle"><input type="checkbox" checked={hints} disabled={live||game?.phase==='paused'} onChange={e=>{setHints(e.target.checked);setGame(null);}}/>符号ヒント（通常敵）</label>
         <span>BEST {best.toLocaleString()}</span>{live&&<button type="button" className="btn btn-secondary" onClick={pause}>一時停止</button>}{game&&<button type="button" className="btn btn-secondary" onClick={()=>{engine.stop();music.stop();playback.current=null;saveBest(game);setGame(null);setMessage('ゲームを終了しました。');}}>終了</button>}
-        <details className="guard-audio"><summary>音量</summary><label>CW<input aria-label="CW音量" type="range" min="0" max="1" step=".05" value={cwVolume} onChange={e=>setCwVolume(Number(e.target.value))}/></label><label>BGM<input aria-label="BGM音量" type="range" min="0" max=".2" step=".01" value={musicVolume} onChange={e=>setMusicVolume(Number(e.target.value))}/></label>{musicPlaying&&<button className="btn btn-secondary" onClick={()=>void music.play(musicVolume).then(()=>setMessage('')).catch(()=>setMessage('BGMを再生できませんでした。'))}>BGM再生</button>}</details>
+        <details className="guard-audio"><summary>音量</summary><label>CW<input aria-label="CW音量" type="range" min="0" max="1" step=".05" value={cwVolume} onChange={e=>setCwVolume(Number(e.target.value))}/></label><label>BGM<input aria-label="BGM音量" type="range" min="0" max="1" step=".01" value={musicVolume} onChange={e=>setMusicVolume(Number(e.target.value))}/></label>{musicPlaying&&<button className="btn btn-secondary" onClick={()=>void music.play(musicVolume).then(()=>setMessage('')).catch(()=>setMessage('BGMを再生できませんでした。'))}>BGM再生</button>}</details>
         <audio ref={audioElement} src="/assets/pcclub/robot/boss_bgm.mp3" loop preload="none" aria-hidden="true"/>
       </div>
     </div>
@@ -221,7 +222,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
       <p>PCは1〜4キー、スマホはタップ。砲台の4文字は部隊中固定。最後の短点・長点が鳴り始めた瞬間から回答できます。必ず発射順の「迎撃対象」から回答。正解すると即座に次の攻撃へ進み、ミサイルの到着を待ちません。誤答時は0.3秒の再装填後、着弾前なら再射撃できます。キー押しっぱなしでは連射しません。</p>
       <p>正解・誤答とも弾薬1発を消費。正解で攻撃元に1ダメージ、COMBO増加。誤答・着弾・一時停止でCOMBOリセット。4連続ごとに倍率が0.25上がり最大2倍。高速CWほど高得点、符号ヒントありは75%。STAGE別の送信枠後の間隔は1.8・0.7・0.18秒です。</p>
       <p>音声は順番に送信し、複数レーザーは同時に下降します。短点・長点・空白は1:3:1、下降速度はWPMと無関係。9棟の建物は着弾X座標で損傷し、隙間には建物ダメージなし。全壊・補給不能な弾切れで終了。STAGE突破時は建物HPを1回復、ボス登場時はHP3へ全回復・弾薬140発を補給します。</p>
-      <p>ボスは赤い直線レーザーと連送・拡散・チャージ攻撃を使用。拡散も正解1回で全ビームを無効化。HP50で一度だけ覚醒、HP10で最終局面へ入り、各10発補給。HP75・50・25の文字切替は全攻撃を解決してから行います。ボスを倒すとボーナス5,000点で最終クリアです。</p>
+      <p>ボスは1文字につき赤いレーザー1本を発射します。3連送は3文字・3つの攻撃IDで、発射順に1件ずつ迎撃。高出力・チャージは太いビームと発光で表現します。HP50で一度だけ覚醒、HP10で最終局面へ入り、各10発補給。HP75・50・25の文字切替は全攻撃を解決してから行います。ボスを倒すとボーナス5,000点で最終クリアです。</p>
       <p>Esc・タブ移動で一時停止し、再開時は送信中の信号だけを再送します。ボスBGMとCWの音量は別々に調整できます。記録はこのブラウザ内に保存。既存の学習進捗・カード・公開ログには加算や投稿しません。ゲーム実績は将来の導入に備えた記録のみで、カード報酬は未実装です。</p>
     </details>
   </section>;

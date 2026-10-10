@@ -53,12 +53,22 @@ describe('enemy endurance and SIGNAL MASTER',()=>{
   const done=hit(g);expect(bossDrone(done)!.hp).toBe(hp-1);expect(done.attacks.some(x=>x.id===b.id)).toBe(true);
   expect(a.impactAt!-a.startedAt!).toBeCloseTo((318-a.y)/LASER_SPEED);
  });
- it('applies spread as one answer event, clears all beams on one hit and bounds per-building impact',()=>{
+ it('emits one powerful beam per character and damages only its actual impact building',()=>{
   let g=boss();g={...g,boss:{...g.boss!,sequence:3},attacks:[],transmittingId:null,nextFireAt:g.time};g=flying(nextAttack(g));
-  const a=oldestAttack(g)!;expect(a.pattern).toBe('spread');expect(a.beamOffsets).toEqual([-64,0,64]);
+  const a=oldestAttack(g)!;expect(a.pattern).toBe('pulse');expect(a.beamOffsets).toHaveLength(1);expect(Math.abs(a.beamOffsets[0])).toBe(64);
   const done=hit(g);expect(bossDrone(done)!.hp).toBe(99);expect(done.correct).toBe(1);expect(done.attacks.some(b=>b.id===a.id)).toBe(false);
-  const impact=advanceGame(g,a.impactAt!);for(const b of impact.buildings)expect(3-b.hp).toBeLessThanOrEqual(1);
+  const impact=advanceGame(g,a.impactAt!);for(const b of impact.buildings)expect(3-b.hp).toBe(a.x+a.beamOffsets[0]>=b.x&&a.x+a.beamOffsets[0]<b.x+b.width?1:0);
+  expect(impact.resolved.find(r=>r.attack.id===a.id)?.buildingId).toBe(impact.buildings.find(b=>a.x+a.beamOffsets[0]>=b.x&&a.x+a.beamOffsets[0]<b.x+b.width)?.id??null);
   expect(advanceGame(impact,impact.time).buildings).toEqual(impact.buildings);
+ });
+ it('three sequential characters produce three independently intercepted single beams',()=>{
+  let g=boss();g={...g,boss:{...g.boss!,form:'awakened',keyTier:2,awakened:true,sequence:0},attacks:[],transmittingId:null,nextFireAt:g.time};g=nextAttack(g);
+  for(let i=0;i<3;i++){g=flying(g);if(i<2)g=advanceGame(g,g.nextFireAt);}
+  expect(g.attacks).toHaveLength(3);const attacks=[...g.attacks];expect(new Set(attacks.map(a=>a.id)).size).toBe(3);
+  for(let i=0;i<3;i++){expect(attacks[i].beamOffsets).toEqual([0]);if(i)expect(attacks[i].startedAt!).toBeGreaterThanOrEqual(attacks[i-1].sendEndsAt!);}
+  expect(answerAttack(g,attacks[2].id,attacks[2].symbol,g.time).correct).toBe(0);
+  for(const a of attacks){expect(oldestAttack(g)?.id).toBe(a.id);g=hit(g);expect(g.attacks.some(b=>b.id===a.id)).toBe(false);}
+  expect(g.correct).toBe(3);expect(bossDrone(g)!.hp).toBe(97);
  });
  it('waits for pending CW/flights before awakening or changing keys; resumes transition safely',()=>{
   let g=flying(boss());g=advanceGame(g,g.nextFireAt);g=tx(g);const originalKeys=[...g.squadChoices],later=g.attacks[1];
@@ -73,12 +83,12 @@ describe('enemy endurance and SIGNAL MASTER',()=>{
  it.each(['beginner','standard','expert'] as const)('%s completes exactly100 hits, one awakening, final10, bonus once and no ammo starvation',mode=>{
   let g=createBossGame(mode,73),awakeCount=0,lastPhase=g.phase,guard=0;const patterns=new Set<string>();const speeds=new Set<number>();
   while(g.phase!=='clear'&&guard++<1500){
-   const a=transmittingAttack(g);if(a){patterns.add(a.pattern);speeds.add(a.wpm);}
+   const a=transmittingAttack(g);if(a){patterns.add(a.pattern);speeds.add(a.wpm);expect(a.beamOffsets).toHaveLength(1);}
    g=step(g);if(g.phase==='awakening'&&lastPhase!=='awakening')awakeCount++;lastPhase=g.phase;
    if(bossDrone(g)!.hp<=10&&bossDrone(g)!.hp>0)expect(g.boss?.form).toBe('final');
    expect(g.ammo).toBeGreaterThan(0);
   }
-  expect(g.phase).toBe('clear');expect(g.correct).toBe(100);expect(bossDrone(g)!.hp).toBe(0);expect(awakeCount).toBe(1);expect(g.boss?.finalSupply).toBe(true);expect(g.ammo).toBe(60);expect(patterns).toEqual(new Set(['single','double','charge','spread','triple','rapid']));
+  expect(g.phase).toBe('clear');expect(g.correct).toBe(100);expect(bossDrone(g)!.hp).toBe(0);expect(awakeCount).toBe(1);expect(g.boss?.finalSupply).toBe(true);expect(g.ammo).toBe(60);expect(patterns).toEqual(new Set(['single','double','charge','pulse','triple','rapid']));
   const total=g.resolved.at(-1)?.attack;expect(g.score).toBeGreaterThan(BOSS_BONUS);expect(g.attacks).toEqual([]);expect(g.transmittingId).toBeNull();expect(nextStage(g)).toBe(g);expect(advanceGame(g,g.time+20).score).toBe(g.score);
   expect(speeds.size).toBeLessThanOrEqual(mode==='expert'?3:1);
  });

@@ -1,0 +1,51 @@
+{
+  "head_before": "7ba115167eb4e113790501e353fb05ff739ca133",
+  "checked_at": "2026-10-10T20:44:15.606120+09:00",
+  "tests": {
+    "files": 85,
+    "tests": 919,
+    "status": "PASS"
+  },
+  "production_types": "PASS",
+  "build": "PASS",
+  "changed_eslint": "PASS",
+  "boss_single_beam": "PASS (all patterns and forms)",
+  "three_letters_three_attack_ids_fifo": "PASS",
+  "warning_seconds": 3.6,
+  "warning_pause_browser_elapsed": 0.2752000000178816,
+  "browser": {
+    "desktop": [
+      1280,
+      900
+    ],
+    "short_desktop": [
+      1280,
+      720
+    ],
+    "mobile": [
+      375,
+      812
+    ],
+    "controls_bottom_720": 709.953125,
+    "mobile_button_size": [
+      73.25,
+      56
+    ],
+    "horizontal_overflow": false,
+    "correct_retrial": "#18 resolves; #19 retained; HP100→99; ammo139→138"
+  },
+  "bgm": {
+    "default": 0.35,
+    "max": 1,
+    "cw_independent": true
+  },
+  "external_changes_hash_unchanged": true,
+  "not_run": [
+    "human CW recognition",
+    "VoiceOver",
+    "actual OS reduced motion",
+    "60fps measurement"
+  ],
+  "push": false,
+  "deploy": false
+}

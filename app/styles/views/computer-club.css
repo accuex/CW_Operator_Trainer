@@ -42,4 +42,37 @@
 .guard-warning text:first-of-type{animation:guard-warning-light .65s ease-in-out infinite alternate}
 @keyframes guard-warning-light{to{opacity:.5}}
 @media(prefers-reduced-motion:reduce){.guard-warning text:first-of-type{animation:none}}
-@media(max-width:600px){.guard-controls select{max-width:165px}.guard-audio[open]{gap:8px}.guard-warning text{font-size:24px}}
+@media(max-width:600px){.guard-controls select{max-width:165px}.guard-audio[open]{gap:8px}}
+
+/* Compact arcade chrome; logical laser/city coordinates remain unchanged. */
+.computer-club .guard-hud{padding:6px 16px;align-items:center}
+.computer-club .guard-hud b{display:inline-block;margin-left:8px;font-size:1.2rem}
+.computer-club .guard-city-status{padding:5px 16px;font-size:.68rem}
+.computer-club .guard-signal{padding:6px 16px 3px;font-size:.85rem}
+.computer-club .guard-choices{padding-top:4px;padding-bottom:4px}
+.computer-club .guard-feedback{min-height:24px;padding-top:2px;padding-bottom:2px;font-size:.78rem}
+.computer-club .guard-controls{gap:8px;padding:6px 16px;font-size:.72rem}
+.computer-club .guard-controls input[type=number]{width:58px;padding:6px}
+.computer-club .guard-controls select{padding:6px}
+.computer-club .guard-controls .btn{min-height:36px}
+.computer-club .guard-audio summary{min-height:36px}
+.guard-warning-complete{filter:drop-shadow(0 0 6px #ff342a)}
+.guard-warning text:first-of-type{animation:none}
+@media(min-width:900px){
+  .computer-club.page-pad{padding-top:12px}
+  .computer-club .club-heading h1{font-size:1.45rem;margin:2px 0}
+  .computer-club .club-heading p:not(.section-kicker){font-size:.75rem}
+  .computer-club .guard-choices{gap:16px}
+  .computer-club .guard-choices button{min-height:52px;font-size:1.45rem}
+}
+@media(max-width:600px){
+  .computer-club .guard-hud{padding:8px 12px;align-items:start}
+  .computer-club .guard-hud b{display:block;margin:0;font-size:1.1rem}
+  .computer-club .guard-city-status{padding:5px 12px}
+  .computer-club .guard-signal{padding:6px 12px 3px}
+  .computer-club .guard-choices button{min-height:56px}
+  .computer-club .guard-controls .btn{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){.guard-warning-complete{filter:none}}
+
+.computer-club .guard-choices button{padding-top:14px;padding-bottom:2px}

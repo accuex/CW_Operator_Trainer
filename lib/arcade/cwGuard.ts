@@ -11,7 +11,7 @@ export const MODES = {
 } as const;
 export interface Drone { id: number; row: number; column: number; symbol: string; alive: boolean; hp: number; maxHp: number }
 export type BossForm='normal'|'awakened'|'final';
-export type BossPattern='single'|'double'|'triple'|'spread'|'charge'|'rapid';
+export type BossPattern='single'|'double'|'triple'|'pulse'|'charge'|'rapid';
 export interface BossState { form: BossForm; awakened: boolean; keyTier: number; transitionUntil: number | null; sequence: number; burstLeft: number; pattern: BossPattern; defeatedAt: number | null; finalSupply: boolean; lastSymbol: string | null }
 export const BOSS_ID=1000, BOSS_HP=100, BOSS_BONUS=5000;
 export const livePhase=(phase: Phase | undefined)=>['active','entering','awakening','rekeying','defeating','intermission','warning'].includes(phase??'');
@@ -59,6 +59,7 @@ export function createCity(): Building[] {
 export const buildingAt = (buildings: readonly Building[],x: number) => buildings.find(b=>x>=b.x && x<b.x+b.width);
 export const cityHp = (game: GuardGame) => game.buildings.reduce((total,b)=>total+b.hp,0);
 export const cityMaxHp = (game: GuardGame) => game.buildings.reduce((total,b)=>total+b.maxHp,0);
+export const WARNING_SECONDS=3.6;
 export const ARRIVAL_MS=850, CHARGE_MS=260, RETRY_SECONDS=.3;
 export function createGame(mode: Difficulty,hints=MODES[mode].hints,seed=Date.now()>>>0,options: GameOptions={}): GuardGame {
   const wpm=Number.isFinite(options.wpm)?Math.max(8,Math.min(40,Math.round(options.wpm!))):MODES[mode].wpm;
@@ -98,7 +99,7 @@ export function nextAttack(game: GuardGame): GuardGame {
   if(['paused','clear','over','awakening','rekeying','defeating','intermission','warning'].includes(game.phase)) return game;
   if(cityHp(game)===0) return {...game,phase:'over',transmittingId:null,attacks:[]};
   const remaining=game.drones.filter(d=>d.alive);
-  if(!remaining.length && !game.attacks.length) return game.resolved.some(r=>r.status==='intercepted'&&game.time-r.at<1)?game:{...game,phase:game.stage===3?'warning':'intermission',transitionUntil:game.time+(game.stage===3?2.6:1.2)};
+  if(!remaining.length && !game.attacks.length) return game.resolved.some(r=>r.status==='intercepted'&&game.time-r.at<1)?game:{...game,phase:game.stage===3?'warning':'intermission',transitionUntil:game.time+(game.stage===3?WARNING_SECONDS:1.2)};
   const boss=game.boss, drone=boss?bossDrone(game):null;
   // Stop new sends at milestones, but let the current CW and queued flights resolve.
   if(boss&&drone&&(bossKeyTier(drone.hp)>boss.keyTier || (drone.hp<=50&&!boss.awakened))){
@@ -134,13 +135,13 @@ export function nextAttack(game: GuardGame): GuardGame {
   const wpm=game.wpm;
   let nextBoss=boss,pattern: BossPattern='single';
   if(boss){
-    const patterns: BossPattern[]=boss.form==='normal'?['single','double','charge','spread']:boss.form==='awakened'?['triple','spread','double','charge']:['rapid','spread','triple'];
+    const patterns: BossPattern[]=boss.form==='normal'?['single','double','charge','pulse']:boss.form==='awakened'?['triple','pulse','double','charge']:['rapid','pulse','triple'];
     pattern=boss.burstLeft>0?boss.pattern:patterns[boss.sequence%patterns.length];
     const size=pattern==='double'?2:pattern==='triple'||pattern==='rapid'?3:1;
     nextBoss={...boss,pattern,sequence:boss.sequence+Number(boss.burstLeft===0),burstLeft:boss.burstLeft>0?boss.burstLeft-1:size-1,lastSymbol:symbols[0]};
   }
   const attack: Attack={id,order:id,enemy:target.id,symbol:symbols[0],wpm,x:0,y:0,readyAt:game.time+(pattern==='charge'?.8:CHARGE_MS/1000),
-    startedAt:null,answerAt:null,toneEndsAt:null,sendEndsAt:null,impactAt:null,window:transmissionWindow(PRESETS[game.preset].symbols,wpm,PRESETS[game.preset].alphabet),beamOffsets:pattern==='spread'?[-64,0,64]:[0],pattern,timeline:null,status:'preparing'};
+    startedAt:null,answerAt:null,toneEndsAt:null,sendEndsAt:null,impactAt:null,window:transmissionWindow(PRESETS[game.preset].symbols,wpm,PRESETS[game.preset].alphabet),beamOffsets:pattern==='pulse'?[id%2?64:-64]:[0],pattern,timeline:null,status:'preparing'};
   return {...game,boss:nextBoss,seed,phase:'active',attackSerial:id,transmittingId:id,attacks:[...game.attacks,attack]};
 }
 /** Bind exactly once to the actual Web Audio handle; firing position never follows the robot. */
@@ -169,7 +170,7 @@ export function advanceGame(game: GuardGame,now: number): GuardGame {
   }
   const impacts=g.attacks.filter(a=>a.impactAt!==null&&now>=a.impactAt);
   for(const attack of impacts){
-    const hit=buildingAt(g.buildings,attack.x);
+    const hit=buildingAt(g.buildings,attack.x+attack.beamOffsets[0]);
     const hitIds=new Set(attack.beamOffsets.flatMap(dx=>{const b=buildingAt(g.buildings,attack.x+dx);return b?[b.id]:[];}));
     g={...g,combo:0,attacks:g.attacks.filter(a=>a.id!==attack.id),
       buildings:g.buildings.map(b=>hitIds.has(b.id)?{...b,hp:Math.max(0,b.hp-1)}:b),
