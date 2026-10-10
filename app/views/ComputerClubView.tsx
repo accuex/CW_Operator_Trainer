@@ -2,9 +2,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MorseAudioEngine, type PlaybackHandle } from '@/lib/audio';
 import { EnemyLaser } from './EnemyLaser';
+import { RobotEnemy, ROBOT_MUZZLE_Y, type RobotPose } from './RobotEnemy';
 import { transmissionWindow } from '@/lib/arcade/laser';
 import type { AudioSettings } from '@/lib/types';
-import { answerAttack, answerSeconds, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty, type GuardGame } from '@/lib/arcade/cwGuard';
+import { answerAttack, answerSeconds, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, completeArrival, beginTransmission, squadDrones, squadNumber, ARRIVAL_MS, CHARGE_MS, type Difficulty, type GuardGame } from '@/lib/arcade/cwGuard';
 
 export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { settings: AudioSettings; stopEpoch: number; setAudioStatus: (status: string) => void }) {
   const engine = useMemo(() => new MorseAudioEngine(), []);
@@ -13,7 +14,9 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
   const [game, setGame] = useState<GuardGame | null>(null);
   const [best, setBest] = useState(0);
   const [clock, setClock] = useState(0);
-  const [visual, setVisual] = useState({offset:0,flight:0});
+  const [visualState, setVisual] = useState({offset:0,flight:0,elapsed:0,arrival:0,phaseKey:''});
+  const visualKey=`${game?.stage}:${game?.squadRow}:${game?.phase}:${game?.attack?.id}`;
+  const visual=visualState.phaseKey===visualKey ? visualState : {...visualState,flight:0,elapsed:0,arrival:0};
   const [laserSource,setLaserSource] = useState({x:300,y:80});
   const movement = useRef(0);
   const offsetRef = useRef(0);
@@ -23,7 +26,7 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
   const state = useRef(game); state.current = game;
   const settingsRef = useRef(settings); settingsRef.current = settings;
   const error = useRef('');
-  const live = Boolean(game && ['sending','answer','feedback'].includes(game.phase));
+  const live = Boolean(game && ['entering','charging','sending','answer','feedback'].includes(game.phase));
   useEffect(() => {
     if (!live) return;
     let frame=0, previous=performance.now();
@@ -33,12 +36,12 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
       movement.current += (now-previous)/1000; previous=now;
       const offset=reduced ? 0 : formationOffset(movement.current);
       offsetRef.current=offset;
-      setVisual({offset,flight:game?.phase==='feedback' ? Math.min(1,(now-started)/550) : 0});
+      setVisual({phaseKey:visualKey,offset,flight:game?.phase==='feedback' ? Math.min(1,(now-started)/550) : 0,elapsed:(now-started)/1000,arrival:game?.phase==='entering' ? Math.min(1,(now-started)/ARRIVAL_MS) : 1});
       frame=requestAnimationFrame(tick);
     };
     frame=requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [live,game?.phase,game?.attack?.id]);
+  }, [live,game?.phase,game?.attack?.id,game?.stage,game?.squadRow]);
   useEffect(() => { setBest(readBest(mode,hints)); }, [mode,hints]);
   const pause = useCallback(() => {
     engine.stop(); handle.current = null;
@@ -60,6 +63,12 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
       else setGame(nextAttack(createGame(mode,hints)));
     } catch { setMessage('音を再生できませんでした。音声を有効にして、開始をもう一度押してください。'); }
   }
+  useEffect(()=>{
+    if(!game || !['entering','charging'].includes(game.phase)) return;
+    const phase=game.phase, stage=game.stage, row=game.squadRow, id=game.attack?.id;
+    const timer=setTimeout(()=>setGame(g=>g && g.phase===phase && g.stage===stage && g.squadRow===row && g.attack?.id===id ? phase==='entering' ? completeArrival(g) : g.attack ? beginTransmission(g,g.attack.id) : g : g),phase==='entering' ? ARRIVAL_MS : CHARGE_MS);
+    return ()=>clearTimeout(timer);
+  },[game?.phase,game?.stage,game?.squadRow,game?.attack?.id]);
   useEffect(() => {
     if (!game || game.phase !== 'sending' || !game.attack) return;
     let cancelled = false, frame = 0;
@@ -72,8 +81,8 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
       handle.current = playback;
       playingAttack.current = `${game.stage}:${id}`;
       const sender=game.drones.find((d)=>d.id===game.attack!.enemy)!;
-      const origin=dronePosition(sender,offsetRef.current);
-      setLaserSource({x:origin.x,y:origin.y+16});
+      const origin=dronePosition(sender,offsetRef.current,movement.current);
+      setLaserSource({x:origin.x,y:origin.y+ROBOT_MUZZLE_Y});
       const tick = () => {
         if (cancelled) return;
         if (engine.state !== 'running') { setMessage('音声が中断されました。再開すると同じ信号を再送します。'); pause(); return; }
@@ -102,7 +111,7 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
     // A short custom acknowledgement, separate from the CW attack.
     const s = settingsRef.current;
     void engine.playSymbol('fx','.',{ ...s, pitch: game.result?.correct ? 1150 : 170, waveform: 'sine', characterSpeed: 60, effectiveSpeed: 60, reverb: false }).catch(() => undefined);
-    const timer = setTimeout(() => setGame((g) => g ? nextAttack(g) : g), game.result?.correct ? 700 : game.mode === 'beginner' ? 1600 : 1100);
+    const timer = setTimeout(() => setGame((g) => g ? nextAttack(g) : g), game.result?.correct ? 1000 : game.mode === 'beginner' ? 1600 : 1100);
     return () => { clearTimeout(timer); engine.stop(); };
   }, [engine,game?.phase,game?.attack?.id]);
   useEffect(() => { if (game && ['clear','over'].includes(game.phase)) setBest(saveBest(game)); }, [game?.phase,game?.score]);
@@ -118,7 +127,7 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
     window.addEventListener('keydown',key); return () => window.removeEventListener('keydown',key);
   }, [choose,pause]);
   const target = game?.attack ? game.drones.find((d) => d.id === game.attack!.enemy) : undefined;
-  const targetPosition = target ? dronePosition(target,visual.offset) : {x:300,y:80};
+  const targetPosition = target ? dronePosition(target,visual.offset,movement.current) : {x:300,y:80};
   const {x:tx,y:ty}=targetPosition;
   const batteryIndex = selectedBattery(game);
   const battery = batteryPosition(Math.max(0,batteryIndex));
@@ -127,21 +136,28 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
   const cityDamage=game?.cityDamage ?? [0,0,0,0];
 
   const remaining = game?.drones.filter((d) => d.alive).length ?? 16;
-  const phaseLabel = game?.phase === 'sending' ? 'CW受信中…最後まで聴こう' : game?.phase === 'answer' ? '迎撃せよ！ 1–4 / タップ' : game?.phase === 'feedback' ? game.result?.correct ? `迎撃成功 +${game.result.points}` : game.result?.selected ? 'ミス！ 正しい信号を確認しよう' : '時間切れ！ 信号を確認しよう' : '音で守る、放課後の防衛線。';
-  const boardDrones = game?.drones ?? createGame('beginner',true,73).drones;
+  const phaseLabel = game?.phase === 'entering' ? '次の4機が降下中…' : game?.phase === 'charging' ? '黄色い目のロボットが送信を準備…' : game?.phase === 'sending' ? 'CW受信中…最後まで聴こう' : game?.phase === 'answer' ? '迎撃せよ！ 1–4 / タップ' : game?.phase === 'feedback' ? game.result?.correct ? `迎撃成功 +${game.result.points}` : game.result?.selected ? 'ミス！ 正しい信号を確認しよう' : '時間切れ！ 信号を確認しよう' : '音で守る、放課後の防衛線。';
+  const previewGame=game ?? createGame('beginner',true,73);
+  const boardDrones=squadDrones(previewGame);
+  const squad=squadNumber(previewGame), squadCount=previewGame.stage===1?4:5;
   return <section className="page-pad computer-club">
     <header className="club-heading"><div><p className="section-kicker">AFTER SCHOOL COMPUTER CLUB / GAME 01</p><h1>放課後パソコン部</h1><p>聞き取れた、その一音が迎撃になる。</p></div><span className="club-label">CW迎撃部 <small>仮タイトル / 欧文CW</small></span></header>
     <div className="guard-console">
-      <div className="guard-hud" aria-label="ゲーム状況"><span>SCORE<b>{game?.score.toLocaleString() ?? '0'}</b></span><span>COMBO<b className={game && game.combo >= 4 ? 'guard-hot' : ''}>{game?.combo ?? 0}<small> ×{(1+Math.min(4,Math.floor((game?.combo ?? 0)/4))*.25).toFixed(2)}</small></b></span><span>AMMO<b>{game?.ammo ?? '—'}<small> / 残敵{remaining}</small></b></span><span>WAVE<b>{game?.stage ?? 1}<small> / 3</small></b></span></div>
+      <div className="guard-hud" aria-label="ゲーム状況"><span>SCORE<b>{game?.score.toLocaleString() ?? '0'}</b></span><span>COMBO<b className={game && game.combo >= 4 ? 'guard-hot' : ''}>{game?.combo ?? 0}<small> ×{(1+Math.min(4,Math.floor((game?.combo ?? 0)/4))*.25).toFixed(2)}</small></b></span><span>AMMO<b>{game?.ammo ?? '—'}<small> / 残敵{remaining}</small></b></span><span>WAVE<b>{game?.stage ?? 1}<small> / 3 · 部隊 {squad}/{squadCount}</small></b></span></div>
       <div className={`guard-board ${game?.phase === 'feedback' ? game.result?.correct ? 'guard-hit' : 'guard-miss' : ''}`}>
-        <svg viewBox="0 0 600 390" role="img" aria-label="光輪型通信ドローン編隊と街と4基の迎撃砲台。敵の文字は表示しません。">
+        <svg viewBox="0 0 600 390" role="img" aria-label="4機ずつ登場するCWOTロボット部隊と街と4基の迎撃砲台。敵の文字は表示しません。">
           <defs><linearGradient id="guard-sky" x2="0" y2="1"><stop stopColor="#122953"/><stop offset="1" stopColor="#071427"/></linearGradient><pattern id="guard-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#537cbc" strokeOpacity=".14"/></pattern></defs>
           <rect width="600" height="390" fill="url(#guard-sky)"/><rect width="600" height="390" fill="url(#guard-grid)"/>
-          <g className="guard-formation" transform={`translate(${visual.offset} 0)`}>{boardDrones.map((d) => {
-            const active = d.id === target?.id && (game?.phase === 'sending' || game?.phase === 'answer');
-            return <g key={d.id} transform={`translate(${115+d.column*122} ${65+d.row*47})`} opacity={d.alive || (d.id===target?.id && game?.phase==='feedback' && game.result?.correct && visual.flight<1) ? 1 : 0} className={active ? 'guard-transmitter' : ''}>
-              <ellipse rx="27" ry="10" fill="none" stroke={active ? '#ffd16b' : '#62d8ed'} strokeWidth="2"/><path d="M-16 0 0-15 16 0 0 15Z" fill={active ? '#e2ae3c' : '#1c6b91'} stroke="#9debff"/><circle r="5" fill={active ? '#fff2b1' : '#9debff'}/><path d="M-23-10-28-18M23-10 28-18" stroke="#70bcde" strokeWidth="2"/>
-              {active && <circle r="32" fill="none" stroke="#ffd16b" strokeDasharray="3 8" className="guard-lock"/>}
+          <g className="guard-formation" data-squad={squad} data-squad-count={squadCount} data-arriving={game?.phase==='entering'}>{boardDrones.map((d) => {
+            const active=d.id===target?.id;
+            const hit=active && game?.phase==='feedback' && game.result?.correct;
+            if(!d.alive && !hit) return null;
+            const p=dronePosition(d,visual.offset,movement.current);
+            const progress=game?.phase==='entering' ? visual.arrival : 1;
+            const drop=-150*Math.pow(1-progress,3);
+            const pose:RobotPose=hit && visual.flight>=1 ? visual.elapsed<.72 ? 'hit' : 'defeat' : active && game?.phase==='charging' ? 'charge' : active && ['sending','answer'].includes(game?.phase??'') ? 'send' : game?.phase==='entering' ? 'enter' : Math.abs(Math.cos(movement.current*.32))>.55 ? Math.cos(movement.current*.32)>0?'right':'left' : 'idle';
+            return <g key={`${previewGame.stage}:${d.id}`} data-enemy-id={d.id} data-enemy-alive={d.alive} data-enemy-x={p.x} data-enemy-y={p.y} transform={`translate(${p.x} ${p.y+drop})`}>
+              <RobotEnemy pose={pose} frame={Math.floor(movement.current*8)} progress={hit ? Math.max(0,Math.min(1,(visual.elapsed-.72)/.28)) : 0}/>
             </g>;
           })}</g>
           {game && ['sending','answer','feedback'].includes(game.phase) && handle.current && game.attack && playingAttack.current===`${game.stage}:${game.attack.id}` && <EnemyLaser
@@ -174,12 +190,12 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
           {game && ['clear','over'].includes(game.phase) && <p>{game.correct}/{game.attempts}迎撃成功 · 最大COMBO {game.maxCombo} · BEST {best.toLocaleString()}</p>}
         </div>}
       </div>
-      <div className="guard-city-status" aria-label="街の防衛状況">CITY {cityDamage.reduce((total,damage)=>total+2-damage,0)}/8 · 最前列 {Math.max(...boardDrones.filter(d=>d.alive).map(d=>d.row),0)+1}段目 <span>各地区：{cityDamage.map(d=>d===0?'無傷':d===1?'損傷':'全壊').join(' / ')}</span></div>
+      <div className="guard-city-status" aria-label="街の防衛状況">CITY {cityDamage.reduce((total,damage)=>total+2-damage,0)}/8 · 第{squad}/{squadCount}部隊 · 残り{boardDrones.filter(d=>d.alive).length}機 <span>各地区：{cityDamage.map(d=>d===0?'無傷':d===1?'損傷':'全壊').join(' / ')}</span></div>
       <div className="guard-signal"><p role="status" aria-live="polite">{phaseLabel}</p><span>{game?.attack?.wpm ?? MODES[mode].wpm} WPM {hints ? '・符号ヒントあり' : '・音だけ'}</span></div>
       <div className="guard-choices" aria-label="迎撃する文字を選択">{(game?.attack?.choices ?? ['E','T','A','N']).map((letter,i) => <button type="button" key={`${game?.attack?.id}-${i}`} disabled={game?.phase !== 'answer'} onClick={() => choose(i)} aria-label={`${i+1}: ${letter}で迎撃`}><small>第{i+1}砲台 · {i+1}</small>{letter}</button>)}</div>
       <div className="guard-feedback" aria-live="polite">{game?.phase === 'feedback' && game.result && <span>{game.result.correct ? `COMBO ${game.combo}！` : `${game.result.selected ? `選択 ${game.result.selected} → ` : ''}正解 ${game.result.answer}　${signalCode(game.result.answer).replaceAll('.', '・').replaceAll('-', '－')}`}</span>}{message && <p role="alert">{message}</p>}</div>
       <div className="guard-controls"><label>難易度<select aria-label="難易度" value={mode} disabled={live || game?.phase === 'paused'} onChange={(e) => { const m=e.target.value as Difficulty; setMode(m); setHints(MODES[m].hints); setGame(null); }}>{(Object.keys(MODES) as Difficulty[]).map((m) => <option key={m} value={m}>{MODES[m].label} · {m === 'expert' ? '22–30' : `${MODES[m].wpm}–${MODES[m].wpm+4}`} WPM</option>)}</select></label><label className="guard-toggle"><input type="checkbox" checked={hints} disabled={live || game?.phase === 'paused'} onChange={(e) => { setHints(e.target.checked); setGame(null); }}/>符号ヒント</label><span>BEST {best.toLocaleString()}</span>{live && <button type="button" className="btn btn-secondary" onClick={pause}>一時停止</button>}{game && <button type="button" className="btn btn-secondary" onClick={() => { engine.stop(); saveBest(game); setGame(null); setMessage('ゲームを終了しました。'); }}>終了</button>}</div>
     </div>
-    <details className="guard-guide"><summary>遊び方・スコアのしくみ</summary><p>敵の攻撃を最後まで聴き、最前列の4文字から1つを選び、その砲台で敵本体を迎撃。PCは1〜4キー、スマホはタップ。TabとEnterでも操作できます。Esc・別タブへの移動で一時停止します。</p><p>16体→20体→20体の3編隊。各ステージは敵の数＋8発で開始し、正解・誤答・時間切れで1発消費。ミスごとに街の1地区が損傷し、合計8回のミスで全壊。ウェーブ突破時には各地区を1段階修復します。4連続正解ごとに倍率が0.25上がり、最大2倍。速い信号ほど高得点、符号ヒントありは75%の得点です。ヒント別・難易度別に自己ベストを保存します。</p><p>送信枠は同じ難易度・速度で共通です。短い符号の後は無音で待ち、レーザーが止まったら回答できます。映像の伸長時間から答えを推測できないようにしています。ミスの後に正しい文字と符号を確認できます。上級は攻撃ごとに速度が変化します。重ね打ち・パイルアップは今後の拡張候補で、今回のモードには含みません。スコアはこのブラウザ専用で、学習進捗・アチーブ・公開ログへ加算や投稿はしません。</p></details>
+    <details className="guard-guide"><summary>遊び方・スコアのしくみ</summary><p>敵の攻撃を最後まで聴き、現在の部隊の4文字から1つを選び、その砲台で敵本体を迎撃。PCは1〜4キー、スマホはタップ。TabとEnterでも操作できます。Esc・別タブへの移動で一時停止します。</p><p>4機ずつ順に登場する3ステージ（4部隊→5部隊→5部隊）。各ステージは敵の数＋8発で開始し、正解・誤答・時間切れで1発消費。ミスごとに街の1地区が損傷し、合計8回のミスで全壊。ウェーブ突破時には各地区を1段階修復します。4連続正解ごとに倍率が0.25上がり、最大2倍。速い信号ほど高得点、符号ヒントありは75%の得点です。ヒント別・難易度別に自己ベストを保存します。</p><p>送信枠は同じ難易度・速度で共通です。短い符号の後は無音で待ち、「迎撃せよ！」になったら回答できます。ヒントなしでは映像の伸長時間から答えを推測できないようにしています。ミスの後に正しい文字と符号を確認できます。上級は攻撃ごとに速度が変化します。重ね打ち・パイルアップは今後の拡張候補で、今回のモードには含みません。スコアはこのブラウザ専用で、学習進捗・アチーブ・公開ログへ加算や投稿はしません。</p></details>
   </section>;
 }

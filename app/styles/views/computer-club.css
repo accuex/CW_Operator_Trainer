@@ -8,3 +8,9 @@
 .guard-formation.moving{animation:none}.guard-city-status{display:flex;justify-content:space-between;gap:8px;padding:8px 20px;color:#9fdaed;font:.75rem monospace;border-bottom:1px solid #233d5b}.guard-city-status span{color:#b5c2d5}.guard-battery-active{filter:drop-shadow(0 0 8px #c5ffff)}.guard-impact{opacity:.85}.guard-choices button small{font-size:.6rem}@media(max-width:600px){.guard-city-status{display:block;padding:8px 12px;font-size:.68rem}.guard-city-status span{display:block;margin-top:3px}}
 
 .guard-laser-glow{filter:blur(2px)}
+
+/* Keep the four large robots high above the city, without growing the controls. */
+.guard-robot-charge{filter:drop-shadow(0 0 4px #ffd96c55)}
+.guard-robot-hit{filter:brightness(1.25)}
+@media(min-width:900px){.computer-club .club-heading{margin-bottom:10px}.computer-club .guard-board,.computer-club .guard-board svg{max-height:360px}.computer-club .guard-controls{padding-top:8px;padding-bottom:8px}.computer-club .guard-hud{padding-top:8px;padding-bottom:8px}}
+@media(max-width:600px){.computer-club .club-heading{display:flex;align-items:center;gap:8px;margin-bottom:10px}.computer-club .club-heading h1{font-size:1.2rem;margin:4px 0}.computer-club .club-heading p:not(.section-kicker){display:none}.computer-club .club-label{flex-shrink:0;font-size:.85rem;margin:0;text-align:right}.computer-club .club-label small{display:block;font-size:.6rem;margin:3px 0 0}}

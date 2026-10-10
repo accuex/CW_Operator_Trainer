@@ -1,14 +1,42 @@
 import { describe, expect, it, vi } from 'vitest';
-import { answerAttack, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
+import { answerAttack, createGame, MODES, nextAttack as queueAttack, completeArrival, beginTransmission, squadDrones, squadNumber, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
 import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
 
+// Existing scoring tests advance presentation phases explicitly.
+const nextAttack=(game: ReturnType<typeof createGame>)=>{
+  let next=queueAttack(game);
+  if(next.phase==='entering') next=completeArrival(next);
+  return next.phase==='charging' ? beginTransmission(next,next.attack!.id) : next;
+};
 describe('CW guard rules', () => {
   it('creates four rows/columns with four distinct hidden letters per row', () => {
     const game=createGame('beginner',true,73);
     expect(game.drones).toHaveLength(16);
     for(let row=0;row<4;row++) expect(new Set(game.drones.filter((d)=>d.row===row).map((d)=>d.symbol)).size).toBe(4);
     expect(createGame('beginner',true,73)).toEqual(game);
+  });
+  it('gates all four-robot arrivals and preparations before audio, including pause/resume',()=>{
+    let g=queueAttack(createGame('beginner',true,73));
+    expect(g.phase).toBe('entering'); expect(g.attack).toBeNull();
+    expect(squadDrones(g)).toHaveLength(4); expect(squadNumber(g)).toBe(1);
+    expect(openAnswer(g,1)).toBe(g); expect(queueAttack(g)).toBe(g);
+    expect(resumeAttack(pauseGame(g)).phase).toBe('entering');
+    g=completeArrival(g); expect(g.phase).toBe('charging');
+    expect(openAnswer(g,g.attack!.id)).toBe(g);
+    expect(beginTransmission(g,999)).toBe(g);
+    expect(resumeAttack(pauseGame(g)).phase).toBe('charging');
+    g=beginTransmission(g,g.attack!.id); expect(g.phase).toBe('sending');
+    const firstSet=[...g.attack!.choices].sort();
+    for(let i=0;i<4;i++){
+      const symbol=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol;
+      g=queueAttack(answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,symbol));
+      if(i<3){expect(g.phase).toBe('charging');g=beginTransmission(g,g.attack!.id);}
+    }
+    expect(g.phase).toBe('entering'); expect(squadNumber(g)).toBe(2);
+    expect(squadDrones(g).every(d=>d.alive)).toBe(true);
+    g=completeArrival(g);expect([...g.attack!.choices].sort()).not.toEqual(firstSet);
+    expect(squadDrones(g).every(d=>dronePosition(d,0).y===77)).toBe(true);
   });
   it('offers four unique shuffled choices including the real sender', () => {
     const positions=new Set<number>();
@@ -58,8 +86,10 @@ describe('CW guard rules', () => {
   it('reaches all three stages with valid play and score increases with combo', () => {
     let g=nextAttack(createGame('standard',false,73)); let previous=0;
     for(let wave=1;wave<=3;wave++) {
+      const squads=new Set<number>();
       while(g.phase==='sending') {
         const target=g.drones.find((d)=>d.id===g.attack!.enemy)!;
+        squads.add(squadNumber(g));expect(squadDrones(g)).toHaveLength(4);
         expect(target.alive).toBe(true);
         expect(target.row).toBe(Math.max(...g.drones.filter(d=>d.alive).map(d=>d.row)));
         g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,target.symbol);
@@ -67,6 +97,7 @@ describe('CW guard rules', () => {
         g=nextAttack(g);
       }
       expect(g.phase).toBe('clear'); expect(g.stage).toBe(wave);
+      expect(squads.size).toBe(wave===1?4:5);
       if(wave<3) g=nextAttack(nextStage(g));
     }
     expect(g.correct).toBe(56); expect(g.maxCombo).toBe(56);

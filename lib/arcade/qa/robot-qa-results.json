@@ -1,0 +1,62 @@
+{
+  "originalAsset": {
+    "path": "public/assets/pcclub/laser/enemy.png",
+    "sha256": "7f0234aee335f1c10db93e4e2798f47368130225a7fdef7507d1b3b9a90aa65c",
+    "modifiedByThisTask": false,
+    "includedInCommit": false
+  },
+  "frames": 8,
+  "webpSize": [
+    256,
+    256
+  ],
+  "stages": [
+    {
+      "stage": 1,
+      "squads": 4,
+      "robots": 16
+    },
+    {
+      "stage": 2,
+      "squads": 5,
+      "robots": 20
+    },
+    {
+      "stage": 3,
+      "squads": 5,
+      "robots": 20
+    }
+  ],
+  "checks": {
+    "fullUnitSuite": {
+      "status": "PASS",
+      "tests": 829,
+      "files": 78
+    },
+    "additionalSquadAndMuzzleAssertions": {
+      "status": "PASS",
+      "tests": 27
+    },
+    "productionTypes": "PASS",
+    "productionBuild": "PASS",
+    "browserDesktop": "PASS: 1280x900, four robots and controls visible",
+    "browserMobile": "PASS: 375x812, scrollWidth375, choice buttons73.25x56",
+    "browserArrival": "PASS: four enter poses, zero laser, zero enabled choices",
+    "browserHit": "PASS: hit.webp visible after missile phase",
+    "browserSquadChange": "PASS: four first-squad kills, second-squad new IDs and letter set; subsequent second-squad kills and third-squad display observed",
+    "browserPauseArrival": "PASS: paused overlay, laser0; resume restarts entry",
+    "browserFullStageCompletion": "NOT_COMPLETED: repeated browser wait/click deadlines",
+    "acousticRecognition": "NOT_RUN",
+    "voiceOver": "NOT_RUN",
+    "fpsMeasurement": "NOT_RUN"
+  },
+  "boundaries": {
+    "audioEngineChanged": false,
+    "morseDataChanged": false,
+    "scoreFormulaChanged": false,
+    "cityDamageRulesChanged": false,
+    "learningProgressChanged": false,
+    "push": false,
+    "deploy": false
+  }
+}

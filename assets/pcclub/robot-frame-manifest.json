@@ -1,0 +1,94 @@
+{
+  "source": "assets/pcclub/robot-atlas-prepared.png",
+  "sourceSha256": "63d12b280acae574c7f43a1b2fc71a71bfa8d827349ab77c7d1766935b7363c5",
+  "cell": [
+    384,
+    512
+  ],
+  "outputSize": [
+    256,
+    256
+  ],
+  "frames": [
+    {
+      "id": "idle-1",
+      "cell": 0,
+      "shift": [
+        1,
+        0
+      ],
+      "path": "public/assets/pcclub/robot/idle-1.webp",
+      "bytes": 18272
+    },
+    {
+      "id": "idle-2",
+      "cell": 1,
+      "shift": [
+        -3,
+        0
+      ],
+      "path": "public/assets/pcclub/robot/idle-2.webp",
+      "bytes": 18652
+    },
+    {
+      "id": "left",
+      "cell": 2,
+      "shift": [
+        23,
+        -5
+      ],
+      "path": "public/assets/pcclub/robot/left.webp",
+      "bytes": 22126
+    },
+    {
+      "id": "right",
+      "cell": 3,
+      "shift": [
+        -15,
+        -4
+      ],
+      "path": "public/assets/pcclub/robot/right.webp",
+      "bytes": 21612
+    },
+    {
+      "id": "charge",
+      "cell": 4,
+      "shift": [
+        1,
+        31
+      ],
+      "path": "public/assets/pcclub/robot/charge.webp",
+      "bytes": 23278
+    },
+    {
+      "id": "send",
+      "cell": 5,
+      "shift": [
+        2,
+        35
+      ],
+      "path": "public/assets/pcclub/robot/send.webp",
+      "bytes": 21276
+    },
+    {
+      "id": "hit",
+      "cell": 6,
+      "shift": [
+        18,
+        12
+      ],
+      "path": "public/assets/pcclub/robot/hit.webp",
+      "bytes": 20988
+    },
+    {
+      "id": "defeat",
+      "cell": 7,
+      "shift": [
+        -6,
+        -14
+      ],
+      "path": "public/assets/pcclub/robot/defeat.webp",
+      "bytes": 22148
+    }
+  ]
+}

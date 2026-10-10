@@ -1,0 +1,47 @@
+{
+  "arrival": {
+    "arrival": "true",
+    "enabled": 0,
+    "enemies": 4,
+    "laser": 0,
+    "poses": [
+      "enter",
+      "enter",
+      "enter",
+      "enter"
+    ]
+  },
+  "pausedArrival": {
+    "laserCount": 0,
+    "text": "PAUSEDひと休みしよう再開で同じ信号を再送。COMBOはリセットします。再開する"
+  },
+  "mobile": {
+    "buttons": [
+      {
+        "height": 56,
+        "width": 73.25
+      },
+      {
+        "height": 56,
+        "width": 73.25
+      },
+      {
+        "height": 56,
+        "width": 73.25
+      },
+      {
+        "height": 56,
+        "width": 73.25
+      }
+    ],
+    "controlsBottom": 750.203125,
+    "laserX": "451.7214340449126",
+    "origin": "109.38818815706895",
+    "robots": 4,
+    "scroll": 375,
+    "width": 375
+  },
+  "plays": [],
+  "completeStageVisual": "NOT_COMPLETED: waitFor reported deadlines even when diagnostic matched a visible SVG group",
+  "acousticRecognition": "NOT_RUN"
+}

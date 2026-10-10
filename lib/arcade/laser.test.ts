@@ -26,7 +26,7 @@ describe('CW beam growth',()=>{
   it.each([16,20,30,40])('%i WPM preserves dot/dash/gap and independent equal-speed travel',wpm=>{
     for(const symbol of ['A','N','S','O','5','0']){
       const t=timeline(symbol,wpm), window=transmissionWindow(MODES.expert.pool,wpm);
-      for(const origin of [81,222,269]){
+      for(const origin of [81,109,222,269]){
         const full=laserSegments(t,t.duration,true,window,origin);
         const unit=(LASER_WAIT_Y-origin)/t.duration*t.dit;
         full.forEach((s,i)=>{
