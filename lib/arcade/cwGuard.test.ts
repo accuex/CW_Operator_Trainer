@@ -4,7 +4,8 @@ import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
 import { LASER_SPEED,laserSegments } from './laser';
 const timeline=(symbol:string,wpm:number)=>buildMorseTimeline(symbol,'international',{...DEFAULT_SETTINGS,characterSpeed:wpm,effectiveSpeed:wpm});
-function start(){const g=nextAttack(createGame('expert',true,73));return advanceGame(g,g.arrivalUntil);}
+// FIFO regressions use one-HP enemies independently of new difficulty HP balance.
+function start(){const base=createGame('expert',true,73);const g=nextAttack({...base,drones:base.drones.map(d=>({...d,hp:1,maxHp:1}))});return advanceGame(g,g.arrivalUntil);}
 function emit(game:GuardGame,x=110,y=109){
   const tx=transmittingAttack(game)!;
   const g=advanceGame(game,Math.max(game.time,tx.readyAt));
@@ -141,7 +142,7 @@ describe('city and FIFO multi-laser defence',()=>{
       }
       expect(g.phase).toBe('clear');expect(g.stage).toBe(stage);if(stage<3) g=nextAttack(nextStage({...g,buildings:g.buildings.map(b=>({...b,hp:1}))}));
     }
-    expect(g.correct).toBe(56);expect(g.maxCombo).toBe(56);expect(nextStage(g)).toBe(g);
+    expect(g.correct).toBe(84);expect(g.maxCombo).toBe(84);expect(nextStage(g).stage).toBe(4);expect(nextStage(g).drones[0].hp).toBe(100);
   });
   it('preserves the score formula, combo multiplier, hints penalty and local-only storage',()=>{
     const score=(mode:Difficulty,hints:boolean)=>{

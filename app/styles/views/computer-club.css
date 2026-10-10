@@ -22,3 +22,15 @@
   .computer-club .guard-board svg{width:100%;height:auto}
   .computer-club .guard-choices{padding-left:7.5%;padding-right:7.5%;gap:24px}
 }
+
+/* Boss battle shares the logical field and physical beam speed. Motion is clock-driven. */
+.guard-boss-awakened,.guard-boss-final{filter:drop-shadow(0 0 4px #ff584955)}
+.guard-boss-final{filter:drop-shadow(0 0 8px #ff584977)}
+.guard-boss-hit{filter:brightness(1.3)}
+.guard-boss-awakening{filter:brightness(1.4) drop-shadow(0 0 15px #ff747488)}
+.guard-hp-hit{filter:drop-shadow(0 0 3px #ffe9a9)}
+.guard-boss-practice{margin-top:10px}
+.guard-boss-health text{font-family:monospace;letter-spacing:.05em}
+@media(prefers-reduced-motion:reduce){.guard-boss-final,.guard-boss-awakening{filter:none}}
+.guard-key-notice{margin:0;padding:4px 20px;color:#ffe18d;font-size:.8rem;font-weight:700}
+@media(max-width:600px){.guard-key-notice{padding:4px 12px}}

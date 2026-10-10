@@ -1,0 +1,147 @@
+{
+  "source": "assets/pcclub/laser/boss.png",
+  "sourceSha256": "0650e8e4740581aa8d37bb35c4d143d3a5354d61b6b4769eabca426a20145a08",
+  "outputSize": [
+    320,
+    320
+  ],
+  "frames": [
+    {
+      "id": "normal-1",
+      "crop": [
+        0,
+        38,
+        250,
+        234
+      ],
+      "path": "public/assets/pcclub/boss/normal-1.webp",
+      "bytes": 32296
+    },
+    {
+      "id": "normal-2",
+      "crop": [
+        250,
+        38,
+        250,
+        234
+      ],
+      "path": "public/assets/pcclub/boss/normal-2.webp",
+      "bytes": 32932
+    },
+    {
+      "id": "normal-3",
+      "crop": [
+        500,
+        38,
+        270,
+        234
+      ],
+      "path": "public/assets/pcclub/boss/normal-3.webp",
+      "bytes": 36844
+    },
+    {
+      "id": "awake-1",
+      "crop": [
+        0,
+        312,
+        250,
+        258
+      ],
+      "path": "public/assets/pcclub/boss/awake-1.webp",
+      "bytes": 39230
+    },
+    {
+      "id": "awake-2",
+      "crop": [
+        252,
+        312,
+        242,
+        258
+      ],
+      "path": "public/assets/pcclub/boss/awake-2.webp",
+      "bytes": 40724
+    },
+    {
+      "id": "awake-3",
+      "crop": [
+        500,
+        312,
+        270,
+        258
+      ],
+      "path": "public/assets/pcclub/boss/awake-3.webp",
+      "bytes": 46036
+    },
+    {
+      "id": "damage",
+      "crop": [
+        0,
+        618,
+        202,
+        188
+      ],
+      "path": "public/assets/pcclub/boss/damage.webp",
+      "bytes": 25724
+    },
+    {
+      "id": "hit",
+      "crop": [
+        202,
+        618,
+        194,
+        188
+      ],
+      "path": "public/assets/pcclub/boss/hit.webp",
+      "bytes": 27440
+    },
+    {
+      "id": "smoke",
+      "crop": [
+        384,
+        610,
+        207,
+        204
+      ],
+      "path": "public/assets/pcclub/boss/smoke.webp",
+      "bytes": 29052
+    },
+    {
+      "id": "defeat",
+      "crop": [
+        745,
+        610,
+        325,
+        209
+      ],
+      "path": "public/assets/pcclub/boss/defeat.webp",
+      "bytes": 28618
+    },
+    {
+      "id": "explosion",
+      "crop": [
+        198,
+        830,
+        124,
+        164
+      ],
+      "path": "public/assets/pcclub/boss/explosion.webp",
+      "bytes": 13310
+    },
+    {
+      "id": "debris",
+      "crop": [
+        478,
+        830,
+        86,
+        160
+      ],
+      "path": "public/assets/pcclub/boss/debris.webp",
+      "bytes": 10766
+    }
+  ],
+  "notes": [
+    "Normal sheet frames already have red eyes/lights; preserve original colours.",
+    "Alpha is retained; labels are outside crops. Low residual backdrop alpha < 12 is removed.",
+    "Normal/awake front sprites aligned to the same central body anchor; effects use independent bounds."
+  ]
+}
