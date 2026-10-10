@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Next.js app をリモートサーバーへ rsync デプロイ
+# Next.js / PHP API をリモートサーバーへ rsync デプロイ
 #
 # 接続情報（api/.vscode/sftp.json と同一ホスト・ユーザー・鍵）:
 #   host: cwot.jp
@@ -9,9 +9,11 @@
 #   key:  ~/.ssh/id_rsa
 #
 # Usage:
-#   ./bin/deploy.sh                 # ソース同期のみ
+#   ./bin/deploy.sh                 # ソース/API同期・API依存更新（DB変更なし）
 #   ./bin/deploy.sh --dry-run       # 差分確認（転送・リモート操作なし）
-#   ./bin/deploy.sh --with-build    # 同期 → npm ci → build → pm2 reload/start
+#   ./bin/deploy.sh --with-build    # ソース/API同期 → build → pm2 reload/start
+#   ./bin/deploy.sh --with-build --with-db  # 上記 + DB migration
+#   ./bin/deploy.sh --list-files    # 転送対象をローカル表示（接続なし）
 #   ./bin/deploy.sh --with-build --skip-pm2  # build のみ（pm2 再起動なし）
 #
 # 本番反映の定番:
@@ -22,6 +24,9 @@
 #   DEPLOY_HOST       (default: cwot.jp)
 #   DEPLOY_PATH       (default: /home/cw/app)
 #   DEPLOY_SSH_KEY    (default: ~/.ssh/id_rsa)
+#   DEPLOY_API_PATH   (default: $DEPLOY_PATH/api) # 実際にPHPが参照するAPIルート
+#   DEPLOY_PHP        (default: php)
+#   DEPLOY_COMPOSER   (default: composer)
 #   DEPLOY_NPM        (default: npm)
 #   DEPLOY_PM2        (default: pm2)
 #   DEPLOY_PM2_APP    (default: cw-app)
@@ -48,9 +53,14 @@ DEPLOY_GA_ID="${DEPLOY_GA_ID-G-0GRT7L4WCN}"
 DRY_RUN=""
 WITH_BUILD=false
 SKIP_PM2=false
+WITH_DB=false
+LIST_FILES=false
+DEPLOY_API_PATH="${DEPLOY_API_PATH:-$DEPLOY_PATH/api}"
+DEPLOY_PHP="${DEPLOY_PHP:-php}"
+DEPLOY_COMPOSER="${DEPLOY_COMPOSER:-composer}"
 
 usage() {
-  sed -n '2,34p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,/^set -euo pipefail/p' "$0" | sed '/^set -euo pipefail/d; s/^# \{0,1\}//'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -60,6 +70,12 @@ while [[ $# -gt 0 ]]; do
       ;;
     --with-build)
       WITH_BUILD=true
+      ;;
+    --with-db)
+      WITH_DB=true
+      ;;
+    --list-files)
+      LIST_FILES=true
       ;;
     --skip-pm2)
       SKIP_PM2=true
@@ -77,9 +93,31 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
+# Build the complete local manifest before any network or remote mutation.
+APP_LIST="$(mktemp)"
+API_LIST="$(mktemp)"
+trap 'rm -f "$APP_LIST" "$API_LIST"' EXIT
+python3 "$ROOT/scripts/deployManifest.py" "$ROOT" --area app > "$APP_LIST"
+python3 "$ROOT/scripts/deployManifest.py" "$ROOT" --area api > "$API_LIST"
+if $LIST_FILES; then
+  echo "[app]"
+  python3 "$ROOT/scripts/deployManifest.py" "$ROOT" --area app --print
+  echo "[api]"
+  python3 "$ROOT/scripts/deployManifest.py" "$ROOT" --area api --print
+  exit 0
+fi
 if ! command -v rsync >/dev/null 2>&1; then
   echo "rsync is required but not found in PATH" >&2
   exit 1
+fi
+# These values enter the existing remote shell scripts; reject shell metacharacters.
+for deploy_value in "$DEPLOY_PATH" "$DEPLOY_API_PATH" "$DEPLOY_USER" "$DEPLOY_HOST" "$DEPLOY_NPM" "$DEPLOY_PM2" "$DEPLOY_PM2_APP" "$DEPLOY_PHP" "$DEPLOY_COMPOSER" "$DEPLOY_PORT" "$DEPLOY_HOST_BIND" "$DEPLOY_GA_ID"; do
+  if [[ ! "$deploy_value" =~ ^[a-zA-Z0-9_./:@-]*$ ]]; then
+    echo "Unsupported character in deployment configuration" >&2; exit 1
+  fi
+done
+if [[ "$DEPLOY_PATH" != /* || "$DEPLOY_API_PATH" != /* || "$DEPLOY_PATH" == / || "$DEPLOY_API_PATH" == / ]]; then
+  echo "Deploy paths must be absolute non-root directories" >&2; exit 1
 fi
 
 DEPLOY_SSH_KEY="${DEPLOY_SSH_KEY/#\~/$HOME}"
@@ -91,9 +129,12 @@ fi
 
 SSH_TARGET="${DEPLOY_USER}@${DEPLOY_HOST}"
 SSH_CMD=(ssh -i "$DEPLOY_SSH_KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15)
+printf -v RSYNC_SSH '%q ' "${SSH_CMD[@]}"
 
 echo "Deploy target: ${SSH_TARGET}:${DEPLOY_PATH}"
 echo "Source:        ${ROOT}/"
+echo "API target:    ${SSH_TARGET}:${DEPLOY_API_PATH}"
+if $WITH_DB; then echo "DB migration:  enabled (existing remote API .env)"; fi
 if $WITH_BUILD; then
   echo "Remote build:  ${DEPLOY_NPM} ci && ${DEPLOY_NPM} run build"
   if [[ -n "$DEPLOY_GA_ID" ]]; then
@@ -132,45 +173,12 @@ RSYNC_EXCLUDES=(
   --exclude '*.tsbuildinfo'
 )
 
-# Transfer only version-controlled application files and the two existing runtime
-# configuration files. Ignored authoring/evidence/credentials never enter rsync.
-# Excluded paths remain protected from --delete (no --delete-excluded).
-TRANSFER_LIST="$(mktemp)"
-trap 'rm -f "$TRANSFER_LIST"' EXIT
-git -C "$ROOT" ls-files -z | python3 -c '
-import sys
-blocked=("docs/", ".openai/", ".claude/", ".wrangler/", "work/", "outputs/", "tmp/")
-paths=sys.stdin.buffer.read().split(b"\0")
-sys.stdout.buffer.write(b"\0".join(p for p in paths if p and not p.decode().startswith(blocked))+b"\0")
-' > "$TRANSFER_LIST"
-# Past-paper player files are untracked, and the sitting JSON is gitignored.
-# The remote build imports both, so git ls-files alone never delivers them.
-python3 -c '
-import pathlib, sys
-root = pathlib.Path(sys.argv[1])
-extras = [
-    "app/styles/views/houki-kakomon.css",
-    "tooling/houki/dev-kakomon.mjs",
-    "lib/cardRarity.ts",
-]
-extras += [str(path.relative_to(root)) for path in (root / "app/dev/houki-kakomon").glob("*") if path.is_file()]
-extras += [str(path.relative_to(root)) for path in (root / "lib/houki/kakomon").glob("*") if path.is_file()]
-extras += [str(path.relative_to(root)) for path in (root / "public/assets/achievement_level").glob("R*.png") if path.is_file()]
-extras += [str(path.relative_to(root)) for path in (root / "private/houki-kakomon/sets").glob("1sou-houki-*.json") if path.is_file()]
-missing = [item for item in extras if not (root / item).is_file()]
-if missing:
-    sys.stderr.write("deploy source missing:\n" + "\n".join(missing) + "\n")
-    sys.exit(1)
-sys.stdout.buffer.write(("\0".join(extras) + "\0").encode())
-' "$ROOT" >> "$TRANSFER_LIST"
-printf 'ecosystem.config.cjs\0.openai/hosting.json\0' >> "$TRANSFER_LIST"
-
-# shellcheck disable=SC2086
-rsync -avz --delete --from0 --files-from="$TRANSFER_LIST" ${DRY_RUN} \
-  "${RSYNC_EXCLUDES[@]}" \
-  -e "${SSH_CMD[*]}" \
-  "${ROOT}/" \
-  "${SSH_TARGET}:${DEPLOY_PATH}/"
+# Preserve server-only configuration and dependencies; do not delete unrelated
+# remote files via a dynamically generated files-from list.
+rsync -avz --from0 --files-from="$APP_LIST" ${DRY_RUN} \
+  "${RSYNC_EXCLUDES[@]}" -e "$RSYNC_SSH" "${ROOT}/" "${SSH_TARGET}:${DEPLOY_PATH}/"
+rsync -avz --from0 --files-from="$API_LIST" ${DRY_RUN} \
+  "${RSYNC_EXCLUDES[@]}" -e "$RSYNC_SSH" "${ROOT}/api/" "${SSH_TARGET}:${DEPLOY_API_PATH}/"
 
 if [[ -n "$DRY_RUN" ]]; then
   echo ""
@@ -178,8 +186,16 @@ if [[ -n "$DRY_RUN" ]]; then
   if $WITH_BUILD; then
     echo "Skipped remote npm ci / build / pm2 (dry run)."
   fi
+  if $WITH_DB; then echo "Skipped DB migration and composer (dry run)."; fi
   exit 0
 fi
+
+# API dependencies must be installed on the server, never copied from local vendor.
+"${SSH_CMD[@]}" "$SSH_TARGET" bash -s <<EOF
+set -euo pipefail
+cd '${DEPLOY_API_PATH}'
+'${DEPLOY_COMPOSER}' install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+EOF
 
 if $WITH_BUILD; then
   echo ""
@@ -200,6 +216,18 @@ export NEXT_PUBLIC_GA_MEASUREMENT_ID='${DEPLOY_GA_ID}'
 '${DEPLOY_NPM}' run build
 EOF
 
+fi
+
+if $WITH_DB; then
+  echo "Applying registered DB migrations..."
+  "${SSH_CMD[@]}" "$SSH_TARGET" bash -s <<EOF
+set -euo pipefail
+cd '${DEPLOY_API_PATH}'
+'${DEPLOY_PHP}' bin/migrate.php
+EOF
+fi
+
+if $WITH_BUILD; then
   if ! $SKIP_PM2; then
     echo ""
     echo "Reloading PM2 app..."

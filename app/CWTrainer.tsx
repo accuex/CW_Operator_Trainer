@@ -2,7 +2,9 @@
 
 import { ComputerClubView } from './views/ComputerClubView';
 import { watchSharingWithdrawal } from '@/lib/activity';
-
+import { ActivityView } from './views/ActivityView';
+import { ACTIVITY_SUBJECTS, publishActivity, retryWithdrawal, syncSharedAvatar } from '@/lib/activity';
+import { AvatarPortrait } from './components/AvatarPicker';
 import GeographyLoading from './views/geography/GeographyLoading';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -97,6 +99,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   const [signedIn, setSignedIn] = useState(false);
   const speedWrapRef = useRef<HTMLDivElement>(null);
   const applyingCloudRef = useRef(false);
+  const achievementActivityReady = useRef(false);
 
   const announce = useCallback((message: string) => {
     setToast(message);
@@ -263,7 +266,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
   useEffect(() => {
     if (!ready) return;
     const { profile: next, unlocked } = applyAchievements(profile, answers, sessions);
+    const shareNewUnlocks = achievementActivityReady.current;
+    achievementActivityReady.current = true;
     if (unlocked.length === 0) return;
+    if (shareNewUnlocks) for (const id of unlocked) void publishActivity('achievement', id, profile.avatarId).catch(() => undefined);
     queueMicrotask(() => {
       setProfile(next);
       const first = achievementById(unlocked[0])?.title ?? unlocked[0];
@@ -273,7 +279,19 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, answers, sessions, profile.cards, profile.koch, profile.kochWabun, profile.qso, profile.achievements]);
 
+  useEffect(() => {
+    if (ready && Object.hasOwn(ACTIVITY_SUBJECTS, view)) {
+      void publishActivity('started', view, profile.avatarId).catch(() => undefined);
+    }
+  }, [ready, view, profile.avatarId]);
+
   useEffect(() => watchSharingWithdrawal(), []);
+
+  useEffect(() => {
+    if (!ready) return;
+    void retryWithdrawal().catch(() => undefined);
+    void syncSharedAvatar(profile.avatarId).catch(() => undefined);
+  }, [ready, profile.avatarId]);
 
   const stopAudio = () => {
     audioEngine.stop();
@@ -315,7 +333,8 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     'computer-club': <ComputerClubView settings={settings} stopEpoch={stopEpoch} setAudioStatus={setAudioStatus} />,
     resources: <ResourcesView onBack={() => navigate('home')} />,
     settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} onNavigate={navigate} />,
-    account: <AccountView announce={announce} onNavigate={navigate} />,
+    activity: <ActivityView onAccount={() => navigate('account')} />,
+    account: <AccountView announce={announce} onNavigate={navigate} profile={profile} setProfile={setProfile} />,
   }[view];
 
   return (
@@ -429,7 +448,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
               <Icon name="stop" size={14} /><span>{AUDIO_STATUS_LABEL[audioStatus] ?? audioStatus}</span>
             </button>
             <button type="button" className="profile-button" onClick={() => navigate('account')} title={`マイページ / 目的: ${goalLabel(profile.goal)} / 範囲: ${scopeLabel(profile)}`} aria-label="マイページ">
-              <span className="profile-avatar" aria-hidden="true"><Icon name="account" size={18} /></span>
+              <span className="profile-avatar" aria-hidden="true"><AvatarPortrait avatarId={profile.avatarId} size={34} /></span>
               <span className="profile-text"><b>{scopeLabel(profile)}</b><small>{goalLabel(profile.goal)}</small></span>
             </button>
           </div>

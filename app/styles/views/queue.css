@@ -459,23 +459,28 @@
 }
 
 @media (max-width: 760px) {
-  .queue-score { justify-items: start; width: 100%; }
-  .queue-config { grid-template-columns: 1fr; }
+  .queue-score { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; width: 100%; padding: 10px 14px; }
+  .queue-score > b { font-size: 32px; }
+  .queue-config { grid-template-columns: 1fr; gap: 12px; }
   .queue-field-depth { grid-column: auto; }
-  .depth-buttons button { height: 56px; font-size: 18px; }
+  .depth-buttons button { height: 48px; font-size: 18px; }
   .queue-fail { flex-direction: column; align-items: stretch; text-align: left; }
   .queue-fail .btn { margin-left: 0; width: 100%; }
   .fifo-stage {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-items: center;
-    gap: 8px;
-    padding: 18px 12px 16px;
+    gap: 12px;
+    padding: 16px 12px;
   }
-  .fifo-arrow { transform: rotate(90deg); }
-  .fifo-memory { width: 100%; }
-  .fifo-column strong { width: 104px; margin: 8px auto; }
+  .fifo-arrow { display: none; }
+  .fifo-column.incoming { grid-column: 1; grid-row: 1; }
+  .fifo-column.output { grid-column: 2; grid-row: 1; }
+  .fifo-memory { width: 100%; grid-column: 1 / -1; grid-row: 2; }
+  .fifo-column strong { width: 72px; margin: 6px auto; }
   .fifo-memory b { min-height: 48px; }
-  .slot-next { display: none; }
+  .slot-next { font-size: 10px; }
+  .queue-active .queue-config .queue-field { display: none; }
+  .queue-active .queue-steps, .queue-active .page-title p:not(.section-kicker) { display: none; }
   .queue-choice { min-height: 74px; }
   .queue-choice b { font-size: 26px; }
   .queue-metrics { grid-template-columns: 1fr 1fr; }

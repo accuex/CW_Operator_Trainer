@@ -32,6 +32,10 @@
 .sidebar-logo-mini { display: none; width: 56px; height: auto; }
 .sidebar .nav { gap: 2px; }
 .sidebar .nav-item { min-height: 44px; }
+@media (min-width: 761px) {
+  .sidebar .nav { gap: 0; }
+  .sidebar .nav-item { min-height: 40px; }
+}
 .brand {
   display: flex;
   align-items: center;

@@ -280,7 +280,7 @@ export function QueueView({ settings, setSettings, record, setAudioStatus, stopE
     );
   };
 
-  return <section className="page-pad queue-page">
+  return <section className={`page-pad queue-page${active ? ' queue-active' : ''}`}>
     <div className="page-title">
       <div>
         <p className="section-kicker">Delayed Copy</p>

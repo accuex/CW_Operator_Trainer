@@ -34,6 +34,7 @@ export const SITE_GROUPS: SiteGroup[] = [
       { href: viewToPath('queue'), label: '遅れ受信', note: '聞いてから書く', icon: 'queue' },
       { href: viewToPath('qso'), label: 'QSO 交信', note: '仮想バンド', icon: 'radio', footer: true },
       { href: viewToPath('collection'), label: 'カード図鑑', note: '覚えた符号', icon: 'collection', footer: true },
+      { href: viewToPath('computer-club'), label: '放課後パソコン部', note: 'CW迎撃隊・受信ミニゲーム', icon: 'radio' },
       { href: viewToPath('analysis'), label: '苦手分析', note: '取り違えの振り返り', icon: 'analysis' },
     ],
   },

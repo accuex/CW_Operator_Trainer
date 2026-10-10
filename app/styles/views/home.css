@@ -164,7 +164,8 @@
 .home-card h3 { margin: 0; font-size: 16px; white-space: nowrap; }
 /* Reserve four lines so every title sits on the same baseline. */
 .home-card p { min-height: calc(4 * 1.6em); margin: 0; color: var(--text-2); font-size: 12.5px; line-height: 1.6; }
-.home-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px; color: var(--tone); font: 800 13px var(--font-display); }
+.home-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px; min-height: 1.4em; white-space: nowrap; color: var(--tone); font: 800 12px/1.4 var(--font-display); }
+.home-card-meta svg { flex-shrink: 0; }
 
 .home-lower { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 14px; margin-top: 16px; }
 .home-qso {
@@ -270,4 +271,44 @@
   }
   .home-qso-quote { position: static; margin-top: 10px; transform: none; text-align: left; }
   .home-status-row { grid-template-columns: 1fr 1fr 88px; }
+}
+
+/* An illustrated, full-width entrance to the after-school arcade. */
+.home-defense-banner {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 16px 0 0;
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #00132b;
+  color: #effaff;
+  text-align: left;
+  cursor: pointer;
+}
+.home-defense-banner > img { display: block; width: 100%; height: auto; }
+.home-defense-copy {
+  position: absolute;
+  top: 18%;
+  left: 34%;
+  width: 31%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-shadow: 0 2px 6px #001025;
+}
+.home-defense-kicker { font-weight: 800; font-size: clamp(12px, 1.55cqw, 24px); color: #61d9ff; letter-spacing: .07em; }
+.home-defense-title { font: italic 900 clamp(32px, 4.6cqw, 72px)/1.15 var(--font-display); white-space: nowrap; color: #fff; text-shadow: 0 0 8px #00baff, 0 0 22px #008aff; }
+.home-defense-description { margin-top: 8px; font-size: clamp(11px, 1.15cqw, 18px); line-height: 1.65; font-weight: 600; }
+.home-defense-cta { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; margin-top: 12px; padding: 8px 24px; border-radius: 18px; background: linear-gradient(#67d5e9, #1695c5); box-shadow: 0 4px 0 #006b9e; color: #002641; font-size: clamp(12px, 1.3cqw, 20px); font-weight: 800; text-shadow: none; }
+.home-defense-banner:hover .home-defense-cta { background: linear-gradient(#8de8f6, #36b8df); }
+.home-defense-banner:focus-visible { outline: 3px solid #ffd56f; outline-offset: 4px; }
+@container dashboard (max-width: 700px) {
+  .home-defense-copy { position: relative; top: auto; left: auto; width: auto; padding: 12px 18px 18px; background: linear-gradient(#00132b, #071d36); }
+  .home-defense-kicker { font-size: 13px; }
+  .home-defense-title { font-size: 34px; }
+  .home-defense-description { font-size: 13px; margin-top: 6px; }
+  .home-defense-cta { font-size: 14px; margin-top: 10px; }
 }

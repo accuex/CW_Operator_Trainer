@@ -93,6 +93,86 @@ FRONTEND_URL=https://cwot.jp
 
 `NEXT_PUBLIC_API_BASE_URL` と `SITE_URL` も `https://cwot.jp` に合わせて再ビルドしてください。旧ドメインで登録したパスキーは新しいRP IDでは使えないため、別のログイン手段で入り、新ドメインで登録し直します。ブラウザ内の学習記録もドメインごとに保存され、移行時に自動では引き継がれません。
 
-## 学習ログ共有の安全性
+## Opt-in academy activity feed
 
-詳細・APIの更新仕様・保存期限・検証結果は [改善記録](docs/activity-sharing-safety.md) を参照。公開IDでは操作できません。ONは専用トークンで取得したrevisionが必須、OFFは版番号にかかわらず優先します。名前・アバター更新は共有設定とは別APIです。既存schemaを変更するmigrationはありません。
+追加migration: `sql/schema_activity.sql`。既存DBへ適用した後、更新されたAPIを配置する。
+本機能の実装時点では本番migration/deployは未実施。従来の同期テーブルは変更しない。
+
+- `GET /api/v1/activity`: 共有中の直近30日・最新100件を取得（未ログインでも閲覧可）。
+- `GET /api/v1/activity/settings`: token所有者の共有状態とrevisionを取得。
+- `PUT /api/v1/activity/settings`: `{ sharing: boolean, nickname: string, avatarId: string|null, revision?: number }`。ONには直前に取得したrevisionが必須。OFFは版に関係なく優先し、revisionを進める。旧クライアントの版なしONは409。
+- `PUT /api/v1/activity/profile`: `{ nickname: string, avatarId: string|null }`。名前・アバターだけを更新し、共有を有効化しない。
+- `POST /api/v1/activity/events`: `{ kind: "started"|"achievement", detail: 許可されたID }`。
+- 書き込みは端末専用のランダム256bit tokenを `Authorization: Bearer` で提示。ログインJWTとは別物。
+  サーバーはSHA256 digestだけを保存し、公開IDとtokenを分離する。tokenはプロフィール同期・エクスポートに入れない。
+- 共有は初期オフ。オフで当人の掲載イベントを削除し、公開名・アバターを消去する。
+  同期profileやメール・回答内容・正答率を参照しない。共有設定はブラウザ専用。
+- 学習開始は対象画面へ移動したとき（30分に1件）。達成は新しく解放されたアチーブIDのみ。
+  過去の達成をさかのぼって投稿しない。イベントは自己申告であり技能認定ではない。
+- IPの時間別digestを用いて書込み120回/時を制限。生IPはこのテーブルに保存しない。
+  読み込みキャッシュは `no-store`。ブラウザの保存データを消すと取り下げtokenも失われる。
+- 開発フロントでは端末内のログだけを表示する。本番へ試験投稿しない。
+- API照合用allowlistは `data/activity-catalog.json`。フロントのavatar/achievement/subjectとの一致をテストで検証。
+
+検証: `php api/tests/activity.php`（SQLiteインメモリ、実DBや本番利用者へ影響なし）。
+本番MariaDBでのmigration・複数利用者の結合確認はdeploy時に別途行う。
+
+## Combined source/API/database deployment
+
+`bin/deploy.sh` transfers tracked files **and nonignored new files**. `.env`, vendor,
+private evidence and credentials stay excluded. Only the existing narrowly listed
+past-paper build inputs are retained as private runtime exceptions. Server-only
+files are not deleted by this transfer.
+
+```bash
+# Offline transfer list (no SSH)
+./bin/deploy.sh --list-files
+# Preview transfers; never executes build, composer or migration
+./bin/deploy.sh --dry-run --with-build --with-db
+# Transfer app/API, install API dependencies, build, migrate, then reload
+./bin/deploy.sh --with-build --with-db
+```
+
+`DEPLOY_API_PATH` defaults to `$DEPLOY_PATH/api`. If the web server serves PHP from
+another directory, set this to that **existing API root** (the directory containing
+`public/`, `src/`, `vendor/`, `.env`). Its existing server `.env` is required for DB
+migration; local `.env` files are never uploaded. `DEPLOY_PHP` and
+`DEPLOY_COMPOSER` can specify executable paths.
+
+The DB step uses `api/bin/migrate.php` and `cwot_schema_migrations` with SHA256 and
+an advisory lock. Registered order: base → passkeys → auth-mail → activity.
+Previously manually created tables are retained with `CREATE TABLE IF NOT EXISTS`;
+this does not assert that an independently modified existing table has the expected
+columns. Applied SQL cannot be edited silently: add a new explicitly registered
+migration instead. Unregistered SQL files stop the runner. The current runner
+supports only the additive initial CREATE TABLE migrations, not arbitrary ALTER,
+stored routines or destructive data patches.
+
+MariaDB DDL auto-commits. A partial failure may leave newly created tables, but
+no applied-history entry is written for the incomplete file. Re-running these
+idempotent initial migrations resumes safely. DB backup/restore remains the server
+operator's responsibility; no automatic data rollback is claimed. Migration failure
+stops before PM2 reload. File synchronization occurs before migration, so this is
+not an atomic zero-downtime deployment.
+
+Offline checks:
+
+```bash
+python3 scripts/deployManifest.test.py
+php api/tests/migrations.php
+```
+
+Production deployment and real MariaDB migration have not been performed as part
+of this script change.
+
+### Activity safety and retention
+
+- GET/settings reads: 120 requests per IP per minute; writes: 120 per IP per hour.
+- OFF has a separate 30/minute budget so exhausted posting limits do not block withdrawal.
+- Activity request bodies are capped at 8 KiB before JSON parsing, including missing/false Content-Length.
+- OFF removes the owner's events and displayed name/avatar; failed requests stay pending and retry on `online`.
+- Public feed is read-only, latest 100 within 30 days. Stored expired events are cleaned at most once an hour on writes.
+- After 90 days without updates, publisher name/avatar are erased and sharing is disabled. Non-public hashed-token/public-ID/revision tombstones remain to reject delayed consent requests; these are not account profiles. Cleanup is opportunistic: without writes, physical expiry waits until the next write. Feed still excludes events older than 30 days.
+- Login does not recover the device publisher token: older publishers have no authenticated account binding. Linking by nickname or public ID would permit impersonation and is intentionally not implemented.
+- Database schema/migration files are unchanged. No production DB commands were run for this change. MariaDB concurrent execution remains a deployment check; SQLite tests cover delayed request ordering and independent ownership.
+- Test: `php api/tests/activity.php` and `php api/tests/activity_body_limit.php`.

@@ -1,3 +1,4 @@
+import { getAvatar } from './avatars';
 import { APP_VERSION, SCHEMA_VERSION, currentDataMeta, currentExportMeta, type DataMeta } from './appMeta';
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from './types';
 import { clampSpeedWpm } from './speed';
@@ -37,6 +38,7 @@ export function normalizeProfile(profile: Partial<TrainerProfile> | null | undef
     cards: profile?.cards ?? {},
     achievements: profile?.achievements ?? {},
     revealAll: Boolean(profile?.revealAll),
+    avatarId: getAvatar(profile?.avatarId)?.id ?? null,
   };
   if (profile?.qso) merged.qso = normalizeQsoProfile(profile.qso);
   if (!merged.unlockedKinds || merged.unlockedKinds.length === 0) {

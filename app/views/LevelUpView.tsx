@@ -277,7 +277,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
 
     <div className="koch-hero panel">
       <div className="koch-level">
-        <Ring value={allCleared ? 1 : Math.min(1, levelBest / KOCH_PASS_ACCURACY)} size={112} stroke={9} tone={allCleared ? 'var(--mint)' : 'var(--violet)'}>
+        <Ring value={allCleared ? 1 : Math.min(1, levelBest / KOCH_PASS_ACCURACY)} size={88} stroke={7} tone={allCleared ? 'var(--mint)' : 'var(--violet)'}>
           <small>Lv.</small><b>{koch.level}</b>
         </Ring>
         <div className="koch-level-text">
@@ -286,6 +286,8 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
           <small>このレベルのベスト {levelBest ? pct(levelBest) : '—'} / 合格 {passLine}%</small>
         </div>
       </div>
+      <details className="koch-ladder-details">
+        <summary>文字の解放状況 · 全 {maxLesson} レベル</summary>
       <ol className="koch-ladder" aria-label="解放済みの文字">
         {order.map((symbol, index) => {
           const unlockedAt = Math.max(1, index);
@@ -297,6 +299,7 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
           );
         })}
       </ol>
+      </details>
     </div>
 
     <div className="koch-grid">
@@ -328,6 +331,15 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
               <Segmented label="時間" value={String(minutes)} onChange={(value) => setMinutes(Number(value) as KochDuration)} options={KOCH_DURATIONS.map((value) => [String(value), `${value} 分`])} />
             </div>
 
+            <details className="disclosure">
+              <summary>速度・音の設定（文字 {settings.characterSpeed} / 実効 {settings.effectiveSpeed} WPM）</summary>
+              <div><AudioControls settings={settings} setSettings={setSettings} /></div>
+            </details>
+
+            <button type="button" className="btn btn-primary btn-lg btn-block koch-start" onClick={() => void start()}>
+              <Icon name="play" size={18} />{mode === 'test' ? '昇級試験をはじめる' : '練習をはじめる'}
+            </button>
+
             <div className="koch-new">
               <span className="koch-field-label">{lesson === koch.level ? 'このレベルの新しい文字' : 'このレベルで加わった文字'}</span>
               <div className="koch-new-chars">
@@ -341,15 +353,6 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
               </div>
               <p className="koch-pool">出題: {chars.join(' ')}</p>
             </div>
-
-            <details className="disclosure">
-              <summary>速度・音の設定（文字 {settings.characterSpeed} / 実効 {settings.effectiveSpeed} WPM）</summary>
-              <div><AudioControls settings={settings} setSettings={setSettings} /></div>
-            </details>
-
-            <button type="button" className="btn btn-primary btn-lg btn-block koch-start" onClick={() => void start()}>
-              <Icon name="play" size={18} />{mode === 'test' ? '昇級試験をはじめる' : '練習をはじめる'}
-            </button>
           </div>
         )}
 
@@ -437,15 +440,15 @@ export function LevelUpView({ settings, setSettings, profile, setProfile, record
               </div>
             )}
 
-            <div className="koch-align" aria-label="採点の詳細">{alignedCells}</div>
-            <p className="koch-legend"><i className="match" />正解 <i className="sub" />誤字 <i className="del" />脱字 <i className="ins" />冗字</p>
-
             <div className="koch-result-actions">
               <button type="button" className="btn btn-ghost" onClick={() => setPhase('setup')}><Icon name="chevron-left" size={16} />設定に戻る</button>
               <button type="button" className="btn btn-primary btn-lg" onClick={() => void start()}>
                 <Icon name="repeat" size={18} />{resultMeta.leveledUp ? `Lv.${koch.level} に挑戦` : 'もう一度'}
               </button>
             </div>
+
+            <div className="koch-align" aria-label="採点の詳細">{alignedCells}</div>
+            <p className="koch-legend"><i className="match" />正解 <i className="sub" />誤字 <i className="del" />脱字 <i className="ins" />冗字</p>
           </div>
         )}
       </div>

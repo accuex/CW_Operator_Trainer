@@ -1,6 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { SharingSettings } from '@/app/components/SharingSettings';
+import { AvatarPicker } from '@/app/components/AvatarPicker';
+import type { TrainerProfile } from '@/lib/types';
 import { loadAuthSession, type AuthSession } from '@/lib/api/authSession';
 import { notifyAuthSync } from '@/lib/api/cloudSync';
 import {
@@ -48,7 +51,11 @@ function clearAccountQuery() {
 export function AccountView({
   announce,
   onNavigate,
+  profile,
+  setProfile,
 }: {
+  profile: TrainerProfile;
+  setProfile: Dispatch<SetStateAction<TrainerProfile>>;
   announce: (message: string) => void;
   onNavigate?: (view: View) => void;
 }) {
@@ -193,10 +200,8 @@ export function AccountView({
             <p className="account-note">ブラウザのデータを消すと、ブラウザだけに保存した記録は失われます。</p>
             {onNavigate && <button type="button" className="account-switch-link" onClick={() => onNavigate('home')}>ログインせずに学習を続ける →</button>}
           </section>
-              <aside className="account-coming-soon" aria-label="今後の予定">
-                <span className="account-coming-soon-label">今後の予定</span>
-                <p>アバターやニックネームを登録して、仲間の頑張りが見える学習ログを準備しています。進捗の公開は、希望する方だけが選べる形を予定しています。</p>
-              </aside>
+              <AvatarPicker avatarId={profile.avatarId} onSelect={(avatarId) => { setProfile((current) => ({ ...current, avatarId })); announce('アバターを変更しました'); }} />
+              <SharingSettings avatarId={profile.avatarId} onOpenLog={() => onNavigate?.('activity')} />
           </div>}
 
           <div className="account-auth-form">
@@ -432,6 +437,8 @@ export function AccountView({
         </div>
       </div>
 
+      <AvatarPicker avatarId={profile.avatarId} onSelect={(avatarId) => { setProfile((current) => ({ ...current, avatarId })); announce('アバターを変更しました'); }} />
+      <SharingSettings avatarId={profile.avatarId} onOpenLog={() => onNavigate?.('activity')} />
       <div className="settings-grid">
         <div className="panel panel-pad settings-panel">
           <div className="settings-card-head">

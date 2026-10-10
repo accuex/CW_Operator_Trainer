@@ -2,11 +2,11 @@
 
 .koch-hero {
   display: grid;
-  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
-  gap: clamp(16px, 2.4vw, 28px);
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  gap: 16px;
   align-items: center;
   margin-bottom: 18px;
-  padding: clamp(16px, 2.2vw, 24px);
+  padding: 16px;
   background:
     radial-gradient(420px 200px at 0% 0%, rgb(174 146 255 / 16%), transparent 68%),
     radial-gradient(380px 220px at 100% 120%, rgb(246 196 83 / 10%), transparent 62%),
@@ -640,7 +640,7 @@
 
 /* The 41-char ladder needs ~600px beside the level block; stack it below on narrower content. */
 .koch-page { container: koch / inline-size; }
-@container koch (max-width: 980px) {
+@container koch (max-width: 680px) {
   .koch-hero { grid-template-columns: 1fr; }
   .koch-ladder { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); }
   .koch-char { width: auto; aspect-ratio: 1; height: auto; }
@@ -648,3 +648,7 @@
 
 .koch-mp3 { margin:20px 0; }
 .koch-mp3 p { color:var(--muted); font-size:13px; line-height:1.7; margin-top:8px; }
+
+.koch-ladder-details { min-width: 0; }
+.koch-ladder-details summary { min-height: 44px; padding: 12px; cursor: pointer; color: var(--text-2); font-weight: 700; border: 1px solid var(--line); border-radius: var(--r-md); }
+.koch-ladder-details[open] summary { margin-bottom: 10px; }

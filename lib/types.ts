@@ -410,6 +410,8 @@ export interface KochProgress {
 }
 
 export interface TrainerProfile {
+  /** Selected catalog avatar; absent in older profiles. */
+  avatarId?: string | null;
   version: 1;
   goal: 'fun' | 'sound' | 'experienced' | 'exam' | null;
   /** Learn / Collection filter via unlockedKinds. Kept for old backups. */

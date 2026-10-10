@@ -131,8 +131,14 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
         ))}
       </div>
 
-      <button type="button" className="home-club-entrance" onClick={() => onNavigate('computer-club')}>
-        <Icon name="radio" size={28} /><span><small>AFTER SCHOOL</small><b>放課後パソコン部</b><span>CWを聞き取って迎撃！ ミニゲームでひと勝負。</span></span><Icon name="chevron-right" size={20} />
+      <button type="button" className="home-defense-banner" onClick={() => onNavigate('computer-club')} aria-label="CW迎撃隊 — 放課後パソコン部の迎撃ミッションへ">
+        <Image src="/assets/pcclub/robot/robot_banner.png" alt="" width={2171} height={724} sizes="(max-width: 760px) 100vw, (max-width: 1400px) 80vw, 1440px" />
+        <span className="home-defense-copy">
+          <span className="home-defense-kicker">音を聴いて、街を守れ。</span>
+          <span className="home-defense-title">CW迎撃隊</span>
+          <span className="home-defense-description">モールスを聞き取って敵を迎撃！<br />放課後の防衛ミッションに挑戦しよう。</span>
+          <span className="home-defense-cta">迎撃ミッションへ<Icon name="chevron-right" size={20} /></span>
+        </span>
       </button>
 
       <div className="home-lower">

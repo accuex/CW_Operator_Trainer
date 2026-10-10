@@ -125,7 +125,7 @@
 /* ───────── Lesson layout ───────── */
 .lesson-grid {
   display: grid;
-  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: clamp(18px, 2.4vw, 32px);
   align-items: start;
 }
@@ -389,7 +389,7 @@
 @media (max-width: 1180px) {
   .learn-top { grid-template-columns: 1fr auto; }
   .phase-stepper { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
-  .lesson-grid { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); }
+  .lesson-grid { grid-template-columns: minmax(200px, 240px) minmax(0, 1fr); }
   .course-pick-grid { grid-template-columns: 1fr; }
   .course-pick-card { min-height: 0; }
 }
@@ -401,7 +401,7 @@
   .phase-stepper button { width: 100%; min-width: 0; padding: 4px 10px 4px 4px; }
   .phase-dot { width: 32px; height: 32px; }
   .lesson-grid { grid-template-columns: 1fr; }
-  .lesson-card-col { position: static; grid-template-columns: 140px 1fr; align-items: start; }
+  .lesson-card-col { position: static; grid-template-columns: 108px minmax(0, 1fr); align-items: start; }
   .lesson-card-stats { padding: 12px; }
   .meter-row { grid-template-columns: 1fr auto; }
   .meter-row span { grid-column: 1 / -1; }

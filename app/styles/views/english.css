@@ -2,7 +2,8 @@
 .english-heading {display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:24px;}
 .english-heading h1 {font-size:clamp(24px,3vw,38px);margin:8px 0;}
 .english-heading p {max-width:700px;line-height:1.8;}
-.english-controls {padding:20px;display:grid;gap:14px;}
+.english-controls {padding:18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);gap:12px 20px;align-items:center;}
+.english-controls > p,.english-controls > small {grid-column:1 / -1;}
 .english-tiers {display:flex;flex-wrap:wrap;gap:10px;}
 .english-tiers span {font-size:.85em;margin-left:8px;}
 .english-controls label {display:grid;gap:8px;max-width:540px;}
@@ -32,12 +33,12 @@
 .english-evidence summary {cursor:pointer;line-height:1.6;min-height:44px;}
 .english-evidence li {margin:12px 0;}
 .english-notice {padding:14px;border:1px solid var(--gold);border-radius:8px;}
-@media(max-width:700px) {.english-heading {flex-direction:column;}.english-workspace {grid-template-columns:1fr;}.english-list {max-height:220px;}.english-controls {padding:14px;}.english-tiers .btn {flex:1;min-width:80px;padding:10px 8px;}.english-tiers span {display:block;margin:4px 0 0;}.english-actions .btn {padding:10px 12px;}.english-view {min-width:0;}}
+@media(max-width:700px) {.english-heading {flex-direction:column;}.english-workspace {grid-template-columns:1fr;}.english-list {max-height:176px;}.english-controls {padding:14px;grid-template-columns:1fr;}.english-tiers .btn {flex:1;min-width:80px;padding:10px 8px;display:block;text-align:center;}.english-tiers span {display:block;margin:4px 0 0;}.english-actions .btn {padding:10px 12px;}.english-view {min-width:0;}}
 
 .english-preview { margin: 1rem 0; padding: .8rem; border: 1px solid var(--line-2); border-radius: .6rem; }
 .english-preview p { margin-top: 0; }
 .english-preview .btn, .english-related .btn { white-space: normal; overflow-wrap: anywhere; }
 .english-why { color: var(--muted); }
-.english-illustration { margin: 24px 0; max-width: 600px; }
+.english-illustration { margin: 16px 0; max-width: 480px; }
 .english-illustration img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; border-radius: 10px; background: var(--surface-2); }
 .english-illustration figcaption { margin-top: 8px; color: var(--muted); font-size: .85rem; line-height: 1.7; }

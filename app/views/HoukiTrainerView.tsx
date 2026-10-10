@@ -24,7 +24,7 @@ export default function HoukiTrainerView({onBack,onOpenKakomon}:{onBack:()=>void
  {process.env.NODE_ENV==='development'&&<a className="btn btn-secondary" href="/__houki-review/login">内部教材レビュー（担当者認証）</a>}
  {master?.edition==='internal_review'&&<button className="btn btn-secondary" onClick={async()=>{await fetch('/__houki-review/logout',{method:'POST',credentials:'same-origin'});window.location.assign('/app/houki');}}>レビューを終了・通常教材へ</button>}
  {master?.edition==='internal_review'&&<p className="ht-notice">実法規・内部レビュー専用／一般公開未承認。教材版 {release?.contentVersion} · 法令確認基準日 {release?.dates.verificationAsOf}。権利審査・人間による公開承認は未完了です。</p>}
- {master?.edition==='approved_release'&&<p className="ht-notice">法令確認基準日：2026年10月7日。一総通法規の限定範囲を扱う、CWOT独自編集教材です。政府機関・試験実施機関の公式教材ではありません。練習問題は独自作成で、過去問の転載ではありません。最新法令は各テーマの公式資料で確認してください。リンク先の現在の版は、この教材の確認版と異なる場合があります。</p>}
+ {master?.edition==='approved_release'&&<div className="ht-notice ht-release-notice"><p>法令確認基準日：2026年10月7日。一総通法規の限定範囲を扱う、CWOT独自編集教材です。</p><details><summary>教材と出典について</summary><p>政府機関・試験実施機関の公式教材ではありません。練習問題は独自作成で、過去問の転載ではありません。最新法令は各テーマの公式資料で確認してください。リンク先の現在の版は、この教材の確認版と異なる場合があります。</p></details></div>}
  {sample&&<p className="ht-notice">新しい2モードは、架空ルールのオリジナルサンプルです。実試験問題・法令教材ではありません。法規の学習には「既存28句」を利用できます。</p>}
  {loc.mode!=='home'&&<button className="btn btn-secondary ht-back" onClick={()=>go({mode:'home',theme:''})}>← 法規トレーナーの入口</button>}
  {error&&<div role="alert"><p>{error}</p><button className="btn btn-secondary" onClick={()=>window.location.reload()}>再読み込み</button></div>}

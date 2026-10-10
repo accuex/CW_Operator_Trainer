@@ -30,6 +30,7 @@ export const views: ViewMeta[] = [
   { id: 'computer-club', label: 'COMPUTER CLUB', title: '放課後パソコン部', icon: 'radio', primary: false },
   { id: 'resources', label: 'REFERENCE', title: '資料', icon: 'learn', primary: false },
   { id: 'settings', label: 'SETTINGS', title: '設定', icon: 'settings', primary: false },
+  { id: 'activity', label: 'ACADEMY LOG', title: '学習ログ', icon: 'learn', primary: false },
   { id: 'account', label: 'ACCOUNT', title: 'マイページ', icon: 'account', primary: false },
 ];
 export const viewMeta = (id: View) => id === 'communication' ? {id, label: 'RECEIVING', title: '一総通 電気通信術', icon: 'exam' as const, primary: false} : id === 'geography' ? {id, label: 'GEOGRAPHY', title: '一総通 地理', icon: 'exam' as const, primary: false} : id === 'english' ? {id, label: 'ENGLISH', title: '一総通 専門英語', icon: 'exam' as const, primary: false} : id === 'houki' ? {id, label: 'LAW', title: '一総通 法規', icon: 'exam' as const, primary: false} : id === 'houki-kakomon' ? {id, label: 'PAST', title: '一総通 法規過去問', icon: 'exam' as const, primary: false} : views.find((item) => item.id === id) ?? views[0];
