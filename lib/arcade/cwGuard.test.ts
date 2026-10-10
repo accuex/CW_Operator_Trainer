@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { answerAttack, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
+import { answerAttack, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
 import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
 
@@ -120,6 +120,16 @@ describe('CW guard rules', () => {
     expect(missilePosition(from,to,1)).toEqual(to);
     expect(missilePosition(from,to,.5)).toEqual({x:(from.x+to.x)/2,y:(from.y+to.y)/2});
     expect(missilePosition(from,dronePosition(drone,20),1).x).toBe(135);
+  });
+  it('can render a cleared wave with retained feedback and no active attack', () => {
+    let game=nextAttack(createGame('beginner',true,73));
+    const answer=game.drones.find(d=>d.id===game.attack!.enemy)!.symbol;
+    game=answerAttack(openAnswer(game,game.attack!.id),game.attack!.id,answer);
+    expect(selectedBattery(game)).toBe(game.attack!.choices.indexOf(answer));
+    const clear=nextAttack({...game,drones:game.drones.map(d=>({...d,alive:false}))});
+    expect(clear.phase).toBe('clear'); expect(clear.attack).toBeNull();
+    expect(clear.result?.selected).toBe(answer);
+    expect(selectedBattery(clear)).toBe(-1); expect(selectedBattery(null)).toBe(-1);
   });
   it('reuses the canonical Morse timeline with 1:3 tones and one-unit element gaps', () => {
     for(const mode of Object.keys(MODES) as Difficulty[]) for(const letter of MODES[mode].pool) {

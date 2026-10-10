@@ -114,3 +114,5 @@ export function missilePosition(from: {x:number;y:number}, to: {x:number;y:numbe
   const t = Math.max(0,Math.min(1,progress));
   return {x:from.x+(to.x-from.x)*t, y:from.y+(to.y-from.y)*t};
 }
+
+export const selectedBattery = (game: GuardGame | null) => game?.result?.selected ? game.attack?.choices.indexOf(game.result.selected) ?? -1 : -1;
