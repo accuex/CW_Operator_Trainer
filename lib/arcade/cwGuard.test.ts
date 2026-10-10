@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { answerAttack, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, type Difficulty } from './cwGuard';
+import { answerAttack, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
 import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
 
@@ -33,21 +33,25 @@ describe('CW guard rules', () => {
     expect(answerAttack(game,999,symbol)).toBe(game);
     expect(answerAttack(game,game.attack!.id,'NOT_A_CHOICE')).toBe(game);
   });
-  it('keeps transmitting down one column and changes column after clearing it', () => {
+  it('only transmits from the lowest surviving row and changes its four-letter set after clearing it', () => {
     let g=nextAttack(createGame('beginner',true,22));
+    const firstSet=[...g.attack!.choices].sort();
     for(let i=0;i<4;i++) {
-      const target=g.drones.find((d)=>d.id===g.attack!.enemy)!; expect(target.column).toBe(0);
+      const target=g.drones.find((d)=>d.id===g.attack!.enemy)!; expect(target.row).toBe(3);
       g=nextAttack(answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,target.symbol));
     }
-    expect(g.drones.find((d)=>d.id===g.attack!.enemy)!.column).toBe(1);
+    expect(g.drones.find((d)=>d.id===g.attack!.enemy)!.row).toBe(2);
+    expect([...g.attack!.choices].sort()).not.toEqual(firstSet);
   });
   it('resets combo on a wrong answer or timeout and stops before an unwinnable state', () => {
     let g=nextAttack(createGame('beginner',true,3));
     g={...g,combo:5};
-    for(let i=0;i<9;i++) {
+    for(let i=0;i<8;i++) {
+      expect(g.drones.find((d)=>d.id===g.attack!.enemy)!.row).toBe(3);
       g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,null);
       expect(g.combo).toBe(0); g=nextAttack(g);
     }
+    expect(g.cityDamage).toEqual([2,2,2,2]);
     expect(g.phase).toBe('over'); expect(g.correct).toBe(0);
     expect(nextAttack(g)).toBe(g);
   });
@@ -56,6 +60,8 @@ describe('CW guard rules', () => {
     for(let wave=1;wave<=3;wave++) {
       while(g.phase==='sending') {
         const target=g.drones.find((d)=>d.id===g.attack!.enemy)!;
+        expect(target.alive).toBe(true);
+        expect(target.row).toBe(Math.max(...g.drones.filter(d=>d.alive).map(d=>d.row)));
         g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,target.symbol);
         expect(g.score).toBeGreaterThan(previous); previous=g.score;
         g=nextAttack(g);
@@ -86,6 +92,34 @@ describe('CW guard rules', () => {
     expect(paused.drones.find((d)=>d.id===paused.attack!.enemy)!.alive).toBe(true);
     expect(paused.score).toBe(g.score); expect(paused.correct).toBe(1);
     expect(answerAttack(resumeAttack(paused),paused.attack!.id,target.symbol)).toMatchObject({correct:1});
+  });
+  it('keeps city intact on hits, damages one building on misses, and repairs one level per wave', () => {
+    let g=nextAttack(createGame('beginner',true,19));
+    const original=g;
+    g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,g.drones.find(d=>d.id===g.attack!.enemy)!.symbol);
+    expect(g.cityDamage).toEqual([0,0,0,0]);
+    g=nextAttack(g);
+    const sender=g.drones.find(d=>d.id===g.attack!.enemy)!;
+    const beforeAmmo=g.ammo;
+    g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,g.attack!.choices.find(c=>c!==sender.symbol)!);
+    expect(g.combo).toBe(0); expect(g.ammo).toBe(beforeAmmo-1);
+    expect(g.cityDamage[sender.column]).toBe(1);
+    expect(g.drones.find(d=>d.id===sender.id)!.alive).toBe(true);
+    expect(g.cityDamage.reduce((a,b)=>a+b,0)).toBe(1);
+    expect(original.cityDamage).toEqual([0,0,0,0]);
+    expect(nextStage({...g,phase:'clear',cityDamage:[2,1,0,2]}).cityDamage).toEqual([1,0,0,1]);
+    expect(nextAttack({...g,ammo:0}).phase).toBe('over');
+  });
+  it('moves formation both ways and missiles follow straight paths to a moving target', () => {
+    expect(formationOffset(0)).toBe(0);
+    expect(formationOffset(5)).toBeGreaterThan(0);
+    expect(formationOffset(15)).toBeLessThan(0);
+    const drone=createGame('beginner',true,73).drones[12];
+    const from=batteryPosition(2), to=dronePosition(drone,formationOffset(5));
+    expect(missilePosition(from,to,0)).toEqual(from);
+    expect(missilePosition(from,to,1)).toEqual(to);
+    expect(missilePosition(from,to,.5)).toEqual({x:(from.x+to.x)/2,y:(from.y+to.y)/2});
+    expect(missilePosition(from,dronePosition(drone,20),1).x).toBe(135);
   });
   it('reuses the canonical Morse timeline with 1:3 tones and one-unit element gaps', () => {
     for(const mode of Object.keys(MODES) as Difficulty[]) for(const letter of MODES[mode].pool) {

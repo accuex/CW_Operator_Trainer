@@ -1,0 +1,96 @@
+{
+  "method": "IAB documented Playwright controls; beginner visible Morse hints, not acoustic recognition",
+  "frontRowAttacks": [
+    {
+      "choices": [
+        "1: Aで迎撃",
+        "2: Oで迎撃",
+        "3: Mで迎撃",
+        "4: Iで迎撃"
+      ],
+      "code": "..",
+      "laser": "M346.55872008765994 226 V310",
+      "offset": "translate(-22.45396764222921 0)",
+      "sender": "translate(359 206)"
+    },
+    {
+      "choices": [
+        "1: Aで迎撃",
+        "2: Mで迎撃",
+        "3: Iで迎撃",
+        "4: Oで迎撃"
+      ],
+      "code": ".-",
+      "laser": "M464.02466077288625 226 V310",
+      "offset": "translate(-9.074967322295473 0)",
+      "sender": "translate(481 206)"
+    },
+    {
+      "choices": [
+        "1: Oで迎撃",
+        "2: Iで迎撃",
+        "3: Mで迎撃",
+        "4: Aで迎撃"
+      ],
+      "code": "---",
+      "laser": "M113.21685240641864 226 V310",
+      "offset": "translate(14.366300587254166 0)",
+      "sender": "translate(115 206)"
+    },
+    {
+      "choices": [
+        "1: Aで迎撃",
+        "2: Mで迎撃",
+        "3: Oで迎撃",
+        "4: Iで迎撃"
+      ],
+      "code": "--",
+      "laser": "M257.27499887979576 226 V310",
+      "offset": "translate(27.088363372023537 0)",
+      "sender": "translate(237 206)"
+    },
+    {
+      "choices": [
+        "1: Mで迎撃",
+        "2: Eで迎撃",
+        "3: Iで迎撃",
+        "4: Aで迎撃"
+      ],
+      "code": ".",
+      "laser": "M388.42524222805673 179 V310",
+      "offset": "translate(29.796612807386403 0)",
+      "sender": "translate(359 159)"
+    }
+  ],
+  "missile": {
+    "battery": 1,
+    "observedPath": "M115 343 L260.7241526324001 291.1143636378484"
+  },
+  "mobile": {
+    "viewport": [
+      375,
+      812
+    ],
+    "scrollWidth": 375,
+    "buttonSize": [
+      73.25,
+      56
+    ],
+    "numericKeyHit": true
+  },
+  "soundOnly": {
+    "hintRects": 0,
+    "verticalPath": true
+  },
+  "newConsoleErrors": [],
+  "voiceOver": "NOT_RUN",
+  "wrongAnswer": {
+    "selected": "S",
+    "correct": "T",
+    "battery": 1,
+    "ammo": 23,
+    "remainingEnemies": 16,
+    "city": 7,
+    "combo": 0
+  }
+}

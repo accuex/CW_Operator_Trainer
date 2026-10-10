@@ -11,7 +11,7 @@ export interface Attack { id: number; enemy: number; choices: string[]; wpm: num
 export type Phase = 'idle' | 'sending' | 'answer' | 'feedback' | 'clear' | 'over' | 'paused';
 export interface GuardGame {
   mode: Difficulty; hints: boolean; stage: number; seed: number; drones: Drone[]; attack: Attack | null;
-  phase: Phase; ammo: number; score: number; combo: number; maxCombo: number; correct: number; attempts: number;
+  phase: Phase; cityDamage: number[]; ammo: number; score: number; combo: number; maxCombo: number; correct: number; attempts: number;
   result: { correct: boolean; answer: string; selected: string | null; points: number } | null;
 }
 function random(seed: number): [number, number] {
@@ -28,29 +28,30 @@ function shuffle<T>(input: readonly T[], seed: number): [T[], number] {
 }
 function formation(mode: Difficulty, stage: number, seed: number): [Drone[], number] {
   const drones: Drone[] = [];
+  let previous = '';
   for (let row = 0; row < (stage === 1 ? 4 : 5); row++) {
     const [symbols, next] = shuffle([...MODES[mode].pool], seed); seed = next;
+    if (symbols.slice(0,4).sort().join('') === previous) [symbols[3],symbols[4]] = [symbols[4],symbols[3]];
+    previous = symbols.slice(0,4).sort().join('');
     for (let column = 0; column < 4; column++) drones.push({ id: row * 4 + column, row, column, symbol: symbols[column], alive: true });
   }
   return [drones, seed];
 }
 export function createGame(mode: Difficulty, hints = MODES[mode].hints, seed = Date.now() >>> 0): GuardGame {
   const [drones, next] = formation(mode, 1, seed);
-  return { mode, hints, stage: 1, seed: next, drones, attack: null, phase: 'idle', ammo: drones.length + 8,
+  return { mode, hints, stage: 1, seed: next, drones, attack: null, phase: 'idle', cityDamage: [0,0,0,0], ammo: drones.length + 8,
     score: 0, combo: 0, maxCombo: 0, correct: 0, attempts: 0, result: null };
 }
 export function nextAttack(game: GuardGame): GuardGame {
   if (!['idle', 'feedback'].includes(game.phase)) return game;
   const remaining = game.drones.filter((d) => d.alive);
   if (!remaining.length) return { ...game, phase: 'clear', attack: null };
-  if (game.ammo < remaining.length) return { ...game, phase: 'over', attack: null };
-  // Work down one column; the selected transmitter is highlighted, never its letter.
-  const previousColumn = game.attack ? game.drones.find((d) => d.id === game.attack!.enemy)?.column : undefined;
-  const column = previousColumn !== undefined && remaining.some((d) => d.column === previousColumn) ? previousColumn : remaining[0].column;
-  const candidates = remaining.filter((d) => d.column === column);
+  if (game.cityDamage.every((damage) => damage === 2) || game.ammo < remaining.length) return { ...game, phase: 'over', attack: null };
+  // Only the lowest surviving row may transmit. Its four letters form the answer set.
+  const row = Math.max(...remaining.map((d) => d.row));
+  const candidates = remaining.filter((d) => d.row === row);
   const [order, seed1] = shuffle(candidates, game.seed); const target = order[0];
-  const [others, seed2] = shuffle([...MODES[game.mode].pool].filter((s) => s !== target.symbol), seed1);
-  const [choices, seed3] = shuffle([target.symbol, ...others.slice(0, 3)], seed2);
+  const [choices, seed3] = shuffle(game.drones.filter((d) => d.row === row).map((d) => d.symbol), seed1);
   const variation = game.mode === 'expert' ? ((game.attempts % 3) - 1) * 2 : 0;
   return { ...game, seed: seed3, phase: 'sending', result: null, attack: { id: (game.attack?.id ?? 0) + 1, enemy: target.id, choices,
     wpm: MODES[game.mode].wpm + (game.stage - 1) * 2 + variation } };
@@ -64,7 +65,12 @@ export function answerAttack(game: GuardGame, attackId: number, selected: string
   const correct = selected === target.symbol; const combo = correct ? game.combo + 1 : 0;
   const multiplier = 1 + Math.min(4, Math.floor(combo / 4)) * 0.25;
   const points = correct ? Math.round(100 * MODES[game.mode].factor * (game.attack.wpm / MODES[game.mode].wpm) * multiplier * (game.hints ? 0.75 : 1)) : 0;
-  return { ...game, phase: 'feedback', ammo: game.ammo - 1, combo, maxCombo: Math.max(game.maxCombo, combo),
+  const cityDamage = [...game.cityDamage];
+  if (!correct) {
+    const hit = cityDamage[target.column] < 2 ? target.column : cityDamage.findIndex((damage) => damage < 2);
+    if (hit >= 0) cityDamage[hit]++;
+  }
+  return { ...game, cityDamage, phase: 'feedback', ammo: game.ammo - 1, combo, maxCombo: Math.max(game.maxCombo, combo),
     attempts: game.attempts + 1, correct: game.correct + Number(correct), score: game.score + points,
     drones: game.drones.map((d) => d.id === target.id && correct ? { ...d, alive: false } : d),
     result: { correct, answer: target.symbol, selected, points } };
@@ -72,7 +78,7 @@ export function answerAttack(game: GuardGame, attackId: number, selected: string
 export function nextStage(game: GuardGame): GuardGame {
   if (game.phase !== 'clear' || game.stage >= 3) return game;
   const [drones, seed] = formation(game.mode, game.stage + 1, game.seed);
-  return { ...game, stage: game.stage + 1, seed, drones, phase: 'idle', attack: null, result: null, ammo: drones.length + 8 };
+  return { ...game, cityDamage: game.cityDamage.map((damage) => Math.max(0,damage-1)), stage: game.stage + 1, seed, drones, phase: 'idle', attack: null, result: null, ammo: drones.length + 8 };
 }
 export function pauseGame(game: GuardGame): GuardGame {
   if (!['sending','answer','feedback'].includes(game.phase)) return game;
@@ -87,7 +93,7 @@ export const signalCode = (symbol: string) => INTERNATIONAL_MORSE[symbol];
 export const answerSeconds = (game: GuardGame) => Math.max(2, MODES[game.mode].seconds - (game.stage - 1) * 0.5);
 export const scoreKey = (mode: Difficulty, hints: boolean) => `${mode}:${hints ? 'guided' : 'sound'}`;
 export function readBest(mode: Difficulty, hints: boolean): number {
-  try { const n = JSON.parse(localStorage.getItem('cwot:arcade:guard:v1') ?? '{}')[scoreKey(mode,hints)]; return typeof n === 'number' && Number.isFinite(n) && n >= 0 ? n : 0; } catch { return 0; }
+  try { const n = JSON.parse(localStorage.getItem('cwot:arcade:guard:city:v1') ?? '{}')[scoreKey(mode,hints)]; return typeof n === 'number' && Number.isFinite(n) && n >= 0 ? n : 0; } catch { return 0; }
 }
 export function saveBest(game: GuardGame): number {
   const best = Math.max(readBest(game.mode, game.hints), game.score);
@@ -95,7 +101,16 @@ export function saveBest(game: GuardGame): number {
     const records: Record<string, number> = {};
     for (const mode of Object.keys(MODES) as Difficulty[]) for (const hints of [true,false]) records[scoreKey(mode,hints)] = readBest(mode,hints);
     records[scoreKey(game.mode, game.hints)] = best;
-    localStorage.setItem('cwot:arcade:guard:v1', JSON.stringify(records));
+    localStorage.setItem('cwot:arcade:guard:city:v1', JSON.stringify(records));
   } catch { /* Private browsing/storage full must not interrupt play. */ }
   return best;
+}
+
+// Shared by rendering and tests. Visual movement is independent of the audio clock.
+export const formationOffset = (seconds: number) => Math.sin(seconds * .32) * 30;
+export const dronePosition = (drone: Drone, offset: number) => ({ x: 115 + drone.column * 122 + offset, y: 65 + drone.row * 47 });
+export const batteryPosition = (index: number) => ({ x: 115 + index * 122, y: 370 });
+export function missilePosition(from: {x:number;y:number}, to: {x:number;y:number}, progress: number) {
+  const t = Math.max(0,Math.min(1,progress));
+  return {x:from.x+(to.x-from.x)*t, y:from.y+(to.y-from.y)*t};
 }

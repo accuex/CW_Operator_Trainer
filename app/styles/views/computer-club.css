@@ -3,3 +3,6 @@
 .guard-lock{transform-box:fill-box;transform-origin:center}
 
 .home-club-entrance{width:100%;display:flex;align-items:center;gap:16px;text-align:left;padding:16px 4px;margin:16px 0;border:0;border-top:1px solid #344571;border-bottom:1px solid #344571;background:transparent;color:#a9e7ff;cursor:pointer}.home-club-entrance>span{display:flex;flex-direction:column;gap:4px;flex:1}.home-club-entrance small{font:.65rem monospace;letter-spacing:.14em}.home-club-entrance b{font-size:1.1rem;color:#e7f4ff}.home-club-entrance>span>span{font-size:.8rem;color:#aabbd1}.home-club-entrance:focus-visible{outline:3px solid #ffd56f;outline-offset:4px}.home-club-entrance:hover b{color:#ffd56f}
+
+/* Formation positions come from the visual clock; no CSS transform may override them. */
+.guard-formation.moving{animation:none}.guard-city-status{display:flex;justify-content:space-between;gap:8px;padding:8px 20px;color:#9fdaed;font:.75rem monospace;border-bottom:1px solid #233d5b}.guard-city-status span{color:#b5c2d5}.guard-battery-active{filter:drop-shadow(0 0 8px #c5ffff)}.guard-impact{opacity:.85}.guard-choices button small{font-size:.6rem}@media(max-width:600px){.guard-city-status{display:block;padding:8px 12px;font-size:.68rem}.guard-city-status span{display:block;margin-top:3px}}
