@@ -1,0 +1,11 @@
+✓ headless CQ run > calling CQ on top of a QSO is flagged, and the bot QSYs when asked  570ms
+   ✓ headless CQ run > settles to a few waiting callers, even with CQ repeat left running and nobody picked  1451ms
+   ✓ headless CQ run > builds a pileup from the same callers with other parameters, and it stays bounded  3729ms
+   ✓ headless CQ run > still works callers it doubled with  363ms
+   ✓ headless CQ run > flags CQs sent without listening after QRL?  336ms
+   ✓ headless CQ run > counts a QRL? that found the frequency in use, and the check before a clear CQ  498ms
+
+ Test Files  81 passed (81)
+      Tests  895 passed (895)
+   Start at  19:32:15
+   Duration  15.52s (transform 2.18s, setup 0ms, collect 13.75s, tests 97.54s, environment 7ms, prepare 3.61s)

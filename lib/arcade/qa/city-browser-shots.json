@@ -1,0 +1,272 @@
+{
+  "early": {
+    "enabled": true,
+    "head": "sending",
+    "hud": "SCORE0COMBO0 ×1.00AMMO24 / 残敵16WAVE1 / 3 · 部隊 1/4",
+    "id": "1"
+  },
+  "shots": [
+    {
+      "before": {
+        "enabled": true,
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO23 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO22 / 残敵16WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO22 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO21 / 残敵16WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO21 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO20 / 残敵16WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO20 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO19 / 残敵16WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO19 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO18 / 残敵16WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO18 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "9",
+        "hud": "SCORE0COMBO0 ×1.00AMMO17 / 残敵16WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "10",
+        "hud": "SCORE0COMBO0 ×1.00AMMO17 / 残敵16WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "hud": "SCORE75COMBO1 ×1.00AMMO16 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO1 ×1.00AMMO16 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO15 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO15 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO14 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO14 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO13 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO13 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO12 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO12 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO11 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO11 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO10 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO10 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO9 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO9 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO8 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO8 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO7 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO7 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO6 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO6 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO5 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO5 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO4 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO4 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "head": "11",
+        "hud": "SCORE75COMBO0 ×1.00AMMO3 / 残敵15WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "before": {
+        "enabled": true,
+        "head": "12",
+        "hud": "SCORE75COMBO0 ×1.00AMMO3 / 残敵15WAVE1 / 3 · 部隊 1/4"
+      },
+      "after": {
+        "hud": "SCORE150COMBO1 ×1.00AMMO2 / 残敵14WAVE1 / 3 · 部隊 1/4",
+        "status": "再装填中…8 WPM ・符号ヒントあり"
+      }
+    },
+    {
+      "hud": "SCORE225COMBO1 ×1.00AMMO1 / 残敵13WAVE1 / 3 · 部隊 1/4"
+    },
+    {
+      "hud": "SCORE225COMBO0 ×1.00AMMO0 / 残敵13WAVE1 / 3 · 部隊 1/4",
+      "overlay": "MISSION END弾切れになりましたレーザーは発射順に迎撃。誤答後も着弾前なら再射撃できます。もう一度遊ぶ3/24迎撃成功 · 最大COMBO 1 · BEST 1,727"
+    },
+    {
+      "enabled": false,
+      "hud": "SCORE225COMBO0 ×1.00AMMO0 / 残敵13WAVE1 / 3 · 部隊 1/4",
+      "overlay": "MISSION END弾切れになりましたレーザーは発射順に迎撃。誤答後も着弾前なら再射撃できます。もう一度遊ぶ3/24迎撃成功 · 最大COMBO 1 · BEST 1,727"
+    }
+  ]
+}

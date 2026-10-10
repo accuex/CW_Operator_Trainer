@@ -1,0 +1,218 @@
+{
+  "reviewedAt": "2026-10-10T10:39:56.709704+00:00",
+  "baseHead": "f1cdfd152caa343cf808a840a6d7339ea30e0a36",
+  "automated": {
+    "fullSuite": {
+      "status": "PASS",
+      "tests": 895,
+      "files": 81
+    },
+    "newCityAndAnswerTests": 45,
+    "productionTargetTypeScript": "PASS",
+    "formalBuild": "PASS",
+    "timing": "All integer WPM8..40, E/T/A/N/S/O: unlock at final tone onset, reject immediately before; signed80ms audio pre-roll retained"
+  },
+  "geometry": {
+    "oldFormationAmplitude": 30,
+    "newFormationAmplitude": 55,
+    "columnOriginRanges": [
+      [
+        60,
+        170
+      ],
+      [
+        182,
+        292
+      ],
+      [
+        304,
+        414
+      ],
+      [
+        426,
+        536
+      ]
+    ],
+    "buildings": [
+      {
+        "building": 0,
+        "footprint": [
+          22,
+          70
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            60,
+            70
+          ]
+        ]
+      },
+      {
+        "building": 1,
+        "footprint": [
+          72,
+          115
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            72,
+            115
+          ]
+        ]
+      },
+      {
+        "building": 2,
+        "footprint": [
+          128,
+          166
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            128,
+            166
+          ]
+        ]
+      },
+      {
+        "building": 3,
+        "footprint": [
+          181,
+          227
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            182,
+            227
+          ]
+        ]
+      },
+      {
+        "building": 4,
+        "footprint": [
+          243,
+          277
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            243,
+            277
+          ]
+        ]
+      },
+      {
+        "building": 5,
+        "footprint": [
+          291,
+          342
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            291,
+            292
+          ],
+          [
+            304,
+            342
+          ]
+        ]
+      },
+      {
+        "building": 6,
+        "footprint": [
+          358,
+          401
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            358,
+            401
+          ]
+        ]
+      },
+      {
+        "building": 7,
+        "footprint": [
+          420,
+          475
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            426,
+            475
+          ]
+        ]
+      },
+      {
+        "building": 8,
+        "footprint": [
+          494,
+          558
+        ],
+        "halfOpen": true,
+        "reachableIntervals": [
+          [
+            494,
+            536
+          ]
+        ]
+      }
+    ],
+    "reducedMotion": "Essential horizontal motion retained, decorative bob suppressed",
+    "coordinateSystem": "Shared600-unit logical world; per-shot origin stays fixed"
+  },
+  "terminalCases": {
+    "cityLoss": "All9 destroyed; priority over wave clear",
+    "ammoLoss": "No earned resupply, finish already-successful missile visual first",
+    "waveClear": "Last bullet may clear wave and proceed to next-wave supply",
+    "bossAwakening": "HP50 reached on last bullet may safely drain pending attacks and earn+10; HP51 with no ammo cannot continue"
+  },
+  "browser": {
+    "desktop": [
+      1280,
+      900
+    ],
+    "mobile": [
+      375,
+      812
+    ],
+    "observed": [
+      "Natural no-input play damages both edges, reaches sole remaining left buildingHP1, then CITY0/18 and MISSION END (attack46 impact)",
+      "Last-tone answer accepted while oldest attack state=sending; first shot ammo24->23",
+      "Repeated wrong answers on same FIFO head consume ammo and retain that head",
+      "Correct answer increases score/combo and removes only that head",
+      "AMMO0 with13 enemies remaining: MISSION END, disabled keys",
+      "Pause/resume retainsCITY16/18 and pending head4",
+      "Mobile scrollWidth375; buttons73.25x56",
+      "Console errors[]"
+    ],
+    "method": "DOM inspection and UI clicks; bounded polling, no game-state injection or acoustic recognition"
+  },
+  "notRun": [
+    "Human acoustic timing/listening assessment",
+    "VoiceOver",
+    "Physical hardware key-repeat stress",
+    "Browser every WPM and boss earned-refill edge case (covered by automated tests)"
+  ],
+  "integrity": {
+    "initialUncommittedTrackedFiles": 19,
+    "initialUncommittedTrackedHashesPreserved": true,
+    "unchangedFiles": [
+      "lib/arcade/laser.ts",
+      "lib/timing.ts",
+      "lib/morse.ts",
+      "package.json"
+    ],
+    "originalUntrackedPreserved": true,
+    "packageVersion": "1.1.1",
+    "push": false,
+    "deploy": false
+  }
+}

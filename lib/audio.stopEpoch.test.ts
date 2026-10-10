@@ -110,6 +110,8 @@ describe('MorseAudioEngine stop during play()', () => {
     engine.stop();
     const handle = await engine.play('E', 'international', settings);
     expect(handle.startedAt).toBeGreaterThan(0);
+    expect(handle.currentTime()).toBe(0);
+    expect(handle.timelineTime!()).toBeCloseTo(-.08);
     handle.stop();
     await handle.finished;
   });

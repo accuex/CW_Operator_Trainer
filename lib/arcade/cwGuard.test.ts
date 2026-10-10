@@ -30,7 +30,7 @@ describe('city and FIFO multi-laser defence',()=>{
     g=advanceGame(g,a.impactAt!);expect(g.buildings[1].hp).toBe(1);expect(cityHp(g)).toBe(17);
     expect(g.resolved.find(r=>r.attack.id===a.id)).toMatchObject({status:'impacted',buildingId:1});
     expect(g.buildings.filter(b=>b.hp!==2).map(b=>b.id)).toEqual([1]);
-    let gap=flown(start(),65),gapAttack=oldestAttack(gap)!;gap=advanceGame(gap,gapAttack.impactAt!);
+    let gap=flown(start(),71),gapAttack=oldestAttack(gap)!;gap=advanceGame(gap,gapAttack.impactAt!);
     expect(cityHp(gap)).toBe(18);expect(gap.resolved.find(r=>r.attack.id===gapAttack.id)?.buildingId).toBeNull();
     let ruin=flown(start(),100);ruin={...ruin,buildings:ruin.buildings.map(b=>b.id===1?{...b,hp:0}:b)};
     const before=cityHp(ruin);ruin=advanceGame(ruin,oldestAttack(ruin)!.impactAt!);expect(cityHp(ruin)).toBe(before);

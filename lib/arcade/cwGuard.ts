@@ -18,7 +18,7 @@ export interface Building { id: number; x: number; width: number; height: number
 export interface Attack {
   id: number; order: number; enemy: number; symbol: string; wpm: number;
   x: number; y: number; readyAt: number; startedAt: number | null;
-  toneEndsAt: number | null; sendEndsAt: number | null; impactAt: number | null;
+  answerAt: number | null; toneEndsAt: number | null; sendEndsAt: number | null; impactAt: number | null;
   window: number; beamOffsets: number[]; pattern: BossPattern; timeline: MorseTimeline | null; status: 'preparing'|'sending'|'flying';
 }
 export interface Resolution { attack: Attack; at: number; status: 'intercepted'|'impacted'; buildingId: number | null }
@@ -52,7 +52,7 @@ function formation(mode: Difficulty,stage: number,seed: number): [Drone[],number
 }
 /** City footprints use the same 600-unit logical world on every viewport. */
 export function createCity(): Building[] {
-  return [[22,39,38],[72,43,56],[128,38,44],[181,46,68],[243,34,39],[291,51,57],[358,43,45],[420,55,64],[494,64,42]]
+  return [[22,48,38],[72,43,56],[128,38,44],[181,46,68],[243,34,39],[291,51,57],[358,43,45],[420,55,64],[494,64,42]]
     .map(([x,width,height],id)=>({id,x,width,height,hp:2,maxHp:2}));
 }
 export const buildingAt = (buildings: readonly Building[],x: number) => buildings.find(b=>x>=b.x && x<b.x+b.width);
@@ -67,7 +67,11 @@ export function createGame(mode: Difficulty,hints=MODES[mode].hints,seed=Date.no
 }
 export const oldestAttack = (game: GuardGame | null) => game?.attacks[0];
 export const transmittingAttack = (game: GuardGame | null) => game?.attacks.find(a=>a.id===game.transmittingId);
-export const canAnswer = (game: GuardGame | null) => Boolean(game?.phase==='active' && game.ammo>0 && game.time>=game.retryUntil && oldestAttack(game)?.status==='flying');
+/** Last tone onset unlocks input, independently of the common transmission window. */
+export const canAnswer = (game: GuardGame | null) => {
+  const head=oldestAttack(game);
+  return Boolean(game?.phase==='active' && game.ammo>0 && game.time>=game.retryUntil && head?.answerAt!=null && game.time>=head.answerAt && head.impactAt!=null && game.time<head.impactAt);
+};
 export function squadDrones(game: GuardGame): Drone[] {
   const row=game.squadRow??Math.max(...game.drones.filter(d=>d.alive).map(d=>d.row));
   return game.drones.filter(d=>d.row===row);
@@ -88,18 +92,24 @@ const bossInterval=(game: GuardGame,attack: Attack) => !game.boss?MODES[game.mod
 /** Single CW transmitter, multiple independent flights; bosses may own several pending events. */
 export function nextAttack(game: GuardGame): GuardGame {
   if(['paused','clear','over','awakening','rekeying','defeating'].includes(game.phase)) return game;
+  if(cityHp(game)===0) return {...game,phase:'over',transmittingId:null,attacks:[]};
   const remaining=game.drones.filter(d=>d.alive);
   if(!remaining.length && !game.attacks.length) return game.resolved.some(r=>r.status==='intercepted'&&game.time-r.at<1)?game:{...game,phase:'clear'};
-  if(game.ammo<=0 || cityHp(game)===0) return {...game,phase:'over',transmittingId:null,attacks:[]};
   const boss=game.boss, drone=boss?bossDrone(game):null;
   // Stop new sends at milestones, but let the current CW and queued flights resolve.
   if(boss&&drone&&(bossKeyTier(drone.hp)>boss.keyTier || (drone.hp<=50&&!boss.awakened))){
-    if(game.attacks.length||game.transmittingId!==null) return game;
+    // At HP50 the earned refill remains possible even on the last bullet.
+    const refill=drone.hp<=50&&!boss.awakened;
+    if(game.ammo<=0&&!refill&&!game.shots.some(s=>s.correct&&game.time-s.at<.55)) return {...game,phase:'over',transmittingId:null,attacks:[]};
+    if(game.attacks.length||game.transmittingId!==null||game.resolved.some(r=>r.attack.toneEndsAt!=null&&game.time<r.attack.toneEndsAt)) return game;
     const awakening=drone.hp<=50&&!boss.awakened;
     return {...game,phase:awakening?'awakening':'rekeying',boss:{...boss,awakened:boss.awakened||awakening,
       form:awakening?'awakened':boss.form,transitionUntil:game.time+(awakening?1.8:.85),burstLeft:0},
       ammo:game.ammo+(awakening?10:0),result:null};
   }
+  // Hit damage is already authoritative; allow its visible missile to finish.
+  // A future milestone cannot refill ammo unless its HP threshold was reached.
+  if(game.ammo<=0) return game.shots.some(s=>s.correct&&game.time-s.at<.55)?game:{...game,phase:'over',transmittingId:null,attacks:[]};
   if(game.transmittingId!==null || game.phase==='entering') return game;
   const row=remaining.length?Math.max(...remaining.map(d=>d.row)):game.squadRow;
   if(row!==game.squadRow){
@@ -127,7 +137,7 @@ export function nextAttack(game: GuardGame): GuardGame {
     nextBoss={...boss,pattern,sequence:boss.sequence+Number(boss.burstLeft===0),burstLeft:boss.burstLeft>0?boss.burstLeft-1:size-1,lastSymbol:symbols[0]};
   }
   const attack: Attack={id,order:id,enemy:target.id,symbol:symbols[0],wpm,x:0,y:0,readyAt:game.time+(pattern==='charge'?.8:CHARGE_MS/1000),
-    startedAt:null,toneEndsAt:null,sendEndsAt:null,impactAt:null,window:transmissionWindow(MODES[game.mode].pool,wpm),beamOffsets:pattern==='spread'?[-64,0,64]:[0],pattern,timeline:null,status:'preparing'};
+    startedAt:null,answerAt:null,toneEndsAt:null,sendEndsAt:null,impactAt:null,window:transmissionWindow(MODES[game.mode].pool,wpm),beamOffsets:pattern==='spread'?[-64,0,64]:[0],pattern,timeline:null,status:'preparing'};
   return {...game,boss:nextBoss,seed,phase:'active',attackSerial:id,transmittingId:id,attacks:[...game.attacks,attack]};
 }
 /** Bind exactly once to the actual Web Audio handle; firing position never follows the robot. */
@@ -136,7 +146,7 @@ export function beginTransmission(game: GuardGame,id: number,timeline: MorseTime
   if(game.phase!=='active'||game.transmittingId!==id||attack?.status!=='preparing'||game.time<attack.readyAt) return game;
   if(![startedAt,x,y].every(Number.isFinite)||timeline.duration>attack.window+1e-6 || laserTravelSeconds(y)<=attack.window) return game;
   return {...game,attacks:game.attacks.map(a=>a.id===id?{...a,x,y,timeline,startedAt,
-    toneEndsAt:startedAt+timeline.duration,sendEndsAt:startedAt+a.window,impactAt:startedAt+laserTravelSeconds(y),status:'sending'}:a)};
+    answerAt:startedAt+(timeline.tones.at(-1)?.start??Infinity),toneEndsAt:startedAt+timeline.duration,sendEndsAt:startedAt+a.window,impactAt:startedAt+laserTravelSeconds(y),status:'sending'}:a)};
 }
 /** Resolve each physical impact once; empty ground and ruins never redirect damage. */
 export function advanceGame(game: GuardGame,now: number): GuardGame {
@@ -176,6 +186,9 @@ export function answerAttack(game: GuardGame,id: number,selected: string,now=gam
     retryUntil:now+RETRY_SECONDS,shots:[...g.shots,shot],
     drones:correct?g.drones.map(d=>d.id===attack.enemy?{...d,hp:Math.max(0,d.hp-1),alive:d.hp>1}:d):g.drones,
     attacks:correct?g.attacks.filter(a=>a.id!==id):g.attacks,
+    // Early interception cancels this transmitter only; an unrelated later CW continues.
+    transmittingId:correct&&g.transmittingId===id?null:g.transmittingId,
+    nextFireAt:correct&&g.transmittingId===id?attack.sendEndsAt!+bossInterval(g,attack):g.nextFireAt,
     resolved:correct?[...g.resolved,{attack,at:now,status:'intercepted',buildingId:null}]:g.resolved,
     result:{correct,answer:correct?attack.symbol:'',selected,points,at:now,attackId:id}};
   if(correct&&hit.boss){
@@ -206,7 +219,7 @@ export function resumeAttack(game: GuardGame): GuardGame {
   // Only an interrupted transmission is replayed. Older flying beams retain
   // IDs, origins and frozen flight time; no ammunition is refunded.
   return {...game,phase:game.pausedFrom??'active',retryUntil:game.time,
-    attacks:game.attacks.map(a=>a.id===game.transmittingId?{...a,status:'preparing',readyAt:game.time,startedAt:null,toneEndsAt:null,sendEndsAt:null,impactAt:null,timeline:null}:a)};
+    attacks:game.attacks.map(a=>a.id===game.transmittingId?{...a,status:'preparing',readyAt:game.time,startedAt:null,answerAt:null,toneEndsAt:null,sendEndsAt:null,impactAt:null,timeline:null}:a)};
 }
 export const signalCode = (symbol: string) => INTERNATIONAL_MORSE[symbol];
 export const answerSeconds = (game: GuardGame) => Math.max(2, MODES[game.mode].seconds - (game.stage - 1) * 0.5);
@@ -226,7 +239,7 @@ export function saveBest(game: GuardGame): number {
 }
 
 // Shared by rendering and tests. Visual movement is independent of the audio clock.
-export const formationOffset = (seconds: number) => Math.sin(seconds * .32) * 30;
+export const formationOffset = (seconds: number) => Math.sin(seconds * .32) * 55;
 // Pass through an upright pose only near a direction reversal.
 export const movementPose = (seconds: number): 'left'|'right'|'idle' => {
   const velocity=Math.cos(seconds*.32);
@@ -242,8 +255,8 @@ export function missilePosition(from: {x:number;y:number}, to: {x:number;y:numbe
 export const selectedBattery = (game: GuardGame | null) => game?.result?.selected ? game.squadChoices.indexOf(game.result.selected) : -1;
 
 export function enemyPosition(game: GuardGame,drone: Drone,time=game.time,reduced=false){
- if(drone.id!==BOSS_ID) return dronePosition(drone,reduced?0:formationOffset(time),time);
+ if(drone.id!==BOSS_ID) return dronePosition(drone,formationOffset(time),reduced?0:time);
  const age=game.boss?.defeatedAt??time;
  const awake=game.boss?.form!=='normal';
- return {x:300+(reduced?0:Math.sin(age*(awake?.43:.28))*(awake?190:155)),y:93+(reduced?0:Math.sin(age*1.6)*2)};
+ return {x:300+Math.sin(age*(awake?.43:.28))*(awake?190:155),y:93+(reduced?0:Math.sin(age*1.6)*2)};
 }

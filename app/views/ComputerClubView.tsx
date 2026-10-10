@@ -29,7 +29,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
   const currentTime=useCallback(()=>{
     if(!livePhase(state.current?.phase)) return clock.current.time;
     const audio=playback.current;
-    return audio?Math.max(clock.current.time,audio.base+audio.handle.currentTime()):clock.current.time+Math.max(0,(performance.now()-clock.current.wall)/1000);
+    return audio?Math.max(clock.current.time,audio.base+(audio.handle.timelineTime?.()??audio.handle.currentTime())):clock.current.time+Math.max(0,(performance.now()-clock.current.wall)/1000);
   },[]);
   useEffect(()=>{
     if(!live) return;
@@ -65,7 +65,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
     const audio={...settingsRef.current,characterSpeed:attack.wpm,effectiveSpeed:attack.wpm,reverb:false};
     void engine.play(attack.symbol,'international',audio).then(handle=>{
       if(cancelled){handle.stop();return;}
-      const now=currentTime(),base=now-handle.currentTime();
+      const now=currentTime(),base=now-(handle.timelineTime?.()??handle.currentTime());
       const sender=initial.drones.find(d=>d.id===attack.enemy)!;
       const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const origin=enemyPosition(initial,sender,now,reduced);
@@ -173,6 +173,6 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
       <div className="guard-feedback" aria-live="polite">{result&&<span>{result.correct?`迎撃成功 +${result.points} · COMBO ${preview.combo}！`:result.answer?`#${result.attackId}着弾 · 正解 ${result.answer} ${signalCode(result.answer).replaceAll('.','・').replaceAll('-','－')}`:'誤答。再装填後に同じレーザーへ再射撃できます。'}</span>}{message&&<p role="alert">{message}</p>}</div>
       <div className="guard-controls"><label>難易度<select aria-label="難易度" value={mode} disabled={live||game?.phase==='paused'} onChange={e=>{const m=e.target.value as Difficulty;setMode(m);setHints(MODES[m].hints);setGame(null);}}>{(Object.keys(MODES) as Difficulty[]).map(m=><option key={m} value={m}>{MODES[m].label} · {m==='expert'?'22–30':`${MODES[m].wpm}–${MODES[m].wpm+4}`} WPM</option>)}</select></label><label className="guard-toggle"><input type="checkbox" checked={hints} disabled={live||game?.phase==='paused'} onChange={e=>{setHints(e.target.checked);setGame(null);}}/>符号ヒント（通常敵）</label><span>BEST {best.toLocaleString()}</span>{live&&<button type="button" className="btn btn-secondary" onClick={pause}>一時停止</button>}{game&&<button type="button" className="btn btn-secondary" onClick={()=>{engine.stop();playback.current=null;saveBest(game);setGame(null);setMessage('ゲームを終了しました。');}}>終了</button>}</div>
     </div>
-    <details className="guard-guide"><summary>遊び方・スコアのしくみ</summary><p>4機ずつ順に登場する3WAVEの後、HP100の大型ボスが登場。初級の通常敵はHP1、中級HP1〜2、上級HP2〜3。正解1回でHPが1減り、生存中の敵は再攻撃します。砲台の文字配置は部隊内で固定し、次部隊の登場時だけ更新します。PCは1〜4キー、スマホはタップ。TabとEnterでも操作できます。Esc・別タブへの移動で一時停止します。</p><p>CW音声は1件ずつ順番に送信します。共通送信枠が終わると次の敵が準備でき、発射済みのレーザーは同時に下降します。必ず発射番号の小さい未解決攻撃から迎撃してください。黄色い輪と「迎撃対象」が先頭の目印です。後続の文字を入力しても、判定するのは先頭です。</p><p>正解・誤答の射撃ごとに1発消費し、誤答でCOMBOがリセット。0.3秒後に再射撃できます。着弾前の正解でレーザーを消し、攻撃元の敵に1ダメージ。HP0で撃破します。通常戦の9棟はHP2、ボス戦ではHP3へ全回復。着弾位置の建物だけが損傷し、隙間・倒壊済みの場所への着弾では他の建物を傷つけません。弾切れ、または街の全壊で終了。ウェーブ突破時は各棟のHPを1回復します。</p><p>短点・長点・空白は音声タイムライン通りの1:3:1、レーザー速度は全WPM・端末で一定です。ヒントなしでは切れ目のないビームを照射します。初級は送信枠後1.8秒、中級0.7秒、上級0.18秒を空けて次の攻撃を準備します。通常敵は未解決攻撃を同時に2件持ちません。ボスは赤い連続ビームと2〜3連送、拡散、チャージ攻撃を使い、最大3〜5イベントが飛行します。拡散の3本も1つのCWイベントなので、正解1回でまとめて無効化できます。部隊の全滅後も未解決攻撃の処理が終わるまで次部隊は攻撃しません。</p><p>4連続正解ごとに倍率が0.25上がり、最大2倍。高速CWほど高得点、ヒントありは75%。ボス戦では弾薬140発を補給し、HP50の覚醒とHP10の最終局面で各10発補給。HP75/50/25の4文字変更は全攻撃の解決後に通知します。ボスの赤いレーザーはヒントONでも符号を表示しません。ボス練習の自己ベストは通常プレイと別に保存します。スコアはブラウザ内に保存し、既存学習進捗・アチーブ・公開ログに加算や投稿はしません。</p></details>
+    <details className="guard-guide"><summary>遊び方・スコアのしくみ</summary><p>4機ずつ順に登場する3WAVEの後、HP100の大型ボスが登場。初級の通常敵はHP1、中級HP1〜2、上級HP2〜3。正解1回でHPが1減り、生存中の敵は再攻撃します。砲台の文字配置は部隊内で固定し、次部隊の登場時だけ更新します。PCは1〜4キー、スマホはタップ。TabとEnterでも操作できます。Esc・別タブへの移動で一時停止します。</p><p>最後の短点・長点が鳴り始めた瞬間から回答できます。1音のE・Tは音の開始と同時に回答可能です。早い正解では対象のCW音とレーザーを停止します。CW音声は1件ずつ順番に送信します。共通送信枠が終わると次の敵が準備でき、発射済みのレーザーは同時に下降します。必ず発射番号の小さい未解決攻撃から迎撃してください。黄色い輪と「迎撃対象」が先頭の目印です。後続の文字を入力しても、判定するのは先頭です。</p><p>正解・誤答の射撃ごとに1発消費し、誤答でCOMBOがリセット。0.3秒後に再射撃できます。着弾前の正解でレーザーを消し、攻撃元の敵に1ダメージ。HP0で撃破します。通常戦の9棟はHP2、ボス戦ではHP3へ全回復。着弾位置の建物だけが損傷し、隙間・倒壊済みの場所への着弾では他の建物を傷つけません。弾切れ、または街の全壊で終了。ウェーブ突破時は各棟のHPを1回復します。</p><p>短点・長点・空白は音声タイムライン通りの1:3:1、レーザー速度は全WPM・端末で一定です。ヒントなしでは切れ目のないビームを照射します。初級は送信枠後1.8秒、中級0.7秒、上級0.18秒を空けて次の攻撃を準備します。通常敵は未解決攻撃を同時に2件持ちません。ボスは赤い連続ビームと2〜3連送、拡散、チャージ攻撃を使い、最大3〜5イベントが飛行します。拡散の3本も1つのCWイベントなので、正解1回でまとめて無効化できます。部隊の全滅後も未解決攻撃の処理が終わるまで次部隊は攻撃しません。</p><p>4連続正解ごとに倍率が0.25上がり、最大2倍。高速CWほど高得点、ヒントありは75%。ボス戦では弾薬140発を補給し、HP50の覚醒とHP10の最終局面で各10発補給。HP75/50/25の4文字変更は全攻撃の解決後に通知します。ボスの赤いレーザーはヒントONでも符号を表示しません。ボス練習の自己ベストは通常プレイと別に保存します。スコアはブラウザ内に保存し、既存学習進捗・アチーブ・公開ログに加算や投稿はしません。</p></details>
   </section>;
 }

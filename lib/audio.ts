@@ -5,6 +5,8 @@ export interface PlaybackHandle {
   timeline: MorseTimeline;
   startedAt: number;
   currentTime: () => number;
+  /** Signed time preserves the scheduled pre-roll for consumers synchronizing input. */
+  timelineTime?: () => number;
   receivedCount: () => number;
   stop: () => void;
   finished: Promise<void>;
@@ -327,6 +329,7 @@ export class MorseAudioEngine {
       timeline,
       startedAt: start,
       currentTime: () => Math.max(0, context.currentTime - start),
+      timelineTime: () => context.currentTime - start,
       receivedCount: () => timeline.characters.filter((character) => start + character.end <= context.currentTime).length,
       stop,
       finished,
