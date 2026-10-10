@@ -76,3 +76,11 @@
 @media(prefers-reduced-motion:reduce){.guard-warning-complete{filter:none}}
 
 .computer-club .guard-choices button{padding-top:14px;padding-bottom:2px}
+
+/* Full-screen celebration precedes results without cropping the supplied artwork. */
+.guard-goodjob{position:fixed;inset:0;z-index:1000;background:#050d1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;isolation:isolate}
+.guard-goodjob img{display:block;width:auto;height:auto;max-width:min(100%,1080px);max-height:calc(100dvh - 100px);object-fit:contain;animation:guard-goodjob-enter .35s ease-out both}
+.guard-goodjob .btn{flex-shrink:0;min-height:44px}
+.guard-final-score{font-family:monospace;color:#a7e9ff}.guard-final-score strong{font-size:1.8rem;margin-left:12px;color:#fff}
+@keyframes guard-goodjob-enter{from{opacity:0;transform:translateX(-24px) scale(.98)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.guard-goodjob img{animation:none}}

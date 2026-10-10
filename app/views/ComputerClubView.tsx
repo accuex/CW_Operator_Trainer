@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useLayoutEffect, useRef, useState } from 'react';
 import { MorseAudioEngine, type PlaybackHandle } from '@/lib/audio';
 import { EnemyLaser } from './EnemyLaser';
+import { GoodJobCutIn } from './GoodJobCutIn';
 import { BossWarning } from './BossWarning';
 import { BossEnemy, BOSS_MUZZLE_Y } from './BossEnemy';
 import { RobotEnemy, ROBOT_MUZZLE_Y, type RobotPose } from './RobotEnemy';
@@ -15,6 +16,7 @@ import { WARNING_SECONDS, BOSS_BONUS, bossDrone, enemyPosition, livePhase, answe
 
 const robotScale=(count:number)=>Math.min(.8,(400/(count-1)-12)/112);
 export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:AudioSettings;stopEpoch:number;setAudioStatus:(status:string)=>void}) {
+  const [cutInPreview,setCutInPreview]=useState(false);
   const boardRef=useRef<HTMLDivElement>(null);
   const [layout,setLayout]=useState({wide:false,width:960,height:900});
   useEffect(()=>{
@@ -152,6 +154,16 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
   const arrival=game?.phase==='entering'?Math.max(0,Math.min(1,1-(game.arrivalUntil-time)/(ARRIVAL_MS/1000))):1;
   const result=game?.result&&time-game.result.at<1.1?game.result:null;
   const label=game?.phase==='warning'?'WARNING · BOSS APPROACHING':game?.phase==='intermission'?`STAGE ${game.stage} CLEAR · 次のSTAGEへ`:game?.phase==='awakening'?'SIGNAL OVERDRIVE · 弾薬補給 +10':game?.phase==='rekeying'?'新しい4文字へ切替中…':game?.phase==='defeating'?'BOSS DEFEATED · +5,000':game?.phase==='entering'?(boss?'大型ボス接近中…4文字を確認！':'新部隊が降下中…砲台の4文字を確認！'):canAnswer(game)?`迎撃せよ！ #${head!.id} · 1–4 / タップ`:game?.phase==='active'?(time<game.retryUntil?'再装填中…':tx?.status==='sending'?'CW受信中…発射順を覚えよう':head?'次のCW送信を待とう':'次の攻撃を待とう'):'音で守る、放課後の防衛線。';
+  const overlay=<div className="guard-overlay">
+          <p className="guard-overlay-kicker">{game?.phase==='clear'?'MISSION COMPLETE':game?.phase==='over'?'MISSION END':game?.phase==='paused'?'PAUSED':'CW迎撃隊'}</p>
+          <h2>{game?.phase==='clear'?boss?'シグナル・マスター、撃破！':game.stage===3?'最終WAVE突破！':'編隊を突破！':game?.phase==='over'?cityHp(game)===0?'街を守りきれませんでした':'弾切れになりました':game?.phase==='paused'?'ひと休みしよう':'音を聴いて、街を守れ。'}</h2>
+          <p>{game?.phase==='paused'?'飛行中のレーザーも停止。再開すると送信中だった信号だけを再送します。':'レーザーは発射順に迎撃。誤答後も着弾前なら再射撃できます。'}</p>
+          <button className="btn btn-primary" onClick={()=>void start(game?.phase==='paused',game?.bossOnly??false)}>{game?.phase==='paused'?'再開する':game?'もう一度遊ぶ':'音を有効にして開始'}</button>
+          {process.env.NODE_ENV==='development'&&!game&&<><button className="btn btn-secondary guard-boss-practice" onClick={()=>void start(false,true)}>開発確認：WARNINGから再生</button><button className="btn btn-secondary guard-boss-practice" onClick={()=>setCutInPreview(true)}>開発確認：Good Job!!</button></>}
+          {game?.phase==='clear'&&<p className="guard-final-score">SCORE <strong>{game.score.toLocaleString()}</strong></p>}
+          {game?.phase==='clear'&&boss&&<p>撃破ボーナス +{BOSS_BONUS.toLocaleString()} · {game.bossOnly?'ボス練習の記録':'全STAGE・ボス戦クリア'}</p>}
+          {game&&['clear','over'].includes(game.phase)&&<p>{game.correct}/{game.attempts}迎撃成功 · 最大COMBO {game.maxCombo} · BEST {best.toLocaleString()}</p>}
+        </div>;
   return <section className="page-pad computer-club">
     <header className="club-heading"><div><p className="section-kicker">AFTER SCHOOL COMPUTER CLUB / GAME 01</p><h1>放課後パソコン部</h1><p>聞き取れた、その一音が迎撃になる。</p></div><span className="club-label">CW迎撃隊 <small>都市防衛 / {PRESETS[preset].label}</small></span></header>
     <div className={`guard-console ${boss?'guard-boss-console':''}`}>
@@ -203,15 +215,9 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
           })}
           {(game?.phase==='warning'||game?.phase==='paused'&&game.pausedFrom==='warning')&&<BossWarning width={fieldWidth} elapsed={WARNING_SECONDS-(game.transitionUntil-time)} reduced={reduced}/>}
         </svg>
-        {(!game||['paused','clear','over'].includes(game.phase))&&<div className="guard-overlay">
-          <p className="guard-overlay-kicker">{game?.phase==='clear'?'MISSION COMPLETE':game?.phase==='over'?'MISSION END':game?.phase==='paused'?'PAUSED':'CW迎撃隊'}</p>
-          <h2>{game?.phase==='clear'?boss?'シグナル・マスター、撃破！':game.stage===3?'最終WAVE突破！':'編隊を突破！':game?.phase==='over'?cityHp(game)===0?'街を守りきれませんでした':'弾切れになりました':game?.phase==='paused'?'ひと休みしよう':'音を聴いて、街を守れ。'}</h2>
-          <p>{game?.phase==='paused'?'飛行中のレーザーも停止。再開すると送信中だった信号だけを再送します。':'レーザーは発射順に迎撃。誤答後も着弾前なら再射撃できます。'}</p>
-          <button className="btn btn-primary" onClick={()=>void start(game?.phase==='paused',game?.bossOnly??false)}>{game?.phase==='paused'?'再開する':game?'もう一度遊ぶ':'音を有効にして開始'}</button>
-          {process.env.NODE_ENV==='development'&&!game&&<button className="btn btn-secondary guard-boss-practice" onClick={()=>void start(false,true)}>開発確認：WARNINGから再生</button>}
-          {game?.phase==='clear'&&boss&&<p>撃破ボーナス +{BOSS_BONUS.toLocaleString()} · {game.bossOnly?'ボス練習の記録':'全STAGE・ボス戦クリア'}</p>}
-          {game&&['clear','over'].includes(game.phase)&&<p>{game.correct}/{game.attempts}迎撃成功 · 最大COMBO {game.maxCombo} · BEST {best.toLocaleString()}</p>}
-        </div>}
+        {(!game||['paused','clear','over'].includes(game.phase))&&(game?.phase==='clear'?<GoodJobCutIn key={game.runId}>{overlay}</GoodJobCutIn>:overlay)}
+        {process.env.NODE_ENV==='development'&&cutInPreview&&<GoodJobCutIn><div className="guard-overlay"><p>カットイン確認完了（記録は変更しません）</p><button className="btn btn-primary" onClick={()=>setCutInPreview(false)}>プレビューを閉じる</button></div></GoodJobCutIn>}
+
       </div>
       <div className="guard-city-status" aria-label="街の防衛状況">CITY {cityHp(preview)}/{cityMaxHp(preview)} · {preview.buildings.filter(b=>b.hp>0).length}/{preview.buildings.length}棟 · {boss?'ボス戦':`第${squad}/${squads}部隊`} <span>飛行中 {preview.attacks.filter(a=>a.startedAt!==null).length} · {head?`迎撃対象 #${head.id}`:'攻撃待ち'}</span></div>
       <div className="guard-signal"><p role="status" aria-live="polite">{label}</p><span>{tx?.wpm??head?.wpm??wpm} WPM {preview.hints?'・符号ヒントあり':'・音だけ'}{boss&&tx?` · ${patternLabel[tx.pattern]}`:''}</span></div>
