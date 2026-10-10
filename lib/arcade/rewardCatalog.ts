@@ -1,4 +1,4 @@
-/** Approved game rewards. Artwork/character assignment is still pending. */
+/** Approved game rewards. Artwork supplied by the project owner. */
 export const GAME_REWARDS = [
   { id: 'cw-guard:first-clear', file: 'cwdef_first_clear_r', rarity: 'R', title: 'はじめての迎撃', condition: '8WPM以上でSTAGE 1クリア' },
   { id: 'cw-guard:stage3-clear', file: 'cwdef_stage3_clear_sr', rarity: 'SR', title: '一人前の迎撃隊員', condition: '12WPM以上でSTAGE 3クリア' },
@@ -14,8 +14,8 @@ export type GameRewardId = typeof GAME_REWARDS[number]['id'];
 export const isGameReward = (id: string) => id.startsWith('cw-guard:');
 export const GAME_REWARD_CARDS = GAME_REWARDS.map(reward => ({
   ...reward, artwork: `/cards/achievments/${reward.rarity.toLowerCase()}/${reward.file}.webp`,
-  description: 'CW迎撃隊のゲーム内攻略実績。カード画像は準備中です。',
-  game: 'cw-guard' as const, artworkPending: true,
+  description: 'CW迎撃隊のゲーム内攻略実績を記念するコレクションカード。',
+  game: 'cw-guard' as const, artworkPending: false,
 }));
 export function speedTier(wpm: number) {
   return wpm >= 20 ? 'SSSR' : wpm >= 15 ? 'SSR' : wpm >= 12 ? 'SR' : 'R';

@@ -28,6 +28,9 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
   const unlockedKinds = revealAll ? ALL_KINDS : (profile.unlockedKinds ?? []);
   const courseCards = cardsForPractice(CARDS, unlockedKinds);
   const [archiveTab, setArchiveTab] = useState<ArchiveTab>('chars');
+  // Preview artwork only: never grant or persist gameplay achievements.
+  const [devGamePreview, setDevGamePreview] = useState(process.env.NODE_ENV === 'development');
+  const showGamePreview = process.env.NODE_ENV === 'development' && devGamePreview;
   const [kindFilter, setKindFilter] = useState<CharacterKind | 'all'>('all');
   const [previewRarity, setPreviewRarity] = useState<CardRarityOwned>('SSR');
   const [selected, setSelected] = useState<MorseCard | null>(null);
@@ -45,7 +48,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
   const charMark = (card: MorseCard) => profile.qso?.charMarks?.[charMarkKey(card.alphabet, card.symbol)];
   const markedCount = Object.values(profile.qso?.charMarks ?? {}).filter(hasCharMark).length;
   const revealCard = (progress?: CardProgress) => Boolean(progress?.mastered) || revealAll;
-  const revealAchievement = (id: AchievementDef['id']) => isGameReward(id) ? gameRewardOwned(profile,id) : Boolean(profile.achievements?.[id]?.unlockedAt) || revealAll;
+  const revealAchievement = (id: AchievementDef['id']) => isGameReward(id) ? gameRewardOwned(profile,id) || showGamePreview : Boolean(profile.achievements?.[id]?.unlockedAt) || revealAll;
   const play = async (card: MorseCard) => {
     setAudioStatus('PLAYING');
     try {
@@ -202,7 +205,8 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
       })}</div>
     )}
 
-    {archiveTab === 'achievements' && <p className="game-collection-summary">CW迎撃隊専用SSSR：{GAME_REWARDS.filter(d=>d.rarity==='SSSR'&&gameRewardOwned(profile,d.id)).length} / 6{GAME_REWARDS.filter(d=>d.rarity==='SSSR').every(d=>gameRewardOwned(profile,d.id))?' · COMPLETE！':''} · ゲーム内の達成だけで解放（画像準備中）</p>}
+    {archiveTab === 'achievements' && process.env.NODE_ENV === 'development' && <label className="game-collection-summary"><input type="checkbox" checked={devGamePreview} onChange={event => setDevGamePreview(event.target.checked)} /> 開発確認：CW迎撃隊カードを解放表示（獲得記録には反映しません）</label>}
+    {archiveTab === 'achievements' && <p className="game-collection-summary">CW迎撃隊専用SSSR：{GAME_REWARDS.filter(d=>d.rarity==='SSSR'&&gameRewardOwned(profile,d.id)).length} / 6{GAME_REWARDS.filter(d=>d.rarity==='SSSR').every(d=>gameRewardOwned(profile,d.id))?' · COMPLETE！':''} · ゲーム内の達成だけで解放</p>}
     {archiveTab === 'achievements' && (
       <div className="card-grid">{ACHIEVEMENTS.map((item, index) => {
         const unlocked = revealAchievement(item.id);
@@ -321,9 +325,11 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
                 <div>
                   <dt>GET日</dt>
                   <dd className="small">
-                    {profile.achievements?.[selectedAchievement.id]?.unlockedAt
-                      ? new Date(profile.achievements[selectedAchievement.id].unlockedAt).toLocaleDateString('ja-JP')
-                      : revealAll
+                    {(selectedAchievement.game ? gameRewardOwned(profile, selectedAchievement.id) : profile.achievements?.[selectedAchievement.id]?.unlockedAt)
+                      ? new Date(profile.achievements?.[selectedAchievement.id]?.unlockedAt ?? 0).toLocaleDateString('ja-JP')
+                      : selectedAchievement.game && showGamePreview
+                        ? '開発プレビュー'
+                        : revealAll
                         ? 'プレビュー'
                         : '—'}
                   </dd>
@@ -331,7 +337,7 @@ export function CollectionView({ settings, profile, setProfile, setAudioStatus }
               </dl>
             </>
           ) : (
-            <p className="detail-locked"><Icon name="lock" size={16} />{selectedAchievement.game ? `CW迎撃隊専用：${selectedAchievement.condition}。画像準備中。` : '条件を満たすと解禁。タイトルも絵も、解禁までシークレット。'}</p>
+            <p className="detail-locked"><Icon name="lock" size={16} />{selectedAchievement.game ? `CW迎撃隊専用：${selectedAchievement.condition}。` : '条件を満たすと解禁。タイトルも絵も、解禁までシークレット。'}</p>
           )}
         </div>
       </div>

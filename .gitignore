@@ -46,3 +46,7 @@ next-env.d.ts
 /ecosystem.config.cjs
 /docs/
 /private/
+
+# Locally supplied achievement card artwork (both existing spellings)
+/public/cards/achievements/
+/public/cards/achievments/
