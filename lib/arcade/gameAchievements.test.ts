@@ -3,16 +3,16 @@ import {createGame} from './cwGuard';
 import {GAME_ACHIEVEMENTS,GAME_EVIDENCE_KEY,evaluateGameAchievements,recordGameTransition,transitionEvidence,type GameAchievementDefinition} from './gameAchievements';
 afterEach(()=>vi.unstubAllGlobals());
 describe('isolated game achievement foundation',()=>{
- it('records game-only immutable settings and milestones without creating unapproved rewards',()=>{
+ it('records game-only immutable settings and milestones without rewarding a start alone',()=>{
   const g=createGame('expert',false,73,{wpm:40,preset:'wabun'});
-  expect(GAME_ACHIEVEMENTS).toEqual([]);expect(evaluateGameAchievements(transitionEvidence(null,g),GAME_ACHIEVEMENTS)).toEqual([]);
+  expect(GAME_ACHIEVEMENTS).toHaveLength(9);expect(evaluateGameAchievements(transitionEvidence(null,g),GAME_ACHIEVEMENTS)).toEqual([]);
   expect(transitionEvidence(null,g)[0]).toMatchObject({game:'cw-guard',wpm:40,preset:'wabun',practice:false,hints:false});
   expect(transitionEvidence(g,{...g,time:99})).toEqual([]);
   expect(transitionEvidence(g,{...g,phase:'warning',stage:3})[0].kind).toBe('stage_cleared');
  });
  it('requires game evidence, excludes developer practice and deduplicates unlocks',()=>{
   const definitions:GameAchievementDefinition[]=[{id:'cw-guard:test-only',game:'cw-guard',accepts:e=>e.kind==='completed'}];
-  const g=createGame('expert'),e={...transitionEvidence(null,g)[0],kind:'completed' as const};
+  const g=createGame('expert'),base=transitionEvidence(null,g)[0],e={...base,id:`${g.runId}:completed:1:0`,kind:'completed' as const};
   expect(evaluateGameAchievements([e],definitions)).toEqual(['cw-guard:test-only']);
   expect(evaluateGameAchievements([{...e,practice:true}],definitions)).toEqual([]);
   expect(evaluateGameAchievements([e],definitions,['cw-guard:test-only'])).toEqual([]);

@@ -1,5 +1,6 @@
 'use client';
 
+import { applyGameEvidence, type GameEvidence } from '@/lib/arcade/gameAchievements';
 import { ComputerClubView } from './views/ComputerClubView';
 import { watchSharingWithdrawal } from '@/lib/activity';
 import { ActivityView } from './views/ActivityView';
@@ -256,6 +257,10 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     void pushAnswers(answer);
   }, []);
 
+  const recordGameRewards = useCallback((events: readonly GameEvidence[]) => {
+    setProfile(current => applyGameEvidence(current, events).profile);
+  }, []);
+
   const recordMany = useCallback((list: AnswerLog[]) => {
     if (!list.length) return;
     setAnswers((old) => [...old, ...list]);
@@ -330,7 +335,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
-    'computer-club': <ComputerClubView settings={settings} stopEpoch={stopEpoch} setAudioStatus={setAudioStatus} />,
+    'computer-club': <ComputerClubView profile={profile} onGameEvidence={recordGameRewards} settings={settings} stopEpoch={stopEpoch} setAudioStatus={setAudioStatus} />,
     resources: <ResourcesView onBack={() => navigate('home')} />,
     settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} onNavigate={navigate} />,
     activity: <ActivityView onAccount={() => navigate('account')} />,

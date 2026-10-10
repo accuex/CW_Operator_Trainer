@@ -1,3 +1,5 @@
+import { gameRewardOwned } from './arcade/gameAchievements';
+import { isGameReward } from './arcade/rewardCatalog';
 import { getAvatar } from './avatars';
 import { APP_VERSION, SCHEMA_VERSION, currentDataMeta, currentExportMeta, type DataMeta } from './appMeta';
 import type { AnswerLog, AudioSettings, SessionRecord, TrainerProfile } from './types';
@@ -40,6 +42,7 @@ export function normalizeProfile(profile: Partial<TrainerProfile> | null | undef
     revealAll: Boolean(profile?.revealAll),
     avatarId: getAvatar(profile?.avatarId)?.id ?? null,
   };
+  merged.achievements = Object.fromEntries(Object.entries(merged.achievements).filter(([id]) => !isGameReward(id) || gameRewardOwned(merged, id)));
   if (profile?.qso) merged.qso = normalizeQsoProfile(profile.qso);
   if (!merged.unlockedKinds || merged.unlockedKinds.length === 0) {
     merged.unlockedKinds = merged.learnCourse

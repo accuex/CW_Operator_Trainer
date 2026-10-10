@@ -24,7 +24,7 @@ export function AchievementCard({
   const [hasArtwork, setHasArtwork] = useState(false);
   const onAvailability = useCallback((value: boolean) => setHasArtwork(value), []);
   const rarity = achievement.rarity.toLowerCase();
-  const foil = achievement.rarity === 'SSR';
+  const foil = ['SSR','SSSR'].includes(achievement.rarity);
 
   const onMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const node = ref.current;
@@ -54,10 +54,11 @@ export function AchievementCard({
 
   const fallback = (
     <div className="face-inner achievement-face">
-      <span className="face-kind">実績</span>
+      <span className="face-kind">{achievement.game ? 'CW迎撃隊' : '実績'}</span>
       <span className="face-crest"><b>★</b></span>
       <span className="face-code">{achievement.rarity}</span>
       <span className="face-title">{achievement.title}</span>
+      {achievement.artworkPending && <small className="achievement-pending-art">カード画像準備中</small>}
     </div>
   );
 
@@ -69,7 +70,7 @@ export function AchievementCard({
       onPointerLeave={interactive ? onLeave : undefined}
     >
       <div className="signal-card-body">
-        <CardArtwork src={achievement.artwork} fallback={fallback} onAvailability={onAvailability} />
+        <CardArtwork src={achievement.artworkPending ? undefined : achievement.artwork} fallback={fallback} onAvailability={onAvailability} />
         {hasArtwork && <span className="achievement-art-badge" aria-hidden="true">{achievement.rarity}</span>}
         {foil && <span className="foil-layer" aria-hidden="true" />}
         {interactive && <span className="glare-layer" aria-hidden="true" />}

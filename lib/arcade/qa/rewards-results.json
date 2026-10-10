@@ -1,0 +1,46 @@
+{
+  "recordedAt": "2026-10-10T13:30:00.032797+00:00",
+  "stage": "PASS",
+  "rewards": {
+    "R": 1,
+    "SR": 1,
+    "SSR": 1,
+    "SSSR": 6,
+    "images": "PENDING",
+    "characterAssignments": "PENDING",
+    "artworkRoot": "public/cards/achievments"
+  },
+  "validation": {
+    "tests": 949,
+    "testFiles": 89,
+    "typescript": "PASS",
+    "build": "PASS",
+    "changedFileLint": "PASS",
+    "ordinaryLearningIsolation": "PASS",
+    "idOnlyAndRevealAllRejection": "PASS",
+    "duplicates": "PASS",
+    "speedBoundaries": [
+      8,
+      11,
+      12,
+      14,
+      15,
+      19,
+      20,
+      40
+    ],
+    "campaignSimulation": "PASS: actual engine transitions through 245 correct interceptions, all stages and boss",
+    "audioRecognition": "NOT_RUN: automated answers use engine truth, not CW listening recognition",
+    "damageHistory": "PASS: remains after healing",
+    "authenticatedSync": "PASS (mock existing API contract); live account NOT_RUN",
+    "guestPersistence": "PASS (compact proof in existing profile)"
+  },
+  "browser": {
+    "desktop": "1280x900: collection list/details/conditions PASS",
+    "mobile": "375x812: details, no overflow, game start/interception/pause/resume/settings lock PASS",
+    "fullBossLivePlay": "NOT_RUN (full campaign covered by engine tests)",
+    "rewardCardRendering": "PASS (render tests); full-campaign unlock notification in browser NOT_RUN"
+  },
+  "protection": "client event/condition validation only; no server gameplay certification, no API or DB changes",
+  "git": "local commit only; no push/deploy; unrelated new public/cards/achievements PNGs and memo preserved"
+}

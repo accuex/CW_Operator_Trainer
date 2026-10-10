@@ -159,3 +159,12 @@
 
 @keyframes foil-sweep { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
 @keyframes art-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Game-only SSSR rewards share the portrait card format, with a prismatic rim. */
+.signal-card.rarity-sssr .signal-card-body { border: 2px solid #b6ecff; box-shadow: 0 0 0 2px #ba87ff, 0 0 24px #b979ff66; background: linear-gradient(135deg,#9befff,#dbafff,#fff3ac,#ffabd9,#9befff); }
+.signal-card.rarity-sssr .foil-layer { opacity: .65; background: linear-gradient(120deg,transparent 15%,#8eefff66 30%,#ff99e866 45%,#fff8b766 60%,transparent 80%); }
+.rarity-badge.sssr { color: #e3c6ff; border-color: #ce9fff; background: #623b7b44; }
+.achievement-pending-art { font-size: 10px; color: #ccd5ec; }
+.game-collection-summary { color: #d4c4f3; font-size: .85rem; margin: 12px 0; }
+.guard-rewards { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; padding:8px 12px; border-left:3px solid #d3a6ff; background:#1a2446; font-size:.8rem; }
+.guard-rewards small { color:#b5c5db; }

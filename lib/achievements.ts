@@ -1,3 +1,4 @@
+import { GAME_REWARD_CARDS, type GameRewardId } from './arcade/rewardCatalog';
 import { CARDS } from './morse';
 import { isKochComplete, kochProgressOf, normalizeKoch } from './koch';
 import { ownedCardRarity, rarityRank } from './cardRarity';
@@ -13,6 +14,7 @@ const DAILY_GOAL = 40;
 
 /** Achievement catalog ID. Artwork: /cards/achievements/{r|sr|ssr}/{id}.webp */
 export type AchievementId =
+  | GameRewardId
   | 'latin-starter'
   | 'latin-master'
   | 'latin-speed-star'
@@ -61,7 +63,9 @@ export interface AchievementDef {
   description: string;
   /** Condition copy for the detail drawer. */
   condition: string;
-  rarity: CardRarity;
+  rarity: CardRarity | 'SSSR';
+  game?: 'cw-guard';
+  artworkPending?: boolean;
   /** Art path once the asset is placed. Missing files fall back to CSS face. */
   artwork: string;
 }
@@ -139,6 +143,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   def('streak-30', 'SSR', '30日連続', 'ひと月、一日も欠かさず電鍵へ。', '連続学習日数 30 日'),
   def('night-owl', 'R', '深夜オペ', '静かなバンドは夜に開く。', `0〜3 時台に累計 ${HOUR_ANSWERS} 字回答`),
   def('early-bird', 'R', '朝練オペ', '出勤前のワッチは三文の得。', `5〜7 時台に累計 ${HOUR_ANSWERS} 字回答`),
+  ...GAME_REWARD_CARDS,
 ];
 
 export const achievementById = (id: string) => ACHIEVEMENTS.find((item) => item.id === id);
@@ -240,7 +245,7 @@ const kochDone = (profile: TrainerProfile, alphabet: 'international' | 'wabun') 
 
 type Predicate = (ctx: AchievementContext) => boolean;
 
-const PREDICATES: Record<AchievementId, Predicate> = {
+const PREDICATES: Record<Exclude<AchievementId, GameRewardId>, Predicate> = {
   'latin-starter': ({ profile }) => masteredCount(LATIN_LETTERS, profile) >= 10,
   'latin-master': ({ profile }) => allAtLeast(LATIN_LETTERS, profile, 'R'),
   'latin-speed-star': ({ profile }) => allAtLeast(LATIN_LETTERS, profile, 'SR'),
@@ -291,12 +296,12 @@ const PREDICATES: Record<AchievementId, Predicate> = {
 };
 
 export function isAchievementUnlocked(id: AchievementId, ctx: AchievementContext) {
-  return PREDICATES[id](ctx);
+  return id.startsWith('cw-guard:') ? false : PREDICATES[id as Exclude<AchievementId, GameRewardId>](ctx);
 }
 
 /** IDs that currently satisfy their condition (including already unlocked). */
 export function satisfiedAchievements(ctx: AchievementContext): AchievementId[] {
-  return ACHIEVEMENTS.filter((item) => PREDICATES[item.id](ctx)).map((item) => item.id);
+  return ACHIEVEMENTS.filter((item) => isAchievementUnlocked(item.id, ctx)).map((item) => item.id);
 }
 
 /**

@@ -114,7 +114,7 @@ export function watchSharingWithdrawal(): () => void {
 }
 export function publishActivity(kind: ActivityKind, detail: string, avatarId?: string | null): Promise<void> {
   if (!readSharing().enabled) return Promise.resolve();
-  if (kind === 'started' ? !Object.hasOwn(ACTIVITY_SUBJECTS, detail) : !achievementById(detail)) return Promise.resolve();
+  if (kind === 'started' ? !Object.hasOwn(ACTIVITY_SUBJECTS, detail) : (!achievementById(detail) || Boolean(achievementById(detail)?.game))) return Promise.resolve();
   return serialize(async () => {
     const value = readSharing();
     if (!value.enabled) return;

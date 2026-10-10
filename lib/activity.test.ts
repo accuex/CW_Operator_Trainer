@@ -56,7 +56,7 @@ describe('opt-in activity', () => {
   it('keeps client and server event/asset allowlists aligned', () => {
     const catalog = JSON.parse(readFileSync('api/data/activity-catalog.json', 'utf8'));
     expect(catalog.avatars).toEqual(AVATARS.map((a) => a.id));
-    expect(catalog.achievements).toEqual(ACHIEVEMENTS.map((a) => a.id));
+    expect(catalog.achievements).toEqual(ACHIEVEMENTS.filter((a) => !a.game).map((a) => a.id));
     expect(catalog.subjects).toEqual(Object.keys(ACTIVITY_SUBJECTS));
   });
   it('renders event detail via the fixed catalog, not arbitrary text', () => {

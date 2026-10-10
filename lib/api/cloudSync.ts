@@ -75,6 +75,7 @@ function isCloudEmpty(
     profile.goal
     || profile.learnCourse
     || (profile.cards && typeof profile.cards === 'object' && Object.keys(profile.cards as object).length > 0)
+    || (profile.achievements && typeof profile.achievements === 'object' && Object.keys(profile.achievements as object).length > 0)
     || profile.koch
     || profile.kochWabun
     || profile.qso

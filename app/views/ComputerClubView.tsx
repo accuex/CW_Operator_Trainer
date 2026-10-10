@@ -9,13 +9,14 @@ import { RobotEnemy, ROBOT_MUZZLE_Y, type RobotPose } from './RobotEnemy';
 import { PRESETS, type Preset } from '@/lib/arcade/presets';
 import { GameSE, SoundEvents, readMix, saveMix } from '@/lib/arcade/se';
 import { GameMusic } from '@/lib/arcade/music';
-import { recordGameTransition } from '@/lib/arcade/gameAchievements';
+import { recordGameTransition, gameRewardOwned, type GameEvidence } from '@/lib/arcade/gameAchievements';
+import { GAME_REWARDS, speedTier } from '@/lib/arcade/rewardCatalog';
 import { LASER_IMPACT_Y } from '@/lib/arcade/laser';
-import type { AudioSettings } from '@/lib/types';
+import type { AudioSettings, TrainerProfile } from '@/lib/types';
 import { WARNING_SECONDS, BOSS_BONUS, bossDrone, enemyPosition, livePhase, answerAttack, advanceGame, beginTransmission, canAnswer, cityHp, cityMaxHp, createGame, nextAttack, oldestAttack, pauseGame, readBest, resumeAttack, saveBest, signalCode, movementPose, batteryPosition, missilePosition, squadDrones, squadNumber, transmittingAttack, ARRIVAL_MS, type Difficulty, type GuardGame } from '@/lib/arcade/cwGuard';
 
 const robotScale=(count:number)=>Math.min(.8,(400/(count-1)-12)/112);
-export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:AudioSettings;stopEpoch:number;setAudioStatus:(status:string)=>void}) {
+export function ComputerClubView({settings,stopEpoch,setAudioStatus,profile,onGameEvidence}:{settings:AudioSettings;stopEpoch:number;setAudioStatus:(status:string)=>void;profile:TrainerProfile;onGameEvidence:(events:readonly GameEvidence[])=>void}) {
   const [cutInPreview,setCutInPreview]=useState(false);
   const boardRef=useRef<HTMLDivElement>(null);
   const [layout,setLayout]=useState({wide:false,width:960,height:900});
@@ -40,7 +41,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
   const [game,setGame]=useState<GuardGame|null>(null),[best,setBest]=useState(0),[message,setMessage]=useState('');
   useEffect(()=>{music.attach(audioElement.current);},[music]);
   const previousGame=useRef<GuardGame|null>(null);
-  useEffect(()=>{recordGameTransition(previousGame.current,game);previousGame.current=game;},[game]);
+  useEffect(()=>{const events=recordGameTransition(previousGame.current,game);previousGame.current=game;if(events.length)onGameEvidence(events);},[game,onGameEvidence]);
   useEffect(()=>{
     if(!game||game.phase==='paused'||game.phase==='over')se.stop();
     for(const sound of soundEvents.update(game))se.play(sound);
@@ -164,8 +165,10 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
           {game?.phase==='clear'&&boss&&<p>撃破ボーナス +{BOSS_BONUS.toLocaleString()} · {game.bossOnly?'ボス練習の記録':'全STAGE・ボス戦クリア'}</p>}
           {game&&['clear','over'].includes(game.phase)&&<p>{game.correct}/{game.attempts}迎撃成功 · 最大COMBO {game.maxCombo} · BEST {best.toLocaleString()}</p>}
         </div>;
+  const earned = GAME_REWARDS.filter(d=>gameRewardOwned(profile,d.id)&&profile.achievements?.[d.id]?.gameEvidence?.runId===game?.runId);
   return <section className="page-pad computer-club">
     <header className="club-heading"><div><p className="section-kicker">AFTER SCHOOL COMPUTER CLUB / GAME 01</p><h1>放課後パソコン部</h1><p>聞き取れた、その一音が迎撃になる。</p></div><span className="club-label">CW迎撃隊 <small>都市防衛 / {PRESETS[preset].label}</small></span></header>
+    {earned.length>0 && !tx && game && ['intermission','warning','clear','over'].includes(game.phase) && <aside className="guard-rewards" aria-label="このプレイで獲得した実績" role="status"><b>カードGET</b>{earned.map(d=><span key={d.id} className={`rarity-badge ${d.rarity.toLowerCase()}`}>{d.rarity} · {d.title}</span>)}<small>画像準備中 · カード図鑑の実績で確認できます</small></aside>}
     <div className={`guard-console ${boss?'guard-boss-console':''}`}>
       <div className="guard-hud" aria-label="ゲーム状況"><span>SCORE<b>{preview.score.toLocaleString()}</b></span><span>COMBO<b className={preview.combo>=4?'guard-hot':''}>{preview.combo}<small> ×{(1+Math.min(4,Math.floor(preview.combo/4))*.25).toFixed(2)}</small></b></span><span>AMMO<b>{game?.ammo??'—'}<small> / 残敵{remaining}</small></b></span><span>{boss?'BOSS':'STAGE'}<b>{boss?bossUnit!.hp:preview.stage}<small>{boss?' / 100':` / 3 · 部隊 ${squad}/${squads}`}</small></b></span></div>
       <div ref={boardRef} className={`guard-board ${result?.correct?'guard-hit':result?.answer?'guard-miss':''}`}>
@@ -220,7 +223,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
 
       </div>
       <div className="guard-city-status" aria-label="街の防衛状況">CITY {cityHp(preview)}/{cityMaxHp(preview)} · {preview.buildings.filter(b=>b.hp>0).length}/{preview.buildings.length}棟 · {boss?'ボス戦':`第${squad}/${squads}部隊`} <span>飛行中 {preview.attacks.filter(a=>a.startedAt!==null).length} · {head?`迎撃対象 #${head.id}`:'攻撃待ち'}</span></div>
-      <div className="guard-signal"><p role="status" aria-live="polite">{label}</p><span>{tx?.wpm??head?.wpm??wpm} WPM {preview.hints?'・符号ヒントあり':'・音だけ'}{boss&&tx?` · ${patternLabel[tx.pattern]}`:''}</span></div>
+      <div className="guard-signal"><p role="status" aria-live="polite">{label}</p><span>{tx?.wpm??head?.wpm??wpm} WPM · {({R:'初級',SR:'中級',SSR:'上級',SSSR:'最高難度'})[speedTier(preview.wpm)]} {preview.hints?'・符号ヒントあり':'・音だけ'}{boss&&tx?` · ${patternLabel[tx.pattern]}`:''}</span></div>
       {game&&time<game.keyNoticeUntil&&<p className="guard-key-notice" role="status">4文字を更新しました：{game.squadChoices.join(' / ')}</p>}
       <div className="guard-choices" aria-label="迎撃する文字を選択">{(preview.squadChoices.length?preview.squadChoices:PRESETS[preset].symbols.slice(0,4)).map((letter,i)=><button type="button" key={`${preview.stage}-${preview.squadRow}-${i}`} disabled={!canAnswer(game)} onClick={()=>choose(i)} aria-label={`${i+1}: ${letter}で迎撃`}><small>第{i+1}砲台 · {i+1}</small>{letter}</button>)}</div>
       <div className="guard-feedback" aria-live="polite">{result&&<span>{result.correct?`迎撃成功 +${result.points} · COMBO ${preview.combo}！`:result.answer?`#${result.attackId}着弾 · 正解 ${result.answer} ${signalCode(result.answer,preview.preset).replaceAll('.','・').replaceAll('-','－')}`:'誤答。再装填後に同じレーザーへ再射撃できます。'}</span>}{message&&<p role="alert">{message}</p>}</div>
@@ -239,7 +242,7 @@ export function ComputerClubView({settings,stopEpoch,setAudioStatus}:{settings:A
       <p>正解・誤答とも弾薬1発を消費。正解で攻撃元に1ダメージ、COMBO増加。誤答・着弾・一時停止でCOMBOリセット。4連続ごとに倍率が0.25上がり最大2倍。高速CWほど高得点、符号ヒントありは75%。STAGE別の送信枠後の間隔は1.8・0.7・0.18秒です。</p>
       <p>音声は順番に送信し、複数レーザーは同時に下降します。短点・長点・空白は1:3:1、下降速度はWPMと無関係。9棟の建物は着弾X座標で損傷し、隙間には建物ダメージなし。全壊・補給不能な弾切れで終了。STAGE突破時は建物HPを1回復、ボス登場時はHP3へ全回復・弾薬140発を補給します。</p>
       <p>ボスは1文字につき赤いレーザー1本を発射します。3連送は3文字・3つの攻撃IDで、発射順に1件ずつ迎撃。高出力・チャージは太いビームと発光で表現します。HP50で一度だけ覚醒、HP10で最終局面へ入り、各10発補給。HP75・50・25の文字切替は全攻撃を解決してから行います。ボスを倒すとボーナス5,000点で最終クリアです。</p>
-      <p>Esc・タブ移動で一時停止し、再開時は送信中の信号だけを再送します。ボスBGMとCWの音量は別々に調整できます。記録はこのブラウザ内に保存。既存の学習進捗・カード・公開ログには加算や投稿しません。ゲーム実績は将来の導入に備えた記録のみで、カード報酬は未実装です。</p>
+      <p>Esc・タブ移動で一時停止し、再開時は送信中の信号だけを再送します。ボスBGMとCWの音量は別々に調整できます。ゲームスコアはこのブラウザ内に保存。攻略実績でCW迎撃隊専用カードを獲得できます（画像は準備中）。実績は既存プロフィールへ保存され、ログイン時は既存の同期対象になります。通常の学習進捗には加算せず、公開ログにも投稿しません。8〜11WPMは初級、12〜14は中級、15〜19は上級、20以上は最高難度。40WPMは必須ではありません。</p>
     </details>
   </section>;
 }

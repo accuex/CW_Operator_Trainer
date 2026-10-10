@@ -26,6 +26,7 @@ export interface Resolution { attack: Attack; at: number; status: 'intercepted'|
 export interface Shot { id: number; attackId: number; enemy: number; at: number; selected: string; correct: boolean; points: number }
 export type Phase = 'idle'|'entering'|'active'|'clear'|'over'|'paused'|'awakening'|'rekeying'|'defeating'|'intermission'|'warning';
 export interface GuardGame {
+  rewardStats: { minWpm: number; hintsUsed: boolean; preset: Preset; presetChanged: boolean; cityDamage: number; stagesCleared: number[] };
   wpm: number; preset: Preset; enemiesPerSquad: number; transitionUntil: number; runId: string; mode: Difficulty; hints: boolean; scoreHints: boolean; stage: number; seed: number; drones: Drone[]; buildings: Building[]; boss: BossState | null; bossOnly: boolean;
   phase: Phase; pausedFrom?: Phase; time: number; arrivalUntil: number; nextFireAt: number;
   squadRow: number | null; squadChoices: string[]; attackSerial: number; attacks: Attack[]; transmittingId: number | null;
@@ -66,7 +67,7 @@ export function createGame(mode: Difficulty,hints=MODES[mode].hints,seed=Date.no
   const preset=options.preset&&options.preset in PRESETS?options.preset:'letters';
   const enemiesPerSquad=Number.isFinite(options.enemiesPerSquad)?Math.max(4,Math.min(8,Math.round(options.enemiesPerSquad!))):5;
   const [drones,next]=formation(preset,1,seed,enemiesPerSquad);
-  return {wpm,preset,enemiesPerSquad,transitionUntil:0,runId:`${seed}-${typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():Date.now()}`,mode,hints,scoreHints:hints,stage:1,seed:next,drones,buildings:createCity(),boss:null,bossOnly:false,phase:'idle',time:0,arrivalUntil:0,nextFireAt:0,
+  return {rewardStats:{minWpm:wpm,hintsUsed:hints,preset,presetChanged:false,cityDamage:0,stagesCleared:[]},wpm,preset,enemiesPerSquad,transitionUntil:0,runId:`${seed}-${typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():Date.now()}`,mode,hints,scoreHints:hints,stage:1,seed:next,drones,buildings:createCity(),boss:null,bossOnly:false,phase:'idle',time:0,arrivalUntil:0,nextFireAt:0,
     squadRow:null,squadChoices:[],attackSerial:0,attacks:[],transmittingId:null,resolved:[],shots:[],keyNoticeUntil:0,retryUntil:0,
     ammo:drones.reduce((sum,d)=>sum+d.hp,0)+8,score:0,combo:0,maxCombo:0,correct:0,attempts:0,result:null};
 }
@@ -99,7 +100,7 @@ export function nextAttack(game: GuardGame): GuardGame {
   if(['paused','clear','over','awakening','rekeying','defeating','intermission','warning'].includes(game.phase)) return game;
   if(cityHp(game)===0) return {...game,phase:'over',transmittingId:null,attacks:[]};
   const remaining=game.drones.filter(d=>d.alive);
-  if(!remaining.length && !game.attacks.length) return game.resolved.some(r=>r.status==='intercepted'&&game.time-r.at<1)?game:{...game,phase:game.stage===3?'warning':'intermission',transitionUntil:game.time+(game.stage===3?WARNING_SECONDS:1.2)};
+  if(!remaining.length && !game.attacks.length) return game.resolved.some(r=>r.status==='intercepted'&&game.time-r.at<1)?game:{...game,rewardStats:{...game.rewardStats,stagesCleared:[...new Set([...game.rewardStats.stagesCleared,game.stage])]},phase:game.stage===3?'warning':'intermission',transitionUntil:game.time+(game.stage===3?WARNING_SECONDS:1.2)};
   const boss=game.boss, drone=boss?bossDrone(game):null;
   // Stop new sends at milestones, but let the current CW and queued flights resolve.
   if(boss&&drone&&(bossKeyTier(drone.hp)>boss.keyTier || (drone.hp<=50&&!boss.awakened))){
@@ -155,7 +156,7 @@ export function beginTransmission(game: GuardGame,id: number,timeline: MorseTime
 /** Resolve each physical impact once; empty ground and ruins never redirect damage. */
 export function advanceGame(game: GuardGame,now: number): GuardGame {
   if(!livePhase(game.phase)||!Number.isFinite(now)||now<game.time) return game;
-  let g={...game,time:now,shots:game.shots.filter(s=>now-s.at<1.1),resolved:game.resolved.filter(r=>now-r.at<1.1)};
+  let g={...game,rewardStats:{...game.rewardStats,minWpm:Math.min(game.rewardStats.minWpm,game.wpm),hintsUsed:game.rewardStats.hintsUsed||game.hints||game.scoreHints,presetChanged:game.rewardStats.presetChanged||game.preset!==game.rewardStats.preset},time:now,shots:game.shots.filter(s=>now-s.at<1.1),resolved:game.resolved.filter(r=>now-r.at<1.1)};
   if(g.phase==='intermission'||g.phase==='warning') return now>=g.transitionUntil?nextAttack(nextStage(g)):g;
   if(g.phase==='defeating') return now-g.boss!.defeatedAt!>=3?{...g,phase:'clear'}:g;
   if(g.phase==='awakening'||g.phase==='rekeying'){
@@ -172,7 +173,7 @@ export function advanceGame(game: GuardGame,now: number): GuardGame {
   for(const attack of impacts){
     const hit=buildingAt(g.buildings,attack.x+attack.beamOffsets[0]);
     const hitIds=new Set(attack.beamOffsets.flatMap(dx=>{const b=buildingAt(g.buildings,attack.x+dx);return b?[b.id]:[];}));
-    g={...g,combo:0,attacks:g.attacks.filter(a=>a.id!==attack.id),
+    g={...g,rewardStats:{...g.rewardStats,cityDamage:g.rewardStats.cityDamage+g.buildings.filter(b=>hitIds.has(b.id)&&b.hp>0).length},combo:0,attacks:g.attacks.filter(a=>a.id!==attack.id),
       buildings:g.buildings.map(b=>hitIds.has(b.id)?{...b,hp:Math.max(0,b.hp-1)}:b),
       resolved:[...g.resolved,{attack,at:attack.impactAt!,status:'impacted' as const,buildingId:hit?.id??null}],
       result:{correct:false,answer:attack.symbol,selected:null,points:0,at:now,attackId:attack.id}};

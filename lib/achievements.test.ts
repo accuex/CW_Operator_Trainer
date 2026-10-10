@@ -119,7 +119,8 @@ describe('applyAchievements', () => {
     expect(ACHIEVEMENTS.length).toBeGreaterThanOrEqual(14);
     expect(new Set(ACHIEVEMENTS.map((item) => item.id)).size).toBe(ACHIEVEMENTS.length);
     for (const item of ACHIEVEMENTS) {
-      expect(item.artwork).toBe(`/cards/achievements/${item.rarity.toLowerCase()}/${item.id}.webp`);
+      if (!item.game) expect(item.artwork).toBe(`/cards/achievements/${item.rarity.toLowerCase()}/${item.id}.webp`);
+      else expect(item.artwork).toMatch(/^\/cards\/achievments\/(r|sr|ssr|sssr)\/cwdef_/);
     }
   });
 

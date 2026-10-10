@@ -396,6 +396,8 @@ export interface CardProgress {
 }
 
 export interface AchievementProgress {
+  /** Compact client-side game evidence; not a server-certified result. */
+  gameEvidence?: import('./arcade/gameAchievements').GameEvidence;
   unlockedAt: number;
 }
 
