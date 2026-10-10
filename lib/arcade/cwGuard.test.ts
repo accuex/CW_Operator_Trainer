@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { answerAttack, createGame, MODES, nextAttack as queueAttack, completeArrival, beginTransmission, squadDrones, squadNumber, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
+import { answerAttack, expireAttack, RETRY_SECONDS, createGame, MODES, nextAttack as queueAttack, completeArrival, beginTransmission, squadDrones, squadNumber, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, movementPose, dronePosition, batteryPosition, missilePosition, type Difficulty } from './cwGuard';
 import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
 
@@ -134,6 +134,8 @@ describe('CW guard rules', () => {
     const beforeAmmo=g.ammo;
     g=answerAttack(openAnswer(g,g.attack!.id),g.attack!.id,g.attack!.choices.find(c=>c!==sender.symbol)!);
     expect(g.combo).toBe(0); expect(g.ammo).toBe(beforeAmmo-1);
+    expect(g.cityDamage[sender.column]).toBe(0);
+    g=expireAttack(g,g.attack!.id);
     expect(g.cityDamage[sender.column]).toBe(1);
     expect(g.drones.find(d=>d.id===sender.id)!.alive).toBe(true);
     expect(g.cityDamage.reduce((a,b)=>a+b,0)).toBe(1);
@@ -141,8 +143,50 @@ describe('CW guard rules', () => {
     expect(nextStage({...g,phase:'clear',cityDamage:[2,1,0,2]}).cityDamage).toEqual([1,0,0,1]);
     expect(nextAttack({...g,ammo:0}).phase).toBe('over');
   });
+  it('allows a miss then correct retry, suppresses spam, spends one round per shot, and hides the answer',()=>{
+    let g=nextAttack(createGame('beginner',true,73));g=openAnswer(g,g.attack!.id);
+    const id=g.attack!.id, answer=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol, wrong=g.attack!.choices.find(c=>c!==answer)!;
+    g={...g,combo:5}; const ammo=g.ammo;
+    g=answerAttack(g,id,wrong,2);
+    expect(g.phase).toBe('answer');expect(g.combo).toBe(0);expect(g.result!.answer).toBe('');expect(g.cityDamage).toEqual([0,0,0,0]);
+    expect(answerAttack(g,id,answer,2)).toBe(g);expect(answerAttack(g,id,answer,2+RETRY_SECONDS-.001)).toBe(g);
+    g=answerAttack(g,id,answer,2+RETRY_SECONDS);
+    expect(g.phase).toBe('feedback');expect(g.ammo).toBe(ammo-2);expect(g.correct).toBe(1);expect(g.combo).toBe(1);expect(g.cityDamage).toEqual([0,0,0,0]);
+    expect(expireAttack(g,id)).toBe(g);expect(answerAttack(g,id,answer,9)).toBe(g);
+  });
+  it('ends at ammo zero or impact, damages town exactly once, and spends nothing on timeout',()=>{
+    let g=nextAttack(createGame('beginner',true,73));g=openAnswer(g,g.attack!.id);
+    const id=g.attack!.id, answer=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol, wrong=g.attack!.choices.find(c=>c!==answer)!;
+    const out=answerAttack({...g,ammo:1},id,wrong,3);
+    expect(out.ammo).toBe(0);expect(out.phase).toBe('feedback');expect(out.cityDamage.reduce((a,b)=>a+b)).toBe(1);
+    expect(answerAttack(out,id,answer,4)).toBe(out);expect(expireAttack(out,id)).toBe(out);
+    const expired=expireAttack(g,id);expect(expired.ammo).toBe(g.ammo);expect(expired.cityDamage.reduce((a,b)=>a+b)).toBe(1);
+    const lateHit=answerAttack(g,id,answer,5.79,5.8);expect(expireAttack(lateHit,id)).toBe(lateHit);
+    expect(answerAttack(g,id,answer,5.8,5.8).correct).toBe(0);
+    expect(answerAttack(g,id,answer,5.81,5.8).phase).toBe('feedback');
+  });
+  it('fixes four battery keys across misses, hits, pause/resume and duplicate-letter enemies',()=>{
+    let g=nextAttack(createGame('beginner',true,73));const choices=[...g.squadChoices];
+    for(let i=0;i<4;i++){
+      expect(g.attack!.choices).toEqual(choices);
+      g=resumeAttack(pauseGame(g));expect(g.squadChoices).toEqual(choices);
+      g=openAnswer(g,g.attack!.id);const answer=g.drones.find(d=>d.id===g.attack!.enemy)!.symbol;
+      g=answerAttack(g,g.attack!.id,g.attack!.choices.find(c=>c!==answer)!,1);
+      expect(g.squadChoices).toEqual(choices);g=answerAttack(g,g.attack!.id,answer,1.3);
+      g=nextAttack(g);
+    }
+    expect(g.squadChoices).not.toEqual(choices);
+    let extra=createGame('beginner',true,73);
+    extra={...extra,drones:[...extra.drones,{...extra.drones[12],id:99,column:4}]};
+    extra=nextAttack(extra);expect(extra.squadChoices).toHaveLength(4);
+    const sender=extra.drones.find(d=>d.id===extra.attack!.enemy)!;
+    const hit=answerAttack(openAnswer(extra,extra.attack!.id),extra.attack!.id,sender.symbol);
+    expect(hit.drones.filter(d=>!d.alive).map(d=>d.id)).toEqual([sender.id]);
+  });
   it('moves formation both ways and missiles follow straight paths to a moving target', () => {
     expect(formationOffset(0)).toBe(0);
+    expect(movementPose(0)).toBe('right');expect(movementPose(Math.PI/.32)).toBe('left');
+    expect(movementPose(Math.PI/2/.32)).toBe('idle');
     expect(formationOffset(5)).toBeGreaterThan(0);
     expect(formationOffset(15)).toBeLessThan(0);
     const drone=createGame('beginner',true,73).drones[12];

@@ -17,6 +17,14 @@ describe('CWOT robot sprites',()=>{
       expect(html).toContain(`data-enemy-state="${pose}"`);
     }
   });
+  it('cycles moving sprites while leaning in the travel direction',()=>{
+    for(const pose of ['left','right'] as const){
+      const frames=Array.from({length:4},(_,frame)=>renderToStaticMarkup(React.createElement(RobotEnemy,{pose,frame})));
+      expect(new Set(frames).size).toBe(3);
+      expect(frames[2]).toContain('idle-1.webp');expect(frames[3]).toContain('idle-2.webp');
+      expect(frames[2]).toContain(`rotate(${pose==='right'?8:-8})`);
+    }
+  });
   it('keeps the muzzle and large laser corridor at the same height for every squad',()=>{
     const game=createGame('expert',true,73);
     for(const drone of game.drones){

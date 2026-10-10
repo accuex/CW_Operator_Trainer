@@ -1,0 +1,132 @@
+{
+  "baseCommit": "1e26f85",
+  "stage": "CW迎撃部 プレイレビュー修正・部隊内キー固定",
+  "status": "PASS_WITH_LIMITATIONS",
+  "laserSpeedWorldUnitsPerSecond": 36,
+  "previousLaserSpeed": 18,
+  "numericalChecks": {
+    "wpm": [
+      8,
+      12,
+      16,
+      20,
+      22,
+      30,
+      40
+    ],
+    "symbols": [
+      "A",
+      "N",
+      "S",
+      "O",
+      "5",
+      "0"
+    ],
+    "toneRatio": "1:3:1",
+    "headTailSameSpeed": true,
+    "WpmIndependentSpeed": true,
+    "releaseAtToneOff": true,
+    "endOfAttackClearsLaser": true,
+    "metrics": [
+      {
+        "wpm": 8,
+        "ditSeconds": 0.15,
+        "dotLength": 5.3999999999999995,
+        "dashLength": 16.2,
+        "elementGap": 5.3999999999999995
+      },
+      {
+        "wpm": 12,
+        "ditSeconds": 0.09999999999999999,
+        "dotLength": 3.5999999999999996,
+        "dashLength": 10.799999999999999,
+        "elementGap": 3.5999999999999996
+      },
+      {
+        "wpm": 16,
+        "ditSeconds": 0.075,
+        "dotLength": 2.6999999999999997,
+        "dashLength": 8.1,
+        "elementGap": 2.6999999999999997
+      },
+      {
+        "wpm": 20,
+        "ditSeconds": 0.06,
+        "dotLength": 2.1599999999999997,
+        "dashLength": 6.4799999999999995,
+        "elementGap": 2.1599999999999997
+      },
+      {
+        "wpm": 22,
+        "ditSeconds": 0.05454545454545454,
+        "dotLength": 1.9636363636363634,
+        "dashLength": 5.890909090909091,
+        "elementGap": 1.9636363636363634
+      },
+      {
+        "wpm": 30,
+        "ditSeconds": 0.04,
+        "dotLength": 1.44,
+        "dashLength": 4.319999999999999,
+        "elementGap": 1.44
+      },
+      {
+        "wpm": 40,
+        "ditSeconds": 0.03,
+        "dotLength": 1.0799999999999998,
+        "dashLength": 3.2399999999999998,
+        "elementGap": 1.0799999999999998
+      }
+    ],
+    "muzzleYRange": [
+      107,
+      111
+    ],
+    "flightSecondsRange": [
+      5.75,
+      5.861111111111111
+    ]
+  },
+  "gameplayChecks": {
+    "retryAfterWrong": "PASS: ammo 24→23→22, correct hit score75, town8/8",
+    "cooldownSeconds": 0.3,
+    "wrongAnswerNotRevealedWhileRetrying": "PASS",
+    "sameSquadKeys": "PASS: E/I/O/S held across4 kills",
+    "nextSquadKeys": "PASS: S/E/A/T at entry",
+    "pauseResume": "PASS: same squad keys retained",
+    "zeroAmmo": "PASS unit",
+    "nearImpactAnswer": "PASS unit before deadline, rejected at/after deadline",
+    "concurrentShots": "PASS unit",
+    "heldKeyGuard": "implemented repeat prevention for1–4/Enter/Space; sustained physical key NOT_RUN",
+    "extraEnemies": "PASS unit five enemies/four distinct keys; only actual sender destroyed"
+  },
+  "browserChecks": {
+    "desktop": "1280x900, 8WPM retry and squad clear;22WPM ON separated beams with left movement sprite",
+    "mobile": "375x812, scrollWidth375, keys73.25x56, pause/resume",
+    "all7WpmLivePlay": "NOT_RUN: live settings retain existing difficulty speeds; all7 covered by numerical/SVG tests",
+    "continuousFrameCapture": "NOT_RUN",
+    "audioRecognition": "NOT_RUN: automated gameplay decoded visible hint paths, not human auditory recognition",
+    "VoiceOver": "NOT_RUN"
+  },
+  "assets": {
+    "availableFrames": 8,
+    "movingFrames": "direction sprite + idle-1 + idle-2 with directional lean; upright transition around reversal",
+    "newImages": 0
+  },
+  "boundaries": {
+    "CWAudioEngineChanged": false,
+    "learningProgressChanged": false,
+    "externalDirtyFilesPreserved": true,
+    "push": false,
+    "deploy": false
+  },
+  "validation": {
+    "relatedTests": 33,
+    "fullTests": 833,
+    "testFiles": 78,
+    "productionTargetTypeScript": "PASS",
+    "formalBuild": "PASS",
+    "diffCheck": "PASS",
+    "packageVersion": "1.1.1"
+  }
+}

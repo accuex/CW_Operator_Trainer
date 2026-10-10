@@ -2,10 +2,10 @@ import { describe,it,expect } from 'vitest';
 import { buildMorseTimeline } from '../timing';
 import { DEFAULT_SETTINGS } from '../storage';
 import { MODES,createGame,nextStage,answerSeconds } from './cwGuard';
-import { laserSegments,transmissionWindow,LASER_SPEED,LASER_IMPACT_Y,laserTravelSeconds } from './laser';
+import { laserSegments,transmissionWindow,LASER_SPEED,LASER_IMPACT_Y,laserTravelSeconds,answerDeadline } from './laser';
 const timeline=(symbol:string,wpm=8)=>buildMorseTimeline(symbol,'international',{...DEFAULT_SETTINGS,characterSpeed:wpm,effectiveSpeed:wpm});
 describe('constant world-speed CW beams',()=>{
-  it.each([8,16,20,30,40])('%i WPM uses exact audio tone-on/off and 1:3:1 lengths/gaps',wpm=>{
+  it.each([8,12,16,20,22,30,40])('%i WPM uses exact audio tone-on/off and 1:3:1 lengths/gaps',wpm=>{
     for(const symbol of ['A','N','S','O','5','0']){
       const t=timeline(symbol,wpm), window=transmissionWindow(MODES.expert.pool,wpm), origin=109;
       expect(t.dit).toBeCloseTo(1.2/wpm);
@@ -36,14 +36,18 @@ describe('constant world-speed CW beams',()=>{
       expect(laserSegments(t,arrival+t.duration+1,true,window,origin)).toEqual([]);
     }
   });
-  it('OFF is one continuously growing beam, identical across WPM and symbol',()=>{
-    for(const wpm of [8,16,20,30,40]) for(const symbol of MODES.expert.pool){
-      const t=timeline(symbol,wpm), window=transmissionWindow(MODES.expert.pool,wpm);
-      for(const elapsed of [.02,.2,1,4]) expect(laserSegments(t,elapsed,false,window,109)).toEqual([{y:109,length:elapsed*LASER_SPEED}]);
-      expect(laserSegments(t,100,false,window,109)).toEqual([{y:109,length:LASER_IMPACT_Y-109}]);
+  it('OFF is continuous, releases its tail at a shared window, never reveals individual tones',()=>{
+    for(const wpm of [8,12,16,20,22,30,40]) {
+      const window=transmissionWindow(MODES.expert.pool,wpm), arrival=laserTravelSeconds(109);
+      for(const elapsed of [.02,.2,1,4,arrival+window+1]){
+        const expected=laserSegments(timeline('A',wpm),elapsed,false,window,109);
+        for(const symbol of MODES.expert.pool) expect(laserSegments(timeline(symbol,wpm),elapsed,false,window,109)).toEqual(expected);
+        if(expected.length && elapsed>window) expect(expected[0].y).toBeGreaterThan(109);
+      }
+      expect(laserSegments(timeline('O',wpm),100,false,window,109)).toEqual([]);
     }
   });
-  it('preserves the full existing answer allowance and audio-before-impact for every difficulty/stage',()=>{
+  it('provides a symbol-independent answer allowance before physical impact for every difficulty/stage',()=>{
     for(const mode of ['beginner','standard','expert'] as const){
       let g=createGame(mode);
       for(let stage=1;stage<=3;stage++){
@@ -52,7 +56,10 @@ describe('constant world-speed CW beams',()=>{
           const wpm=MODES[mode].wpm+(stage-1)*2+variation;
           const window=transmissionWindow(MODES[mode].pool,wpm);
           // Highest muzzle has shortest flight. Neither symbol nor hint changes deadline.
-          expect(window+answerSeconds(g)).toBeLessThan(laserTravelSeconds(111));
+          const deadline=answerDeadline(window,answerSeconds(g),111);
+          expect(deadline).toBeLessThanOrEqual(laserTravelSeconds(111));
+          expect(deadline-window).toBeGreaterThan(2);
+          expect(window).toBeLessThan(deadline);
           for(const symbol of MODES[mode].pool) expect(timeline(symbol,wpm).duration).toBeLessThanOrEqual(window+1e-9);
         }
       }

@@ -11,7 +11,7 @@ export interface Attack { id: number; enemy: number; choices: string[]; wpm: num
 export type Phase = 'idle' | 'entering' | 'charging' | 'sending' | 'answer' | 'feedback' | 'clear' | 'over' | 'paused';
 export interface GuardGame {
   mode: Difficulty; hints: boolean; stage: number; seed: number; drones: Drone[]; attack: Attack | null;
-  phase: Phase; squadRow: number | null; pausedFrom?: Phase; cityDamage: number[]; ammo: number; score: number; combo: number; maxCombo: number; correct: number; attempts: number;
+  phase: Phase; squadRow: number | null; squadChoices: string[]; attackSerial: number; retryUntil: number; shotAt: number | null; pausedFrom?: Phase; cityDamage: number[]; ammo: number; score: number; combo: number; maxCombo: number; correct: number; attempts: number;
   result: { correct: boolean; answer: string; selected: string | null; points: number } | null;
 }
 function random(seed: number): [number, number] {
@@ -39,7 +39,7 @@ function formation(mode: Difficulty, stage: number, seed: number): [Drone[], num
 }
 export function createGame(mode: Difficulty, hints = MODES[mode].hints, seed = Date.now() >>> 0): GuardGame {
   const [drones, next] = formation(mode, 1, seed);
-  return { mode, hints, stage: 1, seed: next, drones, attack: null, phase: 'idle', squadRow: null, cityDamage: [0,0,0,0], ammo: drones.length + 8,
+  return { mode, hints, stage: 1, seed: next, drones, attack: null, phase: 'idle', squadRow: null, squadChoices: [], attackSerial: 0, retryUntil: 0, shotAt: null, cityDamage: [0,0,0,0], ammo: drones.length + 8,
     score: 0, combo: 0, maxCombo: 0, correct: 0, attempts: 0, result: null };
 }
 export function nextAttack(game: GuardGame): GuardGame {
@@ -49,12 +49,16 @@ export function nextAttack(game: GuardGame): GuardGame {
   if (game.cityDamage.every((damage) => damage === 2) || game.ammo < remaining.length) return { ...game, phase: 'over', attack: null };
   // Only the lowest surviving row may transmit. Its four letters form the answer set.
   const row = Math.max(...remaining.map((d) => d.row));
-  if (game.squadRow !== row) return { ...game, phase: 'entering', squadRow: row, attack: null, result: null };
+  if (game.squadRow !== row) {
+    // Keys are a squad-level set, independent of enemy count or attack selection.
+    const [squadChoices, seed] = shuffle([...new Set(game.drones.filter(d=>d.row===row).map(d=>d.symbol))],game.seed);
+    return { ...game, seed, squadChoices, phase: 'entering', squadRow: row, attack: null, result: null, retryUntil: 0, shotAt: null };
+  }
   const candidates = remaining.filter((d) => d.row === row);
   const [order, seed1] = shuffle(candidates, game.seed); const target = order[0];
-  const [choices, seed3] = shuffle(game.drones.filter((d) => d.row === row).map((d) => d.symbol), seed1);
+  const choices = [...game.squadChoices];
   const variation = game.mode === 'expert' ? ((game.attempts % 3) - 1) * 2 : 0;
-  return { ...game, seed: seed3, phase: 'charging', result: null, attack: { id: game.attempts + 1, enemy: target.id, choices,
+  return { ...game, seed: seed1, attackSerial: game.attackSerial+1, phase: 'charging', result: null, retryUntil: 0, shotAt: null, attack: { id: game.attackSerial + 1, enemy: target.id, choices,
     wpm: MODES[game.mode].wpm + (game.stage - 1) * 2 + variation } };
 }
 /** Entry and preparation must finish before any audio/answer phase. */
@@ -74,26 +78,36 @@ export const CHARGE_MS=260;
 export function openAnswer(game: GuardGame, attackId: number): GuardGame {
   return game.phase === 'sending' && game.attack?.id === attackId ? { ...game, phase: 'answer' } : game;
 }
-export function answerAttack(game: GuardGame, attackId: number, selected: string | null): GuardGame {
-  if (game.phase !== 'answer' || game.attack?.id !== attackId || (selected !== null && !game.attack.choices.includes(selected))) return game;
-  const target = game.drones.find((d) => d.id === game.attack!.enemy)!;
-  const correct = selected === target.symbol; const combo = correct ? game.combo + 1 : 0;
-  const multiplier = 1 + Math.min(4, Math.floor(combo / 4)) * 0.25;
-  const points = correct ? Math.round(100 * MODES[game.mode].factor * (game.attack.wpm / MODES[game.mode].wpm) * multiplier * (game.hints ? 0.75 : 1)) : 0;
-  const cityDamage = [...game.cityDamage];
-  if (!correct) {
-    const hit = cityDamage[target.column] < 2 ? target.column : cityDamage.findIndex((damage) => damage < 2);
-    if (hit >= 0) cityDamage[hit]++;
-  }
-  return { ...game, cityDamage, phase: 'feedback', ammo: game.ammo - 1, combo, maxCombo: Math.max(game.maxCombo, combo),
-    attempts: game.attempts + 1, correct: game.correct + Number(correct), score: game.score + points,
-    drones: game.drones.map((d) => d.id === target.id && correct ? { ...d, alive: false } : d),
-    result: { correct, answer: target.symbol, selected, points } };
+export const RETRY_SECONDS = .3;
+/** A miss spends a round but does not resolve the attack or reveal its answer. */
+export function answerAttack(game: GuardGame, attackId: number, selected: string | null, now = 0, deadline = Infinity): GuardGame {
+  if (game.phase !== 'answer' || game.attack?.id !== attackId) return game;
+  if (selected === null || now >= deadline) return expireAttack(game,attackId);
+  if (!Number.isFinite(now) || now < game.retryUntil || game.ammo <= 0 || !game.attack.choices.includes(selected)) return game;
+  const target = game.drones.find(d=>d.id===game.attack!.enemy)!;
+  const correct = selected===target.symbol, combo=correct?game.combo+1:0;
+  const multiplier=1+Math.min(4,Math.floor(combo/4))*.25;
+  const points=correct?Math.round(100*MODES[game.mode].factor*(game.attack.wpm/MODES[game.mode].wpm)*multiplier*(game.hints?.75:1)):0;
+  const shot: GuardGame = {...game, ammo:game.ammo-1, combo, maxCombo:Math.max(game.maxCombo,combo), attempts:game.attempts+1,
+    correct:game.correct+Number(correct), score:game.score+points, retryUntil:now+RETRY_SECONDS, shotAt:now,
+    phase:correct?'feedback':'answer', drones:game.drones.map(d=>d.id===target.id&&correct?{...d,alive:false}:d),
+    result:{correct,answer:correct?target.symbol:'',selected,points}};
+  return !correct && shot.ammo===0 ? expireAttack(shot,attackId) : shot;
+}
+/** Timeout/impact ends the opportunity once; town damage is applied once, no phantom shot. */
+export function expireAttack(game: GuardGame, attackId: number): GuardGame {
+  if (game.phase!=='answer' || game.attack?.id!==attackId) return game;
+  const target=game.drones.find(d=>d.id===game.attack!.enemy)!;
+  const cityDamage=[...game.cityDamage];
+  const hit=cityDamage[target.column]<2?target.column:cityDamage.findIndex(d=>d<2);
+  if(hit>=0) cityDamage[hit]++;
+  return {...game,cityDamage,phase:'feedback',combo:0,
+    result:{correct:false,answer:target.symbol,selected:game.result?.selected??null,points:0}};
 }
 export function nextStage(game: GuardGame): GuardGame {
   if (game.phase !== 'clear' || game.stage >= 3) return game;
   const [drones, seed] = formation(game.mode, game.stage + 1, game.seed);
-  return { ...game, cityDamage: game.cityDamage.map((damage) => Math.max(0,damage-1)), stage: game.stage + 1, seed, drones, squadRow: null, phase: 'idle', attack: null, result: null, ammo: drones.length + 8 };
+  return { ...game, cityDamage: game.cityDamage.map((damage) => Math.max(0,damage-1)), stage: game.stage + 1, seed, drones, squadRow: null, squadChoices: [], retryUntil: 0, shotAt: null, phase: 'idle', attack: null, result: null, ammo: drones.length + 8 };
 }
 export function pauseGame(game: GuardGame): GuardGame {
   if (!['entering','charging','sending','answer','feedback'].includes(game.phase)) return game;
@@ -102,7 +116,7 @@ export function pauseGame(game: GuardGame): GuardGame {
 }
 export function resumeAttack(game: GuardGame): GuardGame {
   if (game.phase !== 'paused') return game;
-  return { ...game, combo: 0, phase: game.pausedFrom==='entering' ? 'entering' : game.pausedFrom==='charging' ? 'charging' : game.attack ? 'sending' : 'idle', result: null };
+  return { ...game, combo: 0, phase: game.pausedFrom==='entering' ? 'entering' : game.pausedFrom==='charging' ? 'charging' : game.attack ? 'sending' : 'idle', result: null, retryUntil: 0, shotAt: null };
 }
 export const signalCode = (symbol: string) => INTERNATIONAL_MORSE[symbol];
 export const answerSeconds = (game: GuardGame) => Math.max(2, MODES[game.mode].seconds - (game.stage - 1) * 0.5);
@@ -123,6 +137,11 @@ export function saveBest(game: GuardGame): number {
 
 // Shared by rendering and tests. Visual movement is independent of the audio clock.
 export const formationOffset = (seconds: number) => Math.sin(seconds * .32) * 30;
+// Pass through an upright pose only near a direction reversal.
+export const movementPose = (seconds: number): 'left'|'right'|'idle' => {
+  const velocity=Math.cos(seconds*.32);
+  return Math.abs(velocity)<.12?'idle':velocity>0?'right':'left';
+};
 export const dronePosition = (drone: Drone, offset: number, seconds=0) => ({ x: 115 + drone.column * 122 + offset, y: 77 + Math.sin(seconds*2)*2 });
 export const batteryPosition = (index: number) => ({ x: 115 + index * 122, y: 370 });
 export function missilePosition(from: {x:number;y:number}, to: {x:number;y:number}, progress: number) {
