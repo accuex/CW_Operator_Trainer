@@ -19,9 +19,13 @@ export function laserSegments(timeline: MorseTimeline, elapsed: number, hints: b
   // Each tone starts at the emitter. Its head travels while sounding; after
   // tone-off its tail follows downward. Earlier tones are lower, never appended.
   // Audio elapsed time preserves dash:dot and inter-element gaps at 3:1:1.
-  const scale=distance/Math.max(window,timeline.dit);
+  // ON uses the actual signal, not the longest signal plus silent wait.
+  // Short codes gain spacing without changing the answer clock.
+  const visualDuration=Math.max(timeline.duration,timeline.dit);
+  const visualTime=Math.min(t,visualDuration);
+  const scale=distance/visualDuration;
   return timeline.tones.flatMap(tone => {
-    const age=Math.max(0,t-tone.start);
+    const age=Math.max(0,visualTime-tone.start);
     const length=Math.min(tone.duration,age)*scale;
     const tail=Math.max(0,age-tone.duration)*scale;
     return length>0 ? [{y:originY+tail,length}] : [];

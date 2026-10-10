@@ -87,3 +87,16 @@ CWインベーダーは既存有名作品との混同を避けて不採用。Sig
 - 実ブラウザ375pxでA/Nの最終path・画面を確認。Aは短点が下、長点がその後方。OFFは一本の連続path。目視可能なヒントを使う自動操作であり、実耳による音声認識検証ではない。
 - 証拠: qa/direction-A.jpg、direction-N.jpg、direction-OFF.jpg、direction-browser.json。
 - 819テスト/76ファイル、production対象TypeScript、正式build PASS。実VoiceOver・人間の聴覚による同期・60fps実測はNOT_RUN。その他の既存未commit差分は保全。push/deployなし。
+
+## 高速ONの符号空白保護（2026-10-10）
+
+- 開始HEAD a54822f / main。速度の変更で音響タイミングや判定は変更しない。
+- 原因: 旧ONは難易度poolの最長符号の送信枠で空間を正規化した。初級11dit→欧文13dit→数字19ditへ移ると、同じ短い信号でも短点・空白が縮む。WPMのみなら式内で相殺されるため、16WPM自体が閾値ではない。blur(2px)が上下にも伸び、地上近くの小さな空白を埋めた。
+- 対応: ONのみ実送信符号のdurationで描画距離を割り当てる。短い符号の空間を無音待機に割かない。音声の最後で待機線y287に到達して保持。回答フェーズ開始は従来の共通window、街への着弾は誤答/timeout後のまま。OFFは旧式を維持。
+- 各セグメントの3層すべてを、そのy/lengthと同一のSVG clipPathで制限。butt端点を明示し、発光は横方向には残すが、空白へ上下に漏れない。
+- 16/20/30/40WPM、A/N/S/O/5/0、発射Y81/222/269で1:3:1、独立発射、音終了後の頭尾の同速移動、時間境界を検証。actual EnemyLaserのSSRで全層clip/OFF非clipを検査。
+- 実コンポーネントから任意速度の60分割フレームを生成する一時ローカル描画fixtureを利用。実ゲームの速度を拡張しない。375pxで各速度のA、40WPM N/S/O/0と最下段の描画を確認。fixtureは音声なしであり、実耳による音声同期のPASSではない。
+- 通常ゲーム上級22WPMの数字ONとOFFを確認。ON5区間/5clip、OFF1区間/clip0。ゲーム状態管理、音声エンジン、敵移動、迎撃、スコア、COMBOは未変更。
+- 限界: 最下段Y269→待機Y287は18SVG単位しかない。0（19dit）は1dit約0.947SVG単位、375pxでは約0.55pxの空白。発光による結合は防止したが、最長数字の明瞭な大きさには戦闘画面の空間拡張が必要。今回は敵・街の配置を変更していない。全符号が全段・全端末で大きく見えるとの保証はしない。
+- 825テスト/77ファイル、本番対象TypeScript、正式build PASS。VoiceOver・実耳の同期確認・fps実測 NOT_RUN。
+- 証拠: qa/high-speed-16/20/30/40.jpg、high-speed-40-N/S/O/zero.jpg、high-speed-game-ON/OFF.jpg、high-speed-browser.json。fixtureサーバーは確認後停止。外部未commit差分保全、push/deployなし。

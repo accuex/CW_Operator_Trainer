@@ -1,5 +1,5 @@
 'use client';
-import { memo } from 'react';
+import { memo, useId } from 'react';
 import type { MorseTimeline } from '@/lib/types';
 import { laserSegments, LASER_IMPACT_Y } from '@/lib/arcade/laser';
 
@@ -7,12 +7,16 @@ export const EnemyLaser = memo(function EnemyLaser({ x,y,timeline,elapsed,window
   x:number; y:number; timeline:MorseTimeline; elapsed:number; window:number; hints:boolean;
   phase:'sending'|'answer'|'feedback'; correct:boolean; impactProgress:number;
 }) {
+  const clipId=useId().replace(/:/g,'');
   if (phase==='feedback' && correct && impactProgress>=1) return null;
   const segments=laserSegments(timeline,phase==='sending'?elapsed:window,hints,window,y);
   const tip=segments.length ? Math.max(...segments.map(segment=>segment.y+segment.length)) : y;
   const impact=phase==='feedback'&&!correct ? Math.min(1,impactProgress) : 0;
-  return <g className="guard-enemy-laser" data-laser-x={x} data-laser-origin-y={y}>
-    {segments.map((segment,i)=><g key={i}>
+  return <g className="guard-enemy-laser" data-laser-x={x} data-laser-origin-y={y} data-laser-hints={hints}>
+    {hints && <defs>{segments.map((segment,i)=><clipPath key={i} id={`${clipId}-${i}`} clipPathUnits="userSpaceOnUse">
+      <rect x={x-12} y={segment.y} width="24" height={segment.length}/>
+    </clipPath>)}</defs>}
+    {segments.map((segment,i)=><g key={i} clipPath={hints ? `url(#${clipId}-${i})` : undefined} strokeLinecap="butt">
       <path className="guard-laser-glow" d={`M${x} ${segment.y} v${segment.length}`} stroke="#e8a928" strokeWidth="9" strokeOpacity=".22" fill="none"/>
       <path className="guard-laser-core" d={`M${x} ${segment.y} v${segment.length}`} stroke="#ffe16c" strokeWidth="4" fill="none"/>
       <path d={`M${x} ${segment.y} v${segment.length}`} stroke="#fff7c4" strokeWidth="1" fill="none"/>
