@@ -131,6 +131,10 @@ export function Dashboard({ answers, sessions, profile, stats, onNavigate }: { a
         ))}
       </div>
 
+      <button type="button" className="home-club-entrance" onClick={() => onNavigate('computer-club')}>
+        <Icon name="radio" size={28} /><span><small>AFTER SCHOOL</small><b>放課後パソコン部</b><span>CWを聞き取って迎撃！ ミニゲームでひと勝負。</span></span><Icon name="chevron-right" size={20} />
+      </button>
+
       <div className="home-lower">
         <div className="home-qso">
           <div className="home-qso-copy">

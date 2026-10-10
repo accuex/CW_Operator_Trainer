@@ -18,6 +18,7 @@ export const APP_VIEWS = [
   'qso',
   'collection',
   'resources',
+  'computer-club',
   'settings',
   'account',
 ] as const;

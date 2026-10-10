@@ -1,5 +1,6 @@
 'use client';
 
+import { ComputerClubView } from './views/ComputerClubView';
 import { watchSharingWithdrawal } from '@/lib/activity';
 
 import GeographyLoading from './views/geography/GeographyLoading';
@@ -311,6 +312,7 @@ export default function CWTrainer({ initialView = 'home' }: { initialView?: View
     // Client-only: canvas, Web Audio and localStorage prefs.
     qso: ready ? <QsoView settings={settings} stopEpoch={stopEpoch} profile={profile} setProfile={setProfile} sessions={sessions} recordMany={recordMany} onSession={onSession} /> : null,
     collection: <CollectionView settings={settings} profile={profile} setProfile={setProfile} setAudioStatus={setAudioStatus} />,
+    'computer-club': <ComputerClubView settings={settings} stopEpoch={stopEpoch} setAudioStatus={setAudioStatus} />,
     resources: <ResourcesView onBack={() => navigate('home')} />,
     settings: <SettingsView settings={settings} setSettings={setSettings} profile={profile} setProfile={setProfile} onImported={async () => { setProfile(normalizeProfile(await getProfile())); setAnswers(await getAnswers()); setSessions(await getSessions()); announce('バックアップを読み込みました'); }} announce={announce} onNavigate={navigate} />,
     account: <AccountView announce={announce} onNavigate={navigate} />,
