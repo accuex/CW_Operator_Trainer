@@ -3,21 +3,33 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MorseAudioEngine, type PlaybackHandle } from '@/lib/audio';
 import { EnemyLaser } from './EnemyLaser';
 import { RobotEnemy, ROBOT_MUZZLE_Y, type RobotPose } from './RobotEnemy';
-import { transmissionWindow } from '@/lib/arcade/laser';
+import { transmissionWindow, laserTravelSeconds } from '@/lib/arcade/laser';
 import type { AudioSettings } from '@/lib/types';
 import { answerAttack, answerSeconds, createGame, MODES, nextAttack, nextStage, openAnswer, pauseGame, readBest, resumeAttack, saveBest, signalCode, selectedBattery, formationOffset, dronePosition, batteryPosition, missilePosition, completeArrival, beginTransmission, squadDrones, squadNumber, ARRIVAL_MS, CHARGE_MS, type Difficulty, type GuardGame } from '@/lib/arcade/cwGuard';
 
 export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { settings: AudioSettings; stopEpoch: number; setAudioStatus: (status: string) => void }) {
+  const boardRef=useRef<HTMLDivElement>(null);
+  const [layout,setLayout]=useState({wide:false,width:960,height:900});
+  useEffect(()=>{
+    const update=()=>{const size={wide:window.innerWidth>=900,width:boardRef.current?.clientWidth??960,height:window.innerHeight};setLayout(old=>old.wide===size.wide&&old.width===size.width&&old.height===size.height?old:size);};
+    const observer=new ResizeObserver(update);if(boardRef.current) observer.observe(boardRef.current);
+    window.addEventListener('resize',update);update();
+    return()=>{observer.disconnect();window.removeEventListener('resize',update);};
+  },[]);
+  // Widen the world at short desktop heights; preserve Y physics and sprite aspect.
+  const fieldWidth=layout.wide?Math.max(960,layout.width*390/Math.max(260,Math.min(440,layout.height-450))):600;
+  const screenX=(x:number)=>x*fieldWidth/600;
   const engine = useMemo(() => new MorseAudioEngine(), []);
   const [mode, setMode] = useState<Difficulty>('beginner');
   const [hints, setHints] = useState(true);
   const [game, setGame] = useState<GuardGame | null>(null);
   const [best, setBest] = useState(0);
   const [clock, setClock] = useState(0);
-  const [visualState, setVisual] = useState({offset:0,flight:0,elapsed:0,arrival:0,phaseKey:''});
+  const [visualState, setVisual] = useState({offset:0,flight:0,elapsed:0,arrival:0,beamElapsed:0,phaseKey:''});
   const visualKey=`${game?.stage}:${game?.squadRow}:${game?.phase}:${game?.attack?.id}`;
   const visual=visualState.phaseKey===visualKey ? visualState : {...visualState,flight:0,elapsed:0,arrival:0};
   const [laserSource,setLaserSource] = useState({x:300,y:80});
+  const [attackCityDamage,setAttackCityDamage]=useState([0,0,0,0]);
   const movement = useRef(0);
   const offsetRef = useRef(0);
   const [message, setMessage] = useState('');
@@ -36,7 +48,7 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
       movement.current += (now-previous)/1000; previous=now;
       const offset=reduced ? 0 : formationOffset(movement.current);
       offsetRef.current=offset;
-      setVisual({phaseKey:visualKey,offset,flight:game?.phase==='feedback' ? Math.min(1,(now-started)/550) : 0,elapsed:(now-started)/1000,arrival:game?.phase==='entering' ? Math.min(1,(now-started)/ARRIVAL_MS) : 1});
+      setVisual({phaseKey:visualKey,offset,beamElapsed:handle.current?.currentTime()??0,flight:game?.phase==='feedback' ? Math.min(1,(now-started)/550) : 0,elapsed:(now-started)/1000,arrival:game?.phase==='entering' ? Math.min(1,(now-started)/ARRIVAL_MS) : 1});
       frame=requestAnimationFrame(tick);
     };
     frame=requestAnimationFrame(tick);
@@ -79,6 +91,7 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
     void engine.play(symbol,'international',audio).then((playback) => {
       if (cancelled) { playback.stop(); return; }
       handle.current = playback;
+      setAttackCityDamage([...game.cityDamage]);
       playingAttack.current = `${game.stage}:${id}`;
       const sender=game.drones.find((d)=>d.id===game.attack!.enemy)!;
       const origin=dronePosition(sender,offsetRef.current,movement.current);
@@ -111,7 +124,10 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
     // A short custom acknowledgement, separate from the CW attack.
     const s = settingsRef.current;
     void engine.playSymbol('fx','.',{ ...s, pitch: game.result?.correct ? 1150 : 170, waveform: 'sine', characterSpeed: 60, effectiveSpeed: 60, reverb: false }).catch(() => undefined);
-    const timer = setTimeout(() => setGame((g) => g ? nextAttack(g) : g), game.result?.correct ? 1000 : game.mode === 'beginner' ? 1600 : 1100);
+    // Failed interception keeps travelling at physical speed. City damage becomes
+    // visible at arrival, not an accelerated feedback animation. Rules stay unchanged.
+    const arrivalDelay=Math.max(0,laserTravelSeconds(laserSource.y)-(handle.current?.currentTime()??0))*1000;
+    const timer = setTimeout(() => setGame((g) => g ? nextAttack(g) : g), game.result?.correct ? 1000 : arrivalDelay+650);
     return () => { clearTimeout(timer); engine.stop(); };
   }, [engine,game?.phase,game?.attack?.id]);
   useEffect(() => { if (game && ['clear','over'].includes(game.phase)) setBest(saveBest(game)); }, [game?.phase,game?.score]);
@@ -133,10 +149,11 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
   const battery = batteryPosition(Math.max(0,batteryIndex));
   const launch = {...battery,y:battery.y-27};
   const missile = missilePosition(launch,{x:tx+(game?.result?.correct ? 0 : 42),y:ty},visual.flight);
-  const cityDamage=game?.cityDamage ?? [0,0,0,0];
+  const awaitingImpact=game?.phase==='feedback' && !game.result?.correct && visual.beamElapsed<laserTravelSeconds(laserSource.y);
+  const cityDamage=awaitingImpact?attackCityDamage:game?.cityDamage ?? [0,0,0,0];
 
   const remaining = game?.drones.filter((d) => d.alive).length ?? 16;
-  const phaseLabel = game?.phase === 'entering' ? '次の4機が降下中…' : game?.phase === 'charging' ? '黄色い目のロボットが送信を準備…' : game?.phase === 'sending' ? 'CW受信中…最後まで聴こう' : game?.phase === 'answer' ? '迎撃せよ！ 1–4 / タップ' : game?.phase === 'feedback' ? game.result?.correct ? `迎撃成功 +${game.result.points}` : game.result?.selected ? 'ミス！ 正しい信号を確認しよう' : '時間切れ！ 信号を確認しよう' : '音で守る、放課後の防衛線。';
+  const phaseLabel = game?.phase === 'entering' ? '次の4機が降下中…' : game?.phase === 'charging' ? '黄色い目のロボットが送信を準備…' : game?.phase === 'sending' ? 'CW受信中…最後まで聴こう' : game?.phase === 'answer' ? '迎撃せよ！ 1–4 / タップ' : game?.phase === 'feedback' ? game.result?.correct ? `迎撃成功 +${game.result.points}` : awaitingImpact ? '迎撃失敗…レーザーが街へ接近中' : game.result?.selected ? 'ミス！ 正しい信号を確認しよう' : '時間切れ！ 信号を確認しよう' : '音で守る、放課後の防衛線。';
   const previewGame=game ?? createGame('beginner',true,73);
   const boardDrones=squadDrones(previewGame);
   const squad=squadNumber(previewGame), squadCount=previewGame.stage===1?4:5;
@@ -144,10 +161,10 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
     <header className="club-heading"><div><p className="section-kicker">AFTER SCHOOL COMPUTER CLUB / GAME 01</p><h1>放課後パソコン部</h1><p>聞き取れた、その一音が迎撃になる。</p></div><span className="club-label">CW迎撃部 <small>仮タイトル / 欧文CW</small></span></header>
     <div className="guard-console">
       <div className="guard-hud" aria-label="ゲーム状況"><span>SCORE<b>{game?.score.toLocaleString() ?? '0'}</b></span><span>COMBO<b className={game && game.combo >= 4 ? 'guard-hot' : ''}>{game?.combo ?? 0}<small> ×{(1+Math.min(4,Math.floor((game?.combo ?? 0)/4))*.25).toFixed(2)}</small></b></span><span>AMMO<b>{game?.ammo ?? '—'}<small> / 残敵{remaining}</small></b></span><span>WAVE<b>{game?.stage ?? 1}<small> / 3 · 部隊 {squad}/{squadCount}</small></b></span></div>
-      <div className={`guard-board ${game?.phase === 'feedback' ? game.result?.correct ? 'guard-hit' : 'guard-miss' : ''}`}>
-        <svg viewBox="0 0 600 390" role="img" aria-label="4機ずつ登場するCWOTロボット部隊と街と4基の迎撃砲台。敵の文字は表示しません。">
+      <div ref={boardRef} className={`guard-board ${game?.phase === 'feedback' ? game.result?.correct ? 'guard-hit' : awaitingImpact?'':'guard-miss' : ''}`}>
+        <svg viewBox={`0 0 ${fieldWidth} 390`} role="img" aria-label="4機ずつ登場するCWOTロボット部隊と街と4基の迎撃砲台。敵の文字は表示しません。">
           <defs><linearGradient id="guard-sky" x2="0" y2="1"><stop stopColor="#122953"/><stop offset="1" stopColor="#071427"/></linearGradient><pattern id="guard-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#537cbc" strokeOpacity=".14"/></pattern></defs>
-          <rect width="600" height="390" fill="url(#guard-sky)"/><rect width="600" height="390" fill="url(#guard-grid)"/>
+          <rect width={fieldWidth} height="390" fill="url(#guard-sky)"/><rect width={fieldWidth} height="390" fill="url(#guard-grid)"/>
           <g className="guard-formation" data-squad={squad} data-squad-count={squadCount} data-arriving={game?.phase==='entering'}>{boardDrones.map((d) => {
             const active=d.id===target?.id;
             const hit=active && game?.phase==='feedback' && game.result?.correct;
@@ -156,30 +173,30 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
             const progress=game?.phase==='entering' ? visual.arrival : 1;
             const drop=-150*Math.pow(1-progress,3);
             const pose:RobotPose=hit && visual.flight>=1 ? visual.elapsed<.72 ? 'hit' : 'defeat' : active && game?.phase==='charging' ? 'charge' : active && ['sending','answer'].includes(game?.phase??'') ? 'send' : game?.phase==='entering' ? 'enter' : Math.abs(Math.cos(movement.current*.32))>.55 ? Math.cos(movement.current*.32)>0?'right':'left' : 'idle';
-            return <g key={`${previewGame.stage}:${d.id}`} data-enemy-id={d.id} data-enemy-alive={d.alive} data-enemy-x={p.x} data-enemy-y={p.y} transform={`translate(${p.x} ${p.y+drop})`}>
+            return <g key={`${previewGame.stage}:${d.id}`} data-enemy-id={d.id} data-enemy-alive={d.alive} data-enemy-x={p.x} data-enemy-y={p.y} transform={`translate(${screenX(p.x)} ${p.y+drop})`}>
               <RobotEnemy pose={pose} frame={Math.floor(movement.current*8)} progress={hit ? Math.max(0,Math.min(1,(visual.elapsed-.72)/.28)) : 0}/>
             </g>;
           })}</g>
           {game && ['sending','answer','feedback'].includes(game.phase) && handle.current && game.attack && playingAttack.current===`${game.stage}:${game.attack.id}` && <EnemyLaser
-            x={laserSource.x} y={laserSource.y} timeline={handle.current.timeline} elapsed={game.phase==='sending'?clock:transmissionWindow(MODES[game.mode].pool,game.attack.wpm)}
+            x={screenX(laserSource.x)} y={laserSource.y} timeline={handle.current.timeline} elapsed={game.phase==='sending'?clock:visual.beamElapsed}
             window={transmissionWindow(MODES[game.mode].pool,game.attack.wpm)} hints={hints}
             phase={game.phase as 'sending'|'answer'|'feedback'} correct={Boolean(game.result?.correct)} impactProgress={visual.flight}
           />}
 
-          <g aria-hidden="true" className="guard-city">{cityDamage.map((damage,i) => <g key={i} transform={`translate(${85+i*122} 0)`}>
+          <g aria-hidden="true" className="guard-city">{cityDamage.map((damage,i) => <g key={i} transform={`translate(${screenX(115+i*122)-30} 0)`}>
             <path d={damage===2 ? 'M0 348V342L12 337 25 344 39 336 60 344V348Z' : damage===1 ? 'M0 348V320H18V325L29 318 39 330H60V348Z' : 'M0 348V313H18V297H40V318H60V348Z'} fill={damage===2 ? '#58485a' : damage===1 ? '#806477' : '#275275'} stroke="#84b2ce"/>
             {damage<2 && <path d="M6 328H12M23 310H30M43 333H50" stroke={damage===1 ? '#ffac69' : '#91e3ee'} strokeWidth="4"/>}
             {damage===1 && <path d="M29 316 25 305 34 293" stroke="#bd8988" fill="none"/>}
           </g>)}</g>
-          <path d="M0 349H600" stroke="#67abc1"/>
-          <g className="guard-batteries" aria-hidden="true">{[0,1,2,3].map((i) => <g key={i} transform={`translate(${batteryPosition(i).x} 370)`} className={game?.phase==='feedback' && batteryIndex===i ? 'guard-battery-active' : ''}>
+          <path d={`M0 349H${fieldWidth}`} stroke="#67abc1"/>
+          <g className="guard-batteries" aria-hidden="true">{[0,1,2,3].map((i) => <g key={i} transform={`translate(${screenX(batteryPosition(i).x)} 370)`} className={game?.phase==='feedback' && batteryIndex===i ? 'guard-battery-active' : ''}>
             <path d="M-24 10V-3L-14-12H14L24-3V10Z" fill="#235475" stroke="#91dbec" strokeWidth="2"/><path d="M-4-12V-27H4V-12" fill="#d2eaff"/>
             <text textAnchor="middle" y="5" fill="#e9faff" fontSize="12">{i+1}</text>
           </g>)}</g>
           {game?.phase==='feedback' && batteryIndex>=0 && visual.flight<1 && <g className="guard-missile" data-battery={batteryIndex+1}>
-            <path d={`M${launch.x} ${launch.y} L${missile.x} ${missile.y}`} stroke="#7cf4ff" strokeWidth="2" opacity=".6"/><circle cx={missile.x} cy={missile.y} r="5" fill="#e7ffff"/>
+            <path d={`M${screenX(launch.x)} ${launch.y} L${screenX(missile.x)} ${missile.y}`} stroke="#7cf4ff" strokeWidth="2" opacity=".6"/><circle cx={screenX(missile.x)} cy={missile.y} r="5" fill="#e7ffff"/>
           </g>}
-          {game?.phase==='feedback' && game.result?.correct && visual.flight>=1 && <g className="guard-impact"><circle cx={tx} cy={ty} r="28" fill="none" stroke="#fff2a5" strokeWidth="4"/><circle cx={tx} cy={ty} r="12" fill="#d8ffff"/></g>}
+          {game?.phase==='feedback' && game.result?.correct && visual.flight>=1 && <g className="guard-impact"><circle cx={screenX(tx)} cy={ty} r="28" fill="none" stroke="#fff2a5" strokeWidth="4"/><circle cx={screenX(tx)} cy={ty} r="12" fill="#d8ffff"/></g>}
 
         </svg>
         {(!game || ['paused','clear','over'].includes(game.phase)) && <div className="guard-overlay">
@@ -196,6 +213,6 @@ export function ComputerClubView({ settings, stopEpoch, setAudioStatus }: { sett
       <div className="guard-feedback" aria-live="polite">{game?.phase === 'feedback' && game.result && <span>{game.result.correct ? `COMBO ${game.combo}！` : `${game.result.selected ? `選択 ${game.result.selected} → ` : ''}正解 ${game.result.answer}　${signalCode(game.result.answer).replaceAll('.', '・').replaceAll('-', '－')}`}</span>}{message && <p role="alert">{message}</p>}</div>
       <div className="guard-controls"><label>難易度<select aria-label="難易度" value={mode} disabled={live || game?.phase === 'paused'} onChange={(e) => { const m=e.target.value as Difficulty; setMode(m); setHints(MODES[m].hints); setGame(null); }}>{(Object.keys(MODES) as Difficulty[]).map((m) => <option key={m} value={m}>{MODES[m].label} · {m === 'expert' ? '22–30' : `${MODES[m].wpm}–${MODES[m].wpm+4}`} WPM</option>)}</select></label><label className="guard-toggle"><input type="checkbox" checked={hints} disabled={live || game?.phase === 'paused'} onChange={(e) => { setHints(e.target.checked); setGame(null); }}/>符号ヒント</label><span>BEST {best.toLocaleString()}</span>{live && <button type="button" className="btn btn-secondary" onClick={pause}>一時停止</button>}{game && <button type="button" className="btn btn-secondary" onClick={() => { engine.stop(); saveBest(game); setGame(null); setMessage('ゲームを終了しました。'); }}>終了</button>}</div>
     </div>
-    <details className="guard-guide"><summary>遊び方・スコアのしくみ</summary><p>敵の攻撃を最後まで聴き、現在の部隊の4文字から1つを選び、その砲台で敵本体を迎撃。PCは1〜4キー、スマホはタップ。TabとEnterでも操作できます。Esc・別タブへの移動で一時停止します。</p><p>4機ずつ順に登場する3ステージ（4部隊→5部隊→5部隊）。各ステージは敵の数＋8発で開始し、正解・誤答・時間切れで1発消費。ミスごとに街の1地区が損傷し、合計8回のミスで全壊。ウェーブ突破時には各地区を1段階修復します。4連続正解ごとに倍率が0.25上がり、最大2倍。速い信号ほど高得点、符号ヒントありは75%の得点です。ヒント別・難易度別に自己ベストを保存します。</p><p>送信枠は同じ難易度・速度で共通です。短い符号の後は無音で待ち、「迎撃せよ！」になったら回答できます。ヒントなしでは映像の伸長時間から答えを推測できないようにしています。ミスの後に正しい文字と符号を確認できます。上級は攻撃ごとに速度が変化します。重ね打ち・パイルアップは今後の拡張候補で、今回のモードには含みません。スコアはこのブラウザ専用で、学習進捗・アチーブ・公開ログへ加算や投稿はしません。</p></details>
+    <details className="guard-guide"><summary>遊び方・スコアのしくみ</summary><p>敵の攻撃を最後まで聴き、現在の部隊の4文字から1つを選び、その砲台で敵本体を迎撃。PCは1〜4キー、スマホはタップ。TabとEnterでも操作できます。Esc・別タブへの移動で一時停止します。</p><p>4機ずつ順に登場する3ステージ（4部隊→5部隊→5部隊）。各ステージは敵の数＋8発で開始し、正解・誤答・時間切れで1発消費。ミスごとに街の1地区が損傷し、合計8回のミスで全壊。ウェーブ突破時には各地区を1段階修復します。4連続正解ごとに倍率が0.25上がり、最大2倍。速い信号ほど高得点、符号ヒントありは75%の得点です。ヒント別・難易度別に自己ベストを保存します。</p><p>送信枠は同じ難易度・速度で共通です。短い符号の後は無音で待ち、「迎撃せよ！」になったら回答できます。レーザーは速度・文字にかかわらず一定速度で下降します。ヒントなしは切れ目のない一本のビームで、映像から符号を読み取れません。誤答・時間切れの後、ビームが街へ届くと損傷を表示します。ミスの後に正しい文字と符号を確認できます。上級は攻撃ごとに速度が変化します。重ね打ち・パイルアップは今後の拡張候補で、今回のモードには含みません。スコアはこのブラウザ専用で、学習進捗・アチーブ・公開ログへ加算や投稿はしません。</p></details>
   </section>;
 }

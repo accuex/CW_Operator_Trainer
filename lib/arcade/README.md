@@ -119,3 +119,18 @@ CWインベーダーは既存有名作品との混同を避けて不採用。Sig
 - 最終QA結果/commitは以下の追記参照。push/deployなし。
 
 最終QA: 全829テスト / 78ファイル PASS。本番対象TypeScript PASS。正式npm run build PASS。その後の全部隊数/origin109の追加アサーションも関連27テストPASS。音声エンジン・タイミング・既存進捗・公開教材には変更なし。ブラウザの全ステージ完走のみ未完了であり、テストの完走を実音声認識または全画面操作のPASSとして扱わない。
+
+## 一定速レーザー・PC横長表示・移動フレーム修正（2026-10-10）
+
+- 開始HEAD f89f69f / main。既存未commit差分を保全。今回の変更はゲーム描画と関連テストだけ。
+- 左/右フレームは準備アトラスの傾き名と実移動方向が逆だったため、RobotEnemyの割り当てを交換。待機・予告・送信・被弾・退場素材は不変。
+- 旧描画のdistance/timeline.durationを廃止。LASER_SPEED=18 world units/sをON/OFF共通に採用。短点はtone-onからheadを出し、tone-offからtailを出す。位置=速度×経過時間。短点/長点/空白は音声生成器のtone.start/duration/ditに従い1:3:1。WPM・文字・難易度・viewportで速度を変えない。端のblurは引き続き各セグメント内へclip。高速で物理的に間隔が狭まることは仕様であり、最小長への水増しはしない。
+- 光線は送信後にも同じWeb Audio時計（PlaybackHandle.currentTime）で下降を続ける。回答・feedback開始時に時刻をwindowへ巻き戻したり停止したりしない。地上Y318で切り詰め、誤答時の人工的な伸長は廃止。
+- 発射口Y107〜111から到達まで11.50〜11.72秒。現在の全難易度・3ステージ・上級速度variationで、共通送信枠＋従来answerSecondsが最短到達前に完了することをテスト。短い/長い符号、ヒント有無で回答枠を変えない。正解なら従来ミサイルの到達で光線を消す。誤答ならfeedbackを物理到達まで保持し、その時点で街の損傷を描画する。判定自体・弾薬・COMBO・損傷量の状態計算は変更なし。pauseの既存feedback進行規則も維持。
+- OFFは同じ一定速の一本の連続ビーム。送信終了や要素境界で点滅・区切り・速度変更をしない。形状は文字・WPMによらず同じ。
+- PCは横幅最大1440、横長viewBox（幅960以上）で、敵/街/砲台/発射口/ミサイルのXを同じ投影へ変換。縦の物理座標は共通。高さ制限による中央letterboxを廃止。短いPC画面はviewBoxをさらに広げて操作部を確保し、画像の縦横比は維持。ResizeObserverは終了時解除。mobileは従来600×390。
+- 数値検査: 8/16/20/30/40WPM、A/N/S/O/5/0で音の開始/終了、1:3:1、headとtailの18units/s、送信後も移動、地上到達/範囲外clipを確認。OFF全poolの同時刻形状同一、answer/feedbackの時刻継続、迎撃時消滅、全部隊・得点・残弾の既存ルールテストPASS。
+- 全827テスト/78ファイルPASS。最終関連27テストPASS。production対象TypeScriptと正式npm run build PASS。既存audio/timing/Morse/cwGuard/packageは開始HEADとhash一致、version1.1.1。
+- ブラウザ: 1280×900（フィールド934×379）、1920×900（1342×440、controls下端875.5）、375×812（scrollWidth375、回答73.25×56）を確認。表示ヒントを使って第三砲台からMを迎撃、75点/COMBO1/残敵15、街8を確認。OFFは1core/clip0。pause→再送→Esc停止、console error0（取得時点）。これは実耳による受信能力検証ではない。
+- 速度別の追加比較fixtureは初回ローカルサーバーのsocket権限不足で接続失敗。権限を取得してサーバーを準備したが、生成されたエラーページの取得がBrowser Use URL policyで拒否されたため迂回しない。実ゲーム8WPMのON/OFFを確認。5速度のライブ比較・実音声認識・VoiceOver・60fps計測はNOT_RUN。補助サーバーは停止。
+- 証拠: qa/physics-desktop.jpg、physics-mobile.jpg、physics-mobile-off.jpg、physics-quality-results.json。旧表示はGit f89f69fで参照可能。今回ファイルだけcommitし、push/deployは行わない。

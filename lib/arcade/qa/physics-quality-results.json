@@ -1,0 +1,162 @@
+{
+  "recordedAt": "2026-10-10T08:52:55.082322+00:00",
+  "startHead": "f89f69f",
+  "branch": "main",
+  "physics": {
+    "speedWorldUnitsPerSecond": 18,
+    "impactY": 318,
+    "originYRange": [
+      107,
+      111
+    ],
+    "travelSecondsRange": [
+      11.5,
+      11.722222222222221
+    ],
+    "answerTiming": "Existing shared pool transmission window and answerSeconds unchanged. All difficulty/stage variants finish both before earliest ground arrival. Failed interception shows damage only at arrival; adjudication/ammo/combo formula unchanged.",
+    "clock": "PlaybackHandle.currentTime during sending, answer and feedback; same Web Audio clock, no WPM distance normalization"
+  },
+  "numericCases": [
+    {
+      "wpm": 8,
+      "dotSeconds": 0.15,
+      "dashSeconds": 0.44999999999999996,
+      "elementGapSeconds": 0.15,
+      "dotWorldLength": 2.6999999999999997,
+      "dashWorldLength": 8.1,
+      "gapWorldLength": 2.6999999999999997,
+      "headSpeed": 18,
+      "tailSpeed": 18,
+      "travelSecondsFromY109": 11.61111111111111,
+      "ratio": "1:3:1",
+      "method": "automated tests against buildMorseTimeline and laserSegments; not live auditory recognition"
+    },
+    {
+      "wpm": 16,
+      "dotSeconds": 0.075,
+      "dashSeconds": 0.22499999999999998,
+      "elementGapSeconds": 0.075,
+      "dotWorldLength": 1.3499999999999999,
+      "dashWorldLength": 4.05,
+      "gapWorldLength": 1.3499999999999999,
+      "headSpeed": 18,
+      "tailSpeed": 18,
+      "travelSecondsFromY109": 11.61111111111111,
+      "ratio": "1:3:1",
+      "method": "automated tests against buildMorseTimeline and laserSegments; not live auditory recognition"
+    },
+    {
+      "wpm": 20,
+      "dotSeconds": 0.06,
+      "dashSeconds": 0.18,
+      "elementGapSeconds": 0.06,
+      "dotWorldLength": 1.08,
+      "dashWorldLength": 3.2399999999999998,
+      "gapWorldLength": 1.08,
+      "headSpeed": 18,
+      "tailSpeed": 18,
+      "travelSecondsFromY109": 11.61111111111111,
+      "ratio": "1:3:1",
+      "method": "automated tests against buildMorseTimeline and laserSegments; not live auditory recognition"
+    },
+    {
+      "wpm": 30,
+      "dotSeconds": 0.04,
+      "dashSeconds": 0.12,
+      "elementGapSeconds": 0.04,
+      "dotWorldLength": 0.72,
+      "dashWorldLength": 2.16,
+      "gapWorldLength": 0.72,
+      "headSpeed": 18,
+      "tailSpeed": 18,
+      "travelSecondsFromY109": 11.61111111111111,
+      "ratio": "1:3:1",
+      "method": "automated tests against buildMorseTimeline and laserSegments; not live auditory recognition"
+    },
+    {
+      "wpm": 40,
+      "dotSeconds": 0.03,
+      "dashSeconds": 0.09,
+      "elementGapSeconds": 0.03,
+      "dotWorldLength": 0.54,
+      "dashWorldLength": 1.6199999999999999,
+      "gapWorldLength": 0.54,
+      "headSpeed": 18,
+      "tailSpeed": 18,
+      "travelSecondsFromY109": 11.61111111111111,
+      "ratio": "1:3:1",
+      "method": "automated tests against buildMorseTimeline and laserSegments; not live auditory recognition"
+    }
+  ],
+  "tests": {
+    "fullSuite": "PASS: 827 tests / 78 files",
+    "finalRelated": "PASS: 27 tests / 4 files",
+    "productionTypeScript": "PASS (app/lib production target; legacy docs excluded)",
+    "formalBuild": "PASS"
+  },
+  "browser": {
+    "desktop1280x900": {
+      "status": "PASS",
+      "fieldWidth": 934,
+      "fieldHeight": 379.4375,
+      "viewBoxWidth": 960,
+      "choiceWidth": 180.4765625,
+      "overflow": false
+    },
+    "desktop1920x900": {
+      "status": "PASS",
+      "fieldWidth": 1342,
+      "fieldHeight": 440,
+      "viewBoxWidth": 1189.5,
+      "controlsBottom": 875.5,
+      "overflow": false
+    },
+    "mobile375x812": {
+      "status": "PASS",
+      "scrollWidth": 375,
+      "choiceSize": [
+        73.25,
+        56
+      ],
+      "controlsBottom": 750.203125
+    },
+    "interception": "PASS: visible beam hints decoded as M, chose third battery, score75/combo1/ammo23/remaining15/city8",
+    "off": "PASS: single core, clip count0; no element boundaries",
+    "pauseResumeKeyboard": "PASS: replay reached answer; Escape returned PAUSED",
+    "consoleErrors": [],
+    "allFiveSpeedsLiveBrowser": "NOT_RUN: comparison fixture failed initial socket permission; temporary loopback server permission granted; existing error tab then blocked by Browser Use URL policy. No bypass. Actual game checked at8WPM; all5 speeds checked numerically. Fixture server stopped.",
+    "auditoryRecognition": "NOT_RUN",
+    "VoiceOver": "NOT_RUN",
+    "fpsMeasurement": "NOT_RUN"
+  },
+  "protected": [
+    {
+      "path": "lib/audio.ts",
+      "unchangedFromStartHead": true,
+      "sha256": "ca05bcd87cb26de0bdfa053cfb6d63be543b695e481dba99f8b507208d2a5c04"
+    },
+    {
+      "path": "lib/timing.ts",
+      "unchangedFromStartHead": true,
+      "sha256": "efef9d90556e604673bf86b6f74b71104142e0493c4414404929539443615773"
+    },
+    {
+      "path": "lib/morse.ts",
+      "unchangedFromStartHead": true,
+      "sha256": "4106563e49e6573ac1ac84cc5dce06cfd6042432e1e5088c9975e839a34016f6"
+    },
+    {
+      "path": "lib/arcade/cwGuard.ts",
+      "unchangedFromStartHead": true,
+      "sha256": "d1af62f50b216e46579a10ec8853495d62f63eb3570d49b9fd6b4d8f9555b13e"
+    },
+    {
+      "path": "package.json",
+      "unchangedFromStartHead": true,
+      "sha256": "8c5af72471e86b5c62629b22eb4df8770d281ee79c69d76b45b8f039b3ff568d"
+    }
+  ],
+  "otherWork": "Unrelated dirty files retained and excluded from this commit",
+  "push": false,
+  "deploy": false
+}

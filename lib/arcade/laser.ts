@@ -10,24 +10,21 @@ export function transmissionWindow(pool: string, wpm: number): number {
   })) * dit;
 }
 export interface LaserSegment { y: number; length: number }
-export const LASER_WAIT_Y = 287;
+export const LASER_WAIT_Y = 287; // Legacy layout reference; physics never stops here.
 export const LASER_IMPACT_Y = 318;
-export function laserSegments(timeline: MorseTimeline, elapsed: number, hints: boolean, window: number, originY: number): LaserSegment[] {
-  const distance=Math.max(0,LASER_WAIT_Y-originY);
-  const t=Math.min(window,Math.max(0,elapsed));
-  if (!hints) return [{y:originY,length:distance*Math.min(1,t/window)}];
-  // Each tone starts at the emitter. Its head travels while sounding; after
-  // tone-off its tail follows downward. Earlier tones are lower, never appended.
-  // Audio elapsed time preserves dash:dot and inter-element gaps at 3:1:1.
-  // ON uses the actual signal, not the longest signal plus silent wait.
-  // Short codes gain spacing without changing the answer clock.
-  const visualDuration=Math.max(timeline.duration,timeline.dit);
-  const visualTime=Math.min(t,visualDuration);
-  const scale=distance/visualDuration;
+/** World units / second. Independent of WPM, symbol, hints and viewport. */
+export const LASER_SPEED = 18;
+export const laserTravelSeconds = (originY: number) => Math.max(0,LASER_IMPACT_Y-originY)/LASER_SPEED;
+export function laserSegments(timeline: MorseTimeline, elapsed: number, hints: boolean, _window: number, originY: number): LaserSegment[] {
+  const time=Math.max(0,elapsed);
+  const distance=Math.max(0,LASER_IMPACT_Y-originY);
+  if (!hints) return [{y:originY,length:Math.min(distance,time*LASER_SPEED)}];
+  // Audio tone-on emits a head; tone-off releases its tail. Both then travel
+  // at the same world velocity. Do not normalize by signal length or WPM.
   return timeline.tones.flatMap(tone => {
-    const age=Math.max(0,visualTime-tone.start);
-    const length=Math.min(tone.duration,age)*scale;
-    const tail=Math.max(0,age-tone.duration)*scale;
-    return length>0 ? [{y:originY+tail,length}] : [];
+    const age=time-tone.start;
+    const head=Math.min(distance,Math.max(0,age)*LASER_SPEED);
+    const tail=Math.min(distance,Math.max(0,age-tone.duration)*LASER_SPEED);
+    return head>tail ? [{y:originY+tail,length:head-tail}] : [];
   });
 }

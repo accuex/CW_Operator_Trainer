@@ -10,7 +10,7 @@ describe('CWOT robot sprites',()=>{
   it('maps every pose to a prepared sprite and stable bounds without visible answer text',()=>{
     for(const pose of ['idle','enter','left','right','charge','send','hit','defeat'] as RobotPose[]){
       const html=renderToStaticMarkup(React.createElement('svg',{},React.createElement(RobotEnemy,{pose,frame:1,progress:.5})));
-      const frame=['idle','enter'].includes(pose)?'idle-2':pose;
+      const frame=['idle','enter'].includes(pose)?'idle-2':pose==='right'?'left':pose==='left'?'right':pose;
       expect(html).toContain(`/assets/pcclub/robot/${frame}.webp`);
       expect(html).toContain(`width="${ROBOT_SIZE}" height="${ROBOT_SIZE}"`);
       expect(html).not.toContain('<text');

@@ -14,3 +14,11 @@
 .guard-robot-hit{filter:brightness(1.25)}
 @media(min-width:900px){.computer-club .club-heading{margin-bottom:10px}.computer-club .guard-board,.computer-club .guard-board svg{max-height:360px}.computer-club .guard-controls{padding-top:8px;padding-bottom:8px}.computer-club .guard-hud{padding-top:8px;padding-bottom:8px}}
 @media(max-width:600px){.computer-club .club-heading{display:flex;align-items:center;gap:8px;margin-bottom:10px}.computer-club .club-heading h1{font-size:1.2rem;margin:4px 0}.computer-club .club-heading p:not(.section-kicker){display:none}.computer-club .club-label{flex-shrink:0;font-size:.85rem;margin:0;text-align:right}.computer-club .club-label small{display:block;font-size:.6rem;margin:3px 0 0}}
+
+/* Desktop uses a wide world view instead of letterboxing a narrow mobile SVG. */
+@media(min-width:900px){
+  .computer-club{max-width:1440px;width:100%}
+  .computer-club .guard-board,.computer-club .guard-board svg{max-height:none}
+  .computer-club .guard-board svg{width:100%;height:auto}
+  .computer-club .guard-choices{padding-left:7.5%;padding-right:7.5%;gap:24px}
+}
